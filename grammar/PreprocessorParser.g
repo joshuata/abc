@@ -31,7 +31,7 @@ tokens {
 
 @header
 {
-package edu.udel.cis.vsl.civl.civlc.preproc.common;
+package edu.udel.cis.vsl.abc.civlc.preproc.common;
 }
 
 @members{
