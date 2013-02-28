@@ -62,26 +62,26 @@
 		<pathelement location="${antlr.jar}" />
 	</path>
 
-	<target name="parsers" depends="C11Parser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
+	<target name="parsers" depends="CivlCParser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
 	</target>
 
-	<target name="checkC11ParserChanges">
-		<uptodate property="noC11ParserChanges">
-			<srcfiles file="${grammar.dir}/C11Parser.g" />
+	<target name="checkCivlCParserChanges">
+		<uptodate property="noCivlCParserChanges">
+			<srcfiles file="${grammar.dir}/CivlCParser.g" />
 			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
 			<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" />
 			<srcfiles file="${grammar.dir}/PreprocessorParser.g" />
 			<srcfiles file="${grammar.dir}/PreprocessorParser.tokens" />
-			<mapper type="merge" to="${real.src.dir}/parse/common/C11Parser.java" />
+			<mapper type="merge" to="${real.src.dir}/parse/common/CivlCParser.java" />
 		</uptodate>
 	</target>
 
-	<target name="C11Parser" depends="PreprocessorParser,checkC11ParserChanges" unless="noC11ParserChanges">
+	<target name="CivlCParser" depends="PreprocessorParser,checkCivlCParserChanges" unless="noCivlCParserChanges">
 		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
 			<arg value="-verbose" />
-			<arg value="C11Parser.g" />
+			<arg value="CivlCParser.g" />
 		</java>
-		<move file="${grammar.dir}/C11Parser.java" todir="${real.src.dir}/parse/common" />
+		<move file="${grammar.dir}/CivlCParser.java" todir="${real.src.dir}/parse/common" />
 	</target>
 
 	<target name="checkExpressionParserChanges">
