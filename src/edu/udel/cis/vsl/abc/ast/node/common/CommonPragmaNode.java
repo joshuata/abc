@@ -10,7 +10,7 @@ import org.antlr.runtime.TokenSource;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
-import edu.udel.cis.vsl.abc.civlc.parse.common.CivlCParser;
+import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
