@@ -90,8 +90,8 @@ public interface ConversionFactory {
 	 * 
 	 * "Except when it is the operand of the sizeof operator, the _Alignof
 	 * operator, or the unary & operator, or is a string literal used to
-	 * initialize an array, an expression that has type ‘‘array of type’’ is
-	 * converted to an expression with type ‘‘pointer to type’’ that points to
+	 * initialize an array, an expression that has type "array of type" is
+	 * converted to an expression with type "pointer to type" that points to
 	 * the initial element of the array object and is not an lvalue. If the
 	 * array object has register storage class, the behavior is undefined."
 	 * 
@@ -111,8 +111,8 @@ public interface ConversionFactory {
 	 * <blockquote> A function designator is an expression that has function
 	 * type. Except when it is the operand of the sizeof operator, the _Alignof
 	 * operator, or the unary & operator, a function designator with type
-	 * ‘‘function returning type’’ is converted to an expression that has type
-	 * ‘‘pointer to function returning type’’. </blockquote>
+	 * "function returning type" is converted to an expression that has type
+	 * "pointer to function returning type". </blockquote>
 	 * 
 	 * @param type
 	 *            a function type

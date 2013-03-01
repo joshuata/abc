@@ -164,10 +164,10 @@ public class ExpressionAnalyzer {
 	/**
 	 * C11 Sec. 6.5.2.3:
 	 * 
-	 * "The first operand of the -> operator shall have type ‘‘pointer to
-	 * atomic, qualified, or unqualified structure’’ or ‘‘pointer to atomic,
-	 * qualified, or unqualified union’’, and the second operand shall name a
-	 * member of the type pointed to."
+	 * "The first operand of the -> operator shall have type "pointer to atomic,
+	 * qualified, or unqualified structure" or "pointer to atomic, qualified, or
+	 * unqualified union", and the second operand shall name a member of the
+	 * type pointed to."
 	 * 
 	 * "A postfix expression followed by the -> operator and an identifier
 	 * designates a member of a structure or union object. The value is that of
@@ -979,9 +979,9 @@ public class ExpressionAnalyzer {
 	}
 
 	/**
-	 * 6.5.2.1: "One of the expressions shall have type ‘‘pointer to complete
-	 * object type’’, the other expression shall have integer type, and the
-	 * result has type ‘‘type’’."
+	 * 6.5.2.1: "One of the expressions shall have type "pointer to complete
+	 * object type", the other expression shall have integer type, and the
+	 * result has type "type"."
 	 * 
 	 * @param node
 	 * @throws SyntaxException
