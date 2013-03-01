@@ -49,10 +49,10 @@ public interface DeclarationNode extends ASTNode {
 
 	/**
 	 * Is this the defining declaration of the identifier? According to C11, "A
-	 * definition of an identifier is a declaration for that identifier that: Ñ
-	 * for an object, causes storage to be reserved for that object; Ñ for a
-	 * function, includes the function body; Ñ for an enumeration constant, is
-	 * the (only) declaration of the identifier; Ñ for a typedef name, is the
+	 * definition of an identifier is a declaration for that identifier that: -
+	 * for an object, causes storage to be reserved for that object; - for a
+	 * function, includes the function body; - for an enumeration constant, is
+	 * the (only) declaration of the identifier; - for a typedef name, is the
 	 * first (or only) declaration of the identifier."
 	 * 
 	 * @return true if this is the identifier's definition.

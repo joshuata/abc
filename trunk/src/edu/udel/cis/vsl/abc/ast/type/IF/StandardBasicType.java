@@ -25,24 +25,24 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
  * the same type.
  * 
  * <pre>
- * Ñ char
- * Ñ signed char
- * Ñ unsigned char
- * Ñ short, signed short, short int, or signed short int
- * Ñ unsigned short, or unsigned short int
- * Ñ int, signed, or signed int
- * Ñ unsigned, or unsigned int
- * Ñ long, signed long, long int, or signed long int
- * Ñ unsigned long, or unsigned long int
- * Ñ long long, signed long long, long long int, or signed long long int
- * Ñ unsigned long long, or unsigned long long int
- * Ñ float
- * Ñ double
- * Ñ long double
- * Ñ _Bool
- * Ñ float _Complex
- * Ñ double _Complex
- * Ñ long double _Complex
+ * - char
+ * - signed char
+ * - unsigned char
+ * - short, signed short, short int, or signed short int
+ * - unsigned short, or unsigned short int
+ * - int, signed, or signed int
+ * - unsigned, or unsigned int
+ * - long, signed long, long int, or signed long int
+ * - unsigned long, or unsigned long int
+ * - long long, signed long long, long long int, or signed long long int
+ * - unsigned long long, or unsigned long long int
+ * - float
+ * - double
+ * - long double
+ * - _Bool
+ * - float _Complex
+ * - double _Complex
+ * - long double _Complex
  * </pre>
  * 
  * @author siegel
