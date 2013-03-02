@@ -5,8 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import org.antlr.runtime.tree.CommonTree;
-
+import edu.udel.cis.vsl.abc.analysis.Analysis;
+import edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST;
+import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.parse.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
@@ -15,7 +16,6 @@ import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 
 public class ABC {
 
@@ -113,12 +113,30 @@ public class ABC {
 		if (preprocOnly) {
 			preprocessor.printOutput(out, infile);
 		} else {
-			CParser parser = Parse.newCParser(preprocessor, infile);
-			CommonTree tree = parser.getTree();
+			// CParser parser = Parse.newCParser(preprocessor, infile);
+			// CommonTree tree = parser.getTree();
+			//
+			// ANTLRUtils.printTree(out, tree);
+			// out.println();
+			// out.flush();
 			
-			ANTLRUtils.printTree(out, tree);
-			out.println();
-			out.flush();
+			 CParser parser = Parse.newCParser(preprocessor, infile);
+             TranslationUnit unit = Antlr2AST.buildAST(parser, out);
+             String bar = "===================";
+
+             out.println(bar + " AST " + bar + "\n");
+             unit.print(out);
+             
+             Analysis.performStandardAnalysis(unit);
+             out.println(bar + " Analyzed AST " + bar + "\n");
+             unit.print(out);
+             out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
+             unit.getRootNode().getScope().print(out);
+             out.println("\n\n" + bar + " Types " + bar + "\n");
+             unit.getUnitFactory().getTypeFactory().printTypes(out);
+             out.println();
+             out.flush();
+
 		}
 	}
 }

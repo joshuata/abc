@@ -58,6 +58,11 @@ public class ScopeAnalyzer implements Analyzer {
 		if (parentScope == null) {
 			parentScope = scopeFactory.newScope(ScopeKind.FILE, null, node);
 		} else if (node instanceof FunctionDefinitionNode) {
+			// children: identifier, type, contract (optional), body.
+			// create function scope (1) for this node. labels go there.
+			// create block scope (2) under 1. parameters go there.
+			// if contract, create block scope (3) under 2. contract goes there.
+			// body is processed under scope 2.
 			FunctionDefinitionNode funcNode = (FunctionDefinitionNode) node;
 			CompoundStatementNode body = funcNode.getBody();
 			SequenceNode<ContractNode> contract = funcNode.getContract();
@@ -65,18 +70,24 @@ public class ScopeAnalyzer implements Analyzer {
 					.getTypeNode();
 			SequenceNode<VariableDeclarationNode> paramsNode = funcTypeNode
 					.getParameters();
+			Scope parameterScope;
 
-			functionScope = parentScope = scopeFactory.newScope(
+			parentScope = functionScope = scopeFactory.newScope(
 					ScopeKind.FUNCTION, parentScope, node);
+			parameterScope = scopeFactory.newScope(ScopeKind.BLOCK,
+					functionScope, paramsNode);
 			if (paramsNode != null)
-				processNode(paramsNode, functionScope, functionScope);
+				processChildren(paramsNode, parameterScope, functionScope);
 			if (contract != null) {
 				Scope contractScope = scopeFactory.newScope(ScopeKind.CONTRACT,
-						functionScope, node);
+						parameterScope, node);
 
-				processNode(contract, contractScope, functionScope);
+				processChildren(contract, contractScope, functionScope);
 			}
-			processNode(body, parentScope, functionScope);
+			processChildren(funcTypeNode, functionScope, functionScope);
+			// processNode because body will get new scope since
+			// it will be a compound statement node...
+			processNode(body, parameterScope, functionScope);
 		} else if (node instanceof CompoundStatementNode) {
 			parentScope = scopeFactory.newScope(ScopeKind.BLOCK, parentScope,
 					node);
@@ -132,13 +143,22 @@ public class ScopeAnalyzer implements Analyzer {
 						ScopeKind.FUNCTION_PROTOTYPE, parentScope, parameters);
 
 				if (parameters != null)
-					processNode(parameters, prototypeScope, functionScope);
+					processChildren(parameters, prototypeScope, functionScope);
 				if (contract != null) {
 					Scope contractScope = scopeFactory.newScope(
 							ScopeKind.CONTRACT, prototypeScope, contract);
 
-					processNode(contract, contractScope, prototypeScope);
+					processChildren(contract, contractScope, prototypeScope);
 				}
+			}
+		} else if (node instanceof FunctionTypeNode) {
+			ASTNode parameters = ((FunctionTypeNode) node).getParameters();
+
+			if (parameters != null && parameters.getScope() == null) {
+				Scope prototypeScope = scopeFactory.newScope(
+						ScopeKind.FUNCTION_PROTOTYPE, parentScope, parameters);
+
+				processChildren(parameters, prototypeScope, functionScope);
 			}
 		} else if (node instanceof OrdinaryLabelNode) {
 			parentScope = functionScope;

@@ -110,7 +110,7 @@ public class DeclarationAnalyzer {
 			throws SyntaxException {
 		return processVariableDeclaration(node, false);
 	}
-	
+
 	// TODO: problem is contract uses variables x declared
 	// as formal parameters but scope is outside of that scope.
 	// function scope: contract, type
