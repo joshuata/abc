@@ -146,7 +146,7 @@
 
 	<target name="compile" description="Compile all java source files." depends="parsers">
 		<mkdir dir="${bin.dir}" />
-		<javac debug="true" srcdir="${src.dir}" destdir="${bin.dir}" includes="edu/udel/cis/vsl/abc/**" classpathref="src.compile.classpath" includeantruntime="false">
+		<javac debug="true" srcdir="${src.dir}" destdir="${bin.dir}" includes="edu/udel/cis/vsl/abc/**" classpathref="src.compile.classpath" encoding="UTF-8" includeantruntime="false">
 		</javac>
 	</target>
 
@@ -188,7 +188,7 @@
 	</target>
 
 	<target name="test-compile" depends="compile,test-init">
-		<javac destdir="${test.bin.dir}" debug="true" failonerror="false" classpathref="test.compile.classpath" includeantruntime="true">
+		<javac destdir="${test.bin.dir}" debug="true" failonerror="false" classpathref="test.compile.classpath" encoding="UTF-8" includeantruntime="true">
 			<src path="${test.src.dir}" />
 		</javac>
 	</target>
