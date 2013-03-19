@@ -19,6 +19,9 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 public class ABC {
 
+	public final static String version = "0.1";
+	public final static String date = "01-mar-2013";
+
 	// TODO:
 	// add -D support. Need to create a token with "source" the command line.
 	// may treat command line as (virtual) file called "commandline"?
@@ -37,7 +40,11 @@ public class ABC {
 		PrintStream out;
 		File[] systemIncludes, userIncludes;
 		boolean preprocOnly = false;
+		boolean verbose = false;
 
+		System.out.println("ABC v" + version + " of " + date
+				+ " -- http://vsl.cis.udel.edu\n");
+		System.out.flush();
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
@@ -86,6 +93,8 @@ public class ABC {
 				userIncludeList.add(new File(name));
 			} else if (arg.equals("-E")) {
 				preprocOnly = true;
+			} else if (arg.equals("-v")) {
+				verbose = true;
 			} else if (arg.startsWith("-")) {
 				throw new IllegalArgumentException(
 						"Unknown command line option: " + arg);
@@ -113,29 +122,27 @@ public class ABC {
 		if (preprocOnly) {
 			preprocessor.printOutput(out, infile);
 		} else {
-			// CParser parser = Parse.newCParser(preprocessor, infile);
-			// CommonTree tree = parser.getTree();
-			//
-			// ANTLRUtils.printTree(out, tree);
-			// out.println();
-			// out.flush();
-			
-			 CParser parser = Parse.newCParser(preprocessor, infile);
-             TranslationUnit unit = Antlr2AST.buildAST(parser, out);
-             String bar = "===================";
+			// ideally, would only like to print earlier stages
+			// if something goes wrong
+			PrintStream parseOut = verbose ? out : null;
+			CParser parser = Parse.newCParser(preprocessor, infile);
+			TranslationUnit unit = Antlr2AST.buildAST(parser, parseOut);
+			String bar = "===================";
 
-             out.println(bar + " AST " + bar + "\n");
-             unit.print(out);
-             
-             Analysis.performStandardAnalysis(unit);
-             out.println(bar + " Analyzed AST " + bar + "\n");
-             unit.print(out);
-             out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
-             unit.getRootNode().getScope().print(out);
-             out.println("\n\n" + bar + " Types " + bar + "\n");
-             unit.getUnitFactory().getTypeFactory().printTypes(out);
-             out.println();
-             out.flush();
+			if (verbose) {
+				out.println(bar + " AST " + bar + "\n");
+				unit.print(out);
+			}
+
+			Analysis.performStandardAnalysis(unit);
+			out.println(bar + " Analyzed AST " + bar + "\n");
+			unit.print(out);
+			out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
+			unit.getRootNode().getScope().print(out);
+			out.println("\n\n" + bar + " Types " + bar + "\n");
+			unit.getUnitFactory().getTypeFactory().printTypes(out);
+			out.println();
+			out.flush();
 
 		}
 	}
