@@ -5,13 +5,13 @@ import java.io.PrintStream;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 
-public class CommonProcessType extends CommonObjectType implements
+public class CommonHeapType extends CommonObjectType implements
 		UnqualifiedObjectType {
 
-	private static int classCode = CommonProcessType.class.hashCode();
+	private static int classCode = CommonHeapType.class.hashCode();
 
-	public CommonProcessType() {
-		super(TypeKind.PROCESS);
+	public CommonHeapType() {
+		super(TypeKind.HEAP);
 	}
 
 	@Override
@@ -31,7 +31,7 @@ public class CommonProcessType extends CommonObjectType implements
 
 	@Override
 	public boolean equals(Object object) {
-		return object instanceof CommonProcessType;
+		return object instanceof CommonHeapType;
 	}
 
 	@Override
@@ -41,12 +41,12 @@ public class CommonProcessType extends CommonObjectType implements
 
 	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
-		out.print("$proc");
+		out.print("$heap");
 	}
 
 	@Override
 	public boolean isScalar() {
-		return true;
+		return false;
 	}
 
 }

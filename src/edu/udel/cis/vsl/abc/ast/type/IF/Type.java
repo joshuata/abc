@@ -39,7 +39,8 @@ public interface Type {
 		POINTER,
 		ATOMIC,
 		QUALIFIED,
-		PROCESS
+		PROCESS,
+		HEAP
 	};
 
 	/**

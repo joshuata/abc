@@ -241,7 +241,7 @@ public class ASTBuilder {
 
 	// added for CIVL-C...
 
-	static final int PROC = CivlCParser.PROC;
+	//static final int PROC = CivlCParser.PROC;
 	static final int SELF = CivlCParser.SELF;
 	static final int INPUT = CivlCParser.INPUT;
 	static final int OUTPUT = CivlCParser.OUTPUT;
@@ -872,10 +872,10 @@ public class ASTBuilder {
 		case ATOMIC:
 			result = translateAtomicType(analysis.typeSpecifierNode, scope);
 			break;
-		case PROCESS:
-			result = nodeFactory
-					.newProcessTypeNode(newSource(analysis.typeSpecifierNode));
-			break;
+//		case PROCESS:
+//			result = nodeFactory
+//					.newProcessTypeNode(newSource(analysis.typeSpecifierNode));
+//			break;
 		default:
 			throw new RuntimeException("Should not happen.");
 		}

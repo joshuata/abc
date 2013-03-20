@@ -154,7 +154,7 @@
 		<jar destfile="${jar-path}">
 			<fileset dir="${bin.dir}" />
 			<fileset dir="${antlr.runtime.bin}" />
-			<fileset dir="${basedir}/text" />
+			<fileset dir="${basedir}/text/include" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Main-Class" value="${main-class}" />
@@ -176,6 +176,7 @@
 		<pathelement location="${bin.dir}" />
 		<pathelement location="${antlr.jar}" />
 		<pathelement location="${junit.jar}" />
+		<pathelement location="${basedir}/text/include" />
 	</path>
 
 	<target name="test-init">
@@ -243,6 +244,7 @@
 		<pathelement location="${antlr.jar}" />
 		<pathelement location="${junit.jar}" />
 		<pathelement location="${bin.dir}" />
+		<pathelement location="${basedir}/text/include" />
 	</path>
 
 	<target name="cobertura-test" depends="cobertura-instrument">

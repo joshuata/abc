@@ -59,6 +59,8 @@ public class CommonTypeFactory implements TypeFactory {
 	private ObjectType voidType = null;
 
 	private ObjectType processType = null;
+	
+	private ObjectType heapType = null;
 
 	private UnsignedIntegerType size_t = null, char16_t = null,
 			char32_t = null;
@@ -275,14 +277,14 @@ public class CommonTypeFactory implements TypeFactory {
 
 	/**
 	 * 
-	 * "If both types are array types, the following rules are applied: ¥ If one
+	 * "If both types are array types, the following rules are applied: * If one
 	 * type is an array of known constant size, the composite type is an array
-	 * of that size. ¥ Otherwise, if one type is a variable length array whose
+	 * of that size. * Otherwise, if one type is a variable length array whose
 	 * size is specified by an expression that is not evaluated, the behavior is
-	 * undefined. ¥ Otherwise, if one type is a variable length array whose size
+	 * undefined. * Otherwise, if one type is a variable length array whose size
 	 * is specified, the composite type is a variable length array of that size.
-	 * ¥ Otherwise, if one type is a variable length array of unspecified size,
-	 * the composite type is a variable length array of unspecified size. ¥
+	 * * Otherwise, if one type is a variable length array of unspecified size,
+	 * the composite type is a variable length array of unspecified size. *
 	 * Otherwise, both types are arrays of unknown size and the composite type
 	 * is an array of unknown size. The element type of the composite type is
 	 * the composite type of the two element types."
@@ -825,6 +827,15 @@ public class CommonTypeFactory implements TypeFactory {
 			insert(processType);
 		}
 		return processType;
+	}
+
+	@Override
+	public ObjectType heapType() {
+		if (heapType == null) {
+			heapType = new CommonHeapType();
+			insert(heapType);
+		}
+		return heapType;
 	}
 
 }

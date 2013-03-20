@@ -123,9 +123,9 @@ public class TypeAnalyzer {
 		case TYPEDEF_NAME:
 			type = processTypedefName((TypedefNameNode) typeNode);
 			break;
-		case PROCESS:
-			type = typeFactory.processType();
-			break;
+		// case PROCESS:
+		// type = typeFactory.processType();
+		// break;
 		default:
 			throw new RuntimeException("Unreachable");
 		}

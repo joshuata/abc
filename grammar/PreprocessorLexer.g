@@ -119,24 +119,24 @@ THREADLOCAL	:	'_Thread_local';
 
 /* Additional keywords and symbols used in CIVL-C */
 
-ASSERT		:	'\\assert';
-ASSUME		:	'\\assume';
+ASSERT		:	'$assert';
+ASSUME		:	'$assume';
 AT		:	'@';
-CHOOSE		:	'\\choose';
-COLLECTIVE	:	'\\collective';
-ENSURES		:	'\\ensures';
-FALSE		:	'\\false';
-INPUT		:	'\\input';
-INVARIANT	:	'\\invariant';
-OUTPUT		:	'\\output';
-PROC		:	'\\proc';
-REQUIRES	:	'\\requires';
-RESULT		:	'\\result';
-SELF		:	'\\self';
-SPAWN		:	'\\spawn';
-TRUE		:	'\\true';
-WAIT		:	'\\wait';
-WHEN		:	'\\when';
+CHOOSE		:	'$choose';
+COLLECTIVE	:	'$collective';
+ENSURES		:	'$ensures';
+FALSE		:	'$false';
+INPUT		:	'$input';
+INVARIANT	:	'$invariant';
+OUTPUT		:	'$output';
+//PROC		:	'$proc';
+REQUIRES	:	'$requires';
+RESULT		:	'$result';
+SELF		:	'$self';
+SPAWN		:	'$spawn';
+TRUE		:	'$true';
+WAIT		:	'$wait';
+WHEN		:	'$when';
 
 
 
@@ -160,7 +160,7 @@ fragment
 NonZeroDigit	:	'1' .. '9' ;
 
 fragment
-NonDigit	:	'A'..'Z' | 'a'..'z' | '_' ;
+NonDigit	:	'A'..'Z' | 'a'..'z' | '_' | '$';
 
 fragment
 UniversalCharacterName

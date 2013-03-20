@@ -20,6 +20,8 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * easy way to ignore typedefs in the standard header files and instead use the
  * symbolic versions of these types provided by the type factory.
  * 
+ * TODO: ADD special CIVL types here, like \proc, \heap, ...
+ * 
  * @author siegel
  * 
  */
@@ -53,6 +55,8 @@ public class StandardTypes {
 		add("wchar_t", typeFactory.wchar_t());
 		add("char16_t", typeFactory.char16_t());
 		add("char32_t", typeFactory.char32_t());
+		add("$proc", typeFactory.processType());
+		add("$heap", typeFactory.heapType());
 	}
 
 	/**
