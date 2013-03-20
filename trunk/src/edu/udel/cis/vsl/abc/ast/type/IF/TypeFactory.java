@@ -426,7 +426,7 @@ public interface TypeFactory {
 	 * 
 	 * <p>
 	 * The integer promotions preserve value including sign. As discussed
-	 * earlier, whether a ‘‘plain’’ char is treated as signed is
+	 * earlier, whether a "plain" char is treated as signed is
 	 * implementation-defined.
 	 * </p>
 	 * </blockquote>
@@ -561,6 +561,9 @@ public interface TypeFactory {
 
 	/** Returns the process type. */
 	ObjectType processType();
+	
+	/** Returns the heap type. */
+	ObjectType heapType();
 
 	/************************* Conversions *****************************/
 

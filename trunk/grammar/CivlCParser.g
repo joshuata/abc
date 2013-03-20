@@ -556,7 +556,6 @@ storageClassSpecifier
 typeSpecifier
 	: VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE
 	| SIGNED | UNSIGNED | BOOL | COMPLEX
-	| PROC
 	| atomicTypeSpecifier
 	| structOrUnionSpecifier
 	| enumSpecifier

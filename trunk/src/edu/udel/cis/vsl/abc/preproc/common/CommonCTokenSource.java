@@ -1259,8 +1259,10 @@ public class CommonCTokenSource implements CTokenSource {
 		if (file == null)
 			file = findFile(systemIncludePaths, filename);
 		if (file == null) {
+			// InputStream inputStream = this.getClass().getResourceAsStream(
+			// "/include/" + filename);
 			InputStream inputStream = this.getClass().getResourceAsStream(
-					"/include/" + filename);
+					"/" + filename);
 
 			if (inputStream == null)
 				return null;

@@ -72,6 +72,7 @@ public class DeclarationAnalyzer {
 
 		if (scope.getScopeKind() == ScopeKind.FILE && ignoredTypes != null
 				&& ignoredTypes.contains(name))
+			// TODO: mark this node to be removed?
 			return;
 		else {
 			TypeNode typeNode = ((TypedefDeclarationNode) node).getTypeNode();
