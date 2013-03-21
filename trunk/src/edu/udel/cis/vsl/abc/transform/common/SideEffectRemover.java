@@ -36,7 +36,8 @@ public class SideEffectRemover implements Transformer {
 
 	private NodeFactory factory;
 
-	public void transform(TranslationUnit unit) throws SyntaxException {
+	public TranslationUnit transform(TranslationUnit unit)
+			throws SyntaxException {
 		ASTNode rootNode = unit.getRootNode();
 
 		factory = unit.getUnitFactory().getNodeFactory();
@@ -49,6 +50,7 @@ public class SideEffectRemover implements Transformer {
 				removeSideEffects((FunctionDefinitionNode) node);
 			}
 		}
+		return unit.getUnitFactory().newTranslationUnit(rootNode);
 	}
 
 	private void removeSideEffects(FunctionDefinitionNode function)

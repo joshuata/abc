@@ -14,6 +14,6 @@ public interface Transformer {
 	 *             If it encounters an error in the translation unit or an
 	 *             unhandled case.
 	 */
-	public void transform(TranslationUnit unit) throws SyntaxException;
+	public TranslationUnit transform(TranslationUnit unit) throws SyntaxException;
 
 }
