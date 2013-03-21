@@ -2,49 +2,44 @@ package edu.udel.cis.vsl.abc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import edu.udel.cis.vsl.abc.analysis.Analysis;
-import edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
-import edu.udel.cis.vsl.abc.parse.Parse;
-import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.preproc.Preprocess;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 public class ABC {
 
 	public final static String version = "0.1";
+	
 	public final static String date = "01-mar-2013";
 
-	// TODO:
-	// add -D support. Need to create a token with "source" the command line.
-	// may treat command line as (virtual) file called "commandline"?
+	public static Activator activator(File file, File[] systemIncludes,
+			File[] userIncludes) {
+		return new Activator(file, systemIncludes, userIncludes);
+	}
 
-	public static void main(String[] args) throws PreprocessorException,
-			ParseException, SyntaxException, FileNotFoundException {
+	public static Activator activator(File file) {
+		return new Activator(file);
+	}
+
+	private static Config parseCommandLind(String[] args)
+			throws FileNotFoundException {
 		String infileName = null;
 		String outfileName = null;
 		// the following are updated by -I
 		ArrayList<File> systemIncludeList = new ArrayList<File>();
 		// the following are updated by -iquote
 		ArrayList<File> userIncludeList = new ArrayList<File>();
-		PreprocessorFactory preprocessorFactory;
-		Preprocessor preprocessor;
 		File infile;
 		PrintStream out;
 		File[] systemIncludes, userIncludes;
 		boolean preprocOnly = false;
 		boolean verbose = false;
+		Config result = new Config();
 
-		System.out.println("ABC v" + version + " of " + date
-				+ " -- http://vsl.cis.udel.edu\n");
-		System.out.flush();
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
 
@@ -116,34 +111,38 @@ public class ABC {
 			out = System.out;
 		else
 			out = new PrintStream(new File(outfileName));
-		preprocessorFactory = Preprocess.newPreprocessorFactory();
-		preprocessor = preprocessorFactory.newPreprocessor(systemIncludes,
-				userIncludes);
-		if (preprocOnly) {
-			preprocessor.printOutput(out, infile);
-		} else {
-			// ideally, would only like to print earlier stages
-			// if something goes wrong
-			PrintStream parseOut = verbose ? out : null;
-			CParser parser = Parse.newCParser(preprocessor, infile);
-			TranslationUnit unit = Antlr2AST.buildAST(parser, parseOut);
-			String bar = "===================";
-
-			if (verbose) {
-				out.println(bar + " AST " + bar + "\n");
-				unit.print(out);
-			}
-
-			Analysis.performStandardAnalysis(unit);
-			out.println(bar + " Analyzed AST " + bar + "\n");
-			unit.print(out);
-			out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
-			unit.getRootNode().getScope().print(out);
-			out.println("\n\n" + bar + " Types " + bar + "\n");
-			unit.getUnitFactory().getTypeFactory().printTypes(out);
-			out.println();
-			out.flush();
-
-		}
+		result.activator = new Activator(infile, systemIncludes, userIncludes);
+		result.verbose = verbose;
+		result.out = out;
+		result.preprocOnly = preprocOnly;
+		return result;
 	}
+
+	// TODO:
+	// add -D support. Need to create a token with "source" the command line.
+	// may treat command line as (virtual) file called "commandline"?
+
+	public static void main(String[] args) throws PreprocessorException,
+			ParseException, SyntaxException, IOException {
+		Config config;
+
+		System.out.println("ABC v" + version + " of " + date
+				+ " -- http://vsl.cis.udel.edu\n");
+		System.out.flush();
+		config = parseCommandLind(args);
+		if (config.preprocOnly)
+			config.activator.preprocess(config.out);
+		else if (config.verbose)
+			config.activator.showTranslation(config.out);
+		else
+			config.activator.getSideEffectFreeTranslationUnit().print(
+					config.out);
+	}
+}
+
+class Config {
+	Activator activator;
+	boolean preprocOnly;
+	PrintStream out;
+	boolean verbose;
 }

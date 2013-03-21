@@ -62,6 +62,10 @@ public class Activator {
 				userIncludes);
 	}
 
+	public Activator(File file) {
+		this(file, new File[0], new File[0]);
+	}
+
 	public CTokenSource getPreprocessedSource() throws PreprocessorException {
 		return preprocessor.outputTokenSource(file);
 	}
