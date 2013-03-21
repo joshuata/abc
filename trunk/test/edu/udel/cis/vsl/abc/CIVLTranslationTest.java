@@ -12,7 +12,7 @@ import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
-public class CIVLParseTest {
+public class CIVLTranslationTest {
 
 	private File[] systemIncludes, userIncludes;
 
@@ -46,4 +46,5 @@ public class CIVLParseTest {
 			SyntaxException, IOException {
 		check("spawn");
 	}
+
 }
