@@ -36,9 +36,8 @@ public class CIVLParseTest {
 
 		this.systemIncludes = new File[0];
 		this.userIncludes = new File[0];
-		a = new Activator(new File(root, filenameRoot + ".cvl"),
+		a = ABC.activator(new File(root, filenameRoot + ".cvl"),
 				systemIncludes, userIncludes);
-
 		a.showTranslation(out);
 	}
 
