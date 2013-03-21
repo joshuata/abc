@@ -99,7 +99,7 @@ public class Activator {
 		TranslationUnit unit = getRawTranslationUnit();
 		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
-		sideEffectRemover.transform(unit);
+		unit = sideEffectRemover.transform(unit);
 		Analysis.performStandardAnalysis(unit);
 		return unit;
 	}
@@ -142,7 +142,7 @@ public class Activator {
 		// print the results of removing side-effects...
 		out.println(bar + " Side-effect-free Raw Translation Unit " + bar);
 		sideEffectRemover = new SideEffectRemover();
-		sideEffectRemover.transform(unit);
+		unit = sideEffectRemover.transform(unit);
 		unit.print(out);
 		out.println();
 		// perform analysis and print results...
