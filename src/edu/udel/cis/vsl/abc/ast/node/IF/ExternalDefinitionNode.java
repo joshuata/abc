@@ -10,7 +10,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
  * 
  * <ul>
  * <li>VariableDeclarationNode</li>
- * <li>FunctionDeclarationNode</li> (includes FunctionDefinitionNode)
+ * <li>FunctionDeclarationNode (includes FunctionDefinitionNode)</li>
  * <li>StructureOrUnionTypeNode</li>
  * <li>EnumerationTypeNode</li>
  * <li>PragmaNode</li>

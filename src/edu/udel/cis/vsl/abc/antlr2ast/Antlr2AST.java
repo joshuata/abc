@@ -28,6 +28,20 @@ import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 
 public class Antlr2AST {
 
+	public static TranslationUnit translate(CParser parser, CommonTree rootTree)
+			throws SyntaxException {
+		TypeFactory typeFactory = Types.newTypeFactory();
+		ValueFactory valueFactory = Values.newValueFactory(typeFactory);
+		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
+				valueFactory);
+		TokenFactory sourceFactory = Tokens.newTokenFactory();
+		UnitFactory unitFactory = Units.newUnitFactory(nodeFactory,
+				sourceFactory, typeFactory);
+		ASTBuilder builder = new ASTBuilder(parser, unitFactory, rootTree);
+
+		return builder.getTranslationUnit();
+	}
+
 	public static TranslationUnit build(CParser parser,
 			UnitFactory unitFactory, PrintStream out) throws ParseException,
 			SyntaxException {

@@ -177,6 +177,8 @@ public class CommonCTokenSource implements CTokenSource {
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macroMap, TokenFactory tokenFactory)
 			throws PreprocessorException {
+		assert systemIncludePaths != null;
+		assert userIncludePaths != null;
 		this.originalSourceFile = source;
 		this.tokenFactory = tokenFactory;
 		try {

@@ -18,27 +18,39 @@ import edu.udel.cis.vsl.abc.token.IF.CToken;
  */
 public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 
+	/**
+	 * Returns the pragma identifier, i.e., the identifier immediately following
+	 * "# pragma". For example, in "# pragma omp ...", the identifier "omp"
+	 * would be returned.
+	 * 
+	 * @return the pragma identifier
+	 */
 	IdentifierNode getPragmaIdentifier();
 
 	/**
-	 * Returns n, the number of tokens following # pragma IDENTIFIER.
+	 * Returns n, the number of tokens in the pragma body, i.e., the number of
+	 * tokens following # pragma IDENTIFIER.
 	 * 
 	 * @return number of tokens in the pragma body
 	 */
 	int getNumTokens();
 
 	/**
-	 * Returns the index-th token in the pragma body.
+	 * Returns the index-th token in the pragma body. The tokens of body are
+	 * indexed beginning with 0.
 	 * 
 	 * @param index
-	 * @return
+	 *            an integer in the range [0,n-1], where n is the value returned
+	 *            by {@link #getNumTokens}
+	 * 
+	 * @return the index-th token in the pragma body
 	 */
 	CToken getToken(int index);
 
 	/**
 	 * Returns an iterator over the tokens in the pragma body.
 	 * 
-	 * @return
+	 * @return iterator over the tokens of pragma body
 	 */
 	Iterator<CToken> getTokens();
 

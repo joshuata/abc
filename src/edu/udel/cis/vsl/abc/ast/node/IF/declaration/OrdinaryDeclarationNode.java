@@ -7,7 +7,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 /**
  * A declaration of a variable or function via a C "declarator". In addition to
  * the identifier (common to all declarations), this also specifies a type and
- * storage information, function specifiers, and alignment specifiers.
+ * storage information.
  * 
  * Note that this is not used to declare members of structures or unions
  * ("fields"). A FieldDeclaration is used for that.
