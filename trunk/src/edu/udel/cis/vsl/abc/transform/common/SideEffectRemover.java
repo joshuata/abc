@@ -434,8 +434,8 @@ public class SideEffectRemover implements Transformer {
 							result = factory.newCompoundStatementNode(
 									statement.getSource(), blockItems);
 						}
-						break;
 					}
+					break;
 				case PLUS:
 				case MINUS:
 				case DIV:
@@ -493,7 +493,8 @@ public class SideEffectRemover implements Transformer {
 					}
 					break;
 				default:
-					throw new RuntimeException("Operation is currently unsupported: " + statement);
+					throw new RuntimeException(
+							"Operation is currently unsupported: " + statement);
 				}
 			} else {
 				throw new RuntimeException(
@@ -576,6 +577,25 @@ public class SideEffectRemover implements Transformer {
 			switch (((OperatorNode) expression).getOperator()) {
 			case ASSIGN:
 				result = assign((OperatorNode) expression);
+				break;
+			case ADDRESSOF:
+			case DEREFERENCE:
+				if (isSEF(((OperatorNode) expression).getArgument(0))) {
+					result = new SideEffectFreeTriple(
+							new Vector<BlockItemNode>(), expression,
+							new Vector<BlockItemNode>());
+				} else {
+					SideEffectFreeTriple target = processExpression(((OperatorNode) expression)
+							.getArgument(0));
+					List<ExpressionNode> arguments = new Vector<ExpressionNode>();
+
+					arguments.add(target.getExpression());
+
+					result = new SideEffectFreeTriple(target.getBefore(),
+							factory.newOperatorNode(expression.getSource(),
+									((OperatorNode) expression).getOperator(),
+									arguments), target.getAfter());
+				}
 				break;
 			case PREINCREMENT:
 			case PREDECREMENT:
