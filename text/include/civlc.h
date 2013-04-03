@@ -23,4 +23,7 @@ void memcpy(void *p, void *q, size_t size);
 /* The CIVL-C de-allocation function, which takes a reference to a heap */
 void $free($heap *h, void *p);
 
+/* Nondeterministic choice of integer i, such that 0<=i<n. */
+int $choose_int(int n);
+
 #endif

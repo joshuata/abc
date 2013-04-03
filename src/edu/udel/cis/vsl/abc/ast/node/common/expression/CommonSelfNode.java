@@ -9,12 +9,12 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 public class CommonSelfNode extends CommonConstantNode implements SelfNode {
 
 	public CommonSelfNode(Source source, ObjectType processType) {
-		super(source, "\\self", processType);
+		super(source, "$self", processType);
 	}
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("\\self");
+		out.print("$self");
 	}
 
 }
