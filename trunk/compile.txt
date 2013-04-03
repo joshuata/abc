@@ -1,0 +1,888 @@
+Apache Ant(TM) version 1.8.2 compiled on June 20 2012
+Trying the default build file: build.xml
+Buildfile: /Users/siegel/Documents/workspace/ABC/build.xml
+Detected Java version: 1.7 in: /Library/Java/JavaVirtualMachines/jdk1.7.0_11.jdk/Contents/Home/jre
+Detected OS: Mac OS X
+parsing buildfile /Users/siegel/Documents/workspace/ABC/build.xml with URI = file:/Users/siegel/Documents/workspace/ABC/build.xml
+Project base dir set to: /Users/siegel/Documents/workspace/ABC
+parsing buildfile jar:file:/usr/share/ant/lib/ant.jar!/org/apache/tools/ant/antlib.xml with URI = jar:file:/usr/share/ant/lib/ant.jar!/org/apache/tools/ant/antlib.xml from a zip file
+ [property] Loading /Users/siegel/Documents/workspace/ABC/build.properties
+Build sequence for target(s) `compile' is [checkLexerChanges, PreprocessorLexer, checkParserChanges, PreprocessorParser, checkCivlCParserChanges, CivlCParser, checkExpressionParserChanges, PreprocessorExpressionParser, parsers, compile]
+Complete build sequence is [checkLexerChanges, PreprocessorLexer, checkParserChanges, PreprocessorParser, checkCivlCParserChanges, CivlCParser, checkExpressionParserChanges, PreprocessorExpressionParser, parsers, compile, test-init, jar, test-compile, test, cobertura-init, cobertura-instrument, cobertura-test, cobertura-html-coverage-report, cobertura, javadoc, all, clean, ]
+
+checkLexerChanges:
+ [uptodate] PreprocessorLexer.g added as PreprocessorLexer.tokens doesn't exist.
+
+PreprocessorLexer:
+     [java] Executing '/Library/Java/JavaVirtualMachines/jdk1.7.0_11.jdk/Contents/Home/jre/bin/java' with arguments:
+     [java] '-classpath'
+     [java] '/VSL/Tools/src/antlr/antlr-3.4/lib/antlr-3.4-complete.jar'
+     [java] 'org.antlr.Tool'
+     [java] '-verbose'
+     [java] 'PreprocessorLexer.g'
+     [java] 
+     [java] The ' characters around the executable and arguments are
+     [java] not part of the command.
+     [java] ANTLR Parser Generator  Version 3.4
+     [java] PreprocessorLexer.g
+     [move] Moving 1 file to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common
+     [move] Attempting to rename: /Users/siegel/Documents/workspace/ABC/grammar/PreprocessorLexer.java to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorLexer.java
+
+checkParserChanges:
+ [uptodate] PreprocessorParser.g omitted as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.java is up to date.
+ [uptodate] PreprocessorLexer.g omitted as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.java is up to date.
+ [uptodate] PreprocessorLexer.tokens added as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.java is outdated.
+
+PreprocessorParser:
+     [java] Executing '/Library/Java/JavaVirtualMachines/jdk1.7.0_11.jdk/Contents/Home/jre/bin/java' with arguments:
+     [java] '-classpath'
+     [java] '/VSL/Tools/src/antlr/antlr-3.4/lib/antlr-3.4-complete.jar'
+     [java] 'org.antlr.Tool'
+     [java] '-verbose'
+     [java] 'PreprocessorParser.g'
+     [java] 
+     [java] The ' characters around the executable and arguments are
+     [java] not part of the command.
+     [java] PreprocessorParser.g
+     [java] ANTLR Parser Generator  Version 3.4
+     [move] Moving 1 file to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common
+     [move] Attempting to rename: /Users/siegel/Documents/workspace/ABC/grammar/PreprocessorParser.java to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.java
+
+checkCivlCParserChanges:
+ [uptodate] CivlCParser.g omitted as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common/CivlCParser.java is up to date.
+ [uptodate] PreprocessorLexer.g omitted as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common/CivlCParser.java is up to date.
+ [uptodate] PreprocessorLexer.tokens added as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common/CivlCParser.java is outdated.
+
+CivlCParser:
+     [java] Executing '/Library/Java/JavaVirtualMachines/jdk1.7.0_11.jdk/Contents/Home/jre/bin/java' with arguments:
+     [java] '-classpath'
+     [java] '/VSL/Tools/src/antlr/antlr-3.4/lib/antlr-3.4-complete.jar'
+     [java] 'org.antlr.Tool'
+     [java] '-verbose'
+     [java] 'CivlCParser.g'
+     [java] 
+     [java] The ' characters around the executable and arguments are
+     [java] not part of the command.
+     [java] CivlCParser.g
+     [java] ANTLR Parser Generator  Version 3.4
+     [move] Moving 1 file to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common
+     [move] Attempting to rename: /Users/siegel/Documents/workspace/ABC/grammar/CivlCParser.java to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common/CivlCParser.java
+
+checkExpressionParserChanges:
+ [uptodate] PreprocessorExpressionParser.g omitted as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.java is up to date.
+ [uptodate] PreprocessorLexer.g omitted as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.java is up to date.
+ [uptodate] PreprocessorLexer.tokens added as /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.java is outdated.
+
+PreprocessorExpressionParser:
+     [java] Executing '/Library/Java/JavaVirtualMachines/jdk1.7.0_11.jdk/Contents/Home/jre/bin/java' with arguments:
+     [java] '-classpath'
+     [java] '/VSL/Tools/src/antlr/antlr-3.4/lib/antlr-3.4-complete.jar'
+     [java] 'org.antlr.Tool'
+     [java] '-verbose'
+     [java] 'PreprocessorExpressionParser.g'
+     [java] 
+     [java] The ' characters around the executable and arguments are
+     [java] not part of the command.
+     [java] PreprocessorExpressionParser.g
+     [java] ANTLR Parser Generator  Version 3.4
+     [move] Moving 1 file to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common
+     [move] Attempting to rename: /Users/siegel/Documents/workspace/ABC/grammar/PreprocessorExpressionParser.java to /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.java
+
+parsers:
+
+compile:
+    [mkdir] Created dir: /Users/siegel/Documents/workspace/ABC/bin
+    [javac] edu/udel/cis/vsl/abc/ABC.java added as edu/udel/cis/vsl/abc/ABC.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/Activator.java added as edu/udel/cis/vsl/abc/Activator.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/Analysis.java added as edu/udel/cis/vsl/abc/analysis/Analysis.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/IF/Analyzer.java added as edu/udel/cis/vsl/abc/analysis/IF/Analyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/common/CompatiblePointerConversion.java added as edu/udel/cis/vsl/abc/analysis/common/CompatiblePointerConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/common/ScopeAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/common/ScopeAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/common/StandardAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/common/StandardAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/entity/DeclarationAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/entity/DeclarationAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/entity/EntityAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/entity/EntityAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/entity/ExpressionAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/entity/ExpressionAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/entity/StandardTypes.java added as edu/udel/cis/vsl/abc/analysis/entity/StandardTypes.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/entity/StatementAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/entity/StatementAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/analysis/entity/TypeAnalyzer.java added as edu/udel/cis/vsl/abc/analysis/entity/TypeAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/antlr2ast/Antlr2AST.java added as edu/udel/cis/vsl/abc/antlr2ast/Antlr2AST.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/antlr2ast/impl/ASTBuilder.java added as edu/udel/cis/vsl/abc/antlr2ast/impl/ASTBuilder.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/antlr2ast/impl/BasicMultiset.java added as edu/udel/cis/vsl/abc/antlr2ast/impl/BasicMultiset.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/antlr2ast/impl/SimpleScope.java added as edu/udel/cis/vsl/abc/antlr2ast/impl/SimpleScope.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/antlr2ast/impl/SpecifierAnalysis.java added as edu/udel/cis/vsl/abc/antlr2ast/impl/SpecifierAnalysis.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/Conversions.java added as edu/udel/cis/vsl/abc/ast/conversion/Conversions.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/ArithmeticConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/ArithmeticConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/ArrayConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/ArrayConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/CompatibleStructureOrUnionConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/CompatibleStructureOrUnionConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/Conversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/Conversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/ConversionFactory.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/ConversionFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/FunctionConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/FunctionConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/LvalueConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/LvalueConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/NullPointerConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/NullPointerConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/PointerBoolConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/PointerBoolConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/IF/VoidPointerConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/IF/VoidPointerConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonArithmeticConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonArithmeticConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonArrayConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonArrayConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonCompatiblePointerConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonCompatiblePointerConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonCompatibleStructureOrUnionConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonCompatibleStructureOrUnionConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonConversionFactory.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonConversionFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonFunctionConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonFunctionConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonLvalueConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonLvalueConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonNullPointerConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonNullPointerConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonPointerBoolConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonPointerBoolConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/conversion/common/CommonVoidPointerConversion.java added as edu/udel/cis/vsl/abc/ast/conversion/common/CommonVoidPointerConversion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/Entities.java added as edu/udel/cis/vsl/abc/ast/entity/Entities.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Entity.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Entity.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/EntityFactory.java added as edu/udel/cis/vsl/abc/ast/entity/IF/EntityFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Enumeration.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Enumeration.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Enumerator.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Enumerator.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Field.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Field.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Function.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Function.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Label.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Label.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/OrdinaryEntity.java added as edu/udel/cis/vsl/abc/ast/entity/IF/OrdinaryEntity.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Scope.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Scope.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/StructureOrUnion.java added as edu/udel/cis/vsl/abc/ast/entity/IF/StructureOrUnion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/TaggedEntity.java added as edu/udel/cis/vsl/abc/ast/entity/IF/TaggedEntity.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Typedef.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Typedef.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/IF/Variable.java added as edu/udel/cis/vsl/abc/ast/entity/IF/Variable.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonEntity.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonEntity.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonEntityFactory.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonEntityFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonEnumeration.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonEnumeration.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonEnumerator.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonEnumerator.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonField.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonField.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonFunction.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonFunction.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonLabel.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonLabel.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonOrdinaryEntity.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonOrdinaryEntity.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonScope.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonScope.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonStructureOrUnion.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonStructureOrUnion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonTaggedEntity.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonTaggedEntity.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonTypedef.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonTypedef.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/entity/common/CommonVariable.java added as edu/udel/cis/vsl/abc/ast/entity/common/CommonVariable.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/ASTNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/ASTNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/AttributeKey.java added as edu/udel/cis/vsl/abc/ast/node/IF/AttributeKey.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/ExternalDefinitionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/ExternalDefinitionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/IdentifierNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/IdentifierNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/NodeFactory.java added as edu/udel/cis/vsl/abc/ast/node/IF/NodeFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/PairNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/PairNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/PragmaNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/PragmaNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/SequenceNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/SequenceNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/StaticAssertionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/StaticAssertionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/ArrayDesignatorNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/ArrayDesignatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/CompoundInitializerNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/CompoundInitializerNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/ContractNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/ContractNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/DeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/DeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/DesignationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/DesignationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/DesignatorNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/DesignatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/EnsuresNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/EnsuresNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/EnumeratorDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/EnumeratorDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/FieldDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/FieldDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/FieldDesignatorNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/FieldDesignatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/FunctionDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/FunctionDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/FunctionDefinitionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/FunctionDefinitionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/InitializerNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/InitializerNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/OrdinaryDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/OrdinaryDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/RequiresNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/RequiresNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/TypedefDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/TypedefDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/declaration/VariableDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/declaration/VariableDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/AlignOfNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/AlignOfNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/ArrowNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/ArrowNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/CastNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/CastNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/CharacterConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/CharacterConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/CollectiveExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/CollectiveExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/CompoundLiteralNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/CompoundLiteralNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/ConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/ConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/DotNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/DotNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/EnumerationConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/EnumerationConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/ExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/ExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/FloatingConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/FloatingConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/FunctionCallNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/FunctionCallNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/GenericSelectionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/GenericSelectionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/IdentifierExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/IdentifierExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/IntegerConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/IntegerConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/OperatorNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/OperatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/RemoteExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/RemoteExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/ResultNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/ResultNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/SelfNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/SelfNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/SizeableNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/SizeableNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/SizeofNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/SizeofNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/SpawnNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/SpawnNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/expression/StringLiteralNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/expression/StringLiteralNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/label/LabelNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/label/LabelNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/label/OrdinaryLabelNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/label/OrdinaryLabelNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/label/SwitchLabelNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/label/SwitchLabelNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/AssertNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/AssertNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/AssumeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/AssumeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/BlockItemNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/BlockItemNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/ChooseStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/ChooseStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/CompoundStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/CompoundStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/DeclarationListNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/DeclarationListNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/ExpressionStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/ExpressionStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/ForLoopInitializerNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/ForLoopInitializerNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/ForLoopNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/ForLoopNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/GotoNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/GotoNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/IfNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/IfNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/JumpNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/JumpNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/LabeledStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/LabeledStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/LoopNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/LoopNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/NullStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/NullStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/ReturnNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/ReturnNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/StatementNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/StatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/SwitchNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/SwitchNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/WaitNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/WaitNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/statement/WhenNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/statement/WhenNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/ArrayTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/ArrayTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/AtomicTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/AtomicTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/BasicTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/BasicTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/EnumerationTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/EnumerationTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/FunctionTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/FunctionTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/PointerTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/PointerTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/StructureOrUnionTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/StructureOrUnionTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/TypeNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/TypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/IF/type/TypedefNameNode.java added as edu/udel/cis/vsl/abc/ast/node/IF/type/TypedefNameNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/Nodes.java added as edu/udel/cis/vsl/abc/ast/node/Nodes.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonASTNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonASTNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonAttributeKey.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonAttributeKey.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonIdentifierNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonIdentifierNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonNodeFactory.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonNodeFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonPairNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonPairNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonPragmaNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonPragmaNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonSequenceNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonSequenceNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonStaticAssertionNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonStaticAssertionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/CommonWhenNode.java added as edu/udel/cis/vsl/abc/ast/node/common/CommonWhenNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/LiteralInterpreter.java added as edu/udel/cis/vsl/abc/ast/node/common/LiteralInterpreter.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonArrayDesignatorNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonArrayDesignatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonCompoundInitializerNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonCompoundInitializerNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonDesignationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonDesignationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonEnsuresNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonEnsuresNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonEnumeratorDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonEnumeratorDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFieldDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFieldDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFieldDesignatorNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFieldDesignatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFunctionDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFunctionDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFunctionDefinitionNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFunctionDefinitionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonOrdinaryDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonOrdinaryDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonRequiresNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonRequiresNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonTypedefDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonTypedefDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonVariableDeclarationNode.java added as edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonVariableDeclarationNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonAlignOfNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonAlignOfNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonArrowNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonArrowNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCastNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCastNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCharacterConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCharacterConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCollectiveExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCollectiveExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCompoundLiteralNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCompoundLiteralNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonDotNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonDotNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonEnumerationConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonEnumerationConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonFloatingConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonFloatingConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonFunctionCallNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonFunctionCallNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonIdentifierExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonIdentifierExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonIntegerConstantNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonIntegerConstantNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonOperatorNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonOperatorNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonRemoteExpressionNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonRemoteExpressionNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonResultNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonResultNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSelfNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSelfNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSizeofNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSizeofNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSpawnNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSpawnNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/expression/CommonStringLiteralNode.java added as edu/udel/cis/vsl/abc/ast/node/common/expression/CommonStringLiteralNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/label/CommonOrdinaryLabelNode.java added as edu/udel/cis/vsl/abc/ast/node/common/label/CommonOrdinaryLabelNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/label/CommonSwitchLabelNode.java added as edu/udel/cis/vsl/abc/ast/node/common/label/CommonSwitchLabelNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonAssertNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonAssertNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonAssumeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonAssumeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonChooseStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonChooseStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonCompoundStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonCompoundStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonDeclarationListNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonDeclarationListNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonExpressionStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonExpressionStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonForLoopNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonForLoopNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonGotoNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonGotoNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonIfNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonIfNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonJumpNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonJumpNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonLabeledStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonLabeledStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonLoopNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonLoopNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonNullStatementNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonNullStatementNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonReturnNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonReturnNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonSwitchNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonSwitchNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/statement/CommonWaitNode.java added as edu/udel/cis/vsl/abc/ast/node/common/statement/CommonWaitNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonArrayTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonArrayTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonAtomicTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonAtomicTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonBasicTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonBasicTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonEnumerationTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonEnumerationTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonFunctionTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonFunctionTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonPointerTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonPointerTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonProcessTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonProcessTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonStructureOrUnionTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonStructureOrUnionTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonTypedefNameNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonTypedefNameNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/common/type/CommonVoidTypeNode.java added as edu/udel/cis/vsl/abc/ast/node/common/type/CommonVoidTypeNode.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/node/package-info.java added as edu/udel/cis/vsl/abc/ast/node/package-info.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/ArithmeticType.java added as edu/udel/cis/vsl/abc/ast/type/IF/ArithmeticType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/ArrayType.java added as edu/udel/cis/vsl/abc/ast/type/IF/ArrayType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/AtomicType.java added as edu/udel/cis/vsl/abc/ast/type/IF/AtomicType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/EnumerationType.java added as edu/udel/cis/vsl/abc/ast/type/IF/EnumerationType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/FloatingType.java added as edu/udel/cis/vsl/abc/ast/type/IF/FloatingType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/FunctionType.java added as edu/udel/cis/vsl/abc/ast/type/IF/FunctionType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/IntegerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/IntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/ObjectType.java added as edu/udel/cis/vsl/abc/ast/type/IF/ObjectType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/PointerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/PointerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/QualifiedObjectType.java added as edu/udel/cis/vsl/abc/ast/type/IF/QualifiedObjectType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/SignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/SignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/SignedOrUnsignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/SignedOrUnsignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/StandardBasicType.java added as edu/udel/cis/vsl/abc/ast/type/IF/StandardBasicType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/StandardSignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/StandardSignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/StandardUnsignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/StandardUnsignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/StructureOrUnionType.java added as edu/udel/cis/vsl/abc/ast/type/IF/StructureOrUnionType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/Type.java added as edu/udel/cis/vsl/abc/ast/type/IF/Type.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/TypeFactory.java added as edu/udel/cis/vsl/abc/ast/type/IF/TypeFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/UnqualifiedObjectType.java added as edu/udel/cis/vsl/abc/ast/type/IF/UnqualifiedObjectType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/IF/UnsignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/IF/UnsignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/Types.java added as edu/udel/cis/vsl/abc/ast/type/Types.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/ArithmeticConversionType.java added as edu/udel/cis/vsl/abc/ast/type/common/ArithmeticConversionType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonArrayType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonArrayType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonAtomicType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonAtomicType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonBasicType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonBasicType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonCharType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonCharType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonEnumerationType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonEnumerationType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonFloatingType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonFloatingType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonFunctionType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonFunctionType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonHeapType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonHeapType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonObjectType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonObjectType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonPointerType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonPointerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonProcessType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonProcessType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonQualifiedObjectType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonQualifiedObjectType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonStandardSignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonStandardSignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonStandardUnsignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonStandardUnsignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonStructureOrUnionType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonStructureOrUnionType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonTypeFactory.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonTypeFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/CommonVoidType.java added as edu/udel/cis/vsl/abc/ast/type/common/CommonVoidType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/IntegerPromotionType.java added as edu/udel/cis/vsl/abc/ast/type/common/IntegerPromotionType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/RangeChoiceType.java added as edu/udel/cis/vsl/abc/ast/type/common/RangeChoiceType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/SymbolicIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/common/SymbolicIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/SymbolicSignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/common/SymbolicSignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/type/common/SymbolicUnsignedIntegerType.java added as edu/udel/cis/vsl/abc/ast/type/common/SymbolicUnsignedIntegerType.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/IF/Program.java added as edu/udel/cis/vsl/abc/ast/unit/IF/Program.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/IF/TranslationUnit.java added as edu/udel/cis/vsl/abc/ast/unit/IF/TranslationUnit.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/IF/UnitFactory.java added as edu/udel/cis/vsl/abc/ast/unit/IF/UnitFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/Units.java added as edu/udel/cis/vsl/abc/ast/unit/Units.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/common/CommonProgram.java added as edu/udel/cis/vsl/abc/ast/unit/common/CommonProgram.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/common/CommonTranslationUnit.java added as edu/udel/cis/vsl/abc/ast/unit/common/CommonTranslationUnit.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/unit/common/CommonUnitFactory.java added as edu/udel/cis/vsl/abc/ast/unit/common/CommonUnitFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/AddressValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/AddressValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/ArrayElementReference.java added as edu/udel/cis/vsl/abc/ast/value/IF/ArrayElementReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/ArrayValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/ArrayValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/CastValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/CastValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/CharacterValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/CharacterValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/ComplexValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/ComplexValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/CompoundValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/CompoundValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/FunctionReference.java added as edu/udel/cis/vsl/abc/ast/value/IF/FunctionReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/IntegerValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/IntegerValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/MemberReference.java added as edu/udel/cis/vsl/abc/ast/value/IF/MemberReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/OperatorValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/OperatorValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/RealFloatingValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/RealFloatingValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/StringValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/StringValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/StructureValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/StructureValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/TypeValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/TypeValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/UnionValue.java added as edu/udel/cis/vsl/abc/ast/value/IF/UnionValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/Value.java added as edu/udel/cis/vsl/abc/ast/value/IF/Value.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/ValueFactory.java added as edu/udel/cis/vsl/abc/ast/value/IF/ValueFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/IF/VariableReference.java added as edu/udel/cis/vsl/abc/ast/value/IF/VariableReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/Values.java added as edu/udel/cis/vsl/abc/ast/value/Values.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonAddressValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonAddressValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonArrayElementReference.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonArrayElementReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonArrayValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonArrayValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonCastValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonCastValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonCharacterValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonCharacterValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonComplexValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonComplexValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonFunctionReference.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonFunctionReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonIntegerValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonIntegerValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonMemberReference.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonMemberReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonOperatorValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonOperatorValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonRealFloatingValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonRealFloatingValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonStringValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonStringValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonStructureValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonStructureValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonTypeValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonTypeValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonUnionValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonUnionValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonValue.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonValueFactory.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonValueFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/CommonVariableReference.java added as edu/udel/cis/vsl/abc/ast/value/common/CommonVariableReference.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/ast/value/common/MappedIntegerValue.java added as edu/udel/cis/vsl/abc/ast/value/common/MappedIntegerValue.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/config/Configurations.java added as edu/udel/cis/vsl/abc/config/Configurations.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/config/IF/Configuration.java added as edu/udel/cis/vsl/abc/config/IF/Configuration.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/config/common/CommonConfiguration.java added as edu/udel/cis/vsl/abc/config/common/CommonConfiguration.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/parse/IF/CParser.java added as edu/udel/cis/vsl/abc/parse/IF/CParser.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/parse/IF/ParseException.java added as edu/udel/cis/vsl/abc/parse/IF/ParseException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/parse/IF/RuntimeParseException.java added as edu/udel/cis/vsl/abc/parse/IF/RuntimeParseException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/parse/Parse.java added as edu/udel/cis/vsl/abc/parse/Parse.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/parse/common/CivlCParser.java added as edu/udel/cis/vsl/abc/parse/common/CivlCParser.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/parse/common/CommonCParser.java added as edu/udel/cis/vsl/abc/parse/common/CommonCParser.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/CTokenSource.java added as edu/udel/cis/vsl/abc/preproc/IF/CTokenSource.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/IllegalMacroArgumentException.java added as edu/udel/cis/vsl/abc/preproc/IF/IllegalMacroArgumentException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/Preprocessor.java added as edu/udel/cis/vsl/abc/preproc/IF/Preprocessor.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/PreprocessorException.java added as edu/udel/cis/vsl/abc/preproc/IF/PreprocessorException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/PreprocessorExpressionException.java added as edu/udel/cis/vsl/abc/preproc/IF/PreprocessorExpressionException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/PreprocessorFactory.java added as edu/udel/cis/vsl/abc/preproc/IF/PreprocessorFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/IF/PreprocessorRuntimeException.java added as edu/udel/cis/vsl/abc/preproc/IF/PreprocessorRuntimeException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/Preprocess.java added as edu/udel/cis/vsl/abc/preproc/Preprocess.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/CTokenIterator.java added as edu/udel/cis/vsl/abc/preproc/common/CTokenIterator.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/CommonCTokenSource.java added as edu/udel/cis/vsl/abc/preproc/common/CommonCTokenSource.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/CommonPreprocessor.java added as edu/udel/cis/vsl/abc/preproc/common/CommonPreprocessor.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/CommonPreprocessorFactory.java added as edu/udel/cis/vsl/abc/preproc/common/CommonPreprocessorFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/FilteredCharStream.java added as edu/udel/cis/vsl/abc/preproc/common/FilteredCharStream.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionAnalyzer.java added as edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionAnalyzer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.java added as edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/PreprocessorLexer.java added as edu/udel/cis/vsl/abc/preproc/common/PreprocessorLexer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.java added as edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/PreprocessorSourceFileInfo.java added as edu/udel/cis/vsl/abc/preproc/common/PreprocessorSourceFileInfo.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/common/PreprocessorUtils.java added as edu/udel/cis/vsl/abc/preproc/common/PreprocessorUtils.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/preproc/p56/Phase5and6.java added as edu/udel/cis/vsl/abc/preproc/p56/Phase5and6.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/CToken.java added as edu/udel/cis/vsl/abc/token/IF/CToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/CharacterToken.java added as edu/udel/cis/vsl/abc/token/IF/CharacterToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/Concatenation.java added as edu/udel/cis/vsl/abc/token/IF/Concatenation.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/ExecutionCharacter.java added as edu/udel/cis/vsl/abc/token/IF/ExecutionCharacter.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/Formation.java added as edu/udel/cis/vsl/abc/token/IF/Formation.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/FunctionMacro.java added as edu/udel/cis/vsl/abc/token/IF/FunctionMacro.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/Inclusion.java added as edu/udel/cis/vsl/abc/token/IF/Inclusion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/Macro.java added as edu/udel/cis/vsl/abc/token/IF/Macro.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/MacroExpansion.java added as edu/udel/cis/vsl/abc/token/IF/MacroExpansion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/ObjectMacro.java added as edu/udel/cis/vsl/abc/token/IF/ObjectMacro.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/Source.java added as edu/udel/cis/vsl/abc/token/IF/Source.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/StringLiteral.java added as edu/udel/cis/vsl/abc/token/IF/StringLiteral.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/StringToken.java added as edu/udel/cis/vsl/abc/token/IF/StringToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/SyntaxException.java added as edu/udel/cis/vsl/abc/token/IF/SyntaxException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/TokenFactory.java added as edu/udel/cis/vsl/abc/token/IF/TokenFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/TokenUtils.java added as edu/udel/cis/vsl/abc/token/IF/TokenUtils.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/IF/UnsourcedException.java added as edu/udel/cis/vsl/abc/token/IF/UnsourcedException.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/Tokens.java added as edu/udel/cis/vsl/abc/token/Tokens.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonCToken.java added as edu/udel/cis/vsl/abc/token/common/CommonCToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonCharacterFactory.java added as edu/udel/cis/vsl/abc/token/common/CommonCharacterFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonCharacterToken.java added as edu/udel/cis/vsl/abc/token/common/CommonCharacterToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonConcatenation.java added as edu/udel/cis/vsl/abc/token/common/CommonConcatenation.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonExecutionCharacter.java added as edu/udel/cis/vsl/abc/token/common/CommonExecutionCharacter.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonFunctionMacro.java added as edu/udel/cis/vsl/abc/token/common/CommonFunctionMacro.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonInclusion.java added as edu/udel/cis/vsl/abc/token/common/CommonInclusion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonMacro.java added as edu/udel/cis/vsl/abc/token/common/CommonMacro.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonMacroExpansion.java added as edu/udel/cis/vsl/abc/token/common/CommonMacroExpansion.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonObjectMacro.java added as edu/udel/cis/vsl/abc/token/common/CommonObjectMacro.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonPrimitiveCToken.java added as edu/udel/cis/vsl/abc/token/common/CommonPrimitiveCToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonSource.java added as edu/udel/cis/vsl/abc/token/common/CommonSource.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonSourceFactory.java added as edu/udel/cis/vsl/abc/token/common/CommonSourceFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonStringLiteral.java added as edu/udel/cis/vsl/abc/token/common/CommonStringLiteral.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonStringToken.java added as edu/udel/cis/vsl/abc/token/common/CommonStringToken.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/token/common/CommonTokenFactory.java added as edu/udel/cis/vsl/abc/token/common/CommonTokenFactory.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/transform/IF/Transformer.java added as edu/udel/cis/vsl/abc/transform/IF/Transformer.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/transform/common/Pruner.java added as edu/udel/cis/vsl/abc/transform/common/Pruner.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/transform/common/SideEffectFreeTriple.java added as edu/udel/cis/vsl/abc/transform/common/SideEffectFreeTriple.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/transform/common/SideEffectRemover.java added as edu/udel/cis/vsl/abc/transform/common/SideEffectRemover.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/util/ANTLRUtils.java added as edu/udel/cis/vsl/abc/util/ANTLRUtils.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/util/Pair.java added as edu/udel/cis/vsl/abc/util/Pair.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/util/SingletonIterator.java added as edu/udel/cis/vsl/abc/util/SingletonIterator.class doesn't exist.
+    [javac] edu/udel/cis/vsl/abc/util/StringPredicate.java added as edu/udel/cis/vsl/abc/util/StringPredicate.class doesn't exist.
+    [javac] Compiling 387 source files to /Users/siegel/Documents/workspace/ABC/bin
+    [javac] Using modern compiler
+    [javac] Compilation arguments:
+    [javac] '-d'
+    [javac] '/Users/siegel/Documents/workspace/ABC/bin'
+    [javac] '-classpath'
+    [javac] '/Users/siegel/Documents/workspace/ABC/bin:/Users/siegel/Documents/workspace/ABC/src:/VSL/Tools/src/antlr/antlr-3.4/lib/antlr-3.4-complete.jar'
+    [javac] '-sourcepath'
+    [javac] '/Users/siegel/Documents/workspace/ABC/src'
+    [javac] '-encoding'
+    [javac] 'UTF-8'
+    [javac] '-g'
+    [javac] 
+    [javac] The ' characters around the executable and arguments are
+    [javac] not part of the command.
+    [javac] Files to be compiled:
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ABC.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/Activator.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/Analysis.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/IF/Analyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/common/CompatiblePointerConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/common/ScopeAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/common/StandardAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/entity/DeclarationAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/entity/EntityAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/entity/ExpressionAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/entity/StandardTypes.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/entity/StatementAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/analysis/entity/TypeAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/antlr2ast/Antlr2AST.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/antlr2ast/impl/ASTBuilder.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/antlr2ast/impl/BasicMultiset.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/antlr2ast/impl/SimpleScope.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/antlr2ast/impl/SpecifierAnalysis.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/Conversions.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/ArithmeticConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/ArrayConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/CompatibleStructureOrUnionConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/Conversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/ConversionFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/FunctionConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/LvalueConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/NullPointerConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/PointerBoolConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/IF/VoidPointerConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonArithmeticConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonArrayConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonCompatiblePointerConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonCompatibleStructureOrUnionConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonConversionFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonFunctionConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonLvalueConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonNullPointerConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonPointerBoolConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/conversion/common/CommonVoidPointerConversion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/Entities.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Entity.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/EntityFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Enumeration.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Enumerator.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Field.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Function.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Label.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/OrdinaryEntity.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Scope.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/StructureOrUnion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/TaggedEntity.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Typedef.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/IF/Variable.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonEntity.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonEntityFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonEnumeration.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonEnumerator.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonField.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonFunction.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonLabel.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonOrdinaryEntity.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonScope.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonStructureOrUnion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonTaggedEntity.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonTypedef.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/entity/common/CommonVariable.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/ASTNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/AttributeKey.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/ExternalDefinitionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/IdentifierNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/NodeFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/PairNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/PragmaNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/SequenceNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/StaticAssertionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/ArrayDesignatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/CompoundInitializerNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/ContractNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/DeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/DesignationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/DesignatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/EnsuresNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/EnumeratorDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/FieldDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/FieldDesignatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/FunctionDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/FunctionDefinitionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/InitializerNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/OrdinaryDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/RequiresNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/TypedefDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/declaration/VariableDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/AlignOfNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/ArrowNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/CastNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/CharacterConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/CollectiveExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/CompoundLiteralNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/ConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/DotNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/EnumerationConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/ExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/FloatingConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/FunctionCallNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/GenericSelectionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/IdentifierExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/IntegerConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/OperatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/RemoteExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/ResultNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/SelfNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/SizeableNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/SizeofNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/SpawnNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/expression/StringLiteralNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/label/LabelNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/label/OrdinaryLabelNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/label/SwitchLabelNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/AssertNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/AssumeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/BlockItemNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/ChooseStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/CompoundStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/DeclarationListNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/ExpressionStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/ForLoopInitializerNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/ForLoopNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/GotoNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/IfNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/JumpNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/LabeledStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/LoopNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/NullStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/ReturnNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/StatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/SwitchNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/WaitNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/statement/WhenNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/ArrayTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/AtomicTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/BasicTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/EnumerationTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/FunctionTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/PointerTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/StructureOrUnionTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/TypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/IF/type/TypedefNameNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/Nodes.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonASTNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonAttributeKey.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonIdentifierNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonNodeFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonPairNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonPragmaNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonSequenceNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonStaticAssertionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/CommonWhenNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/LiteralInterpreter.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonArrayDesignatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonCompoundInitializerNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonDesignationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonEnsuresNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonEnumeratorDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFieldDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFieldDesignatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFunctionDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonFunctionDefinitionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonOrdinaryDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonRequiresNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonTypedefDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/declaration/CommonVariableDeclarationNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonAlignOfNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonArrowNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCastNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCharacterConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCollectiveExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonCompoundLiteralNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonDotNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonEnumerationConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonFloatingConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonFunctionCallNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonIdentifierExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonIntegerConstantNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonOperatorNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonRemoteExpressionNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonResultNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSelfNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSizeofNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonSpawnNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/expression/CommonStringLiteralNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/label/CommonOrdinaryLabelNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/label/CommonSwitchLabelNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonAssertNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonAssumeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonChooseStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonCompoundStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonDeclarationListNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonExpressionStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonForLoopNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonGotoNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonIfNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonJumpNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonLabeledStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonLoopNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonNullStatementNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonReturnNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonSwitchNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/statement/CommonWaitNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonArrayTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonAtomicTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonBasicTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonEnumerationTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonFunctionTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonPointerTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonProcessTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonStructureOrUnionTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonTypedefNameNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/common/type/CommonVoidTypeNode.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/node/package-info.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/ArithmeticType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/ArrayType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/AtomicType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/EnumerationType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/FloatingType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/FunctionType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/IntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/ObjectType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/PointerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/QualifiedObjectType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/SignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/SignedOrUnsignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/StandardBasicType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/StandardSignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/StandardUnsignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/StructureOrUnionType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/Type.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/TypeFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/UnqualifiedObjectType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/IF/UnsignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/Types.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/ArithmeticConversionType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonArrayType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonAtomicType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonBasicType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonCharType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonEnumerationType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonFloatingType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonFunctionType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonHeapType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonObjectType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonPointerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonProcessType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonQualifiedObjectType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonStandardSignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonStandardUnsignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonStructureOrUnionType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonTypeFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/CommonVoidType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/IntegerPromotionType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/RangeChoiceType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/SymbolicIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/SymbolicSignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/type/common/SymbolicUnsignedIntegerType.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/IF/Program.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/IF/TranslationUnit.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/IF/UnitFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/Units.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/common/CommonProgram.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/common/CommonTranslationUnit.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/unit/common/CommonUnitFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/AddressValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/ArrayElementReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/ArrayValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/CastValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/CharacterValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/ComplexValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/CompoundValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/FunctionReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/IntegerValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/MemberReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/OperatorValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/RealFloatingValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/StringValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/StructureValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/TypeValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/UnionValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/Value.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/ValueFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/IF/VariableReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/Values.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonAddressValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonArrayElementReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonArrayValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonCastValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonCharacterValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonComplexValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonFunctionReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonIntegerValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonMemberReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonOperatorValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonRealFloatingValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonStringValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonStructureValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonTypeValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonUnionValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonValueFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/CommonVariableReference.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/ast/value/common/MappedIntegerValue.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/config/Configurations.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/config/IF/Configuration.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/config/common/CommonConfiguration.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/IF/CParser.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/IF/ParseException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/IF/RuntimeParseException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/Parse.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common/CivlCParser.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/parse/common/CommonCParser.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/CTokenSource.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/IllegalMacroArgumentException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/Preprocessor.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/PreprocessorException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/PreprocessorExpressionException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/PreprocessorFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/IF/PreprocessorRuntimeException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/Preprocess.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/CTokenIterator.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/CommonCTokenSource.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/CommonPreprocessor.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/CommonPreprocessorFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/FilteredCharStream.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionAnalyzer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorExpressionParser.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorLexer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorParser.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorSourceFileInfo.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/common/PreprocessorUtils.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/preproc/p56/Phase5and6.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/CToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/CharacterToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/Concatenation.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/ExecutionCharacter.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/Formation.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/FunctionMacro.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/Inclusion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/Macro.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/MacroExpansion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/ObjectMacro.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/Source.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/StringLiteral.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/StringToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/SyntaxException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/TokenFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/TokenUtils.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/IF/UnsourcedException.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/Tokens.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonCToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonCharacterFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonCharacterToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonConcatenation.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonExecutionCharacter.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonFunctionMacro.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonInclusion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonMacro.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonMacroExpansion.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonObjectMacro.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonPrimitiveCToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonSource.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonSourceFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonStringLiteral.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonStringToken.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/token/common/CommonTokenFactory.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/transform/IF/Transformer.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/transform/common/Pruner.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/transform/common/SideEffectFreeTriple.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/transform/common/SideEffectRemover.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/util/ANTLRUtils.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/util/Pair.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/util/SingletonIterator.java
+    [javac]     /Users/siegel/Documents/workspace/ABC/src/edu/udel/cis/vsl/abc/util/StringPredicate.java
+    [javac] Creating empty /Users/siegel/Documents/workspace/ABC/bin/edu/udel/cis/vsl/abc/ast/node/package-info.class
+
+BUILD SUCCESSFUL
+Total time: 22 seconds
