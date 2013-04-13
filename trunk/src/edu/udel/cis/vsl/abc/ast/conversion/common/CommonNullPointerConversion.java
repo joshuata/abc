@@ -21,4 +21,10 @@ public class CommonNullPointerConversion extends CommonConversion implements
 		return (PointerType) super.getNewType();
 	}
 
+	@Override
+	public String toString() {
+		return "NullPointerConversion[" + getOldType().getId() + ", "
+				+ getNewType().getId() + "]";
+	}
+
 }

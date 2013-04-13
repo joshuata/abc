@@ -22,4 +22,10 @@ public class CommonPointerBoolConversion extends CommonConversion implements
 		return (StandardUnsignedIntegerType) super.getNewType();
 	}
 
+	@Override
+	public String toString() {
+		return "PointerBoolConversion[" + getOldType().getId() + ", "
+				+ getNewType().getId() + "]";
+	}
+
 }
