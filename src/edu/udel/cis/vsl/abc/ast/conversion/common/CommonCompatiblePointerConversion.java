@@ -20,4 +20,10 @@ public class CommonCompatiblePointerConversion extends CommonConversion
 	public PointerType getNewType() {
 		return (PointerType) super.getNewType();
 	}
+
+	@Override
+	public String toString() {
+		return "CompatiblePointerConversion[" + getOldType().getId() + ", "
+				+ getNewType().getId() + "]";
+	}
 }

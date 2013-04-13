@@ -21,4 +21,10 @@ public class CommonCompatibleStructureOrUnionConversion extends
 		return (StructureOrUnionType) super.getNewType();
 	}
 
+	@Override
+	public String toString() {
+		return "CompatibleStructureOrUnionConversion[" + getOldType().getId()
+				+ ", " + getNewType().getId() + "]";
+	}
+
 }
