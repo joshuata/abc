@@ -28,7 +28,6 @@ public class CIVLTranslationTest {
 
 	@After
 	public void tearDown() throws Exception {
-		
 	}
 
 	private void check(String filenameRoot) throws PreprocessorException,
