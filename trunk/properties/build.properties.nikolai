@@ -1,0 +1,4 @@
+junit.jar=/Users/tester/VSL/Tools/lib/junit.jar
+antlr.jar=/Users/tester/VSL/Tools/lib/antlr.jar
+antlr.runtime.bin=/Users/tester/VSL/Tools/bin/antlr-3.4-runtime
+jacoco.jar=/Users/tester/VSL/Tools/src/jacoco/lib/jacocoant.jar
