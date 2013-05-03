@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.Iterator;
 
+import javax.lang.model.type.TypeKind;
+
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -36,6 +38,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -140,7 +143,14 @@ public class StatementAnalyzer {
 		} else if (statement instanceof AssumeNode) {
 			processExpression(((AssumeNode) statement).getExpression());
 		} else if (statement instanceof WhenNode) {
-			processExpression(((WhenNode) statement).getGuard());
+			ExpressionNode guard = ((WhenNode)statement).getGuard();
+			Type guardType;
+			
+			processExpression(guard);
+			guardType = guard.getConvertedType();
+			// TODO: check guardType is something that can
+			// be converted to a boolean...what is that?
+			
 			processStatement(((WhenNode) statement).getBody());
 		} else if (statement instanceof ChooseStatementNode) {
 			Iterator<StatementNode> children = ((ChooseStatementNode) statement)

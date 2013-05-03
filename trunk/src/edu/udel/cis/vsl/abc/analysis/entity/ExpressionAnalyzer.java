@@ -28,6 +28,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ResultNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.SelfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
@@ -275,6 +276,8 @@ public class ExpressionAnalyzer {
 			// type should already be set
 		} else if (node instanceof StringLiteralNode) {
 			// type should already be set
+		} else if (node instanceof SelfNode) {
+			// type is process type, already set
 		} else
 			throw new RuntimeException("Unknown kind of constant node: " + node);
 		if (node.getInitialType() == null)
