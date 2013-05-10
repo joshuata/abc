@@ -393,8 +393,12 @@ public class SideEffectRemover implements Transformer {
 					Vector<ExpressionNode> subtractArguments = new Vector<ExpressionNode>();
 					Vector<ExpressionNode> decrementArguments = new Vector<ExpressionNode>();
 
+					subtractArguments.add(((OperatorNode) expression)
+							.getArgument(0));
+					subtractArguments.add(factory.newIntegerConstantNode(
+							expression.getSource(), "1"));
 					subtract = factory.newOperatorNode(expression.getSource(),
-							Operator.PLUS, subtractArguments);
+							Operator.MINUS, subtractArguments);
 					decrementArguments.add(((OperatorNode) expression)
 							.getArgument(0));
 					decrementArguments.add(subtract);
