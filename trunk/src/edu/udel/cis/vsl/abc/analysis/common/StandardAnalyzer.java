@@ -36,4 +36,10 @@ public class StandardAnalyzer implements Analyzer {
 		entityAnalyzer.analyze(unit);
 	}
 
+	@Override
+	public void clear(TranslationUnit unit) {
+		scopeAnalyzer.clear(unit);
+		entityAnalyzer.clear(unit);
+	}
+
 }

@@ -13,7 +13,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 public class ABC {
 
 	public final static String version = "0.1";
-	
+
 	public final static String date = "01-mar-2013";
 
 	public static Activator activator(File file, File[] systemIncludes,
@@ -34,7 +34,6 @@ public class ABC {
 		// the following are updated by -iquote
 		ArrayList<File> userIncludeList = new ArrayList<File>();
 		File infile;
-		PrintStream out;
 		File[] systemIncludes, userIncludes;
 		boolean preprocOnly = false;
 		boolean verbose = false;
@@ -108,12 +107,11 @@ public class ABC {
 		userIncludes = userIncludeList.toArray(new File[0]);
 		systemIncludes = systemIncludeList.toArray(new File[0]);
 		if (outfileName == null)
-			out = System.out;
+			result.out = System.out;
 		else
-			out = new PrintStream(new File(outfileName));
+			result.out = new PrintStream(new File(outfileName));
 		result.activator = new Activator(infile, systemIncludes, userIncludes);
 		result.verbose = verbose;
-		result.out = out;
 		result.preprocOnly = preprocOnly;
 		return result;
 	}
@@ -137,6 +135,7 @@ public class ABC {
 		else
 			config.activator.getSideEffectFreeTranslationUnit().print(
 					config.out);
+		config.out.close();
 	}
 }
 

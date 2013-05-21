@@ -7,4 +7,13 @@ public interface Analyzer {
 
 	void analyze(TranslationUnit unit) throws SyntaxException;
 
+	/**
+	 * Removes all analysis artifacts added to the translation unit by the
+	 * analyze method.
+	 * 
+	 * @param unit
+	 *            a translation unit
+	 */
+	void clear(TranslationUnit unit);
+
 }

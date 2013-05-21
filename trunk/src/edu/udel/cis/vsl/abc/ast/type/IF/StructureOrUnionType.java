@@ -4,19 +4,29 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 
 /**
- * A structure or union type. Such a type is specified by (1) a bit which says
- * whether this is a structure or a union, (2) a tag (which is a string which
- * names the type), and (3) a sequence of Fields, which are the members of the
- * type. The type may be incomplete (the fields have not yet been specified) or
- * complete (the fields have been specified).
+ * A structure or union type. Such a type is specified by (0) a key, (1) a bit
+ * which says whether this is a structure or a union, (2) a tag (which is a
+ * string which names the type), and (3) a sequence of Fields, which are the
+ * members of the type. The type may be incomplete (the fields have not yet been
+ * specified) or complete (the fields have been specified).
+ * 
+ * Two instances are considered equal if they have equal keys, isStruct bits,
+ * and tags.
  * 
  * @author siegel
  * 
  */
 public interface StructureOrUnionType extends UnqualifiedObjectType {
+
+	/**
+	 * Returns the key associated to this instance. The key is used in the
+	 * determination of equality of two instances of StructureOrUnionType.
+	 * 
+	 * @return the key
+	 */
+	Object getKey();
 
 	/**
 	 * Returns the tag of this type. The tag is the string that occurs in the
@@ -61,7 +71,7 @@ public interface StructureOrUnionType extends UnqualifiedObjectType {
 	 *                if this type is not yet complete
 	 */
 	Field getField(int index);
-	
+
 	Field getField(String fieldName);
 
 	/**
@@ -84,8 +94,11 @@ public interface StructureOrUnionType extends UnqualifiedObjectType {
 	 */
 	void complete(List<Field> fields);
 
-	StructureOrUnion getEntity();
+	/** Make incomplete. */
+	void clear();
 
-	void setEntity(StructureOrUnion entity);
+	// StructureOrUnion getEntity();
+
+	// void setEntity(StructureOrUnion entity);
 
 }

@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 
 /**
@@ -14,6 +13,14 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
  * @author siegel
  */
 public interface EnumerationType extends IntegerType {
+
+	/**
+	 * Returns the key associated to this instance. The key is used in the
+	 * determination of equality of two instances of EnumerationType.
+	 * 
+	 * @return the key
+	 */
+	Object getKey();
 
 	/**
 	 * Returns the tag of this enumeration type. This is the string used in the
@@ -71,8 +78,8 @@ public interface EnumerationType extends IntegerType {
 	 */
 	void complete(List<Enumerator> enumerators);
 
-	void setEntity(Enumeration enumeration);
-	
-	Enumeration getEntity();
-
+	/**
+	 * Make incomplete.
+	 */
+	void clear();
 }

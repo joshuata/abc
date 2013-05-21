@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -14,14 +13,18 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 public class CommonEnumerationType extends CommonIntegerType implements
 		EnumerationType {
 
+	private final static int classCode = CommonEnumerationType.class.hashCode();
+
+	private Object key;
+
 	private String tag;
 
 	private ArrayList<Enumerator> enumerators = null;
 
-	private Enumeration entity;
-
-	public CommonEnumerationType(String tag) {
+	public CommonEnumerationType(Object key, String tag) {
 		super(TypeKind.ENUMERATION);
+		assert key != null;
+		this.key = key;
 		this.tag = tag;
 	}
 
@@ -127,23 +130,13 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	}
 
 	@Override
-	public void setEntity(Enumeration enumeration) {
-		this.entity = enumeration;
-	}
-
-	@Override
-	public Enumeration getEntity() {
-		return entity;
-	}
-
-	@Override
 	public String toString() {
 		return "EnumerationType[tag=" + tag + "]";
 	}
 
 	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
-		out.print("Enumeration[tag=" + tag + "]");
+		out.print("Enumeration[tag=" + tag + ", key=" + key + "]");
 		if (!abbrv && enumerators != null) {
 			for (Enumerator enumerator : enumerators) {
 				out.println();
@@ -155,6 +148,38 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	@Override
 	public boolean isInteger() {
 		return true;
+	}
+
+	@Override
+	public Object getKey() {
+		return key;
+	}
+
+	@Override
+	public void clear() {
+		enumerators = null;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object)
+			return true;
+		if (object instanceof CommonEnumerationType) {
+			CommonEnumerationType that = (CommonEnumerationType) object;
+
+			return key.equals(that.key)
+					&& (tag == null || tag.equals(that.tag));
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = classCode ^ key.hashCode();
+
+		if (tag != null)
+			result ^= tag.hashCode();
+		return result;
 	}
 
 }

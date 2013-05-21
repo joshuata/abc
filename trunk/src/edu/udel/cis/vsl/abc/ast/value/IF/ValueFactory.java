@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.value.IF;
 
 import java.math.BigInteger;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;

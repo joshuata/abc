@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -17,10 +16,18 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 public class CommonStructureOrUnionType extends CommonObjectType implements
 		StructureOrUnionType {
 
+	private final static int classCode = CommonStructureOrUnionType.class
+			.hashCode();
+
+	/** Key, cannot be null. */
+	private Object key;
+
+	/** Tag: may be null */
 	private String tag;
 
 	private boolean isStruct;
 
+	/** Fields: will be null initially, until completed. */
 	private ArrayList<Field> fields;
 
 	/**
@@ -29,23 +36,18 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	 */
 	private Map<String, Field> fieldMap = new LinkedHashMap<String, Field>();
 
-	private StructureOrUnion entity;
-
-	public CommonStructureOrUnionType(String tag, boolean isStruct) {
+	public CommonStructureOrUnionType(Object key, String tag, boolean isStruct) {
 		super(TypeKind.STRUCTURE_OR_UNION);
+		assert key != null;
+		this.key = key;
 		this.tag = tag;
 		this.isStruct = isStruct;
 		this.fields = null;
 	}
 
 	@Override
-	public StructureOrUnion getEntity() {
-		return entity;
-	}
-
-	@Override
-	public void setEntity(StructureOrUnion entity) {
-		this.entity = entity;
+	public Object getKey() {
+		return key;
 	}
 
 	@Override
@@ -171,7 +173,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
 		out.print(isStruct ? "Structure" : "Union");
-		out.print("[" + tag + "]");
+		out.print("[tag=" + tag + ", key=" + key + "]");
 		if (!abbrv && fields != null) {
 			for (Field field : fields) {
 				Type fieldType = field.getType();
@@ -196,6 +198,37 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	@Override
 	public boolean isScalar() {
 		return false;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (this == object)
+			return true;
+		if (object instanceof CommonStructureOrUnionType) {
+			CommonStructureOrUnionType that = (CommonStructureOrUnionType) object;
+
+			return key.equals(that.key)
+					&& (tag == null || tag.equals(that.tag))
+					&& isStruct == that.isStruct;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = classCode ^ key.hashCode();
+
+		if (tag != null)
+			result ^= tag.hashCode();
+		if (isStruct)
+			result ^= 1;
+		return result;
+	}
+
+	@Override
+	public void clear() {
+		fieldMap = new LinkedHashMap<String, Field>();
+		fields = null;
 	}
 
 }
