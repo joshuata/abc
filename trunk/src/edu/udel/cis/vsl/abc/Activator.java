@@ -100,7 +100,7 @@ public class Activator {
 
 	public TranslationUnit getSideEffectFreeTranslationUnit()
 			throws SyntaxException, ParseException, PreprocessorException {
-		TranslationUnit unit = getRawTranslationUnit();
+		TranslationUnit unit = getTranslationUnit();
 		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
 		unit = sideEffectRemover.transform(unit);
