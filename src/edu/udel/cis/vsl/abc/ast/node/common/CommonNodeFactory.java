@@ -163,8 +163,6 @@ public class CommonNodeFactory implements NodeFactory {
 
 	private ValueFactory valueFactory;
 
-	private TypeFactory typeFactory;
-
 	private StandardUnsignedIntegerType booleanType;
 
 	private ObjectType processType;
@@ -172,7 +170,7 @@ public class CommonNodeFactory implements NodeFactory {
 	public CommonNodeFactory(TypeFactory typeFactory, ValueFactory valueFactory) {
 		this.literalInterpreter = new LiteralInterpreter(typeFactory,
 				valueFactory);
-		this.typeFactory = typeFactory;
+		// this.typeFactory = typeFactory;
 		this.valueFactory = valueFactory;
 		this.booleanType = typeFactory
 				.unsignedIntegerType(UnsignedIntKind.BOOL);
@@ -182,11 +180,6 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public ValueFactory getValueFactory() {
 		return valueFactory;
-	}
-
-	@Override
-	public TypeFactory getTypeFactory() {
-		return typeFactory;
 	}
 
 	@Override

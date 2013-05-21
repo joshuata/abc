@@ -59,7 +59,7 @@ public class CommonTypeFactory implements TypeFactory {
 	private ObjectType voidType = null;
 
 	private ObjectType processType = null;
-	
+
 	private ObjectType heapType = null;
 
 	private UnsignedIntegerType size_t = null, char16_t = null,
@@ -246,21 +246,19 @@ public class CommonTypeFactory implements TypeFactory {
 	}
 
 	@Override
-	public StructureOrUnionType newStructureOrUnionType(boolean isStruct,
-			String tag) {
-		StructureOrUnionType result = new CommonStructureOrUnionType(tag,
+	public StructureOrUnionType structureOrUnionType(Object key,
+			boolean isStruct, String tag) {
+		StructureOrUnionType result = new CommonStructureOrUnionType(key, tag,
 				isStruct);
 
-		insert(result);
-		return result;
+		return (StructureOrUnionType) canonicalize(result);
 	}
 
 	@Override
-	public EnumerationType newEnumerationType(String tag) {
-		EnumerationType result = new CommonEnumerationType(tag);
+	public EnumerationType enumerationType(Object key, String tag) {
+		EnumerationType result = new CommonEnumerationType(key, tag);
 
-		insert(result);
-		return result;
+		return (EnumerationType) canonicalize(result);
 	}
 
 	@Override

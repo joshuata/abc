@@ -193,4 +193,19 @@ public class ScopeAnalyzer implements Analyzer {
 		}
 	}
 
+	@Override
+	public void clear(TranslationUnit unit) {
+		clearNode(unit.getRootNode());
+	}
+
+	private void clearNode(ASTNode node) {
+		if (node != null) {
+			Iterator<ASTNode> children = node.children();
+
+			node.setScope(null);
+			while (children.hasNext())
+				clearNode(children.next());
+		}
+	}
+
 }

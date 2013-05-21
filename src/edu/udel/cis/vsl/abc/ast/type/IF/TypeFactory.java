@@ -245,6 +245,11 @@ public interface TypeFactory {
 	 * type can be completed using methods in the resulting StructureOrUnionType
 	 * object.
 	 * 
+	 * @param key
+	 *            a key to use to determine if two StructureOrUnionType
+	 *            instances with same tag and "isStruct" values are to be
+	 *            considered equal.
+	 * 
 	 * @param isStruct
 	 *            is this a structure type (as opposed to union)?
 	 * @param tag
@@ -252,18 +257,23 @@ public interface TypeFactory {
 	 *            may be null for an anonymous structure or union
 	 * @return a new, incomplete StructureOrUnion type
 	 */
-	StructureOrUnionType newStructureOrUnionType(boolean isStruct, String tag);
+	StructureOrUnionType structureOrUnionType(Object key, boolean isStruct,
+			String tag);
 
 	/**
-	 * Returns a new incomplete enumeration type with the given tag. The type
-	 * can be completed using methods in the resulting EnumerationType object.
+	 * Returns an enumeration type with the given tag and key. The type can be
+	 * completed using methods in the resulting EnumerationType object.
+	 * 
+	 * @param key
+	 *            an object used to uniquely identify the enumeration type; it
+	 *            is used in the equals method
 	 * 
 	 * @param tag
 	 *            the tag for the enumeration type, as in "enum TAG ..."; may be
 	 *            null for an anonymous enumeration type
 	 * @return a new, incomplete enumeration type
 	 */
-	EnumerationType newEnumerationType(String tag);
+	EnumerationType enumerationType(Object key, String tag);
 
 	/**
 	 * Returns a qualified type based on the given unqualified type. At least
@@ -561,7 +571,7 @@ public interface TypeFactory {
 
 	/** Returns the process type. */
 	ObjectType processType();
-	
+
 	/** Returns the heap type. */
 	ObjectType heapType();
 

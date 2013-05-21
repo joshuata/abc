@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
@@ -19,8 +20,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
@@ -80,7 +86,7 @@ public class EntityAnalyzer implements Analyzer {
 	public EntityAnalyzer(EntityFactory entityFactory, NodeFactory nodeFactory,
 			TokenFactory sourceFactory, ConversionFactory conversionFactory) {
 		this.nodeFactory = nodeFactory;
-		this.typeFactory = nodeFactory.getTypeFactory();
+		this.typeFactory = conversionFactory.getTypeFactory();
 		this.valueFactory = nodeFactory.getValueFactory();
 		this.sourceFactory = sourceFactory;
 		this.entityFactory = entityFactory;
@@ -239,6 +245,48 @@ public class EntityAnalyzer implements Analyzer {
 					}
 				}
 			}
+		}
+	}
+
+	@Override
+	public void clear(TranslationUnit unit) {
+		clearNode(unit.getRootNode());
+	}
+
+	private void clearNode(ASTNode node) {
+		if (node != null) {
+			Iterator<ASTNode> children = node.children();
+
+			if (node instanceof DeclarationNode) {
+				((DeclarationNode) node).setEntity(null);
+				((DeclarationNode) node).setIdentifier(null);
+				((DeclarationNode) node).setIsDefinition(false);
+			}
+			if (node instanceof TypeNode) {
+				((TypeNode) node).setType(null);
+
+			}
+			if (node instanceof IdentifierNode) {
+				((IdentifierNode) node).setDefinition(null);
+				((IdentifierNode) node).setEntity(null);
+			}
+			if (node instanceof ExpressionNode) {
+				((ExpressionNode) node).setInitialType(null);
+			}
+			if (node instanceof LabelNode) {
+				((LabelNode) node).setStatement(null);
+			}
+			if (node instanceof OrdinaryLabelNode) {
+				((OrdinaryLabelNode) node).setFunction(null);
+			}
+			if (node instanceof ChooseStatementNode) {
+				((ChooseStatementNode) node).setDefaultCase(null);
+			}
+			if (node instanceof SwitchNode) {
+				((SwitchNode) node).setDefaultCase(null);
+			}
+			while (children.hasNext())
+				clearNode(children.next());
 		}
 	}
 }

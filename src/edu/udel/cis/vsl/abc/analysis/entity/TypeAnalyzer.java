@@ -157,10 +157,10 @@ public class TypeAnalyzer {
 			}
 		}
 		if (enumeration == null) {
-			// create new incomplete enumeration type
-			enumerationType = typeFactory.newEnumerationType(tag);
+			enumerationType = typeFactory.enumerationType(node, tag);
+			// clear it, in case it was used in previous analysis pass
+			enumerationType.clear();
 			enumeration = entityFactory.newEnumeration(enumerationType);
-			enumerationType.setEntity(enumeration);
 			scope.add(enumeration);
 		}
 		enumeration.addDeclaration(node);
@@ -239,13 +239,13 @@ public class TypeAnalyzer {
 			}
 		}
 		if (structureOrUnion == null) {
-			// create new incomplete structure or union type
-			structureOrUnionType = typeFactory.newStructureOrUnionType(
+			structureOrUnionType = typeFactory.structureOrUnionType(node,
 					node.isStruct(), tag);
+			// in case this was used in previous analysis pass, clear it:
+			structureOrUnionType.clear();
 			structureOrUnion = entityFactory
 					.newStructureOrUnion(structureOrUnionType);
 			structureOrUnion.addDeclaration(node);
-			structureOrUnionType.setEntity(structureOrUnion);
 			scope.add(structureOrUnion);
 		} else {
 			structureOrUnion.addDeclaration(node);
@@ -554,9 +554,9 @@ public class TypeAnalyzer {
 						throw error("No type specified for function parameter",
 								decl);
 					// TODO: check alignment specifiers, storage specifiers.
-					//decl.setEntity(variable);
+					// decl.setEntity(variable);
 					// add to scope...?
-					//decl.getScope().\
+					// decl.getScope().\
 					parameterTypes
 							.add((ObjectType) parameterTypeNode.getType());
 				}
