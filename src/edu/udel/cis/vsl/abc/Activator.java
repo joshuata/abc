@@ -104,6 +104,7 @@ public class Activator {
 		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
 		unit = sideEffectRemover.transform(unit);
+		
 		Analysis.performStandardAnalysis(unit);
 		return unit;
 	}

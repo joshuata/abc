@@ -39,6 +39,7 @@ public class Analysis {
 		Analyzer analyzer = newStandardAnalyzer(entityFactory, nodeFactory,
 				sourceFactory, conversionFactory);
 
+		analyzer.clear(unit);
 		analyzer.analyze(unit);
 	}
 
