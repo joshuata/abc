@@ -134,7 +134,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.type.CommonBasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonEnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonPointerTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.common.type.CommonProcessTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonStructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonTypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonVoidTypeNode;
@@ -660,11 +659,6 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public ExpressionNode newResultNode(Source source) {
 		return new CommonResultNode(source);
-	}
-
-	@Override
-	public TypeNode newProcessTypeNode(Source source) {
-		return new CommonProcessTypeNode(source);
 	}
 
 	@Override

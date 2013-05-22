@@ -19,6 +19,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
@@ -259,19 +261,24 @@ public class EntityAnalyzer implements Analyzer {
 
 			if (node instanceof DeclarationNode) {
 				((DeclarationNode) node).setEntity(null);
-				((DeclarationNode) node).setIdentifier(null);
 				((DeclarationNode) node).setIsDefinition(false);
 			}
 			if (node instanceof TypeNode) {
 				((TypeNode) node).setType(null);
-
 			}
 			if (node instanceof IdentifierNode) {
 				((IdentifierNode) node).setDefinition(null);
 				((IdentifierNode) node).setEntity(null);
 			}
 			if (node instanceof ExpressionNode) {
-				((ExpressionNode) node).setInitialType(null);
+				if (node instanceof ConstantNode) {
+					if (node instanceof EnumerationConstantNode) {
+						((ConstantNode) node).setInitialType(null);
+					}
+				} else {
+					((ExpressionNode) node).setInitialType(null);
+				}
+				((ExpressionNode) node).removeConversions();
 			}
 			if (node instanceof LabelNode) {
 				((LabelNode) node).setStatement(null);

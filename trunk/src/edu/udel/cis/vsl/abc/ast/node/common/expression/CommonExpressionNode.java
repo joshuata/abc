@@ -133,4 +133,9 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 		conversions.add(conversion);
 	}
 
+	@Override
+	public void removeConversions() {
+		conversions = new ArrayList<Conversion>();
+	}
+
 }

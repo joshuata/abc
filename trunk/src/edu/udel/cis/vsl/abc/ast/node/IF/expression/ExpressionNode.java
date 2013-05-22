@@ -97,6 +97,9 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 	 */
 	void addConversion(Conversion conversion);
 
+	/** Remove all conversions from this node */
+	void removeConversions();
+
 	/**
 	 * Is this expression a "constant expression" in the sense of the C11
 	 * Standard?

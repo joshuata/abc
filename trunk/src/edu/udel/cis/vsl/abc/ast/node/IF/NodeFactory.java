@@ -165,8 +165,6 @@ public interface NodeFactory {
 
 	TypeNode newVoidTypeNode(Source source);
 
-	TypeNode newProcessTypeNode(Source source);
-
 	EnumerationTypeNode newEnumerationTypeNode(Source source,
 			IdentifierNode tag,
 			SequenceNode<EnumeratorDeclarationNode> enumerators);
