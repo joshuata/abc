@@ -4,12 +4,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
@@ -28,6 +34,11 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
@@ -35,6 +46,9 @@ import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 public class SideEffectRemover implements Transformer {
 
 	private NodeFactory factory;
+
+	private String tempVariablePrefix = "_TEMP_";
+	private int tempVariableCounter = 0;
 
 	public TranslationUnit transform(TranslationUnit unit)
 			throws SyntaxException {
@@ -71,6 +85,38 @@ public class SideEffectRemover implements Transformer {
 				items.add(item);
 			} else if (item instanceof StatementNode) {
 				items.add(processStatement((StatementNode) item));
+			} else if (item instanceof VariableDeclarationNode) {
+				if (((VariableDeclarationNode) item).getInitializer() == null) {
+					items.add(item);
+				} else {
+					if (isSEF((ExpressionNode) ((VariableDeclarationNode) item)
+							.getInitializer())) {
+						// Only modify things if we need to.
+						items.add(item);
+					} else {
+						ExpressionNode initializer;
+						ExpressionNode initializerAssignment;
+						List<ExpressionNode> assignmentArguments = new Vector<ExpressionNode>();
+						IdentifierNode variable = ((VariableDeclarationNode) item)
+								.getIdentifier();
+
+						assert (((VariableDeclarationNode) item)
+								.getInitializer() instanceof ExpressionNode);
+						initializer = (ExpressionNode) ((VariableDeclarationNode) item)
+								.getInitializer();
+						((VariableDeclarationNode) item).setInitializer(null);
+						items.add(item);
+						assignmentArguments.add(factory
+								.newIdentifierExpressionNode(
+										variable.getSource(), variable));
+						assignmentArguments.add(initializer);
+						initializerAssignment = factory.newOperatorNode(
+								initializer.getSource(), Operator.ASSIGN,
+								assignmentArguments);
+						items.add(processStatement(factory
+								.newExpressionStatementNode(initializerAssignment)));
+					}
+				}
 			} else {
 				// Variable initializers might not be SEF. Handle this later.
 				// Other types of block items should be SEF.
@@ -614,6 +660,10 @@ public class SideEffectRemover implements Transformer {
 			case DIV:
 			case TIMES:
 			case SUBSCRIPT:
+			case LAND:
+			case LOR:
+			case EQUALS:
+			case NEQ:
 				// TODO: Need to process these for precedent, or is this taken
 				// care of?
 				ExpressionNode left = ((OperatorNode) expression)
@@ -643,12 +693,72 @@ public class SideEffectRemover implements Transformer {
 				throw new RuntimeException(
 						"Node should not have side effects: " + expression);
 			}
+		} else if (expression instanceof FunctionCallNode) {
+			Vector<BlockItemNode> before = new Vector<BlockItemNode>();
+			ExpressionNode functionExpression = ((FunctionCallNode) expression)
+					.getFunction();
+			Entity functionEntity;
+			TypeNode returnTypeNode;
+			TypeNode newReturnTypeNode = null;
+			VariableDeclarationNode tmpVariable;
+			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
+
+			assert functionExpression instanceof IdentifierExpressionNode;
+			functionEntity = ((IdentifierExpressionNode) functionExpression)
+					.getIdentifier().getEntity();
+			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
+			returnTypeNode = ((Function) functionEntity).getDefinition()
+					.getTypeNode().getReturnType();
+			if (returnTypeNode instanceof TypedefNameNode) {
+				newReturnTypeNode = returnTypeNode; 
+			} else {
+				switch (returnTypeNode.getType().kind()) {
+				case VOID:
+					newReturnTypeNode = factory.newVoidTypeNode(returnTypeNode
+							.getSource());
+					break;
+				case BASIC:
+					BasicTypeKind basicType = ((BasicTypeNode) returnTypeNode)
+							.getBasicTypeKind();
+					newReturnTypeNode = factory.newBasicTypeNode(
+							returnTypeNode.getSource(), basicType);
+					break;
+				case POINTER:
+					newReturnTypeNode = factory
+							.newPointerTypeNode(returnTypeNode.getSource(),
+									((PointerTypeNode) returnTypeNode)
+											.referencedType());
+					break;
+				case PROCESS:
+				case HEAP:
+				default:
+					throw new RuntimeException(
+							"Duplicating type node (for side effect removal) not supported: "
+									+ returnTypeNode.getSource());
+				}
+			}
+			tmpVariable = factory.newVariableDeclarationNode(expression
+					.getSource(), factory.newIdentifierNode(
+					expression.getSource(), tempVariablePrefix
+							+ tempVariableCounter++), newReturnTypeNode);
+			before.add(tmpVariable);
+			arguments.add(factory.newIdentifierExpressionNode(
+					expression.getSource(), tmpVariable.getIdentifier()));
+			arguments.add(expression);
+			before.add(factory.newExpressionStatementNode(factory
+					.newOperatorNode(expression.getSource(), Operator.ASSIGN,
+							arguments)));
+			result = new SideEffectFreeTriple(before,
+					factory.newIdentifierExpressionNode(expression.getSource(),
+							tmpVariable.getIdentifier()),
+					new Vector<BlockItemNode>());
 		} else if (isSEF(expression)) {
 			result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
 					expression, new Vector<BlockItemNode>());
 		} else {
-			throw new RuntimeException("Unknown side effect expression "
-					+ expression);
+			throw new RuntimeException(
+					"Removing side effects not implemented for:  "
+							+ expression.getSource());
 		}
 		return result;
 	}
