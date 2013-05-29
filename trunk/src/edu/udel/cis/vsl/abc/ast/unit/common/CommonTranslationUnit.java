@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -87,17 +88,36 @@ public class CommonTranslationUnit implements TranslationUnit {
 
 	@Override
 	public void release() {
-		// TODO Auto-generated method stub
+		nullifyOwners(root);
+		externalEntities = null;
+		internalEntities = null;
+		internalOrExternalEntityMap = null;
+		nodeCount = 0;
+		nodes = null;
+		root = null;
+		unitFactory = null;
+	}
 
+	private void nullifyOwners(ASTNode node) {
+		if (node == null)
+			return;
+		else {
+			Iterator<ASTNode> children = node.children();
+
+			node.setOwner(null);
+			node.setId(-1);
+			while (children.hasNext())
+				nullifyOwners(children.next());
+		}
 	}
 
 	// supporting methods...
 
 	private void initialize() throws SyntaxException {
 		this.nodeCount = 0;
-		setIDsAndOwner((ASTNode) root);
+		setIDsAndOwner(root);
 		this.nodes = new ASTNode[nodeCount];
-		initializeNodeArray((ASTNode) root);
+		initializeNodeArray(root);
 		// ScopeAnalyzer.setScopes(this);
 	}
 
@@ -106,6 +126,11 @@ public class CommonTranslationUnit implements TranslationUnit {
 
 		if (node == null)
 			return;
+		if (node.getOwner() != null) {
+			throw new ASTException(
+					"Node cannot be added to new AST until old AST is released:\n"
+							+ node);
+		}
 		node.setId(nodeCount);
 		node.setOwner(this);
 		nodeCount++;
