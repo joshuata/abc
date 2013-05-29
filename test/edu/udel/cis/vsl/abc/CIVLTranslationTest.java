@@ -47,4 +47,10 @@ public class CIVLTranslationTest {
 		check("spawn");
 	}
 
+	@Test
+	public void choose() throws PreprocessorException, ParseException,
+			SyntaxException, IOException {
+		check("choose");
+	}
+
 }

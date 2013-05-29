@@ -104,7 +104,7 @@ public class Activator {
 		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
 		unit = sideEffectRemover.transform(unit);
-		
+
 		Analysis.performStandardAnalysis(unit);
 		return unit;
 	}
@@ -144,14 +144,24 @@ public class Activator {
 		unit = Antlr2AST.translate(parser, tree);
 		unit.print(out);
 		out.println();
+		// perform analysis and print results...
+		out.println(bar + " Analyzed Translation Unit " + bar + "\n");
+		Analysis.performStandardAnalysis(unit);
+		unit.print(out);
+		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
+		unit.getRootNode().getScope().print(out);
+		out.println("\n\n" + bar + " Types " + bar + "\n");
+		unit.getUnitFactory().getTypeFactory().printTypes(out);
+		out.println();
+		out.flush();
 		// print the results of removing side-effects...
-		out.println(bar + " Side-effect-free Raw Translation Unit " + bar);
+		out.println(bar + " Side-effect-free Translation Unit " + bar);
 		sideEffectRemover = new SideEffectRemover();
 		unit = sideEffectRemover.transform(unit);
 		unit.print(out);
 		out.println();
 		// perform analysis and print results...
-		out.println(bar + " Analyzed Translation Unit " + bar + "\n");
+		out.println(bar + " Analyzed Side-effect-free Translation Unit " + bar + "\n");
 		Analysis.performStandardAnalysis(unit);
 		unit.print(out);
 		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
