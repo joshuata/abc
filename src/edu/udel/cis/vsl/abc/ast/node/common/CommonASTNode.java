@@ -31,6 +31,12 @@ public abstract class CommonASTNode implements ASTNode {
 
 	private Scope scope;
 
+	private void checkModifiable() {
+		if (owner != null)
+			throw new ASTException(
+					"Cannot modify node until released from AST:\n" + this);
+	}
+
 	public CommonASTNode(Source source,
 			Iterator<? extends ASTNode> childIterator) {
 		int childCount = 0;
@@ -117,6 +123,7 @@ public abstract class CommonASTNode implements ASTNode {
 	}
 
 	public void setParent(ASTNode parent) {
+		checkModifiable();
 		this.parent = parent;
 	}
 
@@ -202,6 +209,7 @@ public abstract class CommonASTNode implements ASTNode {
 	protected void addChild(ASTNode child) {
 		int index = numChildren();
 
+		checkModifiable();
 		children.add(child);
 		if (child != null) {
 			if (child.parent() != null)
@@ -218,6 +226,7 @@ public abstract class CommonASTNode implements ASTNode {
 		int numChildren = children.size();
 		ASTNode oldChild;
 
+		checkModifiable();
 		if (child != null) {
 			if (child.parent() != null)
 				throw new ASTException("Cannot make\n" + child
