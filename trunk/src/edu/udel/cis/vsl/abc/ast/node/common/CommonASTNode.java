@@ -229,7 +229,7 @@ public abstract class CommonASTNode implements ASTNode {
 
 	@Override
 	public String toString() {
-		return "Node[" + id + "]";
+		return "Node[" + id + ", " + source.getSummary() + "]";
 	}
 
 }
