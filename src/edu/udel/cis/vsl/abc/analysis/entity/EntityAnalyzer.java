@@ -255,6 +255,8 @@ public class EntityAnalyzer implements Analyzer {
 		clearNode(unit.getRootNode());
 	}
 
+	// TODO: need to remove all cases from choose and switch nodes.
+	// other removals?
 	private void clearNode(ASTNode node) {
 		if (node != null) {
 			Iterator<ASTNode> children = node.children();

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -41,6 +42,11 @@ public abstract class CommonASTNode implements ASTNode {
 
 			children.add(child);
 			if (child != null) {
+				if (child.parent() != null)
+					throw new ASTException("Cannot make\n" + child
+							+ "\na child of node\n" + this
+							+ "\nbecause it is already a child of\n"
+							+ child.parent());
 				child.parent = this;
 				child.childIndex = childCount;
 			}
@@ -198,6 +204,11 @@ public abstract class CommonASTNode implements ASTNode {
 
 		children.add(child);
 		if (child != null) {
+			if (child.parent() != null)
+				throw new ASTException("Cannot make\n" + child
+						+ "\na child of node\n" + this
+						+ "\nbecause it is already a child of\n"
+						+ child.parent());
 			((CommonASTNode) child).parent = this;
 			((CommonASTNode) child).childIndex = index;
 		}
@@ -205,10 +216,22 @@ public abstract class CommonASTNode implements ASTNode {
 
 	public void setChild(int index, ASTNode child) {
 		int numChildren = children.size();
+		ASTNode oldChild;
 
+		if (child != null) {
+			if (child.parent() != null)
+				throw new ASTException("Cannot make\n" + child
+						+ "\na child of node\n" + this
+						+ "\nbecause it is already a child of\n"
+						+ child.parent());
+		}
 		while (index >= numChildren) {
 			children.add(null);
 			numChildren++;
+		}
+		oldChild = children.get(index);
+		if (oldChild != null) {
+			((CommonASTNode) oldChild).parent = null;
 		}
 		children.set(index, child);
 		if (child != null) {
