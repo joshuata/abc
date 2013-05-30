@@ -222,18 +222,19 @@ public abstract class CommonASTNode implements ASTNode {
 		}
 	}
 
+	@Override
 	public void setChild(int index, ASTNode child) {
 		int numChildren = children.size();
 		ASTNode oldChild;
 
 		checkModifiable();
-		if (child != null) {
-			if (child.parent() != null)
-				throw new ASTException("Cannot make\n" + child
-						+ "\na child of node\n" + this
-						+ "\nbecause it is already a child of\n"
-						+ child.parent());
-		}
+		if (child == null)
+			throw new ASTException("Cannot set child to null (index=" + index
+					+ "): " + this);
+		if (child.parent() != null)
+			throw new ASTException("Cannot make\n" + child
+					+ "\na child of node\n" + this
+					+ "\nbecause it is already a child of\n" + child.parent());
 		while (index >= numChildren) {
 			children.add(null);
 			numChildren++;
@@ -241,12 +242,28 @@ public abstract class CommonASTNode implements ASTNode {
 		oldChild = children.get(index);
 		if (oldChild != null) {
 			((CommonASTNode) oldChild).parent = null;
+			((CommonASTNode) oldChild).childIndex = -1;
 		}
 		children.set(index, child);
-		if (child != null) {
-			((CommonASTNode) child).parent = this;
-			((CommonASTNode) child).childIndex = index;
+		((CommonASTNode) child).parent = this;
+		((CommonASTNode) child).childIndex = index;
+	}
+
+	@Override
+	public void removeChild(int index) {
+		int numChildren = children.size();
+		ASTNode oldChild;
+
+		checkModifiable();
+		if (index < 0 || index >= numChildren)
+			throw new ASTException("Index " + index + " out of range [0,"
+					+ (numChildren - 1) + "]:" + this);
+		oldChild = children.get(index);
+		if (oldChild != null) {
+			((CommonASTNode) oldChild).parent = null;
+			((CommonASTNode) oldChild).childIndex = -1;
 		}
+		children.set(index, null);
 	}
 
 	@Override

@@ -165,4 +165,28 @@ public interface ASTNode {
 
 	TranslationUnit getOwner();
 
+	/**
+	 * Sets the child node at the given index. This ASTNode must be free (not
+	 * ownded by an AST) if this is called. The child must have a null parent,
+	 * i.e., not be the child of another node. The user is responsible for
+	 * ensuring that the child is of the appropriate kind and type. The index
+	 * can be any nonnegative integer.
+	 * 
+	 * @param index
+	 *            nonnegative integer
+	 * @param child
+	 *            a non-null node to become child of this node
+	 */
+	void setChild(int index, ASTNode child);
+
+	/**
+	 * Removes the child at given index from the node. The index must be in the
+	 * range [0,numChildren-1]. If there is no child at the given index (i.e.,
+	 * child is null), this is a no-op.
+	 * 
+	 * @param index
+	 *            nonnegative integer
+	 */
+	void removeChild(int index);
+
 }
