@@ -6,13 +6,13 @@ import java.io.PrintStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
+import edu.udel.cis.vsl.abc.ast.ASTs;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.Nodes;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.type.Types;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
-import edu.udel.cis.vsl.abc.ast.unit.Units;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
-import edu.udel.cis.vsl.abc.ast.unit.IF.UnitFactory;
 import edu.udel.cis.vsl.abc.ast.value.Values;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.parse.Parse;
@@ -28,22 +28,22 @@ import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 
 public class Antlr2AST {
 
-	public static TranslationUnit translate(CParser parser, CommonTree rootTree)
+	public static AST translate(CParser parser, CommonTree rootTree)
 			throws SyntaxException {
 		TypeFactory typeFactory = Types.newTypeFactory();
 		ValueFactory valueFactory = Values.newValueFactory(typeFactory);
 		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 				valueFactory);
 		TokenFactory sourceFactory = Tokens.newTokenFactory();
-		UnitFactory unitFactory = Units.newUnitFactory(nodeFactory,
+		ASTFactory unitFactory = ASTs.newUnitFactory(nodeFactory,
 				sourceFactory, typeFactory);
 		ASTBuilder builder = new ASTBuilder(parser, unitFactory, rootTree);
 
 		return builder.getTranslationUnit();
 	}
 
-	public static TranslationUnit build(CParser parser,
-			UnitFactory unitFactory, PrintStream out) throws ParseException,
+	public static AST build(CParser parser,
+			ASTFactory unitFactory, PrintStream out) throws ParseException,
 			SyntaxException {
 		CommonTree rootTree = parser.getTree();
 		ASTBuilder builder;
@@ -57,14 +57,14 @@ public class Antlr2AST {
 		return builder.getTranslationUnit();
 	}
 
-	public static TranslationUnit buildAST(CParser parser, PrintStream out)
+	public static AST buildAST(CParser parser, PrintStream out)
 			throws ParseException, SyntaxException {
 		TypeFactory typeFactory = Types.newTypeFactory();
 		ValueFactory valueFactory = Values.newValueFactory(typeFactory);
 		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 				valueFactory);
 		TokenFactory sourceFactory = Tokens.newTokenFactory();
-		UnitFactory unitFactory = Units.newUnitFactory(nodeFactory,
+		ASTFactory unitFactory = ASTs.newUnitFactory(nodeFactory,
 				sourceFactory, typeFactory);
 
 		return build(parser, unitFactory, out);
@@ -72,7 +72,7 @@ public class Antlr2AST {
 
 	public static void buildAndPrintAST(PrintStream out, CParser parser)
 			throws ParseException, SyntaxException {
-		TranslationUnit tu = buildAST(parser, out);
+		AST tu = buildAST(parser, out);
 
 		tu.print(out);
 	}

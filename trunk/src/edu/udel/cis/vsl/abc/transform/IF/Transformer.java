@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.IF;
 
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 public interface Transformer {
@@ -14,6 +14,6 @@ public interface Transformer {
 	 *             If it encounters an error in the translation unit or an
 	 *             unhandled case.
 	 */
-	public TranslationUnit transform(TranslationUnit unit) throws SyntaxException;
+	public AST transform(AST unit) throws SyntaxException;
 
 }

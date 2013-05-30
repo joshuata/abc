@@ -8,7 +8,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.analysis.Analysis;
 import edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.parse.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
@@ -82,25 +82,25 @@ public class Activator {
 		return tree;
 	}
 
-	public TranslationUnit getRawTranslationUnit() throws ParseException,
+	public AST getRawTranslationUnit() throws ParseException,
 			SyntaxException, PreprocessorException {
 		CParser parser = Parse.newCParser(preprocessor, file);
-		TranslationUnit unit = Antlr2AST.buildAST(parser, null);
+		AST unit = Antlr2AST.buildAST(parser, null);
 
 		return unit;
 	}
 
-	public TranslationUnit getTranslationUnit() throws ParseException,
+	public AST getTranslationUnit() throws ParseException,
 			SyntaxException, PreprocessorException {
-		TranslationUnit unit = getRawTranslationUnit();
+		AST unit = getRawTranslationUnit();
 
 		Analysis.performStandardAnalysis(unit);
 		return unit;
 	}
 
-	public TranslationUnit getSideEffectFreeTranslationUnit()
+	public AST getSideEffectFreeTranslationUnit()
 			throws SyntaxException, ParseException, PreprocessorException {
-		TranslationUnit unit = getTranslationUnit();
+		AST unit = getTranslationUnit();
 		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
 		unit = sideEffectRemover.transform(unit);
@@ -121,7 +121,7 @@ public class Activator {
 	 */
 	public void showTranslation(PrintStream out) throws PreprocessorException,
 			ParseException, SyntaxException, IOException {
-		TranslationUnit unit;
+		AST unit;
 		CParser parser;
 		CommonTree tree;
 		SideEffectRemover sideEffectRemover;

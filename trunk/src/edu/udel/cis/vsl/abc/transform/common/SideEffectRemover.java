@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -41,20 +43,18 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
-import edu.udel.cis.vsl.abc.ast.unit.IF.UnitFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 public class SideEffectRemover implements Transformer {
 
-	private UnitFactory unitFactory;
+	private ASTFactory unitFactory;
 	private NodeFactory factory;
 
 	private String tempVariablePrefix = "_TEMP_";
 	private int tempVariableCounter = 0;
 
-	public TranslationUnit transform(TranslationUnit unit)
+	public AST transform(AST unit)
 			throws SyntaxException {
 		ASTNode rootNode = unit.getRootNode();
 

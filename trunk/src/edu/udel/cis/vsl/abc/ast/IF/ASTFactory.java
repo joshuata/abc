@@ -1,6 +1,4 @@
-package edu.udel.cis.vsl.abc.ast.unit.IF;
-
-import java.util.List;
+package edu.udel.cis.vsl.abc.ast.IF;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -8,7 +6,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
-public interface UnitFactory {
+public interface ASTFactory {
 
 	/**
 	 * Creates a new AST with the given root node. The root node is typically a
@@ -45,9 +43,7 @@ public interface UnitFactory {
 	 *            the root node of the new AST
 	 * @return the new AST
 	 */
-	TranslationUnit newTranslationUnit(ASTNode root) throws SyntaxException;
-
-	Program newProgram(List<TranslationUnit> translationUnits);
+	AST newTranslationUnit(ASTNode root) throws SyntaxException;
 
 	NodeFactory getNodeFactory();
 
