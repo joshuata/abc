@@ -19,12 +19,14 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LabeledStatementNode;
@@ -40,11 +42,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
+import edu.udel.cis.vsl.abc.ast.unit.IF.UnitFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 public class SideEffectRemover implements Transformer {
 
+	private UnitFactory unitFactory;
 	private NodeFactory factory;
 
 	private String tempVariablePrefix = "_TEMP_";
@@ -54,7 +58,9 @@ public class SideEffectRemover implements Transformer {
 			throws SyntaxException {
 		ASTNode rootNode = unit.getRootNode();
 
-		factory = unit.getUnitFactory().getNodeFactory();
+		unitFactory = unit.getUnitFactory();
+		factory = unitFactory.getNodeFactory();
+		unit.release();
 		for (int i = 0; i < rootNode.numChildren(); i++) {
 			ASTNode node = rootNode.child(i);
 
@@ -64,7 +70,7 @@ public class SideEffectRemover implements Transformer {
 				removeSideEffects((FunctionDefinitionNode) node);
 			}
 		}
-		return unit.getUnitFactory().newTranslationUnit(rootNode);
+		return unitFactory.newTranslationUnit(rootNode);
 	}
 
 	private void removeSideEffects(FunctionDefinitionNode function)
@@ -80,6 +86,9 @@ public class SideEffectRemover implements Transformer {
 		for (int i = 0; i < statement.numChildren(); i++) {
 			BlockItemNode item = statement.getSequenceChild(i);
 
+			if (item != null && item.parent() != null) {
+				item.parent().removeChild(item.childIndex());
+			}
 			if (item instanceof FunctionDefinitionNode) {
 				removeSideEffects((FunctionDefinitionNode) item);
 				items.add(item);
@@ -102,6 +111,7 @@ public class SideEffectRemover implements Transformer {
 
 						assert (((VariableDeclarationNode) item)
 								.getInitializer() instanceof ExpressionNode);
+						variable.parent().removeChild(variable.childIndex());
 						initializer = (ExpressionNode) ((VariableDeclarationNode) item)
 								.getInitializer();
 						((VariableDeclarationNode) item).setInitializer(null);
@@ -118,7 +128,6 @@ public class SideEffectRemover implements Transformer {
 					}
 				}
 			} else {
-				// Variable initializers might not be SEF. Handle this later.
 				// Other types of block items should be SEF.
 				items.add(item);
 			}
@@ -131,6 +140,9 @@ public class SideEffectRemover implements Transformer {
 			throws SyntaxException {
 		StatementNode result = null;
 
+		if (statement != null && statement.parent() != null) {
+			statement.parent().removeChild(statement.childIndex());
+		}
 		if (statement instanceof AssertNode) {
 			result = assertStatement((AssertNode) statement);
 		} else if (statement instanceof AssumeNode) {
@@ -248,9 +260,13 @@ public class SideEffectRemover implements Transformer {
 	private StatementNode labeledStatement(LabeledStatementNode statement)
 			throws SyntaxException {
 		StatementNode target = processStatement(statement.getStatement());
+		LabelNode label = statement.getLabel();
 
-		return factory.newLabeledStatementNode(statement.getSource(),
-				statement.getLabel(), target);
+		if (label != null && label.parent() != null) {
+			label.parent().removeChild(label.childIndex());
+		}
+		return factory.newLabeledStatementNode(statement.getSource(), label,
+				target);
 	}
 
 	private StatementNode ifStatement(IfNode statement) throws SyntaxException {
@@ -272,9 +288,11 @@ public class SideEffectRemover implements Transformer {
 	private StatementNode whenStatement(WhenNode statement)
 			throws SyntaxException {
 		StatementNode result;
+		ExpressionNode guard = statement.getGuard();
 
-		result = factory.newWhenNode(statement.getSource(),
-				statement.getGuard(), processStatement(statement.getBody()));
+		guard.parent().removeChild(guard.childIndex());
+		result = factory.newWhenNode(statement.getSource(), guard,
+				processStatement(statement.getBody()));
 		return result;
 	}
 
@@ -325,9 +343,13 @@ public class SideEffectRemover implements Transformer {
 		StatementNode result = null;
 		ExpressionNode expression = statement.getExpression();
 
+		// if (statement.parent() != null) {
+		// statement.parent().removeChild(statement.childIndex());
+		// }
 		if (isSEF(expression)) {
 			result = statement;
 		} else {
+			// expression.parent().removeChild(expression.childIndex());
 			if (expression instanceof FunctionCallNode) {
 				boolean sideEffectFree = true;
 
@@ -525,6 +547,10 @@ public class SideEffectRemover implements Transformer {
 						Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
 						Vector<ExpressionNode> assignmentArguments = new Vector<ExpressionNode>();
 
+						expression.removeChild(((OperatorNode) expression)
+								.getArgument(0).childIndex());
+						expression.removeChild(((OperatorNode) expression)
+								.getArgument(1).childIndex());
 						arguments.add(((OperatorNode) expression)
 								.getArgument(0));
 						arguments.add(((OperatorNode) expression)
@@ -561,26 +587,36 @@ public class SideEffectRemover implements Transformer {
 			throws SyntaxException {
 		ExpressionNode condition = statement.getCondition();
 		StatementNode newBody = processStatement(statement.getBody());
+		ExpressionNode invariant = statement.getInvariant();
 		StatementNode result;
 
+		condition.parent().removeChild(condition.childIndex());
+		if (invariant != null) {
+			invariant.parent().removeChild(invariant.childIndex());
+		}
 		if (!isSEF(condition)) {
 			throw new RuntimeException(
 					"Loop conditions should be side effect free. " + condition);
 		}
 		switch (statement.getKind()) {
 		case FOR:
-			result = factory.newForLoopNode(statement.getSource(),
-					((ForLoopNode) statement).getInitializer(), condition,
-					((ForLoopNode) statement).getIncrementer(), newBody,
-					statement.getInvariant());
+			ForLoopInitializerNode initializer = ((ForLoopNode) statement)
+					.getInitializer();
+			ExpressionNode incrementer = ((ForLoopNode) statement)
+					.getIncrementer();
+
+			initializer.parent().removeChild(initializer.childIndex());
+			incrementer.parent().removeChild(incrementer.childIndex());
+			result = factory.newForLoopNode(statement.getSource(), initializer,
+					condition, incrementer, newBody, invariant);
 			break;
 		case DO_WHILE:
 			result = factory.newDoLoopNode(statement.getSource(), condition,
-					newBody, statement.getInvariant());
+					newBody, invariant);
 			break;
 		default:
 			result = factory.newWhileLoopNode(statement.getSource(), condition,
-					newBody, statement.getInvariant());
+					newBody, invariant);
 		}
 		return result;
 	}
@@ -710,7 +746,7 @@ public class SideEffectRemover implements Transformer {
 			returnTypeNode = ((Function) functionEntity).getDefinition()
 					.getTypeNode().getReturnType();
 			if (returnTypeNode instanceof TypedefNameNode) {
-				newReturnTypeNode = returnTypeNode; 
+				newReturnTypeNode = returnTypeNode;
 			} else {
 				switch (returnTypeNode.getType().kind()) {
 				case VOID:
@@ -753,6 +789,7 @@ public class SideEffectRemover implements Transformer {
 							tmpVariable.getIdentifier()),
 					new Vector<BlockItemNode>());
 		} else if (isSEF(expression)) {
+			expression.parent().removeChild(expression.childIndex());
 			result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
 					expression, new Vector<BlockItemNode>());
 		} else {
@@ -771,14 +808,19 @@ public class SideEffectRemover implements Transformer {
 		assert assign.getOperator() == Operator.ASSIGN;
 		// Assume left hand side is side effect free.
 		if (isSEF(assign.getArgument(1))) {
+			assign.parent().removeChild(assign.childIndex());
 			before.add(factory.newExpressionStatementNode(assign));
 		} else {
 			SideEffectFreeTriple rhs = processExpression(assign.getArgument(1));
 			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
+			ExpressionNode lhs = assign.getArgument(0);
+			ExpressionNode newRhs = rhs.getExpression();
 
+			lhs.parent().removeChild(lhs.childIndex());
+			newRhs.parent().removeChild(newRhs.childIndex());
 			before.addAll(rhs.getBefore());
-			arguments.add(assign.getArgument(0));
-			arguments.add(rhs.getExpression());
+			arguments.add(lhs);
+			arguments.add(newRhs);
 			before.add(factory.newExpressionStatementNode(factory
 					.newOperatorNode(assign.getSource(), Operator.ASSIGN,
 							arguments)));
