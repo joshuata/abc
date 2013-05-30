@@ -15,6 +15,10 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public abstract class CommonASTNode implements ASTNode {
 
+	private static long instanceCount = 0;
+
+	private long instanceId;
+
 	private int id = -1;
 
 	private AST owner = null;
@@ -41,6 +45,7 @@ public abstract class CommonASTNode implements ASTNode {
 			Iterator<? extends ASTNode> childIterator) {
 		int childCount = 0;
 
+		instanceId = instanceCount++;
 		this.source = source;
 		children = new ArrayList<ASTNode>();
 		while (childIterator.hasNext()) {
@@ -283,7 +288,8 @@ public abstract class CommonASTNode implements ASTNode {
 
 	@Override
 	public String toString() {
-		return "Node[" + id + ", " + source.getSummary() + "]";
+		return "Node[" + id + ", " + instanceId + ", " + source.getSummary()
+				+ "]";
 	}
 
 }
