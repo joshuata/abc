@@ -82,24 +82,24 @@ public class Activator {
 		return tree;
 	}
 
-	public AST getRawTranslationUnit() throws ParseException,
-			SyntaxException, PreprocessorException {
+	public AST getRawTranslationUnit() throws ParseException, SyntaxException,
+			PreprocessorException {
 		CParser parser = Parse.newCParser(preprocessor, file);
 		AST unit = Antlr2AST.buildAST(parser, null);
 
 		return unit;
 	}
 
-	public AST getTranslationUnit() throws ParseException,
-			SyntaxException, PreprocessorException {
+	public AST getTranslationUnit() throws ParseException, SyntaxException,
+			PreprocessorException {
 		AST unit = getRawTranslationUnit();
 
 		Analysis.performStandardAnalysis(unit);
 		return unit;
 	}
 
-	public AST getSideEffectFreeTranslationUnit()
-			throws SyntaxException, ParseException, PreprocessorException {
+	public AST getSideEffectFreeTranslationUnit() throws SyntaxException,
+			ParseException, PreprocessorException {
 		AST unit = getTranslationUnit();
 		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
@@ -140,12 +140,12 @@ public class Activator {
 		ANTLRUtils.printTree(out, tree);
 		out.println();
 		// print the raw TranslationUnit...
-		out.println(bar + " Raw Translation Unit " + bar);
+		out.println("\n\n" + bar + " Raw Translation Unit " + bar);
 		unit = Antlr2AST.translate(parser, tree);
 		unit.print(out);
 		out.println();
 		// perform analysis and print results...
-		out.println(bar + " Analyzed Translation Unit " + bar + "\n");
+		out.println("\n\n" + bar + " Analyzed Translation Unit " + bar + "\n");
 		Analysis.performStandardAnalysis(unit);
 		unit.print(out);
 		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
@@ -155,13 +155,14 @@ public class Activator {
 		out.println();
 		out.flush();
 		// print the results of removing side-effects...
-		out.println(bar + " Side-effect-free Translation Unit " + bar);
+		out.println("\n\n" + bar + " Side-effect-free Translation Unit " + bar);
 		sideEffectRemover = new SideEffectRemover();
 		unit = sideEffectRemover.transform(unit);
 		unit.print(out);
 		out.println();
 		// perform analysis and print results...
-		out.println(bar + " Analyzed Side-effect-free Translation Unit " + bar + "\n");
+		out.println("\n\n" + bar
+				+ " Analyzed Side-effect-free Translation Unit " + bar + "\n");
 		Analysis.performStandardAnalysis(unit);
 		unit.print(out);
 		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
