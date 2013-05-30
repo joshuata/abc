@@ -127,7 +127,10 @@ public class EntityAnalyzer implements Analyzer {
 	// Package private methods...
 
 	SyntaxException error(String message, ASTNode node) {
-		return sourceFactory.newSyntaxException(message, node.getSource());
+		if (node == null)
+			throw new NullPointerException("Null node and " + message);
+		else
+			return sourceFactory.newSyntaxException(message, node.getSource());
 	}
 
 	SyntaxException error(UnsourcedException e, ASTNode node) {
