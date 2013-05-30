@@ -42,7 +42,7 @@ public class CTranslationTest {
 	}
 
 	@Test
-	public void spawn() throws PreprocessorException, ParseException,
+	public void adder_seq() throws PreprocessorException, ParseException,
 			SyntaxException, IOException {
 		check("adder_seq");
 	}
