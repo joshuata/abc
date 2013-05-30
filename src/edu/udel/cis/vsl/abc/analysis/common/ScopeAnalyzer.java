@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.analysis.common;
 import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
@@ -18,7 +19,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -29,7 +29,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  */
 public class ScopeAnalyzer implements Analyzer {
 
-	public static void setScopes(TranslationUnit ast, EntityFactory scopeFactory)
+	public static void setScopes(AST ast, EntityFactory scopeFactory)
 			throws SyntaxException {
 		(new ScopeAnalyzer(scopeFactory)).analyze(ast);
 	}
@@ -43,7 +43,7 @@ public class ScopeAnalyzer implements Analyzer {
 	}
 
 	@Override
-	public void analyze(TranslationUnit unit) throws SyntaxException {
+	public void analyze(AST unit) throws SyntaxException {
 		ASTNode root = unit.getRootNode();
 
 		processNode(root, null, null);
@@ -194,7 +194,7 @@ public class ScopeAnalyzer implements Analyzer {
 	}
 
 	@Override
-	public void clear(TranslationUnit unit) {
+	public void clear(AST unit) {
 		clearNode(unit.getRootNode());
 	}
 

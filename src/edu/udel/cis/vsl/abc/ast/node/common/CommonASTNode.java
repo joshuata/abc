@@ -7,17 +7,17 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import edu.udel.cis.vsl.abc.ast.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public abstract class CommonASTNode implements ASTNode {
 
 	private int id = -1;
 
-	private TranslationUnit owner = null;
+	private AST owner = null;
 
 	private ASTNode parent;
 
@@ -103,12 +103,12 @@ public abstract class CommonASTNode implements ASTNode {
 	}
 
 	@Override
-	public void setOwner(TranslationUnit owner) {
+	public void setOwner(AST owner) {
 		this.owner = owner;
 	}
 
 	@Override
-	public TranslationUnit getOwner() {
+	public AST getOwner() {
 		return owner;
 	}
 

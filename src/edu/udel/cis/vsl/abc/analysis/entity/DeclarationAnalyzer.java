@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.Collection;
 import java.util.Iterator;
 
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -37,7 +38,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.GotoNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -323,7 +323,7 @@ public class DeclarationAnalyzer {
 	private OrdinaryEntity processOrdinaryDeclaration(
 			OrdinaryDeclarationNode node, boolean isParameter)
 			throws SyntaxException {
-		TranslationUnit unit = node.getOwner();
+		AST unit = node.getOwner();
 		IdentifierNode identifier = node.getIdentifier();
 		TypeNode typeNode = node.getTypeNode();
 		Type type = entityAnalyzer.typeAnalyzer.processTypeNode(typeNode,

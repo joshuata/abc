@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.ast.unit.IF;
+package edu.udel.cis.vsl.abc.ast.IF;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -17,10 +17,10 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * @author siegel
  * 
  */
-public interface TranslationUnit {
+public interface AST {
 
 	/** Returns the UnitFactory responsible for creating this translation unit. */
-	UnitFactory getUnitFactory();
+	ASTFactory getUnitFactory();
 
 	/** Returns the root node of the tree. */
 	ASTNode getRootNode();

@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -30,7 +31,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
@@ -109,7 +109,7 @@ public class EntityAnalyzer implements Analyzer {
 	}
 
 	@Override
-	public void analyze(TranslationUnit unit) throws SyntaxException {
+	public void analyze(AST unit) throws SyntaxException {
 		ASTNode root = unit.getRootNode();
 		Iterator<ASTNode> children = root.children();
 
@@ -251,7 +251,7 @@ public class EntityAnalyzer implements Analyzer {
 	}
 
 	@Override
-	public void clear(TranslationUnit unit) {
+	public void clear(AST unit) {
 		clearNode(unit.getRootNode());
 	}
 

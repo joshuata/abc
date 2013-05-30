@@ -1,18 +1,15 @@
-package edu.udel.cis.vsl.abc.ast.unit.common;
+package edu.udel.cis.vsl.abc.ast.common;
 
-import java.util.List;
-
+import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
-import edu.udel.cis.vsl.abc.ast.unit.IF.Program;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
-import edu.udel.cis.vsl.abc.ast.unit.IF.UnitFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
-public class CommonUnitFactory implements UnitFactory {
+public class CommonASTFactory implements ASTFactory {
 
 	private NodeFactory nodeFactory;
 
@@ -20,7 +17,7 @@ public class CommonUnitFactory implements UnitFactory {
 
 	private TypeFactory typeFactory;
 
-	public CommonUnitFactory(NodeFactory nodeFactory,
+	public CommonASTFactory(NodeFactory nodeFactory,
 			TokenFactory tokenFactory, TypeFactory typeFactory) {
 		this.nodeFactory = nodeFactory;
 		this.tokenFactory = tokenFactory;
@@ -28,18 +25,13 @@ public class CommonUnitFactory implements UnitFactory {
 	}
 
 	@Override
-	public TranslationUnit newTranslationUnit(ASTNode root)
+	public AST newTranslationUnit(ASTNode root)
 			throws SyntaxException {
-		TranslationUnit unit = new CommonTranslationUnit(this,
+		AST unit = new CommonAST(this,
 				(CommonASTNode) root);
 
 		// do some preparation?
 		return unit;
-	}
-
-	@Override
-	public Program newProgram(List<TranslationUnit> translationUnits) {
-		return new CommonProgram(translationUnits);
 	}
 
 	@Override

@@ -4,8 +4,8 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 /**
@@ -161,9 +161,9 @@ public interface ASTNode {
 	 */
 	void setScope(Scope scope);
 
-	void setOwner(TranslationUnit owner);
+	void setOwner(AST owner);
 
-	TranslationUnit getOwner();
+	AST getOwner();
 
 	/**
 	 * Sets the child node at the given index. This ASTNode must be free (not

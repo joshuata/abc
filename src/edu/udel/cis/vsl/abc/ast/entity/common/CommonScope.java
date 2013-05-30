@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -15,7 +16,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -30,7 +30,7 @@ public class CommonScope implements Scope {
 
 	private int id = -1;
 
-	private TranslationUnit translationUnit;
+	private AST translationUnit;
 
 	private CommonScope parentScope;
 
@@ -88,7 +88,7 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public TranslationUnit getTranslationUnit() {
+	public AST getTranslationUnit() {
 		return translationUnit;
 	}
 

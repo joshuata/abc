@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
@@ -63,7 +63,7 @@ import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 public class Pruner implements Transformer {
 
 	@Override
-	public TranslationUnit transform(TranslationUnit unit)
+	public AST transform(AST unit)
 			throws SyntaxException {
 		
 		// TODO Auto-generated method stub

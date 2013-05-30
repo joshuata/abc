@@ -2,10 +2,10 @@ package edu.udel.cis.vsl.abc.analysis.common;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.analysis.entity.EntityAnalyzer;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
@@ -31,13 +31,13 @@ public class StandardAnalyzer implements Analyzer {
 	}
 
 	@Override
-	public void analyze(TranslationUnit unit) throws SyntaxException {
+	public void analyze(AST unit) throws SyntaxException {
 		scopeAnalyzer.analyze(unit);
 		entityAnalyzer.analyze(unit);
 	}
 
 	@Override
-	public void clear(TranslationUnit unit) {
+	public void clear(AST unit) {
 		scopeAnalyzer.clear(unit);
 		entityAnalyzer.clear(unit);
 	}

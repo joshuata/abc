@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.ast.unit.common;
+package edu.udel.cis.vsl.abc.ast.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -7,16 +7,16 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
-import edu.udel.cis.vsl.abc.ast.unit.IF.UnitFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
-public class CommonTranslationUnit implements TranslationUnit {
+public class CommonAST implements AST {
 
-	private UnitFactory unitFactory;
+	private ASTFactory unitFactory;
 
 	private ASTNode root;
 
@@ -30,7 +30,7 @@ public class CommonTranslationUnit implements TranslationUnit {
 
 	private ArrayList<OrdinaryEntity> externalEntities = new ArrayList<OrdinaryEntity>();
 
-	public CommonTranslationUnit(UnitFactory unitFactory, ASTNode root)
+	public CommonAST(ASTFactory unitFactory, ASTNode root)
 			throws SyntaxException {
 		this.root = root;
 		this.unitFactory = unitFactory;
@@ -38,7 +38,7 @@ public class CommonTranslationUnit implements TranslationUnit {
 	}
 
 	@Override
-	public UnitFactory getUnitFactory() {
+	public ASTFactory getUnitFactory() {
 		return unitFactory;
 	}
 

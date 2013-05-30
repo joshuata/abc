@@ -11,6 +11,8 @@ import java.util.Set;
 
 import org.antlr.runtime.tree.CommonTree;
 
+import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -57,8 +59,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
-import edu.udel.cis.vsl.abc.ast.unit.IF.TranslationUnit;
-import edu.udel.cis.vsl.abc.ast.unit.IF.UnitFactory;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
@@ -268,7 +268,7 @@ public class ASTBuilder {
 
 	private TokenFactory sourceFactory;
 
-	private UnitFactory unitFactory;
+	private ASTFactory unitFactory;
 
 	private CommonTree rootTree;
 
@@ -285,7 +285,7 @@ public class ASTBuilder {
 	 *            the CTokenSource used to produce the ANTLR tree
 	 * 
 	 */
-	public ASTBuilder(CParser parser, UnitFactory unitFactory,
+	public ASTBuilder(CParser parser, ASTFactory unitFactory,
 			CommonTree rootTree) {
 		this.parser = parser;
 		this.unitFactory = unitFactory;
@@ -306,7 +306,7 @@ public class ASTBuilder {
 	 *             if there is something in the tree that does not conform to
 	 *             the C11 standard
 	 */
-	public TranslationUnit getTranslationUnit() throws SyntaxException {
+	public AST getTranslationUnit() throws SyntaxException {
 		ASTNode root = translateTranslationUnit(rootTree);
 
 		return unitFactory.newTranslationUnit(root);
