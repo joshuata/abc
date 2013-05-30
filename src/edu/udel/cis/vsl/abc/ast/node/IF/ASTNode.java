@@ -166,16 +166,18 @@ public interface ASTNode {
 	AST getOwner();
 
 	/**
-	 * Sets the child node at the given index. This ASTNode must be free (not
-	 * ownded by an AST) if this is called. The child must have a null parent,
-	 * i.e., not be the child of another node. The user is responsible for
-	 * ensuring that the child is of the appropriate kind and type. The index
-	 * can be any nonnegative integer.
+	 * Sets the child node at the given index. This ASTNode must be either null
+	 * or free (not ownded by an AST) if this is called. A non-null child must
+	 * have a null parent, i.e., not be the child of another node. The user is
+	 * responsible for ensuring that the child is of the appropriate kind and
+	 * type. The index can be any nonnegative integer. The list of children will
+	 * be expanded as necessary with null values in order to incorporate the
+	 * index.
 	 * 
 	 * @param index
 	 *            nonnegative integer
 	 * @param child
-	 *            a non-null node to become child of this node
+	 *            a node (or null) to be made the index-th child of this node
 	 */
 	void setChild(int index, ASTNode child);
 

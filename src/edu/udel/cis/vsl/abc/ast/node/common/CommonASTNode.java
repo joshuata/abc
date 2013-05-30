@@ -228,10 +228,13 @@ public abstract class CommonASTNode implements ASTNode {
 		ASTNode oldChild;
 
 		checkModifiable();
-		if (child == null)
-			throw new ASTException("Cannot set child to null (index=" + index
-					+ "): " + this);
-		if (child.parent() != null)
+		if (index < 0)
+			throw new ASTException("Negative index " + index
+					+ " used in setChild on " + this);
+		// if (child == null)
+		// throw new ASTException("Cannot set child to null (index=" + index
+		// + "): " + this);
+		if (child != null && child.parent() != null)
 			throw new ASTException("Cannot make\n" + child
 					+ "\na child of node\n" + this
 					+ "\nbecause it is already a child of\n" + child.parent());
@@ -245,8 +248,10 @@ public abstract class CommonASTNode implements ASTNode {
 			((CommonASTNode) oldChild).childIndex = -1;
 		}
 		children.set(index, child);
-		((CommonASTNode) child).parent = this;
-		((CommonASTNode) child).childIndex = index;
+		if (child != null) {
+			((CommonASTNode) child).parent = this;
+			((CommonASTNode) child).childIndex = index;
+		}
 	}
 
 	@Override
