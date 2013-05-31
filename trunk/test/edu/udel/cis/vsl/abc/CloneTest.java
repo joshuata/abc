@@ -15,6 +15,12 @@ import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
+/**
+ * Tests the "copy" method in nodes, which performs deep cloning.
+ * 
+ * @author siegel
+ * 
+ */
 public class CloneTest {
 
 	private File[] systemIncludes, userIncludes;
