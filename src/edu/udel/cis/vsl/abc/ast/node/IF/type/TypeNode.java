@@ -104,4 +104,7 @@ public interface TypeNode extends SizeableNode {
 	 */
 	void setType(Type type);
 
+	@Override
+	TypeNode copy();
+
 }

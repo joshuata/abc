@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.node.IF;
 
-
 /** A node with two children, the first of type S and the second of type T. */
 public interface PairNode<S extends ASTNode, T extends ASTNode> extends ASTNode {
 
@@ -15,4 +14,7 @@ public interface PairNode<S extends ASTNode, T extends ASTNode> extends ASTNode 
 
 	/** Set the right child. */
 	void setRight(T child);
+
+	@Override
+	PairNode<S, T> copy();
 }

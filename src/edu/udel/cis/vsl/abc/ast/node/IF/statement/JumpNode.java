@@ -8,4 +8,7 @@ public interface JumpNode extends StatementNode {
 
 	JumpKind getKind();
 
+	@Override
+	JumpNode copy();
+
 }

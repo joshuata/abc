@@ -27,4 +27,7 @@ public interface IfNode extends StatementNode {
 	 */
 	StatementNode getFalseBranch();
 
+	@Override
+	IfNode copy();
+
 }

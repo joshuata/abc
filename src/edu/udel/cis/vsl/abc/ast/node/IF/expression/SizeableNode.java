@@ -21,4 +21,7 @@ public interface SizeableNode extends ASTNode {
 	 */
 	Type getType();
 
+	@Override
+	SizeableNode copy();
+
 }

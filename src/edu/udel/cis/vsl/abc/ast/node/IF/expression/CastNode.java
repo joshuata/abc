@@ -21,4 +21,7 @@ public interface CastNode extends ExpressionNode {
 
 	void setArgument(ExpressionNode expression);
 
+	@Override
+	CastNode copy();
+
 }

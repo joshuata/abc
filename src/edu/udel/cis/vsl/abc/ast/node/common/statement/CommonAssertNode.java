@@ -23,4 +23,9 @@ public class CommonAssertNode extends CommonASTNode implements AssertNode {
 		out.print("Assert");
 	}
 
+	@Override
+	public AssertNode copy() {
+		return new CommonAssertNode(getSource(), duplicate(getExpression()));
+	}
+
 }

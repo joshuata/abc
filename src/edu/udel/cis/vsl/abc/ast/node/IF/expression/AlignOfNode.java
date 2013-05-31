@@ -15,4 +15,7 @@ public interface AlignOfNode extends ExpressionNode {
 
 	void setArgument(TypeNode type);
 
+	@Override
+	AlignOfNode copy();
+
 }

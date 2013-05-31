@@ -7,4 +7,7 @@ public interface IntegerConstantNode extends ConstantNode {
 	@Override
 	IntegerValue getConstantValue();
 
+	@Override
+	IntegerConstantNode copy();
+
 }

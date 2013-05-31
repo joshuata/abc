@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common;
 
 import java.io.PrintStream;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -22,10 +23,6 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 		super(source, (List<ASTNode>) childList);
 		this.name = name;
 	}
-
-	// public CommonSequenceNode(Source source, List<T> childList) {
-	// this(source, "Sequence", childList);
-	// }
 
 	@Override
 	public void addSequenceChild(T child) {
@@ -52,6 +49,30 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 	@Override
 	protected void printBody(PrintStream out) {
 		out.print(name);
+	}
+
+	protected List<T> childListCopy() {
+		List<T> childListCopy = new LinkedList<T>();
+		Iterator<T> iter = childIterator();
+
+		while (iter.hasNext()) {
+			T child = iter.next();
+
+			if (child == null)
+				childListCopy.add(null);
+			else {
+				@SuppressWarnings("unchecked")
+				T childCopy = (T) child.copy();
+
+				childListCopy.add(childCopy);
+			}
+		}
+		return childListCopy;
+	}
+
+	@Override
+	public SequenceNode<T> copy() {
+		return new CommonSequenceNode<T>(getSource(), name, childListCopy());
 	}
 
 }

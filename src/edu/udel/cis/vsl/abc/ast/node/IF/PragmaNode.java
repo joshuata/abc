@@ -61,4 +61,7 @@ public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 	 * @return
 	 */
 	TokenSource getTokenSource();
+
+	@Override
+	PragmaNode copy();
 }

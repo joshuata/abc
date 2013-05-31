@@ -7,5 +7,6 @@ package edu.udel.cis.vsl.abc.ast.node.IF.statement;
  * 
  */
 public interface NullStatementNode extends StatementNode {
-
+	@Override
+	NullStatementNode copy();
 }

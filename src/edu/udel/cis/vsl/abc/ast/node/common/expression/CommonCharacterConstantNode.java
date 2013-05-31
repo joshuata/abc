@@ -30,4 +30,10 @@ public class CommonCharacterConstantNode extends CommonConstantNode implements
 		return (CharacterValue) super.getConstantValue();
 	}
 
+	@Override
+	public CharacterConstantNode copy() {
+		return new CommonCharacterConstantNode(getSource(),
+				getStringRepresentation(), getConstantValue());
+	}
+
 }

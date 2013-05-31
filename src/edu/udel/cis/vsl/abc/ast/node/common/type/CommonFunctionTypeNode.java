@@ -76,4 +76,15 @@ public class CommonFunctionTypeNode extends CommonTypeNode implements
 		out.print("]");
 	}
 
+	@Override
+	public FunctionTypeNode copy() {
+		CommonFunctionTypeNode result = new CommonFunctionTypeNode(getSource(),
+				duplicate(getReturnType()), duplicate(getParameters()),
+				this.hasIdentifierList());
+
+		copyData(result);
+		result.setVariableArgs(this.hasVariableArgs());
+		return result;
+	}
+
 }

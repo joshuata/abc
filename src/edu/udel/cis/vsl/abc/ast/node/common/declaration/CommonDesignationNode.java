@@ -14,4 +14,9 @@ public class CommonDesignationNode extends CommonSequenceNode<DesignatorNode>
 		super(source, "DesignatorList", childList);
 	}
 
+	@Override
+	public DesignationNode copy() {
+		return new CommonDesignationNode(getSource(), childListCopy());
+	}
+
 }

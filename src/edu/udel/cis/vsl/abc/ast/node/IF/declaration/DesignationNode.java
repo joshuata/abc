@@ -4,4 +4,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 
 public interface DesignationNode extends SequenceNode<DesignatorNode> {
 
+	@Override
+	DesignationNode copy();
 }

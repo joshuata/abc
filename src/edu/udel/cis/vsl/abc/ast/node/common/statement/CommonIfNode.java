@@ -43,4 +43,16 @@ public class CommonIfNode extends CommonASTNode implements IfNode {
 		out.print("IfStatement");
 	}
 
+	@Override
+	public IfNode copy() {
+		StatementNode falseBranch = getFalseBranch();
+
+		if (falseBranch == null)
+			return new CommonIfNode(getSource(), duplicate(getCondition()),
+					duplicate(getTrueBranch()));
+		else
+			return new CommonIfNode(getSource(), duplicate(getCondition()),
+					duplicate(getTrueBranch()), duplicate(falseBranch));
+	}
+
 }

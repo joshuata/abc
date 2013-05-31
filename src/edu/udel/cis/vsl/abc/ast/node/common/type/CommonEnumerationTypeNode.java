@@ -78,4 +78,13 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 		this.entity = (Enumeration) entity;
 	}
 
+	@Override
+	public EnumerationTypeNode copy() {
+		CommonEnumerationTypeNode result = new CommonEnumerationTypeNode(
+				getSource(), duplicate(getTag()), duplicate(enumerators()));
+
+		copyData(result);
+		return result;
+	}
+
 }

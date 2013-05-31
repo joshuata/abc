@@ -30,4 +30,16 @@ public class CommonStaticAssertionNode extends CommonASTNode implements
 		out.print("StaticAssertion");
 	}
 
+	@Override
+	public StaticAssertionNode copy() {
+		ExpressionNode expression = getExpression();
+		ExpressionNode expressionCopy = expression == null ? null : expression
+				.copy();
+		StringLiteralNode message = getMessage();
+		StringLiteralNode messageCopy = message == null ? null : message.copy();
+
+		return new CommonStaticAssertionNode(getSource(), expressionCopy,
+				messageCopy);
+	}
+
 }

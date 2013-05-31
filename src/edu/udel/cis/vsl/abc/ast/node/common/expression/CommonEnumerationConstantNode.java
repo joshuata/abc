@@ -29,17 +29,10 @@ public class CommonEnumerationConstantNode extends CommonConstantNode implements
 		out.print("EnumerationConstant");
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// if (expression instanceof CommonEnumerationConstantNode) {
-	// CommonEnumerationConstantNode that = (CommonEnumerationConstantNode)
-	// expression;
-	// Enumerator thisEnumerator = (Enumerator) getName().getEntity();
-	// Enumerator thatEnumerator = (Enumerator) that.getName().getEntity();
-	//
-	// return (thisEnumerator == thatEnumerator);
-	// }
-	// return false;
-	// }
+	@Override
+	public EnumerationConstantNode copy() {
+		return new CommonEnumerationConstantNode(getSource(),
+				duplicate(getName()));
+	}
 
 }

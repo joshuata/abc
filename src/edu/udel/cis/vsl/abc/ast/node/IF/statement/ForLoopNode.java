@@ -20,4 +20,7 @@ public interface ForLoopNode extends LoopNode {
 
 	ExpressionNode getIncrementer();
 
+	@Override
+	ForLoopNode copy();
+
 }

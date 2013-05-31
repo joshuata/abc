@@ -36,4 +36,10 @@ public class CommonTypedefDeclarationNode extends CommonDeclarationNode
 		out.print("Typedef");
 	}
 
+	@Override
+	public TypedefDeclarationNode copy() {
+		return new CommonTypedefDeclarationNode(getSource(),
+				duplicate(getIdentifier()), duplicate(getTypeNode()));
+	}
+
 }

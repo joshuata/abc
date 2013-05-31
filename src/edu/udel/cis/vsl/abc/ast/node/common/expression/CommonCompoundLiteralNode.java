@@ -20,11 +20,6 @@ public class CommonCompoundLiteralNode extends CommonExpressionNode implements
 		return false;
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// return equals(expression);
-	// }
-
 	@Override
 	protected void printBody(PrintStream out) {
 		out.print("CompoundLiteral");
@@ -38,6 +33,12 @@ public class CommonCompoundLiteralNode extends CommonExpressionNode implements
 	@Override
 	public CompoundInitializerNode getInitializerList() {
 		return (CompoundInitializerNode) this.child(1);
+	}
+
+	@Override
+	public CompoundLiteralNode copy() {
+		return new CommonCompoundLiteralNode(getSource(),
+				duplicate(getTypeNode()), duplicate(getInitializerList()));
 	}
 
 }

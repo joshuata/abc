@@ -23,4 +23,9 @@ public class CommonEnsuresNode extends CommonASTNode implements EnsuresNode {
 		out.print("Ensures");
 	}
 
+	@Override
+	public EnsuresNode copy() {
+		return new CommonEnsuresNode(getSource(), duplicate(getExpression()));
+	}
+
 }

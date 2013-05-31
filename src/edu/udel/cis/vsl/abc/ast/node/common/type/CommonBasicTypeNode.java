@@ -31,4 +31,13 @@ public class CommonBasicTypeNode extends CommonTypeNode implements
 		out.print("]");
 	}
 
+	@Override
+	public BasicTypeNode copy() {
+		CommonBasicTypeNode result = new CommonBasicTypeNode(getSource(),
+				getBasicTypeKind());
+
+		copyData(result);
+		return result;
+	}
+
 }

@@ -8,4 +8,7 @@ public interface LabeledStatementNode extends StatementNode {
 
 	StatementNode getStatement();
 
+	@Override
+	LabeledStatementNode copy();
+
 }

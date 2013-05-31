@@ -8,7 +8,7 @@ public interface FunctionTypeNode extends TypeNode {
 	boolean hasIdentifierList();
 
 	/**
-	 * The return type of this function. Non-null.   
+	 * The return type of this function. Non-null.
 	 * 
 	 * @return the return type
 	 */
@@ -37,4 +37,6 @@ public interface FunctionTypeNode extends TypeNode {
 
 	void setParameters(SequenceNode<VariableDeclarationNode> parameters);
 
+	@Override
+	FunctionTypeNode copy();
 }

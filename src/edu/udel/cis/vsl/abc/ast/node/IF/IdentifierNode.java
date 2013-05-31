@@ -38,5 +38,7 @@ public interface IdentifierNode extends ASTNode {
 
 	void setDefinition(DeclarationNode declaration);
 
+	@Override
+	IdentifierNode copy();
 
 }

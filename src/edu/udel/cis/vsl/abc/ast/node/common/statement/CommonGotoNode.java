@@ -16,4 +16,9 @@ public class CommonGotoNode extends CommonJumpNode implements GotoNode {
 		return (IdentifierNode) child(0);
 	}
 
+	@Override
+	public GotoNode copy() {
+		return new CommonGotoNode(getSource(), duplicate(getLabel()));
+	}
+
 }

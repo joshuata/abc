@@ -36,4 +36,7 @@ public interface OrdinaryLabelNode extends LabelNode, DeclarationNode {
 
 	void setStatement(StatementNode statement);
 
+	@Override
+	OrdinaryLabelNode copy();
+
 }

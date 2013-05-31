@@ -29,4 +29,14 @@ public class CommonWhenNode extends CommonASTNode implements WhenNode {
 		out.print("When");
 	}
 
+	@Override
+	public WhenNode copy() {
+		ExpressionNode guard = getGuard();
+		ExpressionNode guardCopy = guard == null ? null : guard.copy();
+		StatementNode body = getBody();
+		StatementNode bodyCopy = body == null ? null : body.copy();
+
+		return new CommonWhenNode(getSource(), guardCopy, bodyCopy);
+	}
+
 }

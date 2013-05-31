@@ -8,4 +8,7 @@ public interface TypedefNameNode extends TypeNode {
 
 	void setName(IdentifierNode name);
 
+	@Override
+	TypedefNameNode copy();
+
 }

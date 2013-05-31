@@ -38,4 +38,7 @@ public interface StructureOrUnionTypeNode extends TypeNode, DeclarationNode,
 	 * @return sequence node for member declarations
 	 */
 	SequenceNode<FieldDeclarationNode> getStructDeclList();
+
+	@Override
+	StructureOrUnionTypeNode copy();
 }

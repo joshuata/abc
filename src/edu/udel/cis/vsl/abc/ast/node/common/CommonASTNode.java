@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import edu.udel.cis.vsl.abc.ast.ASTException;
@@ -39,6 +41,21 @@ public abstract class CommonASTNode implements ASTNode {
 		if (owner != null)
 			throw new ASTException(
 					"Cannot modify node until released from AST:\n" + this);
+	}
+
+	protected static <T extends ASTNode> T duplicate(T node) {
+		@SuppressWarnings("unchecked")
+		T copy = (T) node.copy();
+
+		return node == null ? null : copy;
+	}
+
+	protected static <T extends ASTNode> List<T> duplicate(List<T> list) {
+		LinkedList<T> newList = new LinkedList<T>();
+
+		for (T node : list)
+			newList.add(duplicate(node));
+		return newList;
 	}
 
 	public CommonASTNode(Source source,

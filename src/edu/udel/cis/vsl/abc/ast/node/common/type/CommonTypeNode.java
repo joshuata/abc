@@ -151,4 +151,13 @@ public abstract class CommonTypeNode extends CommonASTNode implements TypeNode {
 		else
 			return "type=" + type.getId();
 	}
+
+	protected void copyData(TypeNode node) {
+		node.setAtomicQualified(isAtomicQualified());
+		node.setConstQualified(isConstQualified());
+		node.setInputQualified(isInputQualified());
+		node.setOutputQualified(isOutputQualified());
+		node.setRestrictQualified(isRestrictQualified());
+		node.setVolatileQualified(isVolatileQualified());
+	}
 }

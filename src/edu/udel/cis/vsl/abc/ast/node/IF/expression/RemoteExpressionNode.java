@@ -6,4 +6,7 @@ public interface RemoteExpressionNode extends ExpressionNode {
 
 	IdentifierExpressionNode getIdentifierNode();
 
+	@Override
+	RemoteExpressionNode copy();
+
 }

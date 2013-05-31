@@ -23,4 +23,9 @@ public class CommonAssumeNode extends CommonASTNode implements AssumeNode {
 		out.print("Assume");
 	}
 
+	@Override
+	public AssumeNode copy() {
+		return new CommonAssumeNode(getSource(), duplicate(getExpression()));
+	}
+
 }

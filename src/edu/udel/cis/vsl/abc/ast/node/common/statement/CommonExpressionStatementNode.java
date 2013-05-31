@@ -25,4 +25,10 @@ public class CommonExpressionStatementNode extends CommonASTNode implements
 		out.print("ExpressionStatement");
 	}
 
+	@Override
+	public ExpressionStatementNode copy() {
+		return new CommonExpressionStatementNode(getSource(),
+				duplicate(getExpression()));
+	}
+
 }

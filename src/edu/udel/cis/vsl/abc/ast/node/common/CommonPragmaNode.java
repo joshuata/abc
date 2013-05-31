@@ -72,6 +72,19 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 
 		return tokenSource;
 	}
+
+	@Override
+	public PragmaNode copy() {
+		@SuppressWarnings("unchecked")
+		ArrayList<CToken> bodyCopy = body == null ? null
+				: (ArrayList<CToken>) body.clone();
+		IdentifierNode identifier = getPragmaIdentifier();
+		IdentifierNode identifierCopy = identifier == null ? null : identifier
+				.copy();
+
+		return new CommonPragmaNode(getSource(), identifierCopy, bodyCopy,
+				eofToken);
+	}
 }
 
 class GenericTokenSource implements TokenSource {

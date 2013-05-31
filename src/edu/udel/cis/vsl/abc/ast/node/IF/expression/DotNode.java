@@ -12,4 +12,7 @@ public interface DotNode extends ExpressionNode {
 
 	void setFieldName(IdentifierNode field);
 
+	@Override
+	DotNode copy();
+
 }

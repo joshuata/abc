@@ -17,4 +17,13 @@ public class CommonSelfNode extends CommonConstantNode implements SelfNode {
 		out.print("$self");
 	}
 
+	@Override
+	public ObjectType getInitialType() {
+		return (ObjectType) super.getInitialType();
+	}
+
+	@Override
+	public SelfNode copy() {
+		return new CommonSelfNode(getSource(), getInitialType());
+	}
 }

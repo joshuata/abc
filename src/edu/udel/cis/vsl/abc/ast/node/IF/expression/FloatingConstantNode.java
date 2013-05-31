@@ -13,4 +13,7 @@ public interface FloatingConstantNode extends ConstantNode {
 	@Override
 	RealFloatingValue getConstantValue();
 
+	@Override
+	FloatingConstantNode copy();
+
 }

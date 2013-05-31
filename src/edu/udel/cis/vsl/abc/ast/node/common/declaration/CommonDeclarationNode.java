@@ -10,9 +10,9 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 public abstract class CommonDeclarationNode extends CommonASTNode implements
 		DeclarationNode {
 
-	private boolean isDefinition;
+	private boolean isDefinition = false;
 
-	private Entity entity;
+	private Entity entity = null;
 
 	public CommonDeclarationNode(Source source, IdentifierNode identifier) {
 		super(source, identifier);

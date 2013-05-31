@@ -26,4 +26,7 @@ public interface EnumeratorDeclarationNode extends DeclarationNode {
 	@Override
 	Enumerator getEntity();
 
+	@Override
+	EnumeratorDeclarationNode copy();
+
 }

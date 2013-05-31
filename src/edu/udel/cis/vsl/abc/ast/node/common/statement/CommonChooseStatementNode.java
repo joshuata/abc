@@ -28,4 +28,9 @@ public class CommonChooseStatementNode extends
 		this.defaultCase = statement;
 	}
 
+	@Override
+	public ChooseStatementNode copy() {
+		return new CommonChooseStatementNode(getSource(), childListCopy());
+	}
+
 }

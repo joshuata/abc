@@ -55,4 +55,10 @@ public class CommonOrdinaryLabelNode extends CommonDeclarationNode implements
 		return getIdentifier().name();
 	}
 
+	@Override
+	public OrdinaryLabelNode copy() {
+		return new CommonOrdinaryLabelNode(getSource(),
+				duplicate(getIdentifier()));
+	}
+
 }

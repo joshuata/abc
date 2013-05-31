@@ -20,4 +20,7 @@ public interface TypedefDeclarationNode extends DeclarationNode,
 	TypeNode getTypeNode();
 
 	void setTypeNode(TypeNode type);
+
+	@Override
+	TypedefDeclarationNode copy();
 }

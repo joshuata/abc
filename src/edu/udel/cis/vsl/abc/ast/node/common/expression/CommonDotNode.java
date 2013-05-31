@@ -39,14 +39,15 @@ public class CommonDotNode extends CommonExpressionNode implements DotNode {
 		out.print("DotExpression");
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// return false;
-	// }
-
 	@Override
 	public boolean isConstantExpression() {
 		return false;
+	}
+
+	@Override
+	public DotNode copy() {
+		return new CommonDotNode(getSource(), duplicate(getStructure()),
+				duplicate(getFieldName()));
 	}
 
 }

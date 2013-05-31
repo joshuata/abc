@@ -100,4 +100,7 @@ public interface VariableDeclarationNode extends OrdinaryDeclarationNode {
 
 	void setConstantAlignmentSpecifiers(SequenceNode<ExpressionNode> specifiers);
 
+	@Override
+	VariableDeclarationNode copy();
+
 }

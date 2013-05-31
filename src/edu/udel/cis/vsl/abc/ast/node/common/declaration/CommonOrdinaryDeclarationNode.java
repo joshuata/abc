@@ -56,4 +56,9 @@ public abstract class CommonOrdinaryDeclarationNode extends
 		staticStorage = value;
 	}
 
+	void copyStorage(OrdinaryDeclarationNode node) {
+		node.setExternStorage(hasExternStorage());
+		node.setStaticStorage(hasStaticStorage());
+	}
+
 }

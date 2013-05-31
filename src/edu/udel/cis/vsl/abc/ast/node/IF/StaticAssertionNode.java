@@ -21,4 +21,7 @@ public interface StaticAssertionNode extends ExternalDefinitionNode,
 
 	StringLiteralNode getMessage();
 
+	@Override
+	StaticAssertionNode copy();
+
 }

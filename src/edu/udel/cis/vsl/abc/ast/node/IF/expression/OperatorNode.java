@@ -74,4 +74,7 @@ public interface OperatorNode extends ExpressionNode {
 
 	void setArgument(int index, ExpressionNode value);
 
+	@Override
+	OperatorNode copy();
+
 }

@@ -55,4 +55,11 @@ public class CommonLoopNode extends CommonASTNode implements LoopNode {
 		}
 	}
 
+	@Override
+	public LoopNode copy() {
+		return new CommonLoopNode(getSource(), getKind(),
+				duplicate(getCondition()), duplicate(getBody()),
+				duplicate(getInvariant()));
+	}
+
 }

@@ -6,4 +6,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 public interface DeclarationListNode extends
 		SequenceNode<VariableDeclarationNode>, ForLoopInitializerNode {
 
+	@Override
+	DeclarationListNode copy();
+
 }

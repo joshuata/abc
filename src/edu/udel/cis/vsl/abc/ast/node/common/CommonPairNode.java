@@ -39,4 +39,15 @@ public class CommonPairNode<S extends ASTNode, T extends ASTNode> extends
 	protected void printBody(PrintStream out) {
 	}
 
+	@Override
+	public PairNode<S, T> copy() {
+		S left = getLeft();
+		@SuppressWarnings("unchecked")
+		S leftCopy = left == null ? null : (S) left.copy();
+		T right = getRight();
+		@SuppressWarnings("unchecked")
+		T rightCopy = right == null ? null : (T) right.copy();
+
+		return new CommonPairNode<S, T>(getSource(), leftCopy, rightCopy);
+	}
 }

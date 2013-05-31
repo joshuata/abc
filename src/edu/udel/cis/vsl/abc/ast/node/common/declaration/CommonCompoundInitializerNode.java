@@ -18,4 +18,9 @@ public class CommonCompoundInitializerNode extends
 		super(source, "CompoundInitializer", childList);
 	}
 
+	@Override
+	public CompoundInitializerNode copy() {
+		return new CommonCompoundInitializerNode(getSource(), childListCopy());
+	}
+
 }

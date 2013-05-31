@@ -29,4 +29,9 @@ public class CommonArrayDesignatorNode extends CommonASTNode implements
 		out.print("ArrayIndex");
 	}
 
+	@Override
+	public ArrayDesignatorNode copy() {
+		return new CommonArrayDesignatorNode(getSource(), duplicate(getIndex()));
+	}
+
 }

@@ -8,4 +8,6 @@ public interface CollectiveExpressionNode extends ExpressionNode {
 
 	ExpressionNode getBody();
 
+	@Override
+	CollectiveExpressionNode copy();
 }

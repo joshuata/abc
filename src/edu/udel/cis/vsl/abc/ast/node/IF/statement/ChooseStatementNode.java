@@ -20,4 +20,7 @@ public interface ChooseStatementNode extends StatementNode,
 
 	void setDefaultCase(LabeledStatementNode statement);
 
+	@Override
+	ChooseStatementNode copy();
+
 }

@@ -36,4 +36,11 @@ public class CommonRemoteExpressionNode extends CommonExpressionNode implements
 	protected void printBody(PrintStream out) {
 		out.print("RemoteExpression");
 	}
+
+	@Override
+	public RemoteExpressionNode copy() {
+		return new CommonRemoteExpressionNode(getSource(),
+				duplicate(getProcessExpression()),
+				duplicate(getIdentifierNode()));
+	}
 }

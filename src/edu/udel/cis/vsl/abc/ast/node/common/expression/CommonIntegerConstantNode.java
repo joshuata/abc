@@ -31,4 +31,10 @@ public class CommonIntegerConstantNode extends CommonConstantNode implements
 				+ "]";
 	}
 
+	@Override
+	public IntegerConstantNode copy() {
+		return new CommonIntegerConstantNode(getSource(),
+				getStringRepresentation(), getConstantValue());
+	}
+
 }

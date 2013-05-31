@@ -23,4 +23,9 @@ public class CommonWaitNode extends CommonASTNode implements WaitNode {
 		out.print("Wait");
 	}
 
+	@Override
+	public WaitNode copy() {
+		return new CommonWaitNode(getSource(), duplicate(getExpression()));
+	}
+
 }

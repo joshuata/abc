@@ -18,4 +18,7 @@ public interface GotoNode extends JumpNode {
 	 */
 	IdentifierNode getLabel();
 
+	@Override
+	GotoNode copy();
+
 }

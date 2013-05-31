@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -71,30 +72,6 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 		}
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// if (expression instanceof CommonOperatorNode) {
-	// CommonOperatorNode that = (CommonOperatorNode) expression;
-	// int numArgs = getNumberOfArguments();
-	//
-	// if (!hasConstantOperator() || !operator.equals(that.operator))
-	// return false;
-	// if (numArgs != that.getNumberOfArguments())
-	// return false;
-	// for (int i = 0; i < numArgs; i++) {
-	// CommonExpressionNode thisArg = (CommonExpressionNode) this
-	// .getArgument(i);
-	// CommonExpressionNode thatArg = (CommonExpressionNode) that
-	// .getArgument(i);
-	//
-	// if (!thisArg.equivalentConstant(thatArg))
-	// return false;
-	// }
-	// return true;
-	// }
-	// return false;
-	// }
-
 	@Override
 	public boolean isConstantExpression() {
 		int numArgs = getNumberOfArguments();
@@ -106,6 +83,16 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 				return false;
 		}
 		return true;
+	}
+
+	@Override
+	public OperatorNode copy() {
+		List<ExpressionNode> arguments = new LinkedList<ExpressionNode>();
+		int numArgs = getNumberOfArguments();
+
+		for (int i = 0; i < numArgs; i++)
+			arguments.add(duplicate(getArgument(i)));
+		return new CommonOperatorNode(getSource(), getOperator(), arguments);
 	}
 
 }

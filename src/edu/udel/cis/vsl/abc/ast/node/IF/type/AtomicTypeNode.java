@@ -10,4 +10,7 @@ public interface AtomicTypeNode extends TypeNode {
 
 	TypeNode getBaseType();
 
+	@Override
+	AtomicTypeNode copy();
+
 }

@@ -45,17 +45,10 @@ public class CommonCastNode extends CommonExpressionNode implements CastNode {
 				&& getArgument().isConstantExpression();
 	}
 
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// if (expression instanceof CommonCastNode) {
-	// CommonCastNode that = (CommonCastNode) expression;
-	// Type thisType = getCastType().getType();
-	// Type thatType = that.getCastType().getType();
-	// CommonExpressionNode thisArg = (CommonExpressionNode) getArgument();
-	// ExpressionNode thatArg = that.getArgument();
-	//
-	// return thisType.equals(thatType)
-	// && thisArg.equivalentConstant(thatArg);
-	// }
-	// return false;
-	// }
+	@Override
+	public CastNode copy() {
+		return new CommonCastNode(getSource(), duplicate(getCastType()),
+				duplicate(getArgument()));
+	}
+
 }

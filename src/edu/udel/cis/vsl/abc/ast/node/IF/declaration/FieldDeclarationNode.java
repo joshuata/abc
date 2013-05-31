@@ -32,4 +32,7 @@ public interface FieldDeclarationNode extends DeclarationNode {
 	@Override
 	Field getEntity();
 
+	@Override
+	FieldDeclarationNode copy();
+
 }

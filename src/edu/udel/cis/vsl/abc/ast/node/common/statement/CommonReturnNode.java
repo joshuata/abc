@@ -16,4 +16,9 @@ public class CommonReturnNode extends CommonJumpNode implements ReturnNode {
 		return (ExpressionNode) child(0);
 	}
 
+	@Override
+	public ReturnNode copy() {
+		return new CommonReturnNode(getSource(), duplicate(getExpression()));
+	}
+
 }

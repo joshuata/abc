@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
 
 import java.util.Iterator;
 
-
 /**
  * A node in which all children have type T.
  */
@@ -19,5 +18,8 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode {
 
 	/** Returns an iterator over the children of this node. */
 	Iterator<T> childIterator();
+
+	@Override
+	SequenceNode<T> copy();
 
 }

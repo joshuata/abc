@@ -15,4 +15,7 @@ public interface SwitchLabelNode extends LabelNode {
 
 	ExpressionNode getExpression();
 
+	@Override
+	SwitchLabelNode copy();
+
 }

@@ -127,4 +127,19 @@ public class CommonArrayTypeNode extends CommonTypeNode implements
 		atomicInBrackets = value;
 	}
 
+	@Override
+	public ArrayTypeNode copy() {
+		CommonArrayTypeNode result = new CommonArrayTypeNode(getSource(),
+				duplicate(getElementType()), duplicate(getExtent()));
+
+		copyData(result);
+		result.setAtomicInBrackets(this.hasAtomicInBrackets());
+		result.setConstInBrackets(this.hasConstInBrackets());
+		result.setRestrictInBrackets(this.hasRestrictInBrackets());
+		result.setStaticExtent(this.hasStaticExtent());
+		result.setUnspecifiedVariableLength(this.hasUnspecifiedVariableLength());
+		result.setVolatileInBrackets(this.hasVolatileInBrackets());
+		return result;
+	}
+
 }

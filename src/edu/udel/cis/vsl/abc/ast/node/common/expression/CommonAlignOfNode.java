@@ -46,4 +46,9 @@ public class CommonAlignOfNode extends CommonExpressionNode implements
 		return false;
 	}
 
+	@Override
+	public AlignOfNode copy() {
+		return new CommonAlignOfNode(getSource(), duplicate(getArgument()));
+	}
+
 }

@@ -68,4 +68,10 @@ public class CommonSwitchNode extends CommonASTNode implements SwitchNode {
 		out.print("Switch");
 	}
 
+	@Override
+	public SwitchNode copy() {
+		return new CommonSwitchNode(getSource(), duplicate(getCondition()),
+				duplicate(getBody()));
+	}
+
 }

@@ -14,4 +14,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 public interface CompoundInitializerNode extends InitializerNode,
 		SequenceNode<PairNode<DesignationNode, InitializerNode>> {
 
+	@Override
+	CompoundInitializerNode copy();
+
 }

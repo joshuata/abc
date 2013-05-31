@@ -15,4 +15,7 @@ public interface FunctionDefinitionNode extends FunctionDeclarationNode {
 
 	void setBody(CompoundStatementNode statement);
 
+	@Override
+	FunctionDefinitionNode copy();
+
 }

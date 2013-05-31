@@ -8,4 +8,7 @@ public interface EnumerationConstantNode extends ConstantNode {
 
 	void setName(IdentifierNode name);
 
+	@Override
+	EnumerationConstantNode copy();
+
 }

@@ -26,4 +26,7 @@ public interface WhenNode extends StatementNode {
 	 */
 	StatementNode getBody();
 
+	@Override
+	WhenNode copy();
+
 }

@@ -14,4 +14,7 @@ public interface LabelNode extends ASTNode {
 
 	void setStatement(StatementNode statement);
 
+	@Override
+	LabelNode copy();
+
 }

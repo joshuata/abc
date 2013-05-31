@@ -54,4 +54,18 @@ public class CommonFieldDeclarationNode extends CommonDeclarationNode implements
 		return (Field) super.getEntity();
 	}
 
+	@Override
+	public FieldDeclarationNode copy() {
+		IdentifierNode identifierCopy = duplicate(getIdentifier());
+		TypeNode typeCopy = duplicate(getTypeNode());
+		ExpressionNode width = duplicate(getBitFieldWidth());
+
+		if (width == null)
+			return new CommonFieldDeclarationNode(getSource(), identifierCopy,
+					typeCopy);
+		else
+			return new CommonFieldDeclarationNode(getSource(), identifierCopy,
+					typeCopy, width);
+	}
+
 }

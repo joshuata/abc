@@ -46,14 +46,18 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 		out.print("FunctionCall");
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// return false;
-	// }
-
 	@Override
 	public boolean isConstantExpression() {
 		return false;
+	}
+
+	@Override
+	public FunctionCallNode copy() {
+		@SuppressWarnings("unchecked")
+		SequenceNode<ExpressionNode> arguments = (SequenceNode<ExpressionNode>) child(1);
+
+		return new CommonFunctionCallNode(getSource(),
+				duplicate(getFunction()), duplicate(arguments));
 	}
 
 }

@@ -10,4 +10,6 @@ public interface SizeofNode extends ExpressionNode {
 
 	void setArgument(SizeableNode argument);
 
+	@Override
+	SizeofNode copy();
 }
