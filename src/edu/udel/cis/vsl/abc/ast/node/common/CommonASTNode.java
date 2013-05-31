@@ -44,10 +44,14 @@ public abstract class CommonASTNode implements ASTNode {
 	}
 
 	protected static <T extends ASTNode> T duplicate(T node) {
-		@SuppressWarnings("unchecked")
-		T copy = (T) node.copy();
+		if (node == null)
+			return null;
+		else {
+			@SuppressWarnings("unchecked")
+			T copy = (T) node.copy();
 
-		return node == null ? null : copy;
+			return copy;
+		}
 	}
 
 	protected static <T extends ASTNode> List<T> duplicate(List<T> list) {
