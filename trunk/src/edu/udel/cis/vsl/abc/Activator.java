@@ -8,7 +8,15 @@ import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.analysis.Analysis;
 import edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST;
+import edu.udel.cis.vsl.abc.ast.ASTs;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.node.Nodes;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.type.Types;
+import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
+import edu.udel.cis.vsl.abc.ast.value.Values;
+import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.parse.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
@@ -17,7 +25,9 @@ import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
+import edu.udel.cis.vsl.abc.token.Tokens;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 
@@ -47,23 +57,63 @@ import edu.udel.cis.vsl.abc.util.ANTLRUtils;
  */
 public class Activator {
 
-	private PreprocessorFactory preprocessorFactory;
+	private static String bar = "===================";
+
+	private TypeFactory typeFactory = Types.newTypeFactory();
+
+	private ValueFactory valueFactory = Values.newValueFactory(typeFactory);
+
+	private NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
+			valueFactory);
+
+	private TokenFactory sourceFactory = Tokens.newTokenFactory();
+
+	private ASTFactory astFactory = ASTs.newUnitFactory(nodeFactory,
+			sourceFactory, typeFactory);
+
+	private PreprocessorFactory preprocessorFactory = Preprocess
+			.newPreprocessorFactory();
 
 	private Preprocessor preprocessor;
 
 	private File file;
 
-	private String bar = "===================";
-
 	public Activator(File file, File[] systemIncludes, File[] userIncludes) {
 		this.file = file;
-		preprocessorFactory = Preprocess.newPreprocessorFactory();
 		preprocessor = preprocessorFactory.newPreprocessor(systemIncludes,
 				userIncludes);
 	}
 
 	public Activator(File file) {
 		this(file, new File[0], new File[0]);
+	}
+
+	public TypeFactory getTypeFactory() {
+		return typeFactory;
+	}
+
+	public ValueFactory getValueFactory() {
+		return valueFactory;
+	}
+
+	public NodeFactory getNodeFactory() {
+		return nodeFactory;
+	}
+
+	public TokenFactory getTokeFactory() {
+		return sourceFactory;
+	}
+
+	public ASTFactory getASTFactory() {
+		return astFactory;
+	}
+
+	public PreprocessorFactory getPreprocessorFactory() {
+		return preprocessorFactory;
+	}
+
+	public Preprocessor getPreprocessor() {
+		return preprocessor;
 	}
 
 	public CTokenSource getPreprocessedSource() throws PreprocessorException {
@@ -85,9 +135,9 @@ public class Activator {
 	public AST getRawTranslationUnit() throws ParseException, SyntaxException,
 			PreprocessorException {
 		CParser parser = Parse.newCParser(preprocessor, file);
-		AST unit = Antlr2AST.buildAST(parser, null);
+		AST ast = Antlr2AST.build(parser, astFactory, null);
 
-		return unit;
+		return ast;
 	}
 
 	public AST getTranslationUnit() throws ParseException, SyntaxException,
