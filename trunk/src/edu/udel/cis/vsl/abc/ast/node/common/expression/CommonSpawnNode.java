@@ -27,4 +27,9 @@ public class CommonSpawnNode extends CommonExpressionNode implements SpawnNode {
 		out.print("spawn");
 	}
 
+	@Override
+	public SpawnNode copy() {
+		return new CommonSpawnNode(getSource(), duplicate(getCall()));
+	}
+
 }

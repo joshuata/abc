@@ -40,4 +40,9 @@ public class CommonJumpNode extends CommonASTNode implements JumpNode {
 		}
 	}
 
+	@Override
+	public JumpNode copy() {
+		return new CommonJumpNode(getSource(), getKind());
+	}
+
 }

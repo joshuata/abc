@@ -45,4 +45,7 @@ public interface SwitchNode extends StatementNode {
 
 	void setDefaultCase(LabeledStatementNode statement);
 
+	@Override
+	SwitchNode copy();
+
 }

@@ -8,4 +8,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF.expression;
  */
 public interface GenericSelectionNode extends ExpressionNode {
 	// TODO: requires some work
+
+	@Override
+	FunctionCallNode copy();
 }

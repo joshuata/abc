@@ -19,4 +19,7 @@ public interface ArrayDesignatorNode extends DesignatorNode {
 	ExpressionNode getIndex();
 
 	void setIndex(ExpressionNode expression);
+
+	@Override
+	ArrayDesignatorNode copy();
 }

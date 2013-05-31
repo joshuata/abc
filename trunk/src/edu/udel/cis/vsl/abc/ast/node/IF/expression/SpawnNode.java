@@ -16,4 +16,7 @@ public interface SpawnNode extends ExpressionNode {
 	 */
 	FunctionCallNode getCall();
 
+	@Override
+	SpawnNode copy();
+
 }

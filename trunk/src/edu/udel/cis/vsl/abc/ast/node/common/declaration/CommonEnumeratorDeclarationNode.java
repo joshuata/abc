@@ -36,4 +36,10 @@ public class CommonEnumeratorDeclarationNode extends CommonDeclarationNode
 		return (Enumerator) super.getEntity();
 	}
 
+	@Override
+	public EnumeratorDeclarationNode copy() {
+		return new CommonEnumeratorDeclarationNode(getSource(),
+				duplicate(getIdentifier()), duplicate(getValue()));
+	}
+
 }

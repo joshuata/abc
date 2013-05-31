@@ -22,4 +22,7 @@ public interface StringLiteralNode extends ExpressionNode {
 	 */
 	StringValue getConstantValue();
 
+	@Override
+	StringLiteralNode copy();
+
 }

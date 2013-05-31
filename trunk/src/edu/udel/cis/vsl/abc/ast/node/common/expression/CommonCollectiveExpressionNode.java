@@ -40,4 +40,11 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 		out.print("CollectiveExpression");
 	}
 
+	@Override
+	public CollectiveExpressionNode copy() {
+		return new CommonCollectiveExpressionNode(getSource(),
+				duplicate(getProcessPointerExpression()),
+				duplicate(getLengthExpression()), duplicate(getBody()));
+	}
+
 }

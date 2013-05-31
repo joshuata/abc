@@ -24,4 +24,10 @@ public class CommonStringLiteralNode extends CommonConstantNode implements
 	public StringValue getConstantValue() {
 		return (StringValue) super.getConstantValue();
 	}
+
+	@Override
+	public CommonStringLiteralNode copy() {
+		return new CommonStringLiteralNode(getSource(),
+				getStringRepresentation(), getConstantValue());
+	}
 }

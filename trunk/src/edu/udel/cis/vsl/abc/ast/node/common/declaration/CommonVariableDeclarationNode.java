@@ -166,4 +166,29 @@ public class CommonVariableDeclarationNode extends
 			out.print("]");
 	}
 
+	@Override
+	public VariableDeclarationNode copy() {
+		InitializerNode initializer = getInitializer();
+		CommonVariableDeclarationNode result;
+		SequenceNode<ExpressionNode> specifiers = constantAlignmentSpecifiers();
+		SequenceNode<TypeNode> typeAlignmentSpecifiers = typeAlignmentSpecifiers();
+
+		if (initializer == null)
+			result = new CommonVariableDeclarationNode(getSource(),
+					duplicate(getIdentifier()), duplicate(getTypeNode()));
+		else
+			result = new CommonVariableDeclarationNode(getSource(),
+					duplicate(getIdentifier()), duplicate(getTypeNode()),
+					duplicate(initializer));
+		copyStorage(result);
+		result.setAutoStorage(hasAutoStorage());
+		result.setRegisterStorage(hasRegisterStorage());
+		result.setThreadLocalStorage(hasThreadLocalStorage());
+		if (specifiers != null)
+			result.setConstantAlignmentSpecifiers(specifiers.copy());
+		if (typeAlignmentSpecifiers != null)
+			result.setTypeAlignmentSpecifiers(typeAlignmentSpecifiers.copy());
+		return result;
+	}
+
 }

@@ -70,4 +70,9 @@ public class CommonIdentifierNode extends CommonASTNode implements
 		this.definition = declaration;
 	}
 
+	@Override
+	public IdentifierNode copy() {
+		return new CommonIdentifierNode(getSource(), name);
+	}
+
 }

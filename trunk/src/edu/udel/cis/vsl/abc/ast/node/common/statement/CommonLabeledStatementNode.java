@@ -31,4 +31,10 @@ public class CommonLabeledStatementNode extends CommonASTNode implements
 		out.print("LabeledStatement");
 	}
 
+	@Override
+	public LabeledStatementNode copy() {
+		return new CommonLabeledStatementNode(getSource(),
+				duplicate(getLabel()), duplicate(getStatement()));
+	}
+
 }

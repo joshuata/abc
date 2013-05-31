@@ -35,4 +35,17 @@ public class CommonFunctionDefinitionNode extends CommonFunctionDeclarationNode
 		out.print("FunctionDefinition");
 	}
 
+	@Override
+	public FunctionDefinitionNode copy() {
+		CommonFunctionDefinitionNode result = new CommonFunctionDefinitionNode(
+				getSource(), duplicate(getIdentifier()),
+				duplicate(getTypeNode()), duplicate(getContract()),
+				duplicate(getBody()));
+
+		result.setInlineFunctionSpecifier(hasInlineFunctionSpecifier());
+		result.setNoreturnFunctionSpecifier(hasNoreturnFunctionSpecifier());
+		copyStorage(result);
+		return result;
+	}
+
 }

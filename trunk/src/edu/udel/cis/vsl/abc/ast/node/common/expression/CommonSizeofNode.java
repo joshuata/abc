@@ -28,21 +28,14 @@ public class CommonSizeofNode extends CommonExpressionNode implements
 		out.print("SizeOf");
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// if (expression instanceof CommonSizeofNode) {
-	// CommonSizeofNode that = (CommonSizeofNode) expression;
-	// Type thisType = getArgument().getType();
-	// Type thatType = that.getArgument().getType();
-	//
-	// return thisType.equals(thatType);
-	// }
-	// return false;
-	// }
-
 	@Override
 	public boolean isConstantExpression() {
 		return !getArgument().getType().isVariablyModified();
+	}
+
+	@Override
+	public SizeofNode copy() {
+		return new CommonSizeofNode(getSource(), duplicate(getArgument()));
 	}
 
 }

@@ -15,4 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  */
 public interface ForLoopInitializerNode extends ASTNode {
 
+	@Override
+	ForLoopInitializerNode copy();
+
 }

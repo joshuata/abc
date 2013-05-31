@@ -12,4 +12,7 @@ public interface EnsuresNode extends ContractNode {
 
 	ExpressionNode getExpression();
 
+	@Override
+	EnsuresNode copy();
+
 }

@@ -98,4 +98,16 @@ public class CommonFunctionDeclarationNode extends
 		return (FunctionTypeNode) super.getTypeNode();
 	}
 
+	@Override
+	public FunctionDeclarationNode copy() {
+		CommonFunctionDeclarationNode result = new CommonFunctionDeclarationNode(
+				getSource(), duplicate(getIdentifier()),
+				duplicate(getTypeNode()), duplicate(getContract()));
+
+		result.setInlineFunctionSpecifier(hasInlineFunctionSpecifier());
+		result.setNoreturnFunctionSpecifier(hasNoreturnFunctionSpecifier());
+		copyStorage(result);
+		return result;
+	}
+
 }

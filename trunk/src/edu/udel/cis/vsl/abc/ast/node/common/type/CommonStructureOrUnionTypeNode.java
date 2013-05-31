@@ -102,4 +102,14 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 			return tag.name();
 	}
 
+	@Override
+	public StructureOrUnionTypeNode copy() {
+		CommonStructureOrUnionTypeNode result = new CommonStructureOrUnionTypeNode(
+				getSource(), isStruct(), duplicate(getTag()),
+				duplicate(getStructDeclList()));
+
+		copyData(result);
+		return result;
+	}
+
 }

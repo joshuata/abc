@@ -16,4 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  */
 public interface InitializerNode extends ASTNode {
 
+	@Override
+	InitializerNode copy();
+
 }

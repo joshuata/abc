@@ -53,4 +53,10 @@ public class CommonSwitchLabelNode extends CommonASTNode implements
 		this.statement = statement;
 	}
 
+	@Override
+	public SwitchLabelNode copy() {
+		return new CommonSwitchLabelNode(getSource(),
+				duplicate(getExpression()));
+	}
+
 }

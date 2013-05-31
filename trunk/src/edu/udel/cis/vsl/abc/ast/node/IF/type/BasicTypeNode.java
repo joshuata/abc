@@ -6,4 +6,7 @@ public interface BasicTypeNode extends TypeNode {
 
 	BasicTypeKind getBasicTypeKind();
 
+	@Override
+	BasicTypeNode copy();
+
 }

@@ -23,4 +23,13 @@ public class CommonAtomicTypeNode extends CommonTypeNode implements
 		out.print("Atomic[" + qualifierString() + "]");
 	}
 
+	@Override
+	public AtomicTypeNode copy() {
+		CommonAtomicTypeNode result = new CommonAtomicTypeNode(getSource(),
+				duplicate(getBaseType()));
+
+		copyData(result);
+		return result;
+	}
+
 }

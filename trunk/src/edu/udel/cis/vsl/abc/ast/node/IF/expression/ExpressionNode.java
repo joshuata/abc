@@ -108,4 +108,7 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 	 */
 	boolean isConstantExpression();
 
+	@Override
+	ExpressionNode copy();
+
 }

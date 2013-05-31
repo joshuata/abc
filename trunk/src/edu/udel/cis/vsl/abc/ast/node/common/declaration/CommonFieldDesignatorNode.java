@@ -29,4 +29,9 @@ public class CommonFieldDesignatorNode extends CommonASTNode implements
 		out.print("Field");
 	}
 
+	@Override
+	public FieldDesignatorNode copy() {
+		return new CommonFieldDesignatorNode(getSource(), duplicate(getField()));
+	}
+
 }

@@ -15,4 +15,9 @@ public class CommonCompoundStatementNode extends
 		super(source, "CompoundStatement", childList);
 	}
 
+	@Override
+	public CompoundStatementNode copy() {
+		return new CommonCompoundStatementNode(getSource(), childListCopy());
+	}
+
 }

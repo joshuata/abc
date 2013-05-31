@@ -18,4 +18,9 @@ public class CommonNullStatementNode extends CommonASTNode implements
 		out.print("NullStatement");
 	}
 
+	@Override
+	public NullStatementNode copy() {
+		return new CommonNullStatementNode(getSource());
+	}
+
 }

@@ -40,4 +40,7 @@ public interface LoopNode extends StatementNode {
 	 */
 	LoopKind getKind();
 
+	@Override
+	LoopNode copy();
+
 }

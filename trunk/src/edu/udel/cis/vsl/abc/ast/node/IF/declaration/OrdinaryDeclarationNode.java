@@ -49,4 +49,7 @@ public interface OrdinaryDeclarationNode extends BlockItemNode,
 
 	void setStaticStorage(boolean value);
 
+	@Override
+	OrdinaryDeclarationNode copy();
+
 }

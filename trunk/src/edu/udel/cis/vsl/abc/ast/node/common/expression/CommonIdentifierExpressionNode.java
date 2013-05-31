@@ -32,25 +32,17 @@ public class CommonIdentifierExpressionNode extends CommonExpressionNode
 		out.print("IdentifierExpression");
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// if (expression instanceof CommonIdentifierExpressionNode) {
-	// CommonIdentifierExpressionNode that = (CommonIdentifierExpressionNode)
-	// expression;
-	// Entity thisEntity = getIdentifier().getEntity();
-	// Entity thatEntity = that.getIdentifier().getEntity();
-	//
-	// return thisEntity.getEntityKind() == EntityKind.ENUMERATOR
-	// && thisEntity == thatEntity;
-	// }
-	// return false;
-	// }
-
 	@Override
 	public boolean isConstantExpression() {
 		Entity entity = getIdentifier().getEntity();
 
 		return entity.getEntityKind() == EntityKind.ENUMERATOR;
+	}
+
+	@Override
+	public IdentifierExpressionNode copy() {
+		return new CommonIdentifierExpressionNode(getSource(),
+				duplicate(getIdentifier()));
 	}
 
 }

@@ -3,7 +3,8 @@ package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 
 /**
- * An item in a block (compound statement): either a statement or a "declaration."
+ * An item in a block (compound statement): either a statement or a
+ * "declaration."
  * 
  * Every instance of BlockItemNode is also an instance of one of the following:
  * 
@@ -22,5 +23,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * 
  */
 public interface BlockItemNode extends ASTNode {
+
+	@Override
+	BlockItemNode copy();
 
 }

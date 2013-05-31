@@ -18,4 +18,7 @@ public interface FieldDesignatorNode extends DesignatorNode {
 	IdentifierNode getField();
 
 	void setField(IdentifierNode name);
+
+	@Override
+	FieldDesignatorNode copy();
 }

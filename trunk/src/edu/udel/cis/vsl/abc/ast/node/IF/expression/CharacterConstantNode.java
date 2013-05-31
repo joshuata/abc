@@ -83,4 +83,7 @@ public interface CharacterConstantNode extends ConstantNode {
 
 	CharacterValue getConstantValue();
 
+	@Override
+	CharacterConstantNode copy();
+
 }

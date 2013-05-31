@@ -16,4 +16,7 @@ public interface CompoundLiteralNode extends ExpressionNode {
 
 	CompoundInitializerNode getInitializerList();
 
+	@Override
+	CompoundLiteralNode copy();
+
 }

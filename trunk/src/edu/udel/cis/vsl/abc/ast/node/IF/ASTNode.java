@@ -191,4 +191,13 @@ public interface ASTNode {
 	 */
 	void removeChild(int index);
 
+	/**
+	 * Returns a deep copy of this AST node. The node and all of its descendants
+	 * will be cloned. The cloning does not copy analysis or attribute
+	 * information.
+	 * 
+	 * @return
+	 */
+	ASTNode copy();
+
 }

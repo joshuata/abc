@@ -10,4 +10,7 @@ public interface ReturnNode extends JumpNode {
 	 * @return expression to return or null
 	 */
 	ExpressionNode getExpression();
+
+	@Override
+	ReturnNode copy();
 }

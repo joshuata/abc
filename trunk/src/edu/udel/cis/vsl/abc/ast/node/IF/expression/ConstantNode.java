@@ -23,4 +23,7 @@ public interface ConstantNode extends ExpressionNode {
 	void setStringRepresentation(String representation);
 
 	Value getConstantValue();
+
+	@Override
+	ConstantNode copy();
 }

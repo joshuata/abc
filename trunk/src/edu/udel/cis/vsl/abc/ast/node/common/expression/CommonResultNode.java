@@ -22,4 +22,9 @@ public class CommonResultNode extends CommonExpressionNode implements
 		out.print("\\result");
 	}
 
+	@Override
+	public ResultNode copy() {
+		return new CommonResultNode(getSource());
+	}
+
 }

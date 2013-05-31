@@ -26,4 +26,7 @@ public interface FunctionCallNode extends ExpressionNode {
 	ExpressionNode getArgument(int index);
 
 	void setArgument(int index, ExpressionNode value);
+
+	@Override
+	FunctionCallNode copy();
 }

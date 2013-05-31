@@ -8,7 +8,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
  * Children: (0) identifier, (1) type, (2) contract.
  * 
  * @author siegel
- *
+ * 
  */
 public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 
@@ -45,5 +45,8 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 
 	@Override
 	FunctionTypeNode getTypeNode();
+
+	@Override
+	FunctionDeclarationNode copy();
 
 }

@@ -32,4 +32,13 @@ public class CommonTypedefNameNode extends CommonTypeNode implements
 			out.print("[" + qualifiers + "]");
 	}
 
+	@Override
+	public TypedefNameNode copy() {
+		CommonTypedefNameNode result = new CommonTypedefNameNode(getSource(),
+				duplicate(getName()));
+
+		result.copyData(result);
+		return result;
+	}
+
 }

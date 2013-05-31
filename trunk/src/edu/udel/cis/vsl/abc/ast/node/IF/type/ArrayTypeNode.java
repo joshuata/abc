@@ -52,21 +52,24 @@ public interface ArrayTypeNode extends TypeNode {
 	boolean hasStaticExtent();
 
 	void setStaticExtent(boolean value);
-	
+
 	boolean hasConstInBrackets();
-	
+
 	void setConstInBrackets(boolean value);
-	
+
 	boolean hasVolatileInBrackets();
-	
+
 	void setVolatileInBrackets(boolean value);
-	
+
 	boolean hasRestrictInBrackets();
-	
+
 	void setRestrictInBrackets(boolean value);
-	
+
 	boolean hasAtomicInBrackets();
-	
+
 	void setAtomicInBrackets(boolean value);
+
+	@Override
+	ArrayTypeNode copy();
 
 }

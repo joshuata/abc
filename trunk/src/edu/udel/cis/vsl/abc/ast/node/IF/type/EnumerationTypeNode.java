@@ -30,4 +30,7 @@ public interface EnumerationTypeNode extends DeclarationNode, TypeNode,
 	 * @return the sequence node for the enumerators of this type
 	 */
 	SequenceNode<EnumeratorDeclarationNode> enumerators();
+
+	@Override
+	EnumerationTypeNode copy();
 }

@@ -12,4 +12,7 @@ public interface ArrowNode extends ExpressionNode {
 
 	void setFieldName(IdentifierNode field);
 
+	@Override
+	ArrowNode copy();
+
 }

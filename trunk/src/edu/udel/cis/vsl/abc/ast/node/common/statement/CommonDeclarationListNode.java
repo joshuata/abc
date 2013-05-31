@@ -16,4 +16,9 @@ public class CommonDeclarationListNode extends
 		super(source, "DeclarationList", childList);
 	}
 
+	@Override
+	public CommonDeclarationListNode copy() {
+		return new CommonDeclarationListNode(getSource(), childListCopy());
+	}
+
 }

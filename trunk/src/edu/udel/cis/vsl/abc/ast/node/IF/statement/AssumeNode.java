@@ -10,4 +10,7 @@ public interface AssumeNode extends StatementNode {
 	 * @return the assumed expression
 	 */
 	ExpressionNode getExpression();
+
+	@Override
+	AssumeNode copy();
 }

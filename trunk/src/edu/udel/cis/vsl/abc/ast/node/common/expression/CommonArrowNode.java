@@ -48,4 +48,10 @@ public class CommonArrowNode extends CommonExpressionNode implements ArrowNode {
 		return false;
 	}
 
+	@Override
+	public ArrowNode copy() {
+		return new CommonArrowNode(getSource(),
+				duplicate(getStructurePointer()), duplicate(getFieldName()));
+	}
+
 }

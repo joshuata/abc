@@ -43,15 +43,6 @@ public class CommonFloatingConstantNode extends CommonConstantNode implements
 				+ getConstantValue().getDoubleValue() + "]";
 	}
 
-	// @Override
-	// public boolean equivalentConstant(ExpressionNode expression) {
-	// if (expression instanceof CommonFloatingConstantNode) {
-	// return getDoubleValue() == ((CommonFloatingConstantNode) expression)
-	// .getDoubleValue();
-	// }
-	// return false;
-	// }
-
 	@Override
 	public String wholePart() {
 		return wholePart;
@@ -65,5 +56,12 @@ public class CommonFloatingConstantNode extends CommonConstantNode implements
 	@Override
 	public String exponent() {
 		return exponent;
+	}
+
+	@Override
+	public FloatingConstantNode copy() {
+		return new CommonFloatingConstantNode(getSource(),
+				getStringRepresentation(), wholePart(), fractionPart(),
+				exponent(), getConstantValue());
 	}
 }

@@ -14,4 +14,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 public interface CompoundStatementNode extends StatementNode,
 		SequenceNode<BlockItemNode> {
 
+	@Override
+	CompoundStatementNode copy();
+
 }

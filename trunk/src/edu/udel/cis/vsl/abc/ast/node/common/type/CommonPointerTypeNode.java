@@ -27,4 +27,13 @@ public class CommonPointerTypeNode extends CommonTypeNode implements
 			out.print("[" + qualifierString() + "]");
 	}
 
+	@Override
+	public PointerTypeNode copy() {
+		CommonPointerTypeNode result = new CommonPointerTypeNode(getSource(),
+				duplicate(referencedType()));
+
+		copyData(result);
+		return result;
+	}
+
 }

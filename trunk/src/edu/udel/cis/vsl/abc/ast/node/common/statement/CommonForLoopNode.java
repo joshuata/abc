@@ -26,4 +26,11 @@ public class CommonForLoopNode extends CommonLoopNode implements ForLoopNode {
 		return (ExpressionNode) child(4);
 	}
 
+	@Override
+	public ForLoopNode copy() {
+		return new CommonForLoopNode(getSource(), duplicate(getCondition()),
+				duplicate(getBody()), duplicate(getInitializer()),
+				duplicate(getIncrementer()), duplicate(getInvariant()));
+	}
+
 }
