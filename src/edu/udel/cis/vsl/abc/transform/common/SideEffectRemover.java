@@ -295,9 +295,9 @@ public class SideEffectRemover implements Transformer {
 	private StatementNode whenStatement(WhenNode statement)
 			throws SyntaxException {
 		StatementNode result;
-		ExpressionNode guard = statement.getGuard();
+		ExpressionNode guard = statement.getGuard().copy();
 
-		guard.parent().removeChild(guard.childIndex());
+		//guard.parent().removeChild(guard.childIndex());
 		result = factory.newWhenNode(statement.getSource(), guard,
 				processStatement(statement.getBody()));
 		return result;
@@ -449,17 +449,16 @@ public class SideEffectRemover implements Transformer {
 					Vector<ExpressionNode> addArguments = new Vector<ExpressionNode>();
 					Vector<ExpressionNode> incrementArguments = new Vector<ExpressionNode>();
 					ExpressionNode variableExpression = ((OperatorNode) expression)
-							.getArgument(0);
+							.getArgument(0).copy();
 
-					variableExpression.parent().removeChild(
-							variableExpression.childIndex());
+//					variableExpression.parent().removeChild(
+//							variableExpression.childIndex());
 					addArguments.add(variableExpression);
 					addArguments.add(factory.newIntegerConstantNode(
 							expression.getSource(), "1"));
 					add = factory.newOperatorNode(expression.getSource(),
 							Operator.PLUS, addArguments);
-					incrementArguments.add(((OperatorNode) expression)
-							.getArgument(0));
+					incrementArguments.add(variableExpression.copy());
 					incrementArguments.add(add);
 					result = factory.newExpressionStatementNode(factory
 							.newOperatorNode(expression.getSource(),
@@ -486,7 +485,7 @@ public class SideEffectRemover implements Transformer {
 					break;
 				case ASSIGN:
 					ExpressionNode rhs = ((OperatorNode) expression)
-							.getArgument(1);
+							.getArgument(1).copy();
 
 					if (isSEF(rhs)) {
 						result = statement;
@@ -503,13 +502,19 @@ public class SideEffectRemover implements Transformer {
 						} else {
 							Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
 							ExpressionNode lhs = ((OperatorNode) expression)
-									.getArgument(0);
+									.getArgument(0).copy();
+							ExpressionNode assignRhs;
 
-							lhs.parent().removeChild(lhs.childIndex());
+							//lhs.parent().removeChild(lhs.childIndex());
 							assignArguments.add(lhs);
 							triple = processExpression(rhs);
 							blockItems.addAll(triple.getBefore());
-							assignArguments.add(triple.getExpression());
+							assignRhs = triple.getExpression();
+							if (assignRhs.parent() != null) {
+								assignRhs.parent().removeChild(
+										assignRhs.childIndex());
+							}
+							assignArguments.add(assignRhs);
 							blockItems.add(factory
 									.newExpressionStatementNode(factory
 											.newOperatorNode(
@@ -818,20 +823,20 @@ public class SideEffectRemover implements Transformer {
 			throws SyntaxException {
 		Vector<BlockItemNode> before = new Vector<BlockItemNode>();
 		Vector<BlockItemNode> after = new Vector<BlockItemNode>();
+		ExpressionNode lhs = assign.getArgument(0).copy();
 
 		assert assign.getOperator() == Operator.ASSIGN;
 		// Assume left hand side is side effect free.
 		if (isSEF(assign.getArgument(1))) {
-			assign.parent().removeChild(assign.childIndex());
-			before.add(factory.newExpressionStatementNode(assign));
+			//assign.parent().removeChild(assign.childIndex());
+			before.add(factory.newExpressionStatementNode(assign.copy()));
 		} else {
-			SideEffectFreeTriple rhs = processExpression(assign.getArgument(1));
+			SideEffectFreeTriple rhs = processExpression(assign.getArgument(1).copy());
 			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
-			ExpressionNode lhs = assign.getArgument(0);
-			ExpressionNode newRhs = rhs.getExpression();
+			ExpressionNode newRhs = rhs.getExpression().copy();
 
-			lhs.parent().removeChild(lhs.childIndex());
-			newRhs.parent().removeChild(newRhs.childIndex());
+			//lhs.parent().removeChild(lhs.childIndex());
+			//newRhs.parent().removeChild(newRhs.childIndex());
 			before.addAll(rhs.getBefore());
 			arguments.add(lhs);
 			arguments.add(newRhs);
@@ -840,21 +845,21 @@ public class SideEffectRemover implements Transformer {
 							arguments)));
 			after.addAll(rhs.getAfter());
 		}
-		return new SideEffectFreeTriple(before, assign.getArgument(0), after);
+		return new SideEffectFreeTriple(before, lhs, after);
 	}
 
 	private SideEffectFreeTriple incrementOrDecrement(OperatorNode operator)
 			throws SyntaxException {
 		Vector<BlockItemNode> before = new Vector<BlockItemNode>();
 		Vector<BlockItemNode> after = new Vector<BlockItemNode>();
-		ExpressionNode base = operator.getArgument(0);
+		ExpressionNode base = operator.getArgument(0).copy();
 
 		OperatorNode.Operator operation = operator.getOperator();
 		ExpressionNode math, assignment;
 		Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
 		Vector<ExpressionNode> mathArguments = new Vector<ExpressionNode>();
 
-		base.parent().removeChild(base.childIndex());
+		//base.parent().removeChild(base.childIndex());
 		mathArguments.add(base.copy());
 		mathArguments.add(factory.newIntegerConstantNode(operator.getSource(),
 				"1"));
