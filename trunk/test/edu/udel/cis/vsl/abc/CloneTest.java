@@ -1,14 +1,13 @@
 package edu.udel.cis.vsl.abc;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 import edu.udel.cis.vsl.abc.analysis.Analysis;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
@@ -24,7 +23,7 @@ public class CloneTest {
 
 	// private static boolean debug = true;
 
-	private PrintStream out = System.out;
+	// private PrintStream out = System.out;
 
 	private File root = new File("examples");
 
@@ -39,7 +38,6 @@ public class CloneTest {
 	private void check(String filenameRoot) throws PreprocessorException,
 			ParseException, SyntaxException, IOException {
 		Activator a;
-		ASTFactory astFactory;
 		AST ast1, ast2;
 		ASTNode root1, root2;
 
@@ -47,12 +45,10 @@ public class CloneTest {
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
 				userIncludes);
-		astFactory = a.getASTFactory();
 		ast1 = a.getTranslationUnit();
 		root1 = ast1.getRootNode();
 		root2 = root1.copy();
-		ast2 = astFactory.newTranslationUnit(root2);
-		Analysis.performStandardAnalysis(ast2);
+		ast2 = a.newTranslationUnit(root2);
 		assertEquals(ast1.getNumberOfNodes(), ast2.getNumberOfNodes());
 	}
 
