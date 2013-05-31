@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
+import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
@@ -409,8 +410,14 @@ public class ExpressionAnalyzer {
 		int numArgs = node.getNumberOfArguments();
 
 		// the following sets the initial type of each argument:
-		for (int i = 0; i < numArgs; i++)
-			processExpression(node.getArgument(i));
+		for (int i = 0; i < numArgs; i++) {
+			ExpressionNode child = node.getArgument(i);
+
+			if (child == null)
+				throw new ASTException("Child " + i
+						+ " of operator node is null:\n" + node);
+			processExpression(child);
+		}
 		switch (operator) {
 		case ADDRESSOF: // & pointer to object
 			processADDRESSOF(node);
