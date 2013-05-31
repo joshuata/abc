@@ -571,7 +571,7 @@ public class SideEffectRemover implements Transformer {
 						addition = factory.newOperatorNode(
 								expression.getSource(), Operator.PLUS,
 								arguments);
-						assignmentArguments.add(variable);
+						assignmentArguments.add(variable.copy());
 						assignmentArguments.add(addition);
 						result = factory.newExpressionStatementNode(factory
 								.newOperatorNode(expression.getSource(),
@@ -855,7 +855,7 @@ public class SideEffectRemover implements Transformer {
 		Vector<ExpressionNode> mathArguments = new Vector<ExpressionNode>();
 
 		base.parent().removeChild(base.childIndex());
-		mathArguments.add(base);
+		mathArguments.add(base.copy());
 		mathArguments.add(factory.newIntegerConstantNode(operator.getSource(),
 				"1"));
 		switch (operation) {
@@ -868,8 +868,8 @@ public class SideEffectRemover implements Transformer {
 			math = factory.newOperatorNode(operator.getSource(),
 					Operator.MINUS, mathArguments);
 		}
-		assignArguments.add(base);
-		assignArguments.add(math);
+		assignArguments.add(base.copy());
+		assignArguments.add(math.copy());
 		assignment = factory.newOperatorNode(operator.getSource(),
 				Operator.ASSIGN, assignArguments);
 		switch (operation) {
