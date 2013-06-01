@@ -509,11 +509,11 @@ public class SideEffectRemover implements Transformer {
 							assignArguments.add(lhs);
 							triple = processExpression(rhs);
 							blockItems.addAll(triple.getBefore());
-							assignRhs = triple.getExpression();
-							if (assignRhs.parent() != null) {
-								assignRhs.parent().removeChild(
-										assignRhs.childIndex());
-							}
+							assignRhs = triple.getExpression().copy();
+//							if (assignRhs.parent() != null) {
+//								assignRhs.parent().removeChild(
+//										assignRhs.childIndex());
+//							}
 							assignArguments.add(assignRhs);
 							blockItems.add(factory
 									.newExpressionStatementNode(factory
