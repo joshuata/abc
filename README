@@ -1,0 +1,45 @@
+                             ABC: A C Front-end
+
+Installation from source:
+
+0. Install Java 1.7 and Apache ant, if you don't have them already.
+
+1. Download the JUnit jar (v. 4.10), ANTLR complete jar, and the ANTLR runtime 
+and Jacoco gzipped tar archives from http://vsl.cis.udel.edu/tools.  Put these 
+files somewhere on your system and untar the ANTLR runtime and Jacoco archives.
+
+2. svn checkout svn://vsl.cis.udel.edu/abc
+
+3. cd abc/trunk
+
+4. Create a file named build.properties by copying and editing one of the examples
+in the properties directory.  Edit each entry to point to the corresponding items
+you downloaded in step 1.
+
+5. Type "ant" and everything should build without warnings or errors and produce
+abc.jar.  Type "ant test" to run a JUnit test suite.  All tests should pass.
+
+If there are any problems, email siegel at udel dot edu.
+
+Installation from source using Eclipse:
+
+1. Do steps 0 and 1 from above if you have not already.
+
+2. Install an SVN plugin in Eclipse (such as Subversive) if you have not already.
+
+3. From within Eclipse, select New Project...from SVN.  The archive
+is svn://vsl.cis.udel.edu/abc.  After entering that, open it up and select
+the "trunk". (It is simplest to just check out the trunk for the Eclipse
+project.)
+
+4. Check out the trunk, and create the project using the New Java Project
+Wizard as usual, naming it "ABC".  The .project, .classpath,  and other Eclipse
+meta-data are already in the SVN archive, saving you a bunch of work.
+
+5. The platform-specific information are handled
+in Eclipse by defining Classpath variables.  Navigate to  
+Preferences->Java->Build Path-> Classpath Variables->New
+and define a new variable called "ANTLR". To define it,
+navigate to and select the complete ANTLR jar file you downloaded
+above.  In addition, you may also define ANTLR_SOURCE to point
+to the root of the ANTLR source tree, but that is optional.
