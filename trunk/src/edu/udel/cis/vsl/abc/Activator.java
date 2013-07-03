@@ -290,12 +290,17 @@ public class Activator {
 	 * recommended for small examples.
 	 * 
 	 * @param out
+	 * @return the AST
 	 * @throws PreprocessorException
+	 *             if preprocessing fails
 	 * @throws ParseException
+	 *             if parsing the preprocessed file fails
 	 * @throws SyntaxException
+	 *             if analysis of syntax fails
 	 * @throws IOException
+	 *             if file cannot be read
 	 */
-	public void showTranslation(PrintStream out) throws PreprocessorException,
+	public AST showTranslation(PrintStream out) throws PreprocessorException,
 			ParseException, SyntaxException, IOException {
 		AST unit;
 		CParser parser;
@@ -347,6 +352,7 @@ public class Activator {
 		unit.getUnitFactory().getTypeFactory().printTypes(out);
 		out.println();
 		out.flush();
+		return unit;
 	}
 
 }

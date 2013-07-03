@@ -10,6 +10,23 @@ import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
+/**
+ * The main class for the ABC C front end. Provides a simple command line
+ * interface as well as static methods to produce an {@link Activator} for more
+ * advanced uses.
+ * 
+ * Include paths are searched as follows. For a file included with angle
+ * brackets, first the paths occurring in the array <code>systemIncludes</code>
+ * are searched, in order; if file is not found there, then the built-in system
+ * include paths inside of ABC are searched. For a file included with double
+ * quotes, first the paths occurring in the array <code>userIncludes</code> are
+ * searched (in order) and if the file is not found there, the protocol for
+ * angle brackets is followed.
+ * 
+ * 
+ * @author siegel
+ * 
+ */
 public class ABC {
 
 	public final static String version = "0.1";
