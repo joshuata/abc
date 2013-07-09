@@ -29,6 +29,7 @@ tests should pass.
 
 If there are any problems, email siegel at udel dot edu.
 
+
 ============== Installation from source using Eclipse ==================
 
 1. Start with Eclipse IDE for Java/EE developers, available at
@@ -49,7 +50,10 @@ Project Wizard as usual, naming it "ABC".  The .project, .classpath,
 and other Eclipse meta-data are already in the SVN archive, saving you
 a bunch of work.
 
-6. The platform-specific information are handled in Eclipse by
+6. Create the build.properties files as above. (This is not used
+by Eclipse, but you will want to run Ant to build the jar file.)
+
+7. The platform-specific information are handled in Eclipse by
 defining Classpath variables.  Navigate to Preferences->Java->Build
 Path->Classpath Variables->New and define a new variable called
 "ANTLR". To define it, navigate to and select the complete ANTLR jar
@@ -57,3 +61,13 @@ file you downloaded above.  In addition, you may also define
 ANTLR_SOURCE to point to the root of the ANTLR source tree (this step
 is optional but helps with debugging).
 
+8.  Do a clean build.  Everything should compile.  To build the jar,
+right click (or ctrl-click on Mac) on build.xml and select
+Run As->Ant Build.
+
+9. To run the JUnit tests through Eclipse: Select Run->Run Configurations...
+Create a new JUnit configuration called "ABC Tests".  Select
+"Run all tests in the selected project..." and navigate to the "test"
+folder in the ABC project.  Under the Arguments tab, type "-ea"
+(without the quotes) into the VM arguments field, to enable assertion
+checking.   Click "Run" to run the tests.
