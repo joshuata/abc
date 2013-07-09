@@ -1,0 +1,59 @@
+                    ABC Installation Instructions
+
+======================= Installation from source =======================
+
+1. Install a Java 7 SDK if you have not already.  Go to
+http://www.oracle.com/technetwork/java/javase/downloads/ for the
+latest from Oracle.  On linux, you can optionally sudo apt-get install
+openjdk-7-jdk.
+
+2. Install Apache ant, if you don't already have it
+(http://ant.apache.org).
+
+3. Download the JUnit jar (v. 4.10), ANTLR complete jar, and the ANTLR
+runtime and Jacoco gzipped tar archives from
+http://vsl.cis.udel.edu/tools.  Put these files somewhere on your
+system and untar the ANTLR runtime and Jacoco archives.
+
+4. svn checkout svn://vsl.cis.udel.edu/abc
+
+5. cd abc/trunk
+
+6. Create a file named build.properties by copying and editing one of
+the examples in the properties directory.  Edit each entry to point to
+the corresponding items you downloaded in step 3.
+
+7. Type "ant" and everything should build without warnings or errors
+and produce abc.jar.  Type "ant test" to run a JUnit test suite.  All
+tests should pass.
+
+If there are any problems, email siegel at udel dot edu.
+
+============== Installation from source using Eclipse ==================
+
+1. Start with Eclipse IDE for Java/EE developers, available at
+http://www.eclipse.org/downloads/
+
+2. Do steps 1-3 from above if you have not already.
+
+3. Install an SVN plugin in Eclipse (such as Subversive) if you have
+not already.
+
+4. From within Eclipse, select New Project...from SVN.  The archive is
+svn://vsl.cis.udel.edu/abc.  After entering that, open it up and
+select the "trunk". (It is simplest to just check out the trunk for
+the Eclipse project.)
+
+5. Check out the trunk, and create the project using the New Java
+Project Wizard as usual, naming it "ABC".  The .project, .classpath,
+and other Eclipse meta-data are already in the SVN archive, saving you
+a bunch of work.
+
+6. The platform-specific information are handled in Eclipse by
+defining Classpath variables.  Navigate to Preferences->Java->Build
+Path->Classpath Variables->New and define a new variable called
+"ANTLR". To define it, navigate to and select the complete ANTLR jar
+file you downloaded above.  In addition, you may also define
+ANTLR_SOURCE to point to the root of the ANTLR source tree (this step
+is optional but helps with debugging).
+
