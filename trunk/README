@@ -1,45 +1,28 @@
                              ABC: A C Front-end
+                         http://vsl.cis.udel.edu/abc
 
-Installation from source:
+ABC is a Java-based C front-end.  It provides a pre-processor and
+parser for C programs.  These produce an Abstract Syntax Tree
+representation of the program.  The AST includes information such as
+the type of every expression, the "symbol table" (i.e., the mapping
+which yields the entity corresponding to each identifier in the
+program), and a precise description of the origin of each AST element
+in the original source files.  There is also support for transforming
+ASTs.  
 
-0. Install Java 1.7 and Apache ant, if you don't have them already.
+The ABC interface is intended to be thoroughly documented and easy to
+use.  The code is 100% Java.
 
-1. Download the JUnit jar (v. 4.10), ANTLR complete jar, and the ANTLR runtime 
-and Jacoco gzipped tar archives from http://vsl.cis.udel.edu/tools.  Put these 
-files somewhere on your system and untar the ANTLR runtime and Jacoco archives.
+No one is sure what ABC stands for.  It may stand for "ANTLR-Based C
+front-end" because it uses the ANTLR parser generator at several
+steps.  However, ABC goes significantly beyond the services provided
+by these ANTLR parsers.  ABC may stand for "A Better C front-end" or
+using it may be as easy as the "ABCs".
 
-2. svn checkout svn://vsl.cis.udel.edu/abc
+ABC is developed by Stephen F. Siegel and Timothy K. Zirkel at the
+Verified Software Laboratory, University of Delaware.  It is
+distributed under the terms of the GNU Lessor General Public
+License (LGPL).
 
-3. cd abc/trunk
-
-4. Create a file named build.properties by copying and editing one of the examples
-in the properties directory.  Edit each entry to point to the corresponding items
-you downloaded in step 1.
-
-5. Type "ant" and everything should build without warnings or errors and produce
-abc.jar.  Type "ant test" to run a JUnit test suite.  All tests should pass.
-
-If there are any problems, email siegel at udel dot edu.
-
-Installation from source using Eclipse:
-
-1. Do steps 0 and 1 from above if you have not already.
-
-2. Install an SVN plugin in Eclipse (such as Subversive) if you have not already.
-
-3. From within Eclipse, select New Project...from SVN.  The archive
-is svn://vsl.cis.udel.edu/abc.  After entering that, open it up and select
-the "trunk". (It is simplest to just check out the trunk for the Eclipse
-project.)
-
-4. Check out the trunk, and create the project using the New Java Project
-Wizard as usual, naming it "ABC".  The .project, .classpath,  and other Eclipse
-meta-data are already in the SVN archive, saving you a bunch of work.
-
-5. The platform-specific information are handled
-in Eclipse by defining Classpath variables.  Navigate to  
-Preferences->Java->Build Path-> Classpath Variables->New
-and define a new variable called "ANTLR". To define it,
-navigate to and select the complete ANTLR jar file you downloaded
-above.  In addition, you may also define ANTLR_SOURCE to point
-to the root of the ANTLR source tree, but that is optional.
+ABC is distributed as a jar file.  For most users, this is all you
+will need.  For installation instructions from source see INSTALL.
