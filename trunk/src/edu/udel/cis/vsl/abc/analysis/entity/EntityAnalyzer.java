@@ -109,8 +109,8 @@ public class EntityAnalyzer implements Analyzer {
 	}
 
 	@Override
-	public void analyze(AST unit) throws SyntaxException {
-		ASTNode root = unit.getRootNode();
+	public void analyze(AST ast) throws SyntaxException {
+		ASTNode root = ast.getRootNode();
 		Iterator<ASTNode> children = root.children();
 
 		try {

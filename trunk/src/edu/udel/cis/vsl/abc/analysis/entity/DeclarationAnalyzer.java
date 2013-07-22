@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
+import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -67,15 +68,24 @@ public class DeclarationAnalyzer {
 
 	void processTypedefDeclaration(TypedefDeclarationNode node)
 			throws SyntaxException {
-		String name = node.getIdentifier().name();
+		IdentifierNode identifier = node.getIdentifier();
+		String name = identifier.name();
 		Scope scope = node.getScope();
+		TypeNode typeNode = node.getTypeNode();
 
 		if (scope.getScopeKind() == ScopeKind.FILE && ignoredTypes != null
-				&& ignoredTypes.contains(name))
-			// TODO: mark this node to be removed?
-			return;
-		else {
-			TypeNode typeNode = ((TypedefDeclarationNode) node).getTypeNode();
+				&& ignoredTypes.contains(name)) {
+			OrdinaryEntity entity = scope.getOrdinaryEntity(name);
+
+			if (entity == null)
+				throw error("Cannot find definition of system typedef", node);
+			if (entity instanceof Typedef) {
+				entityAnalyzer.typeAnalyzer.processTypeNode(typeNode);
+				identifier.setEntity(entity);
+				node.setEntity(entity);
+			} else
+				throw error("Expected system typedef, got " + entity, node);
+		} else {
 			Type type = entityAnalyzer.typeAnalyzer.processTypeNode(typeNode);
 			OrdinaryEntity entity = scope.getOrdinaryEntity(name);
 			Typedef typedef;
@@ -104,6 +114,7 @@ public class DeclarationAnalyzer {
 			}
 			typedef.addDeclaration((TypedefDeclarationNode) node);
 			node.setEntity(typedef);
+			identifier.setEntity(typedef);
 		}
 	}
 
@@ -317,7 +328,7 @@ public class DeclarationAnalyzer {
 	 * @param node
 	 *            the declaration node
 	 * @param isParameter
-	 *            is the declaration the delcaration of a function parameter?
+	 *            is the declaration the declaration of a function parameter?
 	 * @throws SyntaxException
 	 */
 	private OrdinaryEntity processOrdinaryDeclaration(
@@ -367,6 +378,7 @@ public class DeclarationAnalyzer {
 				unit.add(entity);
 		}
 		node.setEntity(entity);
+		identifier.setEntity(entity);
 		return entity;
 	}
 

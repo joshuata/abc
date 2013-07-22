@@ -105,7 +105,7 @@ public class SpecifierAnalysis {
 	int unionTypeCount = 0;
 	int enumTypeCount = 0;
 	int typedefNameCount = 0;
-	//int processTypeCount = 0;
+	// int processTypeCount = 0;
 	// qualifiers:
 	boolean constQualifier = false;
 	boolean restrictQualifier = false;
@@ -205,11 +205,6 @@ public class SpecifierAnalysis {
 				setTypeNameKind(TypeNodeKind.TYPEDEF_NAME);
 				setTypeSpecifierNode(node);
 				break;
-//			case CivlCParser.PROC:
-//				processTypeCount++;
-//				setTypeNameKind(TypeNodeKind.PROCESS);
-//				setTypeSpecifierNode(node);
-//				break;
 			case CivlCParser.CONST:
 				constQualifier = true;
 				break;

@@ -8,7 +8,7 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public class ASTs {
 
-	public static ASTFactory newUnitFactory(NodeFactory nodeFactory,
+	public static ASTFactory newASTFactory(NodeFactory nodeFactory,
 			TokenFactory tokenFactory, TypeFactory typeFactory) {
 		return new CommonASTFactory(nodeFactory, tokenFactory, typeFactory);
 	}

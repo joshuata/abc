@@ -4,6 +4,6 @@ public interface AttributeKey {
 
 	String getAttributeName();
 
-	Class<Object> getAttributeClass();
+	Class<? extends Object> getAttributeClass();
 
 }

@@ -20,8 +20,6 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * easy way to ignore typedefs in the standard header files and instead use the
  * symbolic versions of these types provided by the type factory.
  * 
- * TODO: ADD special CIVL types here, like \proc, \heap, ...
- * 
  * @author siegel
  * 
  */

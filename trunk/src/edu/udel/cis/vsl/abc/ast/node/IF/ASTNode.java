@@ -200,4 +200,19 @@ public interface ASTNode {
 	 */
 	ASTNode copy();
 
+	/**
+	 * Removes all children that do not satisfy the predicate and applies this
+	 * method recursively to the remaining children.
+	 * 
+	 * Removing a node is interpreted as follows. If u is an instance of
+	 * {@link SequenceNode}, and a child of u does not satisfy the predicate,
+	 * then the child is removed and all subsequent elements of the sequence are
+	 * shifted down to remove the gap. If u is not an instance of
+	 * {@link SequenceNode} and the child does not satisfy the predicate then
+	 * the child is replaced by null.
+	 * 
+	 * @param keep
+	 *            a node predicate
+	 */
+	void keepOnly(NodePredicate keep);
 }

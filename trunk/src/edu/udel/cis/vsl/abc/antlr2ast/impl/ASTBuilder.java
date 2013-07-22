@@ -241,7 +241,7 @@ public class ASTBuilder {
 
 	// added for CIVL-C...
 
-	//static final int PROC = CivlCParser.PROC;
+	// static final int PROC = CivlCParser.PROC;
 	static final int SELF = CivlCParser.SELF;
 	static final int INPUT = CivlCParser.INPUT;
 	static final int OUTPUT = CivlCParser.OUTPUT;
@@ -744,6 +744,23 @@ public class ASTBuilder {
 	}
 
 	/**
+	 * If typeNode is a struct, union, or enumeration type node, make it in
+	 * complete, i.e., delete the "body" (list of fields, or enumerators) if it
+	 * is present. Otherwise, a no-op.
+	 * 
+	 * @param typeNode
+	 *            any type node
+	 */
+	private TypeNode makeIncomplete(TypeNode typeNode) {
+		if (typeNode instanceof StructureOrUnionTypeNode) {
+			((StructureOrUnionTypeNode) typeNode).makeIncomplete();
+		} else if (typeNode instanceof EnumerationTypeNode) {
+			((EnumerationTypeNode) typeNode).makeIncomplete();
+		}
+		return typeNode;
+	}
+
+	/**
 	 * Returns a list consiting of the following kinds of external definitions:
 	 * 
 	 * <ul>
@@ -800,7 +817,8 @@ public class ASTBuilder {
 					.getChild(1);
 			InitializerNode initializer = translateInitializer(initializerTree,
 					scope);
-			TypeNode baseType = newSpecifierType(analysis, scope);
+			TypeNode baseType = i == 0 ? newSpecifierType(analysis, scope)
+					: makeIncomplete(newSpecifierType(analysis, scope));
 			DeclaratorData data = processDeclarator(declaratorTree, baseType,
 					scope);
 			ExternalDefinitionNode definition;
@@ -872,10 +890,6 @@ public class ASTBuilder {
 		case ATOMIC:
 			result = translateAtomicType(analysis.typeSpecifierNode, scope);
 			break;
-//		case PROCESS:
-//			result = nodeFactory
-//					.newProcessTypeNode(newSource(analysis.typeSpecifierNode));
-//			break;
 		default:
 			throw new RuntimeException("Should not happen.");
 		}
@@ -943,17 +957,24 @@ public class ASTBuilder {
 		CommonTree structDeclaratorList = (CommonTree) declarationTree
 				.getChild(1); // may be ABSENT
 		SpecifierAnalysis analysis = newSpecifierAnalysis(declarationSpecifiers);
-		TypeNode baseType = newSpecifierType(analysis, scope);
 		int numDeclarators = structDeclaratorList.getChildCount();
 		List<FieldDeclarationNode> result = new LinkedList<FieldDeclarationNode>();
 		Source source = newSource(declarationTree);
 
+		// TODO: error if shared specifier like "int x,y;"
+		// need to move baseType computation into loop,
+		// just as in ordinary variable declarations.
+
 		if (numDeclarators == 0) {
 			// this can happen if the specifier is an anonymous struct or union
+			TypeNode baseType = newSpecifierType(analysis, scope);
+
 			result.add(nodeFactory.newFieldDeclarationNode(source, null,
 					baseType, null));
 		} else {
 			for (int i = 0; i < numDeclarators; i++) {
+				TypeNode baseType = i == 0 ? newSpecifierType(analysis, scope)
+						: makeIncomplete(newSpecifierType(analysis, scope));
 				CommonTree structDeclarator = (CommonTree) structDeclaratorList
 						.getChild(i);
 				CommonTree declaratorTree = (CommonTree) structDeclarator

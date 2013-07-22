@@ -35,9 +35,9 @@ public class Antlr2AST {
 		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 				valueFactory);
 		TokenFactory sourceFactory = Tokens.newTokenFactory();
-		ASTFactory unitFactory = ASTs.newUnitFactory(nodeFactory,
+		ASTFactory astFactory = ASTs.newASTFactory(nodeFactory,
 				sourceFactory, typeFactory);
-		ASTBuilder builder = new ASTBuilder(parser, unitFactory, rootTree);
+		ASTBuilder builder = new ASTBuilder(parser, astFactory, rootTree);
 
 		return builder.getTranslationUnit();
 	}
@@ -64,7 +64,7 @@ public class Antlr2AST {
 		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 				valueFactory);
 		TokenFactory sourceFactory = Tokens.newTokenFactory();
-		ASTFactory unitFactory = ASTs.newUnitFactory(nodeFactory,
+		ASTFactory unitFactory = ASTs.newASTFactory(nodeFactory,
 				sourceFactory, typeFactory);
 
 		return build(parser, unitFactory, out);

@@ -7,10 +7,16 @@ import java.io.PrintStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.analysis.Analysis;
+import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST;
+import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
 import edu.udel.cis.vsl.abc.ast.ASTs;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.conversion.Conversions;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
+import edu.udel.cis.vsl.abc.ast.entity.Entities;
+import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.node.Nodes;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -26,9 +32,14 @@ import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
+import edu.udel.cis.vsl.abc.program.Programs;
+import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.token.Tokens;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.transform.IF.Transformer;
+import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 
@@ -54,6 +65,11 @@ public class Activator {
 
 	private static String bar = "===================";
 
+	private TokenFactory sourceFactory = Tokens.newTokenFactory();
+
+	private PreprocessorFactory preprocessorFactory = Preprocess
+			.newPreprocessorFactory();
+
 	private TypeFactory typeFactory = Types.newTypeFactory();
 
 	private ValueFactory valueFactory = Values.newValueFactory(typeFactory);
@@ -61,13 +77,23 @@ public class Activator {
 	private NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 			valueFactory);
 
-	private TokenFactory sourceFactory = Tokens.newTokenFactory();
-
-	private ASTFactory astFactory = ASTs.newUnitFactory(nodeFactory,
+	private ASTFactory astFactory = ASTs.newASTFactory(nodeFactory,
 			sourceFactory, typeFactory);
 
-	private PreprocessorFactory preprocessorFactory = Preprocess
-			.newPreprocessorFactory();
+	private EntityFactory entityFactory = Entities.newEntityFactory();
+
+	private ConversionFactory conversionFactory = Conversions
+			.newConversionFactory(typeFactory);
+
+	private Analyzer standardAnalyzer = Analysis.newStandardAnalyzer(
+			entityFactory, nodeFactory, sourceFactory, conversionFactory);
+
+	private Transformer sideEffectRemover = new SideEffectRemover();
+
+	private Transformer pruner = new Pruner(astFactory);
+
+	private ProgramFactory programFactory = Programs.newProgramFactory(
+			astFactory, standardAnalyzer, pruner, sideEffectRemover);
 
 	private Preprocessor preprocessor;
 
@@ -153,6 +179,13 @@ public class Activator {
 	 */
 	public PreprocessorFactory getPreprocessorFactory() {
 		return preprocessorFactory;
+	}
+
+	/**
+	 * Returns the program factory responsible for making programs form ASTs.
+	 */
+	public ProgramFactory getProgramFactory() {
+		return programFactory;
 	}
 
 	/**
@@ -248,6 +281,28 @@ public class Activator {
 	}
 
 	/**
+	 * Returns the Program object containing the analyzed AST obtained from
+	 * parsing the file. The program will not have any transformations performed
+	 * upon it, but these can be accomplished by calling methods in the program
+	 * itself.
+	 * 
+	 * @return the Program
+	 * @throws ParseException
+	 *             if a parsing error occurs
+	 * @throws SyntaxException
+	 *             if a syntax error is found in the parsed file
+	 * @throws PreprocessorException
+	 *             if an error occurs in preprocessing the file
+	 */
+	public Program getProgram() throws ParseException, SyntaxException,
+			PreprocessorException {
+		AST ast = getRawTranslationUnit();
+		Program program = programFactory.newProgram(ast);
+
+		return program;
+	}
+
+	/**
 	 * Creates a new analyzed AST from the given root node. This method is
 	 * useful for those doing AST transformations. The typical flow is to create
 	 * the AST using one of the methods above, then release the AST, then modify
@@ -277,12 +332,21 @@ public class Activator {
 	public AST getSideEffectFreeTranslationUnit() throws SyntaxException,
 			ParseException, PreprocessorException {
 		AST unit = getTranslationUnit();
-		SideEffectRemover sideEffectRemover = new SideEffectRemover();
 
 		unit = sideEffectRemover.transform(unit);
-
 		Analysis.performStandardAnalysis(unit);
 		return unit;
+	}
+
+	public AST getSideEffectFreePrunedTranslationUnit() throws SyntaxException,
+			ParseException, PreprocessorException {
+		AST ast = getTranslationUnit();
+
+		ast = pruner.transform(ast);
+		Analysis.performStandardAnalysis(ast);
+		ast = sideEffectRemover.transform(ast);
+		Analysis.performStandardAnalysis(ast);
+		return ast;
 	}
 
 	/**
@@ -300,12 +364,14 @@ public class Activator {
 	 * @throws IOException
 	 *             if file cannot be read
 	 */
-	public AST showTranslation(PrintStream out) throws PreprocessorException,
-			ParseException, SyntaxException, IOException {
-		AST unit;
+	public Program showTranslation(PrintStream out)
+			throws PreprocessorException, ParseException, SyntaxException,
+			IOException {
+		AST ast;
 		CParser parser;
 		CommonTree tree;
-		SideEffectRemover sideEffectRemover;
+		ASTBuilder builder;
+		Program program;
 
 		// print the original source file...
 		ANTLRUtils.source(out, file);
@@ -320,39 +386,43 @@ public class Activator {
 		tree = parser.getTree();
 		ANTLRUtils.printTree(out, tree);
 		out.println();
-		// print the raw TranslationUnit...
-		out.println("\n\n" + bar + " Raw Translation Unit " + bar);
-		unit = Antlr2AST.translate(parser, tree);
-		unit.print(out);
-		out.println();
-		// perform analysis and print results...
-		out.println("\n\n" + bar + " Analyzed Translation Unit " + bar + "\n");
-		Analysis.performStandardAnalysis(unit);
-		unit.print(out);
+		out.flush();
+		ast = null;
+		try {
+			builder = new ASTBuilder(parser, astFactory, tree);
+			ast = builder.getTranslationUnit(); // creates ast
+			program = programFactory.newProgram(ast); // analyzes ast
+			ast = program.getAST();
+		} catch (Exception e) {
+			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
+			if (ast == null)
+				out.println("null");
+			else
+				ast.print(out);
+			out.println();
+			out.flush();
+			throw e;
+		}
+		out.println("\n\n" + bar + " Program " + bar + "\n");
+		program.print(out);
 		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
-		unit.getRootNode().getScope().print(out);
+		program.printSymbolTable(out);
 		out.println("\n\n" + bar + " Types " + bar + "\n");
-		unit.getUnitFactory().getTypeFactory().printTypes(out);
+		typeFactory.printTypes(out);
+		out.println();
+		out.flush();
+		// print the result of pruning unreachable decls...
+		out.println("\n\n" + bar + " Pruned Program " + bar);
+		program.prune();
+		program.print(out);
 		out.println();
 		out.flush();
 		// print the results of removing side-effects...
-		out.println("\n\n" + bar + " Side-effect-free Translation Unit " + bar);
-		sideEffectRemover = new SideEffectRemover();
-		unit = sideEffectRemover.transform(unit);
-		unit.print(out);
-		out.println();
-		// perform analysis and print results...
-		out.println("\n\n" + bar
-				+ " Analyzed Side-effect-free Translation Unit " + bar + "\n");
-		Analysis.performStandardAnalysis(unit);
-		unit.print(out);
-		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
-		unit.getRootNode().getScope().print(out);
-		out.println("\n\n" + bar + " Types " + bar + "\n");
-		unit.getUnitFactory().getTypeFactory().printTypes(out);
+		out.println("\n\n" + bar + " Side-effect-free Pruned Program " + bar);
+		program.removeSideEffects();
+		program.print(out);
 		out.println();
 		out.flush();
-		return unit;
+		return program;
 	}
-
 }

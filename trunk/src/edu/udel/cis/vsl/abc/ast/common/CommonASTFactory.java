@@ -17,18 +17,16 @@ public class CommonASTFactory implements ASTFactory {
 
 	private TypeFactory typeFactory;
 
-	public CommonASTFactory(NodeFactory nodeFactory,
-			TokenFactory tokenFactory, TypeFactory typeFactory) {
+	public CommonASTFactory(NodeFactory nodeFactory, TokenFactory tokenFactory,
+			TypeFactory typeFactory) {
 		this.nodeFactory = nodeFactory;
 		this.tokenFactory = tokenFactory;
 		this.typeFactory = typeFactory;
 	}
 
 	@Override
-	public AST newTranslationUnit(ASTNode root)
-			throws SyntaxException {
-		AST unit = new CommonAST(this,
-				(CommonASTNode) root);
+	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
+		AST unit = new CommonAST(this, (CommonASTNode) root);
 
 		// do some preparation?
 		return unit;

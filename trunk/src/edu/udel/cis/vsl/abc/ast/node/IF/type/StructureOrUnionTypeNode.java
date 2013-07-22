@@ -39,6 +39,11 @@ public interface StructureOrUnionTypeNode extends TypeNode, DeclarationNode,
 	 */
 	SequenceNode<FieldDeclarationNode> getStructDeclList();
 
+	/**
+	 * Nullifies the structDeclList, if not already null. Otherwise is a noop.
+	 */
+	void makeIncomplete();
+
 	@Override
 	StructureOrUnionTypeNode copy();
 }

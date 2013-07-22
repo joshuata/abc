@@ -13,6 +13,7 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodePredicate;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public abstract class CommonASTNode implements ASTNode {
@@ -209,7 +210,7 @@ public abstract class CommonASTNode implements ASTNode {
 	@Override
 	public void setAttribute(AttributeKey key, Object value) {
 		int id = ((CommonAttributeKey) key).getId();
-		Class<Object> attributeClass = key.getAttributeClass();
+		Class<? extends Object> attributeClass = key.getAttributeClass();
 		int size;
 
 		if (!(attributeClass.isInstance(value)))
@@ -295,6 +296,58 @@ public abstract class CommonASTNode implements ASTNode {
 			((CommonASTNode) oldChild).childIndex = -1;
 		}
 		children.set(index, null);
+	}
+
+	/**
+	 * Default implementation, for non-sequence nodes. Must be overridden for
+	 * sequence nodes.
+	 */
+	@Override
+	public void keepOnly(NodePredicate keep) {
+		int numChildren = numChildren();
+
+		checkModifiable();
+		for (int i = 0; i < numChildren; i++) {
+			ASTNode child = child(i);
+
+			if (child != null) {
+				if (keep.holds(child))
+					child.keepOnly(keep);
+				else
+					removeChild(i);
+			}
+		}
+	}
+
+	/**
+	 * Removes children and shifts down to remove the gaps; also applies
+	 * keepOnly to children not removed. This method is mean to be applied to
+	 * sequence nodes.
+	 * 
+	 * @param keep
+	 *            a node predicate telling which nodes to keep
+	 */
+	protected void keepOnlyAndShift(NodePredicate keep) {
+		int numChildren = numChildren();
+		int count = 0; // number of children to keep
+
+		checkModifiable();
+		for (int i = 0; i < numChildren; i++) {
+			ASTNode child = child(i);
+
+			if (child != null) {
+				if (keep.holds(child)) {
+					child.keepOnly(keep);
+					if (count < i) {
+						children.set(count, child);
+						((CommonASTNode) child).childIndex = count;
+					}
+					count++;
+				} else
+					removeChild(i);
+			}
+		}
+		children.subList(count, numChildren).clear();
 	}
 
 	@Override
