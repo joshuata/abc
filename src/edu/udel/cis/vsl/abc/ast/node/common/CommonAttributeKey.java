@@ -8,9 +8,10 @@ public class CommonAttributeKey implements AttributeKey {
 
 	private int id;
 
-	private Class<Object> attributeClass;
+	private Class<? extends Object> attributeClass;
 
-	public CommonAttributeKey(int id, String name, Class<Object> attributeClass) {
+	public CommonAttributeKey(int id, String name,
+			Class<? extends Object> attributeClass) {
 		this.id = id;
 		this.name = name;
 		this.attributeClass = attributeClass;
@@ -22,7 +23,7 @@ public class CommonAttributeKey implements AttributeKey {
 	}
 
 	@Override
-	public Class<Object> getAttributeClass() {
+	public Class<? extends Object> getAttributeClass() {
 		return attributeClass;
 	}
 

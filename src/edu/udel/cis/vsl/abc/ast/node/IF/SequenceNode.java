@@ -21,5 +21,4 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode {
 
 	@Override
 	SequenceNode<T> copy();
-
 }

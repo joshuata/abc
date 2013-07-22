@@ -183,7 +183,7 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public AttributeKey newAttribute(String attributeName,
-			Class<Object> attributeClass) {
+			Class<? extends Object> attributeClass) {
 		AttributeKey key = new CommonAttributeKey(attributeCount,
 				attributeName, attributeClass);
 

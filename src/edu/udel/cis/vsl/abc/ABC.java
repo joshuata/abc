@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -149,9 +150,14 @@ public class ABC {
 			config.activator.preprocess(config.out);
 		else if (config.verbose)
 			config.activator.showTranslation(config.out);
-		else
-			config.activator.getSideEffectFreeTranslationUnit().print(
-					config.out);
+		else {
+			Program program = config.activator.getProgram();
+			
+			program.prune();
+			program.removeSideEffects();
+			program.print(config.out);
+			config.out.flush();
+		}
 		config.out.close();
 	}
 }

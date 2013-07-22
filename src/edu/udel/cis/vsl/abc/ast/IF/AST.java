@@ -26,7 +26,7 @@ public interface AST {
 	ASTNode getRootNode();
 
 	/** The number of nodes in the tree. */
-	long getNumberOfNodes();
+	int getNumberOfNodes();
 
 	/**
 	 * Returns the node with the given id number, The id must lie between 0 and
@@ -43,11 +43,38 @@ public interface AST {
 	 */
 	void release();
 
+	/**
+	 * If this AST contains an entity with internal or external linkage and with
+	 * the given name, it is returned by this method, else this method returns
+	 * null. The entity will be either a Function, Variable, or Typedef.
+	 * 
+	 * @param name
+	 *            name of the entity
+	 * @return the entity
+	 */
 	OrdinaryEntity getInternalOrExternalEntity(String name);
 
+	/**
+	 * Returns an iterator over all entities with internal linkage belonging to
+	 * this AST.
+	 * 
+	 * @return entities with internal linkage
+	 */
 	Iterator<OrdinaryEntity> getInternalEntities();
 
+	/**
+	 * Returns an iterator over all entities with external linkage belonging to
+	 * this AST.
+	 * 
+	 * @return entities with external linkage
+	 */
 	Iterator<OrdinaryEntity> getExternalEntities();
 
+	/**
+	 * Adds the given entity to this AST.
+	 * 
+	 * @param entity
+	 *            an Entity with internal or external linkage
+	 */
 	void add(OrdinaryEntity entity);
 }

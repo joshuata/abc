@@ -17,6 +17,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
@@ -135,6 +136,7 @@ public class TypeAnalyzer {
 
 	Type processEnumerationType(EnumerationTypeNode node)
 			throws SyntaxException {
+		IdentifierNode identifier = node.getIdentifier();
 		Scope scope = node.getScope();
 		String tag = node.getName(); // could be null
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
@@ -163,6 +165,9 @@ public class TypeAnalyzer {
 			enumeration = entityFactory.newEnumeration(enumerationType);
 			scope.add(enumeration);
 		}
+		node.setEntity(enumeration);
+		if (identifier != null)
+			identifier.setEntity(enumeration);
 		enumeration.addDeclaration(node);
 		if (enumerators != null) {
 			Iterator<EnumeratorDeclarationNode> enumeratorIter = enumerators
@@ -192,6 +197,9 @@ public class TypeAnalyzer {
 				}
 				enumerator = entityFactory.newEnumerator(decl, enumerationType,
 						value);
+				enumerator.setDefinition(decl);
+				decl.setEntity(enumerator);
+				decl.getIdentifier().setEntity(enumerator);
 				enumeratorList.add(enumerator);
 				try {
 					scope.add(enumerator);
@@ -218,6 +226,7 @@ public class TypeAnalyzer {
 	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
 			throws SyntaxException {
 		Scope scope = node.getScope();
+		IdentifierNode identifier = node.getIdentifier();
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList();
@@ -236,6 +245,7 @@ public class TypeAnalyzer {
 							+ entity.getFirstDeclaration().getSource(), node);
 				structureOrUnion = (StructureOrUnion) entity;
 				structureOrUnionType = structureOrUnion.getType();
+				identifier.setEntity(structureOrUnion);
 			}
 		}
 		if (structureOrUnion == null) {
@@ -247,6 +257,8 @@ public class TypeAnalyzer {
 					.newStructureOrUnion(structureOrUnionType);
 			structureOrUnion.addDeclaration(node);
 			scope.add(structureOrUnion);
+			if (identifier != null)
+				identifier.setEntity(structureOrUnion);
 		} else {
 			structureOrUnion.addDeclaration(node);
 		}
@@ -296,6 +308,8 @@ public class TypeAnalyzer {
 				}
 				field = entityFactory.newField(decl, fieldType, bitWidth,
 						structureOrUnion);
+				decl.setEntity(field);
+				decl.getIdentifier().setEntity(field);
 				fieldList.add(field);
 			}
 			structureOrUnionType.complete(fieldList);
@@ -491,6 +505,7 @@ public class TypeAnalyzer {
 					"Internal error: typedef name does not refer to typedef",
 					typeNode);
 		typedef = (Typedef) entity;
+		typeNode.getName().setEntity(typedef);
 		return typedef.getType();
 	}
 

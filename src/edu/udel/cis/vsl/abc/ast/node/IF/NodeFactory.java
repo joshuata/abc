@@ -113,8 +113,9 @@ public interface NodeFactory {
 
 	/**
 	 * Creates an attribute slot for all AST nodes. This is a mechanism for
-	 * extending the functionality of nodes. Thi may be used to hang any kind of
-	 * data onto nodes.
+	 * extending the functionality of nodes. This may be used to hang any kind
+	 * of data onto nodes. Initially, the attribute value associated to the new
+	 * key will be null in every node.
 	 * 
 	 * @param attributeName
 	 *            a name for the new attribute, unique among all attribute names
@@ -124,7 +125,8 @@ public interface NodeFactory {
 	 * @return a new attribute key which can be used to assign attribute values
 	 *         to nodes
 	 */
-	AttributeKey newAttribute(String attributeName, Class<Object> attributeClass);
+	AttributeKey newAttribute(String attributeName,
+			Class<? extends Object> attributeClass);
 
 	/**
 	 * Creates a new sequence node, i.e., a node which has some finite ordered

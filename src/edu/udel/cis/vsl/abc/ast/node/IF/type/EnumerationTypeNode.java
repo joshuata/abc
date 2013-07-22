@@ -33,4 +33,10 @@ public interface EnumerationTypeNode extends DeclarationNode, TypeNode,
 
 	@Override
 	EnumerationTypeNode copy();
+
+	/**
+	 * Nullifies the enumerators field, making this an incomplete enumeration
+	 * type. If already null, it is a no-op.
+	 */
+	void makeIncomplete();
 }

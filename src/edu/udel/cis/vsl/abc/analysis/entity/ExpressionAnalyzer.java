@@ -273,6 +273,7 @@ public class ExpressionAnalyzer {
 						+ " as enumeration constant?", node);
 			type = ((Enumerator) entity).getType();
 			node.setInitialType(type);
+			((EnumerationConstantNode) node).getName().setEntity(entity);
 		} else if (node instanceof FloatingConstantNode) {
 			// type should already be set
 		} else if (node instanceof StringLiteralNode) {

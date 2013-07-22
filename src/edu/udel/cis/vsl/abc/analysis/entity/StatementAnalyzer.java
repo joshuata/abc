@@ -281,6 +281,7 @@ public class StatementAnalyzer {
 
 		node.setFunction(function);
 		node.setEntity(label);
+		node.getIdentifier().setEntity(label);
 		try {
 			function.getScope().add(label);
 		} catch (UnsourcedException e) {

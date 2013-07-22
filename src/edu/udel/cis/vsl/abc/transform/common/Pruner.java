@@ -1,73 +1,130 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
+import java.util.Iterator;
+import java.util.List;
+
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodePredicate;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 /**
- * Prunes unreachable objects from a TranslationUnit.
+ * Prunes unreachable objects from an AST. Starting from the "main" function,
+ * this transformer performs a search of the nodes that can be reached by
+ * following children other than ordinary declarations and typedef declarations.
+ * When an identifier is encountered, the definition or declaration of the
+ * entity to which it refers is also searched. Hence only those
+ * declarations/definitions that are actually used will be enountered in the
+ * search.
  * 
- * Strategy: objects include: ASTNodes, Types, Entities, Scopes
+ * Once the reachable nodes have been determined, the set of reachable nodes is
+ * "closed" by marking all ancestors of reachable nodes reachable.
  * 
- * Assume closed program.  Start from main method: parameters and
- * statement body (are marked reachable).  Do DFS on nodes from there.
- * Is it possible something reaches the node going through a non-node?
- * Get rid of the unreachable nodes.  Yes: example: decl node has type
- * node that names a typedef.  follow the type, you get to the typedef.
- * so need to include other objects in the DFS.
+ * This transformer assumes the given AST is a closed program. It also assumes
+ * that the standard analysis has been performed, so that identifiers have
+ * entities associted to them.
  * 
- * Certain nodes: you need all their children.
- * Others: not necessarily.  For example don't keep any decl nodes
- * unless they are referenced from somewhere else.
+ * The AST nodes are modified and re-used. If you want to keep the original AST
+ * intact, you should clone it before performing this transformation.
  * 
- * Eliminate any ordinary declaration that is never used?
- * 
- * statements, expressions, typesrequire all children.
- * 
- * Do DFS, but skip any OrdinaryDeclarationNodes -- mark them only
- * if throw an entity.  When it comes to nodes: hit all children
- * and additional object; types: go immediately to decls; entities:
- * 
- * types: need to find the type nodes with that type can keep the node.
- * 
- * so: first pass, mark the reachable types  second pass: mark
- * the reachable type nodes.
- * 
- * Conclusions: add reachable bits to nodes.
- * set all to false.
- * to dfs starting from main body.
- * 
- * iterate over all nodes in mark them unreachable.
- * then dfs(main.body)
- * 
- * dfs (node)
- *   - if node is already marked reachable, return
- *   - mark node reachable
- *   - if IdentifierNode, recurse on Entity object's decl node(s),
- *     then set entity to null.
- *   - dfs on all children that are not decl nodes
- *   - dfs on parent
- *   - return
- * 
- * remove unreachables: dfs on node.  let newChildren be a new list.
- * iterate over (old) children.  if child is reachable, add to list.
- * make new children the children of this node.  iterate over
- * (new) children and call dfs on each.
- * 
- * make new TranslationUnit,
- *   perform standard analyses to rebuild Types, Entities, Scopes 
+ * The AST returned will be pruned, but will have not the standard analyses
+ * encoded in it. If you want them, they should be invoked on the new AST.
  * 
  * @author siegel
- *
+ * 
  */
 public class Pruner implements Transformer {
 
+	public enum Reachability {
+		/**
+		 * Indicates this node is unreachable and can therefore be pruned from
+		 * the AST.
+		 */
+		UNREACHABLE,
+		/**
+		 * Indicates this node is reachable and must therefore be kept in the
+		 * AST.
+		 */
+		REACHABLE,
+		/**
+		 * Indicates that not only is this node reachable, but all of its
+		 * ancestors have also been marked reachable (in fact, all ancestors
+		 * have been marked reachable and closed).
+		 */
+		REACHABLE_AND_CLOSED
+	};
+
+	private ASTFactory astFactory;
+
+	private NodeFactory nodeFactory;
+
+	private AttributeKey reachedKey;
+
+	private NodePredicate reachable;
+
+	public Pruner(ASTFactory astFactory) {
+		this.astFactory = astFactory;
+		this.nodeFactory = astFactory.getNodeFactory();
+		reachedKey = nodeFactory.newAttribute("reached", Reachability.class);
+		reachable = new NodePredicate() {
+
+			@Override
+			public boolean holds(ASTNode node) {
+				return node.getAttribute(reachedKey) == Reachability.REACHABLE_AND_CLOSED;
+			}
+
+		};
+	}
+
+	private void markAllUnreachable(ASTNode node) {
+		if (node == null)
+			return;
+		else {
+			Iterator<ASTNode> children = node.children();
+
+			node.setAttribute(reachedKey, Reachability.UNREACHABLE);
+			while (children.hasNext())
+				markAllUnreachable(children.next());
+		}
+	}
+
+	/**
+	 * Change status of all reachable nodes and their ancestors to
+	 * REACHABLE_AND_CLOSED.
+	 * 
+	 * @param ast
+	 *            the AST which has already been analyzed by the worker for
+	 *            REACHABLE nodes
+	 */
+	private void close(List<ASTNode> reachableNodes) {
+		for (ASTNode node : reachableNodes) {
+			while (node != null
+					&& node.getAttribute(reachedKey) != Reachability.REACHABLE_AND_CLOSED) {
+				node.setAttribute(reachedKey, Reachability.REACHABLE_AND_CLOSED);
+				node = node.parent();
+			}
+		}
+	}
+
 	@Override
-	public AST transform(AST unit)
-			throws SyntaxException {
-		
-		// TODO Auto-generated method stub
-		return null;
+	public AST transform(AST ast) throws SyntaxException {
+		ASTNode root = ast.getRootNode();
+		PrunerWorker worker;
+		AST newAst;
+		List<ASTNode> reachableNodes;
+
+		ast.release();
+		markAllUnreachable(root);
+		worker = new PrunerWorker(reachedKey, root);
+		reachableNodes = worker.getReachableNodes();
+		close(reachableNodes);
+		root.keepOnly(reachable);
+		newAst = astFactory.newTranslationUnit(root);
+		return newAst;
 	}
 
 }

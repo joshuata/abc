@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodePredicate;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -70,9 +71,45 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 		return childListCopy;
 	}
 
+	/**
+	 * Copies the list of children, but keeping only those children for which
+	 * the corresponding flag in array <code>heap</code> is <code>true</code>.
+	 * 
+	 * @param keep
+	 *            array of length number of children
+	 * @return deep copy of children list for the children being kept
+	 */
+	protected List<T> childListCopy(boolean[] keep) {
+		List<T> childListCopy = new LinkedList<T>();
+		Iterator<T> iter = childIterator();
+		int count = 0;
+
+		while (iter.hasNext()) {
+			T child = iter.next();
+
+			if (keep[count]) {
+				if (child == null)
+					childListCopy.add(null);
+				else {
+					@SuppressWarnings("unchecked")
+					T childCopy = (T) child.copy();
+
+					childListCopy.add(childCopy);
+				}
+			}
+			count++;
+		}
+		return childListCopy;
+	}
+
 	@Override
 	public SequenceNode<T> copy() {
 		return new CommonSequenceNode<T>(getSource(), name, childListCopy());
+	}
+
+	@Override
+	public void keepOnly(NodePredicate keep) {
+		keepOnlyAndShift(keep);
 	}
 
 }

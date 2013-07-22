@@ -54,6 +54,11 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 	}
 
 	@Override
+	public void makeIncomplete() {
+		removeChild(1);
+	}
+
+	@Override
 	protected void printBody(PrintStream out) {
 		out.print("Enumeration[" + qualifierString() + "]");
 	}

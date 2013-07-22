@@ -112,4 +112,9 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 		return result;
 	}
 
+	@Override
+	public void makeIncomplete() {
+		removeChild(1);
+	}
+
 }

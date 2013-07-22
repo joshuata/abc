@@ -48,7 +48,7 @@ public class CommonAST implements AST {
 	}
 
 	@Override
-	public long getNumberOfNodes() {
+	public int getNumberOfNodes() {
 		return nodeCount;
 	}
 
