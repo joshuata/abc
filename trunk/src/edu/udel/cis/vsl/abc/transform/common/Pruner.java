@@ -3,8 +3,10 @@ package edu.udel.cis.vsl.abc.transform.common;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -55,7 +57,7 @@ public class Pruner implements Transformer {
 		 * ancestors have also been marked reachable (in fact, all ancestors
 		 * have been marked reachable and closed).
 		 */
-		REACHABLE_AND_CLOSED
+		KEEP
 	};
 
 	private ASTFactory astFactory;
@@ -74,7 +76,7 @@ public class Pruner implements Transformer {
 
 			@Override
 			public boolean holds(ASTNode node) {
-				return node.getAttribute(reachedKey) == Reachability.REACHABLE_AND_CLOSED;
+				return node.getAttribute(reachedKey) == Reachability.KEEP;
 			}
 
 		};
@@ -93,8 +95,7 @@ public class Pruner implements Transformer {
 	}
 
 	/**
-	 * Change status of all reachable nodes and their ancestors to
-	 * REACHABLE_AND_CLOSED.
+	 * Change status of all reachable nodes and their ancestors to KEEP.
 	 * 
 	 * @param ast
 	 *            the AST which has already been analyzed by the worker for
@@ -103,8 +104,8 @@ public class Pruner implements Transformer {
 	private void close(List<ASTNode> reachableNodes) {
 		for (ASTNode node : reachableNodes) {
 			while (node != null
-					&& node.getAttribute(reachedKey) != Reachability.REACHABLE_AND_CLOSED) {
-				node.setAttribute(reachedKey, Reachability.REACHABLE_AND_CLOSED);
+					&& node.getAttribute(reachedKey) != Reachability.KEEP) {
+				node.setAttribute(reachedKey, Reachability.KEEP);
 				node = node.parent();
 			}
 		}
@@ -113,18 +114,26 @@ public class Pruner implements Transformer {
 	@Override
 	public AST transform(AST ast) throws SyntaxException {
 		ASTNode root = ast.getRootNode();
-		PrunerWorker worker;
-		AST newAst;
-		List<ASTNode> reachableNodes;
+		Function main = (Function) root.getScope().getOrdinaryEntity("main");
 
-		ast.release();
-		markAllUnreachable(root);
-		worker = new PrunerWorker(reachedKey, root);
-		reachableNodes = worker.getReachableNodes();
-		close(reachableNodes);
-		root.keepOnly(reachable);
-		newAst = astFactory.newTranslationUnit(root);
-		return newAst;
+		if (main == null)
+			return ast;
+		if (main.getDefinition() == null)
+			throw new ASTException("Main function missing definition");
+		else {
+			PrunerWorker worker;
+			AST newAst;
+			List<ASTNode> reachableNodes;
+
+			ast.release();
+			markAllUnreachable(root);
+			worker = new PrunerWorker(reachedKey, root);
+			reachableNodes = worker.getReachableNodes();
+			close(reachableNodes);
+			root.keepOnly(reachable);
+			newAst = astFactory.newTranslationUnit(root);
+			return newAst;
+		}
 	}
 
 }

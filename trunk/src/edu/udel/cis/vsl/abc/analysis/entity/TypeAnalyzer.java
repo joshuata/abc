@@ -309,7 +309,8 @@ public class TypeAnalyzer {
 				field = entityFactory.newField(decl, fieldType, bitWidth,
 						structureOrUnion);
 				decl.setEntity(field);
-				decl.getIdentifier().setEntity(field);
+				if (decl.getIdentifier() != null)
+					decl.getIdentifier().setEntity(field);
 				fieldList.add(field);
 			}
 			structureOrUnionType.complete(fieldList);

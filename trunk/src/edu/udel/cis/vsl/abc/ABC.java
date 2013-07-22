@@ -56,6 +56,8 @@ public class ABC {
 		boolean preprocOnly = false;
 		boolean verbose = false;
 		Config result = new Config();
+		boolean prune = false; // prune nodes unreachable from main
+		boolean sef = false; // make side-effect-free
 
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
@@ -107,6 +109,22 @@ public class ABC {
 				preprocOnly = true;
 			} else if (arg.equals("-v")) {
 				verbose = true;
+			} else if (arg.startsWith("-prune")) {
+				if (arg.equals("-prune") || arg.equals("-prune=true"))
+					prune = true;
+				else if (arg.equals("-prune=false"))
+					prune = false;
+				else
+					throw new IllegalArgumentException(
+							"Unknown command line option: " + arg);
+			} else if (arg.startsWith("-sef")) {
+				if (arg.equals("-sef") || arg.equals("-sef=true"))
+					sef = true;
+				else if (arg.equals("-sef=false"))
+					sef = false;
+				else
+					throw new IllegalArgumentException(
+							"Unknown command line option: " + arg);
 			} else if (arg.startsWith("-")) {
 				throw new IllegalArgumentException(
 						"Unknown command line option: " + arg);
@@ -131,6 +149,8 @@ public class ABC {
 		result.activator = new Activator(infile, systemIncludes, userIncludes);
 		result.verbose = verbose;
 		result.preprocOnly = preprocOnly;
+		result.prune = prune;
+		result.sef = sef;
 		return result;
 	}
 
@@ -152,9 +172,29 @@ public class ABC {
 			config.activator.showTranslation(config.out);
 		else {
 			Program program = config.activator.getProgram();
-			
-			program.prune();
-			program.removeSideEffects();
+			int numNodes1 = program.getAST().getNumberOfNodes();
+			int numNodes2;
+
+			System.out.println("AST has " + numNodes1 + " nodes.");
+			if (config.prune) {
+				System.out.print("Pruning... ");
+				System.out.flush();
+				program.prune();
+				numNodes2 = program.getAST().getNumberOfNodes();
+				System.out.println("pruned " + (numNodes1 - numNodes2)
+						+ " nodes yielding AST with " + numNodes2 + " nodes.");
+				System.out.flush();
+			}
+			if (config.sef) {
+				System.out.print("Removing side-effects... ");
+				System.out.flush();
+				program.removeSideEffects();
+				System.out.println("resulting AST has "
+						+ program.getAST().getNumberOfNodes() + " nodes.");
+				System.out.flush();
+			}
+			System.out.println();
+			System.out.flush();
 			program.print(config.out);
 			config.out.flush();
 		}
@@ -167,4 +207,6 @@ class Config {
 	boolean preprocOnly;
 	PrintStream out;
 	boolean verbose;
+	boolean prune; // prune nodes unreachable from main?
+	boolean sef; // make side-effect-free?
 }
