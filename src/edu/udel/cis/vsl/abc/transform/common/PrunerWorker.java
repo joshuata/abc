@@ -117,8 +117,6 @@ public class PrunerWorker {
 		Function main = (Function) rootScope.getOrdinaryEntity("main");
 		Iterator<Variable> iter = rootScope.getVariables();
 
-		if (main == null) // no main method, can't prune anything.
-			return;
 		while (iter.hasNext()) {
 			Variable variable = iter.next();
 			Type type = variable.getType();
@@ -137,10 +135,6 @@ public class PrunerWorker {
 				}
 			}
 		}
-		// if (main == null)
-		// throw new ASTException("Program does not contain a main function");
-		if (main.getDefinition() == null)
-			throw new ASTException("Main function missing definition");
 		explore(main);
 	}
 
