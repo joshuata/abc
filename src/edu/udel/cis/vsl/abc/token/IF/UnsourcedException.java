@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
+import edu.udel.cis.vsl.abc.ABCException;
+
 /**
  * An exception for which the source (in the source program being compiled) is
  * unknown. The expectation is that this exception will be caught internally by
@@ -9,7 +11,7 @@ package edu.udel.cis.vsl.abc.token.IF;
  * @author siegel
  * 
  */
-public class UnsourcedException extends Exception {
+public class UnsourcedException extends ABCException {
 
 	/**
 	 * Eclipse made me do it

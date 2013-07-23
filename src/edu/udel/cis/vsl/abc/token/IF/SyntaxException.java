@@ -1,6 +1,8 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-public class SyntaxException extends Exception {
+import edu.udel.cis.vsl.abc.ABCException;
+
+public class SyntaxException extends ABCException {
 
 	/**
 	 * Eclipse made me do it.
@@ -10,9 +12,7 @@ public class SyntaxException extends Exception {
 	private Source source;
 
 	public SyntaxException(String message, Source source) {
-		super(source == null ? message : message + "\nAt "
-				+ source.getSummary());
-		assert source != null;
+		super(message, source.getSummary());
 		this.source = source;
 	}
 

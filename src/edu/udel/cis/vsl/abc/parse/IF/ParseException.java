@@ -2,7 +2,9 @@ package edu.udel.cis.vsl.abc.parse.IF;
 
 import org.antlr.runtime.Token;
 
-public class ParseException extends Exception {
+import edu.udel.cis.vsl.abc.ABCException;
+
+public class ParseException extends ABCException {
 
 	/**
 	 * Eclipse made me do it
