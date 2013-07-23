@@ -2,7 +2,9 @@ package edu.udel.cis.vsl.abc.preproc.IF;
 
 import org.antlr.runtime.Token;
 
-public class PreprocessorRuntimeException extends RuntimeException {
+import edu.udel.cis.vsl.abc.ABCRuntimeException;
+
+public class PreprocessorRuntimeException extends ABCRuntimeException {
 	/**
 	 * Eclipse made me do it.
 	 */

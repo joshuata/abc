@@ -1,6 +1,14 @@
 package edu.udel.cis.vsl.abc.ast;
 
-public class ASTException extends RuntimeException {
+import edu.udel.cis.vsl.abc.ABCRuntimeException;
+
+/**
+ * Runtime exception thrown when something goes wrong with the AST.
+ * 
+ * @author siegel
+ * 
+ */
+public class ASTException extends ABCRuntimeException {
 
 	/**
 	 * Eclipse made me do it.
@@ -10,5 +18,7 @@ public class ASTException extends RuntimeException {
 	public ASTException(String msg) {
 		super(msg);
 	}
+	
+	// TODO: add method with sourceable thing like AST node?
 
 }
