@@ -314,7 +314,7 @@ public class SideEffectRemover implements Transformer {
 			items.addAll(sefCondition.getAfter());
 			items.add(factory.newIfNode(statement.getSource(), factory
 					.newIdentifierExpressionNode(condition.getSource(),
-							tempVariableID), trueBranch, falseBranch));
+							tempVariableID.copy()), trueBranch, falseBranch));
 			return factory.newCompoundStatementNode(statement.getSource(),
 					items);
 		}
@@ -645,7 +645,8 @@ public class SideEffectRemover implements Transformer {
 		if (!isSEF(condition)) {
 			// If a side effect exists in a condition, convert from
 			// while (e) {S;} to while (true) {int tmp_X = e; if (!e) break; S;}
-			SideEffectFreeTriple sefCondition = processExpression(condition);
+			SideEffectFreeTriple sefCondition = processExpression(condition
+					.copy());
 			List<BlockItemNode> bodyItems = new ArrayList<BlockItemNode>();
 			List<ExpressionNode> ifArgument = new ArrayList<ExpressionNode>();
 			IdentifierNode tempVariableID = factory.newIdentifierNode(
@@ -656,15 +657,15 @@ public class SideEffectRemover implements Transformer {
 			bodyItems.add(factory.newVariableDeclarationNode(condition
 					.getSource(), tempVariableID, factory.newBasicTypeNode(
 					condition.getSource(), BasicTypeKind.BOOL), sefCondition
-					.getExpression()));
+					.getExpression().copy()));
 			bodyItems.addAll(sefCondition.getAfter());
 			ifArgument.add(factory.newIdentifierExpressionNode(
-					condition.getSource(), tempVariableID));
+					condition.getSource(), tempVariableID.copy()));
 			bodyItems.add(factory.newIfNode(condition.getSource(), factory
 					.newOperatorNode(condition.getSource(), Operator.NOT,
 							ifArgument), factory.newBreakNode(condition
 					.getSource())));
-			bodyItems.add(newBody);
+			bodyItems.add(newBody.copy());
 			newBody = factory.newCompoundStatementNode(newBody.getSource(),
 					bodyItems);
 			condition = factory.newBooleanConstantNode(condition.getSource(),
@@ -692,7 +693,9 @@ public class SideEffectRemover implements Transformer {
 			if (modifiedIncrementer instanceof ExpressionStatementNode) {
 				result = factory.newForLoopNode(statement.getSource(),
 						initializer.copy(), condition.copy(),
-						incrementer.copy(), newBody.copy(), invariant);
+						((ExpressionStatementNode) modifiedIncrementer)
+								.getExpression().copy(), newBody.copy(),
+						invariant);
 			} else {
 				List<BlockItemNode> bodyItems = new ArrayList<BlockItemNode>();
 				List<BlockItemNode> allItems = new ArrayList<BlockItemNode>();
@@ -818,6 +821,10 @@ public class SideEffectRemover implements Transformer {
 			case LOR:
 			case EQUALS:
 			case NEQ:
+			case LT:
+			case GT:
+			case LTE:
+			case GTE:
 				left = ((OperatorNode) expression).getArgument(0);
 				right = ((OperatorNode) expression).getArgument(1);
 				leftTriple = processExpression(left);
@@ -830,7 +837,7 @@ public class SideEffectRemover implements Transformer {
 				before.addAll(leftTriple.getBefore());
 				before.addAll(rightTriple.getBefore());
 				after.addAll(leftTriple.getAfter());
-				after.addAll(leftTriple.getAfter());
+				after.addAll(rightTriple.getAfter());
 				result = new SideEffectFreeTriple(before,
 						sideEffectFreeExpression, after);
 				break;
