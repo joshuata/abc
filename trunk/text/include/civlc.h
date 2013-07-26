@@ -9,10 +9,10 @@
 typedef unsigned long int size_t;
  
 /* The CIVL-C process reference type */ 
-typedef int $proc;
+typedef struct __proc__ $proc;
 
 /* The CIVL-C heap type, used to represent a heap */
-typedef int $heap;
+typedef struct __heap__ $heap;
 
 /* The CIVL-C malloc function, which takes a reference to a heap */
 void* $malloc($heap *h, int size);
