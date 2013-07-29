@@ -45,7 +45,12 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
+import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
+import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
@@ -242,20 +247,68 @@ public class SideEffectRemover implements Transformer {
 			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
 			SideEffectFreeTriple triple = processExpression(statement
 					.getExpression());
+			TypeNode expressionType = typeNode(statement.getExpression()
+					.getSource(), statement.getExpression().getType());
+			IdentifierNode tempVariableID = factory.newIdentifierNode(statement
+					.getExpression().getSource(), tempVariablePrefix
+					+ tempVariableCounter++);
+			VariableDeclarationNode tempVariableDeclaration = factory
+					.newVariableDeclarationNode(statement.getExpression()
+							.getSource(), tempVariableID, expressionType,
+							triple.getExpression());
 
-			if (!triple.getAfter().isEmpty()) {
-				throw new ABCUnsupportedException(
-						"Side effects that modify the state after a return statement are not supported. "
-								+ statement, statement.getSource().getSummary());
-			} else {
-				newStatements.addAll(triple.getBefore());
-				newStatements.add(factory.newReturnNode(statement.getSource(),
-						triple.getExpression()));
-				result = factory.newCompoundStatementNode(
-						statement.getSource(), newStatements);
-			}
+			newStatements.addAll(triple.getBefore());
+			newStatements.add(tempVariableDeclaration);
+			newStatements.addAll(triple.getAfter());
+			newStatements
+					.add(factory.newReturnNode(statement.getSource(), factory
+							.newIdentifierExpressionNode(statement
+									.getExpression().getSource(),
+									tempVariableID.copy())));
+			result = factory.newCompoundStatementNode(statement.getSource(),
+					newStatements);
 		}
 		return result;
+	}
+
+	/**
+	 * 
+	 * @param type
+	 *            An AST type.
+	 * @return An AST type node corresponding to the type.
+	 */
+	private TypeNode typeNode(Source source, Type type) {
+
+		switch (type.kind()) {
+		case ARRAY:
+			ArrayType arrayType = (ArrayType) type;
+			return factory.newArrayTypeNode(source,
+					typeNode(source, arrayType.getElementType()), null);
+		case ATOMIC:
+			AtomicType atomicType = (AtomicType) type;
+			return factory.newAtomicTypeNode(source,
+					typeNode(source, atomicType.getBaseType()));
+		case BASIC:
+			StandardBasicType basicType = (StandardBasicType) type;
+			return factory.newBasicTypeNode(source,
+					basicType.getBasicTypeKind());
+		case POINTER:
+			PointerType pointerType = (PointerType) type;
+			return factory.newPointerTypeNode(source,
+					typeNode(source, pointerType.referencedType()));
+		case VOID:
+			return factory.newVoidTypeNode(source);
+		case ENUMERATION:
+		case FUNCTION:
+		case HEAP:
+		case OTHER_INTEGER:
+		case PROCESS:
+		case QUALIFIED:
+		case STRUCTURE_OR_UNION:
+		default:
+			throw new ABCUnsupportedException("converting type " + type
+					+ " to a type node.", source.getSummary());
+		}
 	}
 
 	private StatementNode waitStatement(WaitNode statement)
