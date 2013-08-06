@@ -19,8 +19,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  */
 public interface AST {
 
-	/** Returns the UnitFactory responsible for creating this translation unit. */
-	ASTFactory getUnitFactory();
+	/** Returns the ASTFactory responsible for creating this translation unit. */
+	ASTFactory getASTFactory();
 
 	/** Returns the root node of the tree. */
 	ASTNode getRootNode();

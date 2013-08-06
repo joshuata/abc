@@ -6,6 +6,7 @@ import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 public class CommonProgram implements Program {
@@ -55,6 +56,11 @@ public class CommonProgram implements Program {
 	@Override
 	public void printSymbolTable(PrintStream out) {
 		ast.getRootNode().getScope().print(out);
+	}
+
+	@Override
+	public TokenFactory getTokenFactory() {
+		return ast.getASTFactory().getTokenFactory();
 	}
 
 }
