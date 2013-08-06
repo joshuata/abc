@@ -66,7 +66,7 @@ public class SideEffectRemover implements Transformer {
 	public AST transform(AST unit) throws SyntaxException {
 		ASTNode rootNode = unit.getRootNode();
 
-		unitFactory = unit.getUnitFactory();
+		unitFactory = unit.getASTFactory();
 		factory = unitFactory.getNodeFactory();
 		unit.release();
 		for (int i = 0; i < rootNode.numChildren(); i++) {

@@ -28,7 +28,7 @@ public class Analysis {
 	public static void performStandardAnalysis(AST unit)
 			throws SyntaxException {
 		EntityFactory entityFactory = Entities.newEntityFactory();
-		ASTFactory unitFactory = unit.getUnitFactory();
+		ASTFactory unitFactory = unit.getASTFactory();
 		TypeFactory typeFactory = unitFactory.getTypeFactory();
 		ConversionFactory conversionFactory = Conversions
 				.newConversionFactory(typeFactory);

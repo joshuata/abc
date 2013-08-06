@@ -38,7 +38,7 @@ public class CommonAST implements AST {
 	}
 
 	@Override
-	public ASTFactory getUnitFactory() {
+	public ASTFactory getASTFactory() {
 		return unitFactory;
 	}
 
