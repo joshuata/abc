@@ -192,10 +192,12 @@ public class EntityAnalyzer implements Analyzer {
 		} else if (node instanceof StaticAssertionNode) {
 			processStaticAssertion((StaticAssertionNode) node);
 		} else if (node instanceof StructureOrUnionTypeNode) {
-			typeAnalyzer
-					.processStructureOrUnionType((StructureOrUnionTypeNode) node);
+			((StructureOrUnionTypeNode) node)
+					.setType(typeAnalyzer
+							.processStructureOrUnionType((StructureOrUnionTypeNode) node));
 		} else if (node instanceof EnumerationTypeNode) {
-			typeAnalyzer.processEnumerationType((EnumerationTypeNode) node);
+			((EnumerationTypeNode) node).setType(typeAnalyzer
+					.processEnumerationType((EnumerationTypeNode) node));
 		} else {
 			throw new RuntimeException("Unreachable");
 		}
