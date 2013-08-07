@@ -6,7 +6,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 
 public class CommonArrayType extends CommonObjectType implements ArrayType {
 
@@ -16,7 +16,7 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 
 	private ExpressionNode variableSize;
 
-	private Value constantSize;
+	private IntegerValue constantSize;
 
 	private boolean unspecifiedVariableLength;
 
@@ -64,7 +64,7 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 	 * @param constantSize
 	 *            the constant obtained by evaluating the extent expression
 	 */
-	public CommonArrayType(ObjectType elementType, Value constantSize) {
+	public CommonArrayType(ObjectType elementType, IntegerValue constantSize) {
 		super(TypeKind.ARRAY);
 		this.elementType = elementType;
 		this.variableSize = null;
@@ -74,7 +74,8 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 
 	@Override
 	public boolean isComplete() {
-		return variableSize != null || constantSize != null || unspecifiedVariableLength;
+		return variableSize != null || constantSize != null
+				|| unspecifiedVariableLength;
 	}
 
 	@Override
@@ -104,7 +105,7 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 	}
 
 	@Override
-	public Value getConstantSize() {
+	public IntegerValue getConstantSize() {
 		return constantSize;
 	}
 

@@ -9,7 +9,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardSignedIntegerType.SignedIntKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardUnsignedIntegerType.UnsignedIntKind;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 
 /**
  * A factory for producing C types. C types are complicated. First, types have
@@ -215,7 +215,7 @@ public interface TypeFactory {
 	 *            the constant array length
 	 * @return the complete array type with constant extent
 	 */
-	ArrayType arrayType(ObjectType elementType, Value constantExtent);
+	ArrayType arrayType(ObjectType elementType, IntegerValue constantExtent);
 
 	/**
 	 * Returns a complete array type of "unspecified variable length". This is

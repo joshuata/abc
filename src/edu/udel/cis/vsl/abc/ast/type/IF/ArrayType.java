@@ -1,7 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 
 /**
  * Represents an array type. See C11 Sec. 6.7.6.2.
@@ -65,7 +65,7 @@ public interface ArrayType extends UnqualifiedObjectType {
 	 * 
 	 * @return the known constant extent or null
 	 */
-	Value getConstantSize();
+	IntegerValue getConstantSize();
 
 	/**
 	 * Is this a Variable Length Array (VLA) type?

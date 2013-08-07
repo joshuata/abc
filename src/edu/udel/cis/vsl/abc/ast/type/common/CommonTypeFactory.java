@@ -34,7 +34,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnsignedIntegerType;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 
 /**
  * An implementation of TypeFactory. The Flyweight Pattern is used on Types so
@@ -240,7 +240,7 @@ public class CommonTypeFactory implements TypeFactory {
 	}
 
 	@Override
-	public ArrayType arrayType(ObjectType elementType, Value constantSize) {
+	public ArrayType arrayType(ObjectType elementType, IntegerValue constantSize) {
 		return (ArrayType) canonicalize(new CommonArrayType(elementType,
 				constantSize));
 	}
@@ -305,7 +305,7 @@ public class CommonTypeFactory implements TypeFactory {
 	private ArrayType compositeArrayType(ArrayType type1, ArrayType type2) {
 		ObjectType elementType = (ObjectType) compositeType(
 				type1.getElementType(), type2.getElementType());
-		Value constantSize1 = type1.getConstantSize();
+		IntegerValue constantSize1 = type1.getConstantSize();
 		ExpressionNode sizeExpression1, sizeExpression2;
 
 		if (constantSize1 != null)
