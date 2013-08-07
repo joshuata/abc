@@ -46,6 +46,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
+import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -429,7 +430,8 @@ public class TypeAnalyzer {
 						.processExpression(sizeExpression);
 				if (sizeExpression.isConstantExpression()) {
 					result = typeFactory.arrayType(elementType,
-							nodeFactory.getConstantValue(sizeExpression));
+							(IntegerValue) nodeFactory
+									.getConstantValue(sizeExpression));
 				} else {
 					// C11 6.7.6.2(5): "If the size is an expression that is not
 					// an
