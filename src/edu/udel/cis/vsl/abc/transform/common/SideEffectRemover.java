@@ -15,6 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -74,7 +75,9 @@ public class SideEffectRemover implements Transformer {
 
 			// For now, assume initializers for global variables are side effect
 			// free (SEF).
-			if (node instanceof FunctionDefinitionNode) {
+			if (node instanceof VariableDeclarationNode) {
+
+			} else if (node instanceof FunctionDefinitionNode) {
 				removeSideEffects((FunctionDefinitionNode) node);
 			}
 		}
@@ -727,7 +730,7 @@ public class SideEffectRemover implements Transformer {
 		switch (statement.getKind()) {
 		case FOR:
 			ForLoopInitializerNode initializer = ((ForLoopNode) statement)
-					.getInitializer().copy();
+					.getInitializer();
 			ExpressionNode incrementer = ((ForLoopNode) statement)
 					.getIncrementer().copy();
 			// We wrap the incrementer as an expression statement, then remove
@@ -743,9 +746,14 @@ public class SideEffectRemover implements Transformer {
 			StatementNode modifiedIncrementer = expressionStatement(factory
 					.newExpressionStatementNode(incrementer));
 
+			// If initializer is not null, work on a copy to maintain tree
+			// structure.
+			if (initializer != null) {
+				initializer = initializer.copy();
+			}
 			if (modifiedIncrementer instanceof ExpressionStatementNode) {
 				result = factory.newForLoopNode(statement.getSource(),
-						initializer.copy(), condition.copy(),
+						initializer, condition.copy(),
 						((ExpressionStatementNode) modifiedIncrementer)
 								.getExpression().copy(), newBody.copy(),
 						invariant);
