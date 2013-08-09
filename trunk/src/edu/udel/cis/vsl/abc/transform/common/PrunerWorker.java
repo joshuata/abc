@@ -16,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -65,6 +66,14 @@ public class PrunerWorker {
 
 			node.setAttribute(reachedKey, Reachability.REACHABLE);
 			reachableNodes.add(node);
+			if (node instanceof FunctionTypeNode) {
+				// special case: don't want to remove unused formal parameters
+				Iterator<VariableDeclarationNode> formalIter = ((FunctionTypeNode) node)
+						.getParameters().childIterator();
+
+				while (formalIter.hasNext())
+					markReachable(formalIter.next());
+			}
 			while (iter.hasNext()) {
 				ASTNode child = iter.next();
 
