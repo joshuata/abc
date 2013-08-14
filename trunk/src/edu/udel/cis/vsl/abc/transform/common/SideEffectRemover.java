@@ -15,7 +15,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -42,10 +41,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
@@ -230,7 +226,7 @@ public class SideEffectRemover implements Transformer {
 
 		if (!isSEF(statement.getCondition())) {
 			throw new ABCUnsupportedException(
-					"Side effects in a switch condition are not supported. "
+					"side effects in a switch condition. "
 							+ statement.getCondition(), statement
 							.getCondition().getSource().getSummary());
 		}
@@ -674,13 +670,12 @@ public class SideEffectRemover implements Transformer {
 					}
 					break;
 				default:
-					throw new ABCUnsupportedException(
-							"Operation is currently unsupported: " + statement,
-							statement.getSource().getSummary());
+					throw new ABCUnsupportedException("this operation: "
+							+ statement, statement.getSource().getSummary());
 				}
 			} else {
 				throw new ABCUnsupportedException(
-						"Unsupported expression statement with side effects: "
+						"removing side effects from this expression statement: "
 								+ statement, statement.getSource().getSummary());
 			}
 		}
@@ -779,7 +774,7 @@ public class SideEffectRemover implements Transformer {
 					}
 				} else {
 					throw new ABCUnsupportedException(
-							"Unable to convert initializer declaration to statement list.",
+							"converting initializer declaration to statement list.",
 							initializer.getSource().getSummary());
 				}
 				allItems.add(loop);
@@ -925,8 +920,8 @@ public class SideEffectRemover implements Transformer {
 				break;
 			default:
 				throw new ABCUnsupportedException(
-						"Node should not have side effects: " + expression,
-						expression.getSource().getSummary());
+						"removing side effects from: " + expression, expression
+								.getSource().getSummary());
 			}
 		} else if (expression instanceof FunctionCallNode) {
 			Vector<BlockItemNode> before = new Vector<BlockItemNode>();
@@ -934,7 +929,6 @@ public class SideEffectRemover implements Transformer {
 					.getFunction();
 			Entity functionEntity;
 			TypeNode returnTypeNode;
-			TypeNode newReturnTypeNode = null;
 			VariableDeclarationNode tmpVariable;
 			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
 
@@ -943,40 +937,11 @@ public class SideEffectRemover implements Transformer {
 					.getIdentifier().getEntity();
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
 			returnTypeNode = ((Function) functionEntity).getDefinition()
-					.getTypeNode().getReturnType();
-			if (returnTypeNode instanceof TypedefNameNode) {
-				newReturnTypeNode = returnTypeNode;
-			} else {
-				switch (returnTypeNode.getType().kind()) {
-				case VOID:
-					newReturnTypeNode = factory.newVoidTypeNode(returnTypeNode
-							.getSource());
-					break;
-				case BASIC:
-					BasicTypeKind basicType = ((BasicTypeNode) returnTypeNode)
-							.getBasicTypeKind();
-					newReturnTypeNode = factory.newBasicTypeNode(
-							returnTypeNode.getSource(), basicType);
-					break;
-				case POINTER:
-					newReturnTypeNode = factory
-							.newPointerTypeNode(returnTypeNode.getSource(),
-									((PointerTypeNode) returnTypeNode)
-											.referencedType());
-					break;
-				case PROCESS:
-				case HEAP:
-				default:
-					throw new ABCUnsupportedException(
-							"Duplicating type node (for side effect removal) not supported: "
-									+ returnTypeNode, returnTypeNode
-									.getSource().getSummary());
-				}
-			}
+					.getTypeNode().getReturnType().copy();
 			tmpVariable = factory.newVariableDeclarationNode(expression
 					.getSource(), factory.newIdentifierNode(
 					expression.getSource(), tempVariablePrefix
-							+ tempVariableCounter++), newReturnTypeNode);
+							+ tempVariableCounter++), returnTypeNode);
 			before.add(tmpVariable);
 			arguments.add(factory.newIdentifierExpressionNode(
 					expression.getSource(), tmpVariable.getIdentifier()));
@@ -988,14 +953,29 @@ public class SideEffectRemover implements Transformer {
 					factory.newIdentifierExpressionNode(expression.getSource(),
 							tmpVariable.getIdentifier()),
 					new Vector<BlockItemNode>());
+		} else if (expression instanceof CastNode) {
+			ExpressionNode argument = ((CastNode) expression).getArgument();
+
+			if (isSEF(argument)) {
+				result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
+						expression.copy(), new Vector<BlockItemNode>());
+			} else {
+				SideEffectFreeTriple sefArgument = processExpression(argument);
+
+				result = new SideEffectFreeTriple(sefArgument.getBefore(),
+						factory.newCastNode(expression.getSource(),
+								((CastNode) expression).getCastType().copy(),
+								sefArgument.getExpression()),
+						sefArgument.getAfter());
+			}
+
 		} else if (isSEF(expression)) {
 			// expression.parent().removeChild(expression.childIndex());
 			result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
 					expression.copy(), new Vector<BlockItemNode>());
 		} else {
-			throw new ABCUnsupportedException(
-					"Removing side effects not implemented for:  " + expression,
-					expression.getSource().getSummary());
+			throw new ABCUnsupportedException("removing side effects from:  "
+					+ expression, expression.getSource().getSummary());
 		}
 		return result;
 	}

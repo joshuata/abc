@@ -52,11 +52,17 @@ public class CIVLTranslationTest {
 			SyntaxException, IOException {
 		check("choose");
 	}
-	
+
 	@Test
 	public void sideEffects() throws PreprocessorException, ParseException,
 			SyntaxException, IOException {
 		check("sideEffects");
+	}
+
+	@Test
+	public void malloc() throws PreprocessorException, ParseException,
+			SyntaxException, IOException {
+		check("malloc");
 	}
 
 }
