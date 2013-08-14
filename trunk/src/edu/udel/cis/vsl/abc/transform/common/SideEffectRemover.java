@@ -567,7 +567,7 @@ public class SideEffectRemover implements Transformer {
 					break;
 				case ASSIGN:
 					ExpressionNode rhs = ((OperatorNode) expression)
-							.getArgument(1).copy();
+							.getArgument(1);
 
 					if (isSEF(rhs)) {
 						result = statement;
@@ -936,22 +936,22 @@ public class SideEffectRemover implements Transformer {
 			functionEntity = ((IdentifierExpressionNode) functionExpression)
 					.getIdentifier().getEntity();
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
-			returnTypeNode = ((Function) functionEntity).getDefinition()
-					.getTypeNode().getReturnType().copy();
+			returnTypeNode = typeNode(functionEntity.getFirstDeclaration()
+					.getSource(), ((Function) functionEntity).getType().getReturnType());
 			tmpVariable = factory.newVariableDeclarationNode(expression
 					.getSource(), factory.newIdentifierNode(
 					expression.getSource(), tempVariablePrefix
 							+ tempVariableCounter++), returnTypeNode);
 			before.add(tmpVariable);
 			arguments.add(factory.newIdentifierExpressionNode(
-					expression.getSource(), tmpVariable.getIdentifier()));
-			arguments.add(expression);
+					expression.getSource(), tmpVariable.getIdentifier().copy()));
+			arguments.add(expression.copy());
 			before.add(factory.newExpressionStatementNode(factory
 					.newOperatorNode(expression.getSource(), Operator.ASSIGN,
 							arguments)));
 			result = new SideEffectFreeTriple(before,
 					factory.newIdentifierExpressionNode(expression.getSource(),
-							tmpVariable.getIdentifier()),
+							tmpVariable.getIdentifier().copy()),
 					new Vector<BlockItemNode>());
 		} else if (expression instanceof CastNode) {
 			ExpressionNode argument = ((CastNode) expression).getArgument();
