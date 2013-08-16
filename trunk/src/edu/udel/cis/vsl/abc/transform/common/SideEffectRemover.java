@@ -571,6 +571,8 @@ public class SideEffectRemover implements Transformer {
 
 					if (isSEF(rhs)) {
 						result = statement;
+					} else if (isCompleteMallocExpression(rhs)) {
+						result = statement;
 					} else {
 						SideEffectFreeTriple triple;
 						Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
@@ -1099,5 +1101,39 @@ public class SideEffectRemover implements Transformer {
 			after.add(factory.newExpressionStatementNode(assignment));
 		}
 		return new SideEffectFreeTriple(before, base, after);
+	}
+
+	private boolean isMallocCall(ExpressionNode node) {
+		if (node instanceof FunctionCallNode) {
+			ExpressionNode functionNode = ((FunctionCallNode) node)
+					.getFunction();
+
+			if (functionNode instanceof IdentifierExpressionNode) {
+				String functionName = ((IdentifierExpressionNode) functionNode)
+						.getIdentifier().name();
+
+				if ("$malloc".equals(functionName))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Is the ABC expression node an expression of the form
+	 * <code>(t)$malloc(...)</code>? I.e., a cast expression for which the
+	 * argument is a malloc call?
+	 * 
+	 * @param node
+	 *            an expression node
+	 * @return true iff this is a cast of a malloc call
+	 */
+	private boolean isCompleteMallocExpression(ExpressionNode node) {
+		if (node instanceof CastNode) {
+			ExpressionNode argumentNode = ((CastNode) node).getArgument();
+
+			return isMallocCall(argumentNode);
+		}
+		return false;
 	}
 }
