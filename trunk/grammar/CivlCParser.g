@@ -1019,21 +1019,21 @@ typedefName
 directAbstractDeclaratorSuffix
     : LSQUARE
       ( typeQualifierList_opt assignmentExpression_opt RSQUARE
-        -> ^(ARRAY_SUFFIX ABSENT typeQualifierList_opt
+        -> ^(ARRAY_SUFFIX LSQUARE ABSENT typeQualifierList_opt
              assignmentExpression_opt)
       | STATIC typeQualifierList_opt assignmentExpression RSQUARE
-        -> ^(ARRAY_SUFFIX STATIC typeQualifierList_opt
+        -> ^(ARRAY_SUFFIX LSQUARE STATIC typeQualifierList_opt
              assignmentExpression)
       | typeQualifierList STATIC assignmentExpression RSQUARE
-        -> ^(ARRAY_SUFFIX STATIC typeQualifierList assignmentExpression)
+        -> ^(ARRAY_SUFFIX LSQUARE STATIC typeQualifierList assignmentExpression)
       | STAR RSQUARE
-        -> ^(ARRAY_SUFFIX ABSENT ABSENT STAR)
+        -> ^(ARRAY_SUFFIX LSQUARE ABSENT ABSENT STAR)
       )
     | LPAREN
       ( parameterTypeList RPAREN
-        -> ^(FUNCTION_SUFFIX parameterTypeList)
+        -> ^(FUNCTION_SUFFIX LPAREN parameterTypeList RPAREN)
       | RPAREN
-        -> ^(FUNCTION_SUFFIX ABSENT)
+        -> ^(FUNCTION_SUFFIX LPAREN ABSENT RPAREN)
       )
     ;
 
