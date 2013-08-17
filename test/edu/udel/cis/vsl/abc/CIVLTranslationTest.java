@@ -52,6 +52,12 @@ public class CIVLTranslationTest {
 			SyntaxException, IOException {
 		check("choose");
 	}
+	
+	@Test
+	public void duffs() throws PreprocessorException, ParseException,
+			SyntaxException, IOException {
+		check("duffs");
+	}
 
 	@Test
 	public void sideEffects() throws PreprocessorException, ParseException,

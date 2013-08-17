@@ -48,4 +48,9 @@ public interface SwitchNode extends StatementNode {
 	@Override
 	SwitchNode copy();
 
+	/**
+	 * Remove cases and default case.
+	 */
+	void clear();
+
 }
