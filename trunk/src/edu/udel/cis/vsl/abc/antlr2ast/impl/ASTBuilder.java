@@ -761,7 +761,7 @@ public class ASTBuilder {
 	}
 
 	/**
-	 * Returns a list consiting of the following kinds of external definitions:
+	 * Returns a list consisting of the following kinds of external definitions:
 	 * 
 	 * <ul>
 	 * <li>VariableDeclarationNode</li>
@@ -792,14 +792,20 @@ public class ASTBuilder {
 		Source source = newSource(declarationTree);
 
 		if (numDeclarators == 0) {
+			TypeNode baseType;
+			ExternalDefinitionNode definition;
+
 			// C11 Sec. 6.7 Constraint 2:
 			// "A declaration other than a static_assert declaration shall
 			// declare at least a declarator (other than the parameters of a
 			// function or the members of a structure or union), a tag, or the
 			// members of an enumeration."
-			TypeNode baseType = newSpecifierType(analysis, scope);
-			ExternalDefinitionNode definition;
 
+			// error if $input or $output occur here:
+			if (analysis.inputQualifier || analysis.outputQualifier)
+				throw error("Use of $input or $output without variable",
+						declarationTree);
+			baseType = newSpecifierType(analysis, scope);
 			if (baseType instanceof EnumerationTypeNode)
 				definition = (EnumerationTypeNode) baseType;
 			else if (baseType instanceof StructureOrUnionTypeNode)
@@ -823,6 +829,13 @@ public class ASTBuilder {
 					scope);
 			ExternalDefinitionNode definition;
 
+			// special handling of $input and $output qualifiers required
+			// these must not go in base type but must be pulled all the
+			// way out to modify the final declarator.
+			// So remove them from the base type, and add them back at end.
+			// $input int x, y;
+			// $input const double a[n];
+
 			if (analysis.typedefCount > 0) {
 				String name;
 
@@ -845,10 +858,14 @@ public class ASTBuilder {
 				checkAlignmentSpecifiers(declaration, analysis);
 				definition = declaration;
 			} else {
-				VariableDeclarationNode declaration = nodeFactory
-						.newVariableDeclarationNode(source, data.identifier,
-								data.type);
+				VariableDeclarationNode declaration;
 
+				if (analysis.inputQualifier)
+					data.type.setInputQualified(true);
+				if (analysis.outputQualifier)
+					data.type.setOutputQualified(true);
+				declaration = nodeFactory.newVariableDeclarationNode(source,
+						data.identifier, data.type);
 				if (initializer != null)
 					declaration.setInitializer(initializer);
 				setStorageSpecifiers(declaration, analysis, scope);
@@ -861,6 +878,19 @@ public class ASTBuilder {
 		return definitionList;
 	}
 
+	/**
+	 * Creates a new type node based on the result of analyzing a set of type
+	 * specifiers.
+	 * 
+	 * Input and output specifiers are ignored, since these require special
+	 * handling: they must be pulled all the way up to the final type node for
+	 * the variable being declared.
+	 * 
+	 * @param analysis
+	 * @param scope
+	 * @return
+	 * @throws SyntaxException
+	 */
 	private TypeNode newSpecifierType(SpecifierAnalysis analysis,
 			SimpleScope scope) throws SyntaxException {
 		TypeNode result;
@@ -901,10 +931,10 @@ public class ASTBuilder {
 			result.setRestrictQualified(true);
 		if (analysis.atomicQualifier)
 			result.setAtomicQualified(true);
-		if (analysis.inputQualifier)
-			result.setInputQualified(true);
-		if (analysis.outputQualifier)
-			result.setOutputQualified(true);
+		// if (analysis.inputQualifier)
+		// result.setInputQualified(true);
+		// if (analysis.outputQualifier)
+		// result.setOutputQualified(true);
 		return result;
 	}
 

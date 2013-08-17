@@ -260,8 +260,7 @@ public class EntityAnalyzer implements Analyzer {
 		clearNode(unit.getRootNode());
 	}
 
-	// TODO: need to remove all cases from choose and switch nodes.
-	// other removals?
+	// TODO: why don't nodes have "clear" method in them?
 	private void clearNode(ASTNode node) {
 		if (node != null) {
 			Iterator<ASTNode> children = node.children();
@@ -297,7 +296,7 @@ public class EntityAnalyzer implements Analyzer {
 				((ChooseStatementNode) node).setDefaultCase(null);
 			}
 			if (node instanceof SwitchNode) {
-				((SwitchNode) node).setDefaultCase(null);
+				((SwitchNode) node).clear();
 			}
 			while (children.hasNext())
 				clearNode(children.next());

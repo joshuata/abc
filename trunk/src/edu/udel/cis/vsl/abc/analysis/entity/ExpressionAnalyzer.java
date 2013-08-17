@@ -346,12 +346,13 @@ public class ExpressionAnalyzer {
 
 	private void processFunctionCall(FunctionCallNode node)
 			throws SyntaxException {
-		// TODO: check type agreement, adjust types, etc.
 		ExpressionNode functionNode = node.getFunction();
 		int numArgs = node.getNumberOfArguments();
 		Type tmpType;
 		TypeKind tmpKind;
 		FunctionType functionType;
+		int expectedNumArgs;
+		boolean hasVariableNumArgs;
 
 		processExpression(functionNode);
 		tmpType = functionNode.getType();
@@ -366,11 +367,33 @@ public class ExpressionAnalyzer {
 			throw error(
 					"Function expression in function call does not have function "
 							+ "type or pointer to function type", functionNode);
+		expectedNumArgs = functionType.getNumParameters();
+		hasVariableNumArgs = functionType.isVariablyModified();
+		if (hasVariableNumArgs) {
+			// if function has variable number of args then the number of
+			// actual parameters must be at least the number expected
+			if (numArgs < expectedNumArgs)
+				throw error("Expected at least " + expectedNumArgs
+						+ " arguments, saw " + numArgs, node);
+		} else {
+			if (numArgs != expectedNumArgs)
+				throw error("Expected " + expectedNumArgs
+						+ " arguments but saw " + numArgs, node);
+		}
 		for (int i = 0; i < numArgs; i++) {
 			ExpressionNode argument = node.getArgument(i);
 
 			processExpression(argument);
-			// conversions?
+			addStandardConversions(argument);
+			if (!hasVariableNumArgs || i < expectedNumArgs) {
+				ObjectType expectedType = functionType.getParameterType(i);
+
+				try {
+					convertRHS(argument, expectedType);
+				} catch (UnsourcedException e) {
+					throw error(e, argument);
+				}
+			}
 		}
 		node.setInitialType(functionType.getReturnType());
 	}
@@ -550,7 +573,9 @@ public class ExpressionAnalyzer {
 	}
 
 	/**
-	 * Processes a simple assignment of the form lhs = rhs.
+	 * Processes a simple assignment of the form lhs = rhs. Pre-req: the two
+	 * operands have already been processed via method
+	 * {@link #processExpression}.
 	 * 
 	 * @param node
 	 *            an OperatorNode with operator ASSIGN
@@ -1305,7 +1330,7 @@ public class ExpressionAnalyzer {
 
 	/**
 	 * Applies array conversion, function conversion, and lvalue conversion to
-	 * the given expression. The node is updates as necessary by adding any
+	 * the given expression. The node is updated as necessary by adding any
 	 * nontrivial conversions to the node's conversion list.
 	 * 
 	 * @param node

@@ -16,7 +16,7 @@ public class CommonSwitchNode extends CommonASTNode implements SwitchNode {
 
 	private List<LabeledStatementNode> cases = new LinkedList<LabeledStatementNode>();
 
-	private LabeledStatementNode defaultCase;
+	private LabeledStatementNode defaultCase = null;
 
 	public CommonSwitchNode(Source source, ExpressionNode condition,
 			StatementNode body) {
@@ -72,6 +72,15 @@ public class CommonSwitchNode extends CommonASTNode implements SwitchNode {
 	public SwitchNode copy() {
 		return new CommonSwitchNode(getSource(), duplicate(getCondition()),
 				duplicate(getBody()));
+	}
+
+	/**
+	 * Removes cases and default case.
+	 */
+	@Override
+	public void clear() {
+		cases = new LinkedList<LabeledStatementNode>();
+		defaultCase = null;
 	}
 
 }

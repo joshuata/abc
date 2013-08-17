@@ -398,6 +398,7 @@ public class TypeAnalyzer {
 		// C11 6.7.3(9):
 		// "If the specification of an array type includes any type qualifiers,
 		// the element type is so-qualified, not the array type."
+		// but don't apply that rule to $input and $output
 		elementType = typeFactory.qualify(elementType, constQ, volatileQ,
 				restrictQ, false, false);
 		if (restrictQ
@@ -434,12 +435,9 @@ public class TypeAnalyzer {
 									.getConstantValue(sizeExpression));
 				} else {
 					// C11 6.7.6.2(5): "If the size is an expression that is not
-					// an
-					// integer
-					// constant expression: if it occurs in a declaration at
-					// function
-					// prototype scope, it is treated as if it were replaced by
-					// *"
+					// an integer constant expression: if it occurs in a
+					// declaration at function prototype scope, it is treated as
+					// if it were replaced by *"
 					if (node.getScope().getScopeKind() == ScopeKind.FUNCTION_PROTOTYPE)
 						result = typeFactory
 								.unspecifiedVariableLengthArrayType(elementType);
