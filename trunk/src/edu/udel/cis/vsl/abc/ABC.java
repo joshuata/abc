@@ -34,6 +34,17 @@ public class ABC {
 
 	public final static String date = "01-mar-2013";
 
+	public static enum Language {
+		C, CIVL_C
+	};
+
+	/**
+	 * The language of the program being processed. C is the default, but if the
+	 * file suffix ends in ".cvl" the command line processor will change it to
+	 * CIVL_C. As this is a public static variable, it can also be set manually.
+	 */
+	public static Language language = Language.C;
+
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes) {
 		return new Activator(file, systemIncludes, userIncludes);
@@ -41,6 +52,47 @@ public class ABC {
 
 	public static Activator activator(File file) {
 		return new Activator(file);
+	}
+
+	public static void setLanguageFromName(String name) {
+		int dotIndex = name.lastIndexOf('.');
+
+		if (dotIndex >= 0) {
+			String suffix = name.substring(dotIndex + 1, name.length());
+
+			if ("cvl".equals(suffix))
+				language = Language.CIVL_C;
+		}
+	}
+
+	private static void help(PrintStream out) {
+		out.println("Usage: abc [options] filename");
+		out.println("Options:");
+		out.println("-I <path>");
+		out.println("  add path to system include list");
+		out.println("-iquote <path>");
+		out.println("  add path to user include list");
+		out.println("-o <filename>");
+		out.println("  send output to filename");
+		out.println("-E");
+		out.println("  preprocess only");
+		out.println("-v");
+		out.println("  verbose mode, show all processing steps");
+		out.println("-prune");
+		out.println("  prune nodes unreachable from main from AST");
+		out.println("-sef");
+		out.println("  transform expressions with side-effects");
+		out.println("-lang=[c|civlc]");
+		out.println("  set language (default determined by file suffix)");
+		out.println("");
+	}
+
+	private static void err(String msg) {
+		System.out.println("Error: " + msg);
+		System.out.println();
+		help(System.out);
+		System.out.flush();
+		System.exit(1);
 	}
 
 	private static Config parseCommandLind(String[] args)
@@ -55,9 +107,10 @@ public class ABC {
 		File[] systemIncludes, userIncludes;
 		boolean preprocOnly = false;
 		boolean verbose = false;
-		Config result = new Config();
 		boolean prune = false; // prune nodes unreachable from main
 		boolean sef = false; // make side-effect-free
+		Language languageChoice = null;
+		Config result = new Config();
 
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
@@ -68,8 +121,7 @@ public class ABC {
 				if (arg.length() == 2) {
 					i++;
 					if (i >= args.length)
-						throw new IllegalArgumentException(
-								"Filename must follow -o");
+						err("Filename must follow -o");
 					name = args[i];
 				} else {
 					name = arg.substring(2);
@@ -77,16 +129,14 @@ public class ABC {
 				if (outfileName == null)
 					outfileName = name;
 				else
-					throw new IllegalArgumentException(
-							"More than one use of -o");
+					err("More than one use of -o");
 			} else if (arg.startsWith("-I")) {
 				String name;
 
 				if (arg.length() == 2) {
 					i++;
 					if (i >= args.length)
-						throw new IllegalArgumentException(
-								"Filename must follow -I");
+						err("Filename must follow -I");
 					name = args[i];
 				} else {
 					name = arg.substring(2);
@@ -98,8 +148,7 @@ public class ABC {
 				if (arg.length() == "-iquote".length()) {
 					i++;
 					if (i >= args.length)
-						throw new IllegalArgumentException(
-								"Filename must follow -iquote");
+						err("Filename must follow -iquote");
 					name = args[i];
 				} else {
 					name = arg.substring("-iquote".length());
@@ -115,30 +164,37 @@ public class ABC {
 				else if (arg.equals("-prune=false"))
 					prune = false;
 				else
-					throw new IllegalArgumentException(
-							"Unknown command line option: " + arg);
+					err("Unknown command line option: " + arg);
 			} else if (arg.startsWith("-sef")) {
 				if (arg.equals("-sef") || arg.equals("-sef=true"))
 					sef = true;
 				else if (arg.equals("-sef=false"))
 					sef = false;
 				else
-					throw new IllegalArgumentException(
-							"Unknown command line option: " + arg);
+					err("Unknown command line option: " + arg);
+			} else if (arg.startsWith("-lang")) {
+				if (arg.equals("-lang=C"))
+					languageChoice = Language.C;
+				else if (arg.equals("-lang=civlc"))
+					languageChoice = Language.CIVL_C;
+				else
+					err("Unknown command line option: " + arg);
 			} else if (arg.startsWith("-")) {
-				throw new IllegalArgumentException(
-						"Unknown command line option: " + arg);
+				err("Unknown command line option: " + arg);
 			} else {
 				if (infileName == null)
 					infileName = arg;
 				else
-					throw new IllegalArgumentException(
-							"More than one input file specified (previous was "
-									+ infileName + "): " + arg);
+					err("More than one input file specified (previous was "
+							+ infileName + "): " + arg);
 			}
 		}
 		if (infileName == null)
-			throw new IllegalArgumentException("No input file specified");
+			err("No input file specified");
+		if (languageChoice == null)
+			setLanguageFromName(infileName);
+		else
+			language = languageChoice;
 		infile = new File(infileName);
 		userIncludes = userIncludeList.toArray(new File[0]);
 		systemIncludes = systemIncludeList.toArray(new File[0]);

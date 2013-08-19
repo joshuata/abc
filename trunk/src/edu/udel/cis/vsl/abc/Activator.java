@@ -111,7 +111,10 @@ public class Activator {
 	 *            list of user include paths
 	 */
 	public Activator(File file, File[] systemIncludes, File[] userIncludes) {
+		String filename = file.getName();
+
 		this.file = file;
+		ABC.setLanguageFromName(filename);
 		preprocessor = preprocessorFactory.newPreprocessor(systemIncludes,
 				userIncludes);
 	}
