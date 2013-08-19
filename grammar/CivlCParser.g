@@ -1357,6 +1357,7 @@ externalDeclaration
       functionDefinition
     | declaration
     | pragma
+    | assumeStatement
     ;
 
 /* 6.9.1 */

@@ -45,6 +45,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -1615,6 +1616,15 @@ public class ASTBuilder {
 		return data.type;
 	}
 
+	private AssumeNode translateAssume(Source source, CommonTree assumeTree,
+			SimpleScope scope) throws SyntaxException {
+		return nodeFactory
+				.newAssumeNode(
+						source,
+						translateExpression(
+								(CommonTree) assumeTree.getChild(0), scope));
+	}
+
 	/**
 	 * 
 	 * @param statementTree
@@ -1805,10 +1815,7 @@ public class ASTBuilder {
 							scope));
 
 		case ASSUME:
-			return nodeFactory.newAssumeNode(
-					statementSource,
-					translateExpression((CommonTree) statementTree.getChild(0),
-							scope));
+			return translateAssume(statementSource, statementTree, scope);
 		case WHEN:
 			return nodeFactory.newWhenNode(
 					statementSource,
@@ -2111,6 +2118,9 @@ public class ASTBuilder {
 						.add(translateStaticAssertion(definitionTree, scope));
 			else if (definitionType == PRAGMA)
 				definitions.add(translatePragma(newSource(definitionTree),
+						definitionTree, scope));
+			else if (definitionType == ASSUME)
+				definitions.add(translateAssume(newSource(definitionTree),
 						definitionTree, scope));
 			else
 				throw error("Unknown type of external definition",
