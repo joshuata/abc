@@ -11,11 +11,15 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -125,6 +129,7 @@ public class PrunerWorker {
 		Scope rootScope = root.getScope();
 		Function main = (Function) rootScope.getOrdinaryEntity("main");
 		Iterator<Variable> iter = rootScope.getVariables();
+		Iterator<ASTNode> iter2 = root.children();
 
 		while (iter.hasNext()) {
 			Variable variable = iter.next();
@@ -143,6 +148,15 @@ public class PrunerWorker {
 					markReachable(decl);
 				}
 			}
+		}
+		while (iter2.hasNext()) {
+			ExternalDefinitionNode externalDef = (ExternalDefinitionNode) iter2
+					.next();
+
+			if (externalDef instanceof PragmaNode
+					|| externalDef instanceof StaticAssertionNode
+					|| externalDef instanceof AssumeNode)
+				markReachable(externalDef);
 		}
 		explore(main);
 	}

@@ -25,6 +25,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
@@ -198,6 +199,8 @@ public class EntityAnalyzer implements Analyzer {
 		} else if (node instanceof EnumerationTypeNode) {
 			((EnumerationTypeNode) node).setType(typeAnalyzer
 					.processEnumerationType((EnumerationTypeNode) node));
+		} else if (node instanceof AssumeNode) {
+			statementAnalyzer.processStatement((AssumeNode)node);
 		} else {
 			throw new RuntimeException("Unreachable");
 		}

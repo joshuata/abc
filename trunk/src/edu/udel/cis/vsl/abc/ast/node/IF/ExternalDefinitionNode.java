@@ -15,6 +15,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
  * <li>PragmaNode</li>
  * <li>StaticAssertionNode</li>
  * <li>TypedefDeclarationNode</li>
+ * <li>AssumeNode</li>
  * </ul>
  */
 public interface ExternalDefinitionNode extends ASTNode {
