@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
+import edu.udel.cis.vsl.abc.ABC;
+import edu.udel.cis.vsl.abc.ABC.Language;
 import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
@@ -1030,6 +1032,8 @@ public class ExpressionAnalyzer {
 
 		if (!(type1 instanceof IntegerType))
 			throw error("Subscript does not have integer type:\n" + type1, arg1);
+		// the following will check pointer in any case
+		// if strict C, must also be pointer to complete object type:
 		if (isPointerToCompleteObjectType(type0))
 			node.setInitialType(((PointerType) type0).referencedType());
 		else
@@ -1361,13 +1365,17 @@ public class ExpressionAnalyzer {
 	 */
 	private boolean isPointerToCompleteObjectType(Type type) {
 		if (type instanceof PointerType) {
-			Type baseType = ((PointerType) type).referencedType();
-
-			if (baseType instanceof ObjectType
-					&& ((ObjectType) baseType).isComplete())
+			if (ABC.language == Language.CIVL_C)
 				return true;
-			else
-				return false;
+			else {
+				Type baseType = ((PointerType) type).referencedType();
+
+				if (baseType instanceof ObjectType
+						&& ((ObjectType) baseType).isComplete())
+					return true;
+				else
+					return false;
+			}
 		}
 		return false;
 	}

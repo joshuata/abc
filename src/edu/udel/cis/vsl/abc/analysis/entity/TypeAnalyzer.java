@@ -4,6 +4,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ABC;
+import edu.udel.cis.vsl.abc.ABC.Language;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
@@ -387,7 +389,8 @@ public class TypeAnalyzer {
 			throw error("Non-object type used for element type of array type",
 					elementTypeNode);
 		elementType = (ObjectType) tempElementType;
-		if (!isParameter && !elementType.isComplete())
+		if (ABC.language == Language.C && !isParameter
+				&& !elementType.isComplete())
 			throw error("Element type of array type is not complete",
 					elementTypeNode);
 		// C11 6.7.3(3):
