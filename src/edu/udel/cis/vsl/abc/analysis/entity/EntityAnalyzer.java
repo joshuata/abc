@@ -1,12 +1,15 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
+import edu.udel.cis.vsl.abc.ast.entity.IF.PragmaHandler;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
@@ -78,6 +81,8 @@ public class EntityAnalyzer implements Analyzer {
 
 	StandardTypes standardTypes;
 
+	Map<String, PragmaHandler> pragmaHandlerMap;
+
 	// Private fields...
 
 	private Configuration configuration;
@@ -101,6 +106,7 @@ public class EntityAnalyzer implements Analyzer {
 				conversionFactory, typeFactory);
 		this.statementAnalyzer = new StatementAnalyzer(this, expressionAnalyzer);
 		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory, entityFactory);
+		this.pragmaHandlerMap = new LinkedHashMap<String, PragmaHandler>();
 	}
 
 	// Public methods...
@@ -200,14 +206,23 @@ public class EntityAnalyzer implements Analyzer {
 			((EnumerationTypeNode) node).setType(typeAnalyzer
 					.processEnumerationType((EnumerationTypeNode) node));
 		} else if (node instanceof AssumeNode) {
-			statementAnalyzer.processStatement((AssumeNode)node);
+			statementAnalyzer.processStatement((AssumeNode) node);
 		} else {
 			throw new RuntimeException("Unreachable");
 		}
 	}
 
-	private void processPragma(PragmaNode node) throws SyntaxException {
-		// TODO: insert pragma handlers?
+	void processPragma(PragmaNode node) throws SyntaxException {
+		IdentifierNode identifier = node.getPragmaIdentifier();
+		String name = identifier.name();
+		PragmaHandler handler = pragmaHandlerMap.get(name);
+
+		if (handler == null) {
+			handler = entityFactory.newPragmaHandler(name);
+
+			pragmaHandlerMap.put(name, handler);
+		}
+		identifier.setEntity(handler);
 	}
 
 	/**

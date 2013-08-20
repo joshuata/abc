@@ -2,8 +2,6 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.Iterator;
 
-import javax.lang.model.type.TypeKind;
-
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -135,7 +133,7 @@ public class StatementAnalyzer {
 			processExpression(((SwitchNode) statement).getCondition());
 			processStatement(((SwitchNode) statement).getBody());
 		} else if (statement instanceof PragmaNode) {
-			// do nothing for now
+			entityAnalyzer.processPragma((PragmaNode) statement);
 		} else if (statement instanceof NullStatementNode) {
 			// nothing to do
 		} else if (statement instanceof AssertNode) {
@@ -143,14 +141,14 @@ public class StatementAnalyzer {
 		} else if (statement instanceof AssumeNode) {
 			processExpression(((AssumeNode) statement).getExpression());
 		} else if (statement instanceof WhenNode) {
-			ExpressionNode guard = ((WhenNode)statement).getGuard();
+			ExpressionNode guard = ((WhenNode) statement).getGuard();
 			Type guardType;
-			
+
 			processExpression(guard);
 			guardType = guard.getConvertedType();
 			// TODO: check guardType is something that can
 			// be converted to a boolean...what is that?
-			
+
 			processStatement(((WhenNode) statement).getBody());
 		} else if (statement instanceof ChooseStatementNode) {
 			Iterator<StatementNode> children = ((ChooseStatementNode) statement)
@@ -297,9 +295,9 @@ public class StatementAnalyzer {
 
 		if (switchLabel.isDefault()) {
 			ASTNode enclosing = enclosingSwitchOrChoose(switchLabel);
-			
+
 			if (enclosing instanceof ChooseStatementNode) {
-				ChooseStatementNode choose = (ChooseStatementNode)enclosing;
+				ChooseStatementNode choose = (ChooseStatementNode) enclosing;
 				LabeledStatementNode oldDefault = choose.getDefaultCase();
 
 				if (oldDefault != null)
@@ -310,7 +308,7 @@ public class StatementAnalyzer {
 				return;
 			}
 		}
-		
+
 		SwitchNode switchNode = enclosingSwitch(switchLabel);
 
 		if (switchNode == null)
