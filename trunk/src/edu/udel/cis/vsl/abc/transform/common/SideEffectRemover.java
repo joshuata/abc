@@ -566,49 +566,85 @@ public class SideEffectRemover implements Transformer {
 									Operator.ASSIGN, decrementArguments));
 					break;
 				case ASSIGN:
+					ExpressionNode lhs = ((OperatorNode) expression)
+							.getArgument(0);
 					ExpressionNode rhs = ((OperatorNode) expression)
 							.getArgument(1);
 
-					if (isSEF(rhs)) {
+					if (isSEF(lhs) && isSEF(rhs)) {
 						result = statement;
-					} else if (isCompleteMallocExpression(rhs)) {
-						result = statement;
-					} else {
-						SideEffectFreeTriple triple;
-						Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
-
-						if (rhs instanceof FunctionCallNode) {
-							// TODO check that arguments are SEF
-							result = statement;
-						} else if (rhs instanceof SpawnNode) {
-							// TODO check that arguments are SEF
+					} else if (isSEF(lhs)) {
+						if (isCompleteMallocExpression(rhs)) {
 							result = statement;
 						} else {
-							Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
-							ExpressionNode lhs = ((OperatorNode) expression)
-									.getArgument(0).copy();
-							ExpressionNode assignRhs;
+							SideEffectFreeTriple triple;
+							Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
 
-							// lhs.parent().removeChild(lhs.childIndex());
-							assignArguments.add(lhs);
-							triple = processExpression(rhs);
-							blockItems.addAll(triple.getBefore());
-							assignRhs = triple.getExpression().copy();
-							// if (assignRhs.parent() != null) {
-							// assignRhs.parent().removeChild(
-							// assignRhs.childIndex());
-							// }
-							assignArguments.add(assignRhs);
+							if (rhs instanceof FunctionCallNode) {
+								// TODO check that arguments are SEF
+								result = statement;
+							} else if (rhs instanceof SpawnNode) {
+								// TODO check that arguments are SEF
+								result = statement;
+							} else {
+								Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
+								ExpressionNode assignRhs;
+
+								// lhs.parent().removeChild(lhs.childIndex());
+								assignArguments.add(lhs.copy());
+								triple = processExpression(rhs);
+								blockItems.addAll(triple.getBefore());
+								assignRhs = triple.getExpression().copy();
+								// if (assignRhs.parent() != null) {
+								// assignRhs.parent().removeChild(
+								// assignRhs.childIndex());
+								// }
+								assignArguments.add(assignRhs);
+								blockItems.add(factory
+										.newExpressionStatementNode(factory
+												.newOperatorNode(
+														expression.getSource(),
+														Operator.ASSIGN,
+														assignArguments)));
+								blockItems.addAll(triple.getAfter());
+								result = factory.newCompoundStatementNode(
+										statement.getSource(), blockItems);
+							}
+						}
+					} else {
+						// lhs is not SEF.
+						SideEffectFreeTriple lhsTriple = processExpression(lhs);
+						Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
+						Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
+
+						assignArguments.add(lhsTriple.getExpression());
+						blockItems.addAll(lhsTriple.getBefore());
+						if (isSEF(rhs) || rhs instanceof FunctionCallNode
+								|| rhs instanceof SpawnNode) {
+
+							assignArguments.add(rhs.copy());
 							blockItems.add(factory
 									.newExpressionStatementNode(factory
 											.newOperatorNode(
 													expression.getSource(),
 													Operator.ASSIGN,
 													assignArguments)));
-							blockItems.addAll(triple.getAfter());
-							result = factory.newCompoundStatementNode(
-									statement.getSource(), blockItems);
+						} else {
+							SideEffectFreeTriple rhsTriple = processExpression(rhs);
+
+							blockItems.addAll(rhsTriple.getBefore());
+							assignArguments.add(rhsTriple.getExpression());
+							blockItems.add(factory
+									.newExpressionStatementNode(factory
+											.newOperatorNode(
+													expression.getSource(),
+													Operator.ASSIGN,
+													assignArguments)));
+							blockItems.addAll(rhsTriple.getAfter());
 						}
+						blockItems.addAll(lhsTriple.getAfter());
+						result = factory.newCompoundStatementNode(
+								statement.getSource(), blockItems);
 					}
 					break;
 				case PLUS:
@@ -939,14 +975,16 @@ public class SideEffectRemover implements Transformer {
 					.getIdentifier().getEntity();
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
 			returnTypeNode = typeNode(functionEntity.getFirstDeclaration()
-					.getSource(), ((Function) functionEntity).getType().getReturnType());
+					.getSource(), ((Function) functionEntity).getType()
+					.getReturnType());
 			tmpVariable = factory.newVariableDeclarationNode(expression
 					.getSource(), factory.newIdentifierNode(
 					expression.getSource(), tempVariablePrefix
 							+ tempVariableCounter++), returnTypeNode);
 			before.add(tmpVariable);
-			arguments.add(factory.newIdentifierExpressionNode(
-					expression.getSource(), tmpVariable.getIdentifier().copy()));
+			arguments
+					.add(factory.newIdentifierExpressionNode(expression
+							.getSource(), tmpVariable.getIdentifier().copy()));
 			arguments.add(expression.copy());
 			before.add(factory.newExpressionStatementNode(factory
 					.newOperatorNode(expression.getSource(), Operator.ASSIGN,
@@ -1037,10 +1075,20 @@ public class SideEffectRemover implements Transformer {
 			throws SyntaxException {
 		Vector<BlockItemNode> before = new Vector<BlockItemNode>();
 		Vector<BlockItemNode> after = new Vector<BlockItemNode>();
-		ExpressionNode lhs = assign.getArgument(0).copy();
+		ExpressionNode lhs;
 
 		assert assign.getOperator() == Operator.ASSIGN;
-		// Assume left hand side is side effect free.
+		// Remove side effects from left hand side if necessary.
+		if (isSEF(assign.getArgument(0))) {
+			lhs = assign.getArgument(0).copy();
+		} else {
+			SideEffectFreeTriple lhsTriple = processExpression(assign
+					.getArgument(0).copy());
+			before.addAll(lhsTriple.getBefore());
+			lhs = lhsTriple.getExpression();
+			after.addAll(lhsTriple.getAfter());
+		}
+		// Remove side effects from right hand side if necessary.
 		if (isSEF(assign.getArgument(1))) {
 			// assign.parent().removeChild(assign.childIndex());
 			before.add(factory.newExpressionStatementNode(assign.copy()));
