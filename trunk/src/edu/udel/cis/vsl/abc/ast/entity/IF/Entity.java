@@ -27,7 +27,8 @@ public interface Entity {
 		ENUMERATION,
 		ENUMERATOR,
 		FIELD,
-		LABEL
+		LABEL,
+		PRAGMA_HANDLER
 	};
 
 	/**

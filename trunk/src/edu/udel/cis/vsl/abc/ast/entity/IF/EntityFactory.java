@@ -34,4 +34,6 @@ public interface EntityFactory {
 
 	Label newLabel(OrdinaryLabelNode declaration);
 
+	PragmaHandler newPragmaHandler(String name);
+
 }
