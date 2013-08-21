@@ -57,13 +57,15 @@ void printf(const char * restrict format, ...);
  * a single value. */
 typedef struct __bundle__ $bundle;
 
+int $bundle_size($bundle b);
+
 /* Creates a bundle from the memory region specified by
  * ptr and size, copying the data into the new bundle */
 $bundle $bundle_pack(void *ptr, int size);
 
 /* Copies the data out of the bundle into the region
  * specified */
-void $bundle_unpack($bundle bundle, void *ptr, int size);
+void $bundle_unpack($bundle bundle, void *ptr);
 
 
 // Message passing:
@@ -122,7 +124,7 @@ int $message_size($message * message) {
 /* transfers message data to buf, throwing exception if message
  * size exceeds specified size */ 
 void $message_unpack($message * message, void *buf, int size) {
-  $bundle_unpack(message->data, buf, size);
+  $bundle_unpack(message->data, buf);
 }
 
 /* A datatype representing a queue of messages.  All message
