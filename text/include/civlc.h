@@ -128,7 +128,7 @@ void $message_unpack($message * message, void *buf, int size) {
 }
 
 /* A datatype representing a queue of messages.  All message
- * data is encapsulated inside this value; no external alloation
+ * data is encapsulated inside this value; no external allocation
  * is used. */ 
 typedef struct __queue__ {
   int length;
