@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.conversion.IF;
 
-import edu.udel.cis.vsl.abc.analysis.common.CompatiblePointerConversion;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -91,16 +91,16 @@ public interface ConversionFactory {
 	 * "Except when it is the operand of the sizeof operator, the _Alignof
 	 * operator, or the unary & operator, or is a string literal used to
 	 * initialize an array, an expression that has type "array of type" is
-	 * converted to an expression with type "pointer to type" that points to
-	 * the initial element of the array object and is not an lvalue. If the
-	 * array object has register storage class, the behavior is undefined."
+	 * converted to an expression with type "pointer to type" that points to the
+	 * initial element of the array object and is not an lvalue. If the array
+	 * object has register storage class, the behavior is undefined."
 	 * 
 	 * @param type
 	 *            any array type
 	 * @return array conversion with old type the given array type and new type
 	 *         the pointer type to the element type of the array type
 	 */
-	ArrayConversion arrayConversion(ArrayType type);
+	ArrayConversion arrayConversion(ArrayType type, Scope scope);
 
 	/**
 	 * Returns the function conversion object with old type equal to the given

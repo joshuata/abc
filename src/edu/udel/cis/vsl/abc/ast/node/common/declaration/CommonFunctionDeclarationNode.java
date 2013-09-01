@@ -19,9 +19,11 @@ public class CommonFunctionDeclarationNode extends
 
 	public CommonFunctionDeclarationNode(Source source,
 			IdentifierNode identifier, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract) {
+			SequenceNode<ContractNode> contract,
+			SequenceNode<IdentifierNode> scopeList) {
 		super(source, identifier, type);
 		addChild(contract); // child 2
+		addChild(scopeList); // child 3
 	}
 
 	@Override
@@ -102,12 +104,19 @@ public class CommonFunctionDeclarationNode extends
 	public FunctionDeclarationNode copy() {
 		CommonFunctionDeclarationNode result = new CommonFunctionDeclarationNode(
 				getSource(), duplicate(getIdentifier()),
-				duplicate(getTypeNode()), duplicate(getContract()));
+				duplicate(getTypeNode()), duplicate(getContract()),
+				duplicate(getScopeList()));
 
 		result.setInlineFunctionSpecifier(hasInlineFunctionSpecifier());
 		result.setNoreturnFunctionSpecifier(hasNoreturnFunctionSpecifier());
 		copyStorage(result);
 		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SequenceNode<IdentifierNode> getScopeList() {
+		return (SequenceNode<IdentifierNode>) child(3);
 	}
 
 }

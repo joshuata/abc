@@ -46,7 +46,7 @@ tokens
 	DECLARATION_SPECIFIERS;   // list of declaration specifiers
 	INIT_DECLARATOR_LIST;     // list of initializer-declarator pairs
 	INIT_DECLARATOR;          // initializer-declaration pair
-	STRUCT_DECLARATION_LIST;  // list of field declarations
+ 	STRUCT_DECLARATION_LIST;  // list of field declarations
 	STRUCT_DECLARATION;       // a field declaration
 	SPECIFIER_QUALIFIER_LIST; // list of type specifiers and qualifiers
 	STRUCT_DECLARATOR_LIST;   // list of struct/union declarators
@@ -83,11 +83,14 @@ tokens
 	FUNCTION_DEFINITION;
 	TYPEDEF_NAME;
 	TOKEN_LIST;
+	SCOPE_NAME;		// use of a CIVL-C scope name
+	SCOPE_LIST;		// e.g., "<s1,s2,s3>"
 }
 
 scope Symbols {
     Set<String> types; // to keep track of typedefs
     Set<String> enumerationConstants; // to keep track of enum constants
+    Set<String> scopeNames; // to keep track of CIVL-C scope names
     boolean isFunctionDefinition; // "function scope": entire function definition
 }
 
@@ -124,6 +127,13 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 		return false;
 	}
 	
+	boolean isScopeName(String name) {
+		for (Object scope : Symbols_stack)
+			if (((Symbols_scope)scope).scopeNames.contains(name))
+				return true;
+		return false;
+	}
+
 	boolean isEnumerationConstant(String name) {
 		boolean answer = false;
 		
@@ -139,6 +149,54 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 		return answer;
 	}	
 }
+
+/* ****** CIVL-C Scopes ********* */
+
+
+/*
+ * An optional scope modifier, providing a non-empty tree
+ * "ABSENT" which matches nothing.
+ */
+scopeModifier_opt
+	: -> ABSENT
+	| scopeModifier
+	;
+
+/*
+ * A scope modifier, a CIVL-C construct such as the "<s>"
+ * in the declaration "double *<s> p;" meaning p is a
+ * pointer-to-double-in-scope-s.
+ */
+scopeModifier
+	: {input.LT(1).getType()==LT && isScopeName(input.LT(2).getText())}?
+	  LT IDENTIFIER GT -> ^(SCOPE_NAME IDENTIFIER)
+	;
+
+
+scopeParameterList_opt
+	: -> ABSENT
+	| scopeParameterList
+	;
+
+scopeParameterList
+	: {input.LT(1).getType()==LT &&
+		(input.LT(2).getType()==GT ||
+			isScopeName(input.LT(2).getText()))}?
+	  LT	(
+		  GT -> ^(SCOPE_LIST) // empty list
+		| IDENTIFIER (COMMA IDENTIFIER)* GT
+		  -> ^(SCOPE_LIST IDENTIFIER+)
+		)
+	;
+
+/* Use of a CIVL-C scope name.   The scope name must have
+ * been declared previously, and therefore entered into
+ * the scope name set of the current scope or one of its
+ * containing scopes. */
+scopeName
+	: {isScopeName(input.LT(1).getText())}? IDENTIFIER
+	  -> ^(SCOPE_NAME IDENTIFIER)
+	;
 
 
 /* ***** A.2.1: Expressions ***** */
@@ -194,13 +252,21 @@ genericAssociation
 /* 6.5.2 */
 postfixExpression
 	: (postfixExpressionRoot -> postfixExpressionRoot)
+		// array index operator:
 	  ( l=LSQUARE expression RSQUARE
 	    -> ^(OPERATOR
 	           INDEX[$l]
 	           ^(ARGUMENT_LIST $postfixExpression expression)
 	           RSQUARE)
-	  | LPAREN argumentExpressionList RPAREN
-	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList RPAREN)
+	  |	// function call with scope parameters:
+	    scopeParameterList
+	    LPAREN argumentExpressionList RPAREN
+	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
+	    	 RPAREN scopeParameterList)
+	  |	// function call without scope modifier:
+	    LPAREN argumentExpressionList RPAREN
+	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
+	    	 RPAREN ABSENT)
 	  | DOT IDENTIFIER
 	    -> ^(DOT $postfixExpression IDENTIFIER)
 	  | ARROW IDENTIFIER
@@ -208,7 +274,8 @@ postfixExpression
 	  | p=PLUSPLUS
 	    -> ^(OPERATOR POST_INCREMENT[$p]
 	         ^(ARGUMENT_LIST $postfixExpression))
-	  | AT IDENTIFIER
+	  | // CIVL-C @ operator: remote reference like x@f
+	    AT IDENTIFIER
 	    -> ^(AT $postfixExpression IDENTIFIER)
 	  | m=MINUSMINUS
 	    -> ^(OPERATOR POST_DECREMENT[$m]
@@ -268,10 +335,10 @@ unaryExpression
 
 
 spawnExpression
-	: SPAWN postfixExpressionRoot LPAREN 
-	  argumentExpressionList RPAREN
+	: SPAWN postfixExpressionRoot scopeParameterList_opt LPAREN 
+	  argumentExpressionList RPAREN 
 	  -> ^(SPAWN LPAREN postfixExpressionRoot
-	       argumentExpressionList RPAREN)
+	       argumentExpressionList RPAREN scopeParameterList_opt)
 	;
 
 
@@ -453,12 +520,17 @@ constantExpression
 
 /* 6.7.
  *
- * This rule will construct either a DECLARATION or
+ * This rule will construct either a SCOPE, DECLARATION, or
  * STATICASSERT tree:
- 
+ *
+ * Root: SCOPE
+ * Child 0: Identifier
+ *
  * Root: DECLARATION
  * Child 0: declarationSpecifiers
  * Child 1: initDeclaratorList or ABSENT
+ * Child 2: contract or ABSENT
+ * Child 3: scopeParameterList or ABSENT
  *
  * Root: STATICASSERT
  * Child 0: constantExpression
@@ -477,15 +549,22 @@ scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
 }
-	: d=declarationSpecifiers
+	: SCOPE IDENTIFIER SEMI
+	  {
+		$Symbols::scopeNames.add($IDENTIFIER.text);
+	  }
+	  -> ^(SCOPE IDENTIFIER)
+	| s=scopeParameterList_opt d=declarationSpecifiers
 	  ( 
 	    i=initDeclaratorList contract_opt SEMI
-	    -> ^(DECLARATION $d $i contract_opt)
+	    -> ^(DECLARATION $d $i contract_opt $s)
 	  | SEMI
-	    -> ^(DECLARATION $d ABSENT ABSENT)
+	    -> ^(DECLARATION $d ABSENT ABSENT ABSENT)
 	  )
 	| staticAssertDeclaration
 	;
+
+
 
 /* 6.7
  * Root: DECLARATION_SPECIFIERS
@@ -837,9 +916,11 @@ pointer
 /*
  * Root: STAR
  * child 0: TYPE_QUALIFIER_LIST
+ * child 1 : SCOPE_MODIFIER or ABSENT
  */
 pointer_part
-	: STAR typeQualifierList_opt -> ^(STAR typeQualifierList_opt)
+	: STAR scopeModifier_opt typeQualifierList_opt
+	-> ^(STAR typeQualifierList_opt scopeModifier_opt)
 	;
 
 /* 6.7.6
@@ -871,6 +952,7 @@ scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
+	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::isFunctionDefinition = false;
 }
 	: parameterTypeListWithoutScope
@@ -1001,8 +1083,10 @@ directAbstractDeclarator
  * to be present in a typedef.
  */
 typedefName
-    : {isTypeName(input.LT(1).getText())}? IDENTIFIER
-      -> ^(TYPEDEF_NAME IDENTIFIER)
+    : {isTypeName(input.LT(1).getText())}?
+      IDENTIFIER
+      scopeParameterList_opt
+      -> ^(TYPEDEF_NAME IDENTIFIER scopeParameterList_opt)
     ;
 
 /* 6.7.7
@@ -1108,6 +1192,7 @@ statementWithScope
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
+	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1149,6 +1234,7 @@ compoundStatement
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
+	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1199,6 +1285,7 @@ selectionStatement
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
+	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1234,6 +1321,7 @@ iterationStatement
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
+	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1338,6 +1426,7 @@ scope Symbols; // the global scope
 scope DeclarationScope; // just to have an outermost one with isTypedef false
 @init {
     $Symbols::types = new HashSet<String>();
+    $Symbols::scopeNames = new HashSet<String>();
     $Symbols::enumerationConstants = new HashSet<String>();
     $Symbols::isFunctionDefinition = false;
     $DeclarationScope::isTypedef = false;
@@ -1352,7 +1441,7 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
  * are in a function definition.
  */
 externalDeclaration
-    : (declarationSpecifiers declarator 
+    : (scopeParameterList_opt declarationSpecifiers declarator 
        contract_opt declarationList_opt LCURLY)=>
       functionDefinition
     | declaration
@@ -1360,18 +1449,32 @@ externalDeclaration
     | assumeStatement
     ;
 
-/* 6.9.1 */
+/* 6.9.1
+ * Root: FUNCTION_DEFINITION
+ * Child 0: declarationSpecifiers
+ * Child 1: declarator
+ * Child 2: declarationList or ABSENT (formal parameters)
+ * Child 3: compound statement (body)
+ * Child 4: contract or ABSENT (code contract)
+ * Child 5: scope parameter list or ABSENT (scope formal params)
+ */
 functionDefinition
 scope Symbols; // "function scope"
 @init {
     $Symbols::types = new HashSet<String>();
     $Symbols::enumerationConstants = new HashSet<String>();
+    $Symbols::scopeNames = new HashSet<String>();
     $Symbols::isFunctionDefinition = true;
 }
-	: declarationSpecifiers declarator contract_opt
-	  declarationList_opt compoundStatement
+	: scopeParameterList_opt
+	  declarationSpecifiers
+	  declarator
+	  contract_opt
+	  declarationList_opt
+	  compoundStatement
 	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
-	       declarationList_opt compoundStatement contract_opt)
+	       declarationList_opt compoundStatement contract_opt
+	       scopeParameterList_opt)
 	;
 
 

@@ -1,8 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.conversion.common;
 
-import edu.udel.cis.vsl.abc.analysis.common.CompatiblePointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ArithmeticConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ArrayConversion;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.CompatiblePointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.CompatibleStructureOrUnionConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.LvalueConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.NullPointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.PointerBoolConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.VoidPointerConversion;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
@@ -108,15 +109,16 @@ public class CommonConversionFactory implements ConversionFactory {
 	}
 
 	@Override
-	public ArrayConversion arrayConversion(ArrayType type) {
+	public ArrayConversion arrayConversion(ArrayType type, Scope scope) {
 		// get rid of $input/$output qualifiers on type.getElementType?
-		return new CommonArrayConversion(type, typeFactory.pointerType(type
-				.getElementType()));
+		return new CommonArrayConversion(type, typeFactory.pointerType(
+				type.getElementType(), scope));
 	}
 
 	@Override
 	public FunctionConversion functionConversion(FunctionType type) {
-		return new CommonFunctionConversion(type, typeFactory.pointerType(type));
+		return new CommonFunctionConversion(type, typeFactory.pointerType(type,
+				null));
 	}
 
 	private void checkQualifierConsistency(PointerType type1,

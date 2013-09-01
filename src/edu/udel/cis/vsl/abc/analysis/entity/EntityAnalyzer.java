@@ -83,6 +83,8 @@ public class EntityAnalyzer implements Analyzer {
 
 	Map<String, PragmaHandler> pragmaHandlerMap;
 
+	Scope rootScope;
+
 	// Private fields...
 
 	private Configuration configuration;
@@ -120,15 +122,16 @@ public class EntityAnalyzer implements Analyzer {
 		ASTNode root = ast.getRootNode();
 		Iterator<ASTNode> children = root.children();
 
+		this.rootScope = root.getScope();
 		try {
-			standardTypes.addToScope(root.getScope());
+			standardTypes.addToScope(rootScope);
 		} catch (UnsourcedException e) {
 			throw error(e, root);
 		}
 		while (children.hasNext()) {
 			processExternalDefinitions((ExternalDefinitionNode) children.next());
 		}
-		findTentativeDefinitions(root.getScope());
+		findTentativeDefinitions(rootScope);
 	}
 
 	// Package private methods...

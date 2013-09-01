@@ -40,6 +40,7 @@ public interface Type {
 		ATOMIC,
 		QUALIFIED,
 		PROCESS,
+		SCOPE,
 		HEAP
 	};
 
@@ -84,6 +85,29 @@ public interface Type {
 	/**
 	 * Is this type "compatible" with the given type? See C11 Sec. 6.2.7 for the
 	 * definition of "compatible".
+	 * 
+	 * Notion extended to deal with CIVL-C scope-restricted pointers. Two
+	 * pointers types: (P1) pointer to T1 in scope S1, and (P2) pointer to T2 in
+	 * scope S2 are compatible iff:
+	 * 
+	 * <ol>
+	 * <li>pointer-to-T1 and pointer-to-T2 are compatible in the C sense, and</li>
+	 * <li>one of the following holds:
+	 * <ol>
+	 * <li>at least one of S1, S2 is null</li>
+	 * <li>S1 and S2 are non null and one of the two scopes is contained in the
+	 * other</li>
+	 * </ol>
+	 * </li>
+	 * </ol>
+	 * 
+	 * Note that the above does not guarantee "assignment compatibility". For an
+	 * assignment "lhs=rhs" where lhs has type P1 and rhs has type P2, we must
+	 * have in addition one of the following: (1) S1 is null; or (2) S1 is
+	 * non-null and is the root scope; or (3) S1 is a non-null, non-root scope
+	 * and S2 is a non-null scope contained in S1. In such cases, there will be
+	 * an automatic conversion. In all other cases, an explicit cast is
+	 * required.
 	 * 
 	 * @param type
 	 *            the type to compare with this one for compatibility

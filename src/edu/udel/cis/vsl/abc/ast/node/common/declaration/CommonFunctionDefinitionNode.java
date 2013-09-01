@@ -15,19 +15,21 @@ public class CommonFunctionDefinitionNode extends CommonFunctionDeclarationNode
 
 	public CommonFunctionDefinitionNode(Source source,
 			IdentifierNode identifier, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract, CompoundStatementNode statement) {
-		super(source, identifier, type, contract);
+			SequenceNode<ContractNode> contract,
+			SequenceNode<IdentifierNode> scopeList,
+			CompoundStatementNode statement) {
+		super(source, identifier, type, contract, scopeList);
 		addChild(statement);
 	}
 
 	@Override
 	public CompoundStatementNode getBody() {
-		return (CompoundStatementNode) child(3);
+		return (CompoundStatementNode) child(4);
 	}
 
 	@Override
 	public void setBody(CompoundStatementNode statement) {
-		setChild(3, statement);
+		setChild(4, statement);
 	}
 
 	@Override
@@ -40,7 +42,7 @@ public class CommonFunctionDefinitionNode extends CommonFunctionDeclarationNode
 		CommonFunctionDefinitionNode result = new CommonFunctionDefinitionNode(
 				getSource(), duplicate(getIdentifier()),
 				duplicate(getTypeNode()), duplicate(getContract()),
-				duplicate(getBody()));
+				duplicate(getScopeList()), duplicate(getBody()));
 
 		result.setInlineFunctionSpecifier(hasInlineFunctionSpecifier());
 		result.setNoreturnFunctionSpecifier(hasNoreturnFunctionSpecifier());

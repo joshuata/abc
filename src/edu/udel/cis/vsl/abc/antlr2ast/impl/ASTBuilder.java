@@ -260,6 +260,8 @@ public class ASTBuilder {
 	static final int RESULT = CivlCParser.RESULT;
 	static final int AT = CivlCParser.AT;
 	static final int COLLECTIVE = CivlCParser.COLLECTIVE;
+	static final int SCOPE = CivlCParser.SCOPE;
+	static final int SCOPE_NAME = CivlCParser.SCOPE_NAME;
 
 	// Instance fields...
 
@@ -369,6 +371,28 @@ public class ASTBuilder {
 		Source source = sourceFactory.newSource(token);
 
 		return nodeFactory.newIdentifierNode(source, token.getText());
+	}
+
+	private SequenceNode<IdentifierNode> translateIdentifierList(String name,
+			CommonTree list) {
+		int kind = list.getType();
+		if (kind == ABSENT) {
+			return null;
+		} else {
+			int numChildren = list.getChildCount();
+			LinkedList<IdentifierNode> nodeList = new LinkedList<IdentifierNode>();
+			SequenceNode<IdentifierNode> result;
+			Source source = newSource(list);
+
+			for (int i = 0; i < numChildren; i++) {
+				CommonTree child = (CommonTree) list.getChild(i);
+				IdentifierNode identifierNode = translateIdentifier(child);
+
+				nodeList.add(identifierNode);
+			}
+			result = nodeFactory.newSequenceNode(source, name, nodeList);
+			return result;
+		}
 	}
 
 	private IntegerConstantNode translateIntegerConstant(Source source,
@@ -526,6 +550,8 @@ public class ASTBuilder {
 		ExpressionNode functionNode = translateExpression(functionTree, scope);
 		int numArgs = argumentListTree.getChildCount();
 		List<ExpressionNode> argumentList = new LinkedList<ExpressionNode>();
+		SequenceNode<IdentifierNode> scopeList = translateIdentifierList(
+				"scope list", (CommonTree) callTree.getChild(4));
 
 		for (int i = 0; i < numArgs; i++) {
 			CommonTree argumentTree = (CommonTree) argumentListTree.getChild(i);
@@ -535,7 +561,7 @@ public class ASTBuilder {
 			argumentList.add(argumentNode);
 		}
 		return nodeFactory.newFunctionCallNode(source, functionNode,
-				argumentList);
+				argumentList, scopeList);
 	}
 
 	/**
@@ -761,6 +787,18 @@ public class ASTBuilder {
 		return typeNode;
 	}
 
+	private VariableDeclarationNode translateScopeDeclaration(
+			CommonTree scopeDeclTree, SimpleScope scope) throws SyntaxException {
+		CommonTree identifierTree = (CommonTree) scopeDeclTree.getChild(0);
+		IdentifierNode identifierNode = translateIdentifier(identifierTree);
+		Source source = newSource(scopeDeclTree);
+		TypeNode scopeType = nodeFactory.newScopeTypeNode(source);
+		VariableDeclarationNode result = nodeFactory
+				.newVariableDeclarationNode(source, identifierNode, scopeType);
+
+		return result;
+	}
+
 	/**
 	 * Returns a list consisting of the following kinds of external definitions:
 	 * 
@@ -786,11 +824,14 @@ public class ASTBuilder {
 		CommonTree initDeclaratorList = (CommonTree) declarationTree
 				.getChild(1);
 		CommonTree contractTree = (CommonTree) declarationTree.getChild(2);
+		CommonTree scopeListTree = (CommonTree) declarationTree.getChild(3);
 		SequenceNode<ContractNode> contract = getContract(contractTree, scope);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(declarationSpecifiers);
 		int numDeclarators = initDeclaratorList.getChildCount();
 		ArrayList<ExternalDefinitionNode> definitionList = new ArrayList<ExternalDefinitionNode>();
 		Source source = newSource(declarationTree);
+		SequenceNode<IdentifierNode> scopeList = translateIdentifierList(
+				"scope list", scopeListTree);
 
 		if (numDeclarators == 0) {
 			TypeNode baseType;
@@ -841,7 +882,7 @@ public class ASTBuilder {
 				String name;
 
 				definition = nodeFactory.newTypedefDeclarationNode(source,
-						data.identifier, data.type);
+						data.identifier, data.type, scopeList);
 				if (data.identifier == null)
 					throw error("Missing identifier in typedef", declaratorTree);
 				name = data.identifier.name();
@@ -849,7 +890,8 @@ public class ASTBuilder {
 			} else if (isFunction(data.type, scope)) {
 				FunctionDeclarationNode declaration = nodeFactory
 						.newFunctionDeclarationNode(source, data.identifier,
-								(FunctionTypeNode) data.type, contract);
+								(FunctionTypeNode) data.type, contract,
+								scopeList);
 
 				setFunctionSpecifiers(declaration, analysis);
 				setStorageSpecifiers(declaration, analysis, scope);
@@ -906,11 +948,19 @@ public class ASTBuilder {
 					newSource(analysis.specifierListNode),
 					analysis.basicTypeKind);
 			break;
-		case TYPEDEF_NAME:
-			result = nodeFactory
-					.newTypedefNameNode(translateIdentifier((CommonTree) analysis.typeSpecifierNode
-							.getChild(0)));
+		case TYPEDEF_NAME: {
+			CommonTree typedefNameTree = (CommonTree) analysis.typeSpecifierNode;
+			CommonTree identifierTree = (CommonTree) typedefNameTree
+					.getChild(0);
+			CommonTree scopeListTree = (CommonTree) typedefNameTree.getChild(1);
+			IdentifierNode identifierNode = translateIdentifier(identifierTree);
+			SequenceNode<IdentifierNode> scopeListNode = translateIdentifierList(
+					"scope list", scopeListTree);
+
+			result = nodeFactory.newTypedefNameNode(identifierNode,
+					scopeListNode);
 			break;
+		}
 		case STRUCTURE_OR_UNION:
 			result = translateStructOrUnionType(analysis.typeSpecifierNode,
 					scope);
@@ -991,10 +1041,6 @@ public class ASTBuilder {
 		int numDeclarators = structDeclaratorList.getChildCount();
 		List<FieldDeclarationNode> result = new LinkedList<FieldDeclarationNode>();
 		Source source = newSource(declarationTree);
-
-		// TODO: error if shared specifier like "int x,y;"
-		// need to move baseType computation into loop,
-		// just as in ordinary variable declarations.
 
 		if (numDeclarators == 0) {
 			// this can happen if the specifier is an anonymous struct or union
@@ -1370,9 +1416,13 @@ public class ASTBuilder {
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree starNode = (CommonTree) pointerTree.getChild(i);
 			CommonTree qualifiers = (CommonTree) starNode.getChild(0);
+			CommonTree scopeModifierTree = (CommonTree) starNode.getChild(1);
+			IdentifierNode scopeModifierNode = scopeModifierTree.getType() == ABSENT ? null
+					: translateIdentifier(scopeModifierTree);
 
-			source = sourceFactory.join(source, newSource(pointerTree));
-			type = nodeFactory.newPointerTypeNode(source, type);
+			source = sourceFactory.join(source, newSource(starNode));
+			type = nodeFactory.newPointerTypeNode(source, type,
+					scopeModifierNode);
 			applyQualifiers(qualifiers, type);
 		}
 		return type;
@@ -1885,6 +1935,8 @@ public class ASTBuilder {
 				for (ExternalDefinitionNode declaration : translateDeclaration(
 						childTree, newScope))
 					items.add((BlockItemNode) declaration);
+			} else if (kind == SCOPE) {
+				items.add(translateScopeDeclaration(childTree, newScope));
 			} else if (kind == STATICASSERT) {
 				items.add(translateStaticAssertion(childTree, newScope));
 			} else if (kind == FUNCTION_DEFINITION) {
@@ -1954,6 +2006,10 @@ public class ASTBuilder {
 				.getChild(3);
 		CommonTree contractTree = (CommonTree) functionDefinitionTree
 				.getChild(4);
+		CommonTree scopeListTree = (CommonTree) functionDefinitionTree
+				.getChild(5);
+		SequenceNode<IdentifierNode> scopeListNode = translateIdentifierList(
+				"scope list", scopeListTree);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(specifiers);
 		TypeNode baseType = newSpecifierType(analysis, newScope);
 		DeclaratorData data = processDeclarator(declarator, baseType, newScope);
@@ -2035,7 +2091,8 @@ public class ASTBuilder {
 		body = translateCompoundStatement(compoundStatementTree, newScope);
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
-				functionType, getContract(contractTree, newScope), body);
+				functionType, getContract(contractTree, newScope),
+				scopeListNode, body);
 		return result;
 	}
 
@@ -2110,6 +2167,9 @@ public class ASTBuilder {
 
 			if (definitionType == DECLARATION)
 				definitions.addAll(translateDeclaration(definitionTree, scope));
+			else if (definitionType == SCOPE)
+				definitions
+						.add(translateScopeDeclaration(definitionTree, scope));
 			else if (definitionType == FUNCTION_DEFINITION)
 				definitions.add(translateFunctionDefinition(definitionTree,
 						scope));

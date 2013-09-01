@@ -134,6 +134,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.type.CommonBasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonEnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonPointerTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.common.type.CommonScopeTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonStructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonTypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonVoidTypeNode;
@@ -238,8 +239,8 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public PointerTypeNode newPointerTypeNode(Source source,
-			TypeNode referencedType) {
-		return new CommonPointerTypeNode(source, referencedType);
+			TypeNode referencedType, IdentifierNode scopeModifier) {
+		return new CommonPointerTypeNode(source, referencedType, scopeModifier);
 	}
 
 	@Override
@@ -259,8 +260,14 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public TypedefNameNode newTypedefNameNode(IdentifierNode name) {
-		return new CommonTypedefNameNode(name.getSource(), name);
+	public TypeNode newScopeTypeNode(Source source) {
+		return new CommonScopeTypeNode(source);
+	}
+
+	@Override
+	public TypedefNameNode newTypedefNameNode(IdentifierNode name,
+			SequenceNode<IdentifierNode> scopeList) {
+		return new CommonTypedefNameNode(name.getSource(), name, scopeList);
 	}
 
 	@Override
@@ -323,12 +330,13 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public FunctionCallNode newFunctionCallNode(Source source,
-			ExpressionNode function, List<ExpressionNode> arguments) {
+			ExpressionNode function, List<ExpressionNode> arguments,
+			SequenceNode<IdentifierNode> scopeList) {
 		SequenceNode<ExpressionNode> argumentSequenceNode = newSequenceNode(
 				source, "ActualParameterList", arguments);
 
 		return new CommonFunctionCallNode(source, function,
-				argumentSequenceNode);
+				argumentSequenceNode, scopeList);
 	}
 
 	@Override
@@ -370,8 +378,10 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public FunctionDeclarationNode newFunctionDeclarationNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract) {
-		return new CommonFunctionDeclarationNode(source, name, type, contract);
+			SequenceNode<ContractNode> contract,
+			SequenceNode<IdentifierNode> scopeList) {
+		return new CommonFunctionDeclarationNode(source, name, type, contract,
+				scopeList);
 	}
 
 	@Override
@@ -423,8 +433,9 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public TypedefDeclarationNode newTypedefDeclarationNode(Source source,
-			IdentifierNode name, TypeNode type) {
-		return new CommonTypedefDeclarationNode(source, name, type);
+			IdentifierNode name, TypeNode type,
+			SequenceNode<IdentifierNode> scopeList) {
+		return new CommonTypedefDeclarationNode(source, name, type, scopeList);
 	}
 
 	@Override
@@ -561,9 +572,10 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public FunctionDefinitionNode newFunctionDefinitionNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract, CompoundStatementNode body) {
+			SequenceNode<ContractNode> contract,
+			SequenceNode<IdentifierNode> scopeList, CompoundStatementNode body) {
 		return new CommonFunctionDefinitionNode(source, name, type, contract,
-				body);
+				scopeList, body);
 	}
 
 	@Override

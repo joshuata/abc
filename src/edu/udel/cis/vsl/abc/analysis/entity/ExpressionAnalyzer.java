@@ -10,6 +10,8 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -147,9 +149,10 @@ public class ExpressionAnalyzer {
 	 * @return type of assignment
 	 * @throws UnsourcedException
 	 *             if the types are not compatible
+	 * @throws SyntaxException
 	 */
 	UnqualifiedObjectType processAssignment(ObjectType lhsType,
-			ExpressionNode rhs) throws UnsourcedException {
+			ExpressionNode rhs) throws UnsourcedException, SyntaxException {
 		UnqualifiedObjectType type = conversionFactory
 				.lvalueConversionType(lhsType);
 
@@ -568,10 +571,71 @@ public class ExpressionAnalyzer {
 
 	// Operators...
 
-	private void processADDRESSOF(OperatorNode node) {
-		ExpressionNode arg0 = node.getArgument(0);
+	/**
+	 * Given a left hand side expression, try to find the scope in which the
+	 * memory object refered to by that expression is stored.
+	 * 
+	 * @param node
+	 *            a LHS expression node
+	 * @return a non-null Scope, in the worst case, the root scope
+	 * @throws SyntaxException
+	 *             if node is not a LHS expression
+	 */
+	private Scope scopeOf(ExpressionNode node) throws SyntaxException {
+		Scope result;
 
-		node.setInitialType(typeFactory.pointerType(arg0.getType()));
+		if (node instanceof IdentifierExpressionNode) {
+			Variable variable = (Variable) ((IdentifierExpressionNode) node)
+					.getIdentifier().getEntity();
+
+			result = variable.getFirstDeclaration().getScope();
+		} else if (node instanceof OperatorNode) {
+			OperatorNode opNode = (OperatorNode) node;
+			Operator operator = opNode.getOperator();
+
+			switch (operator) {
+			case DEREFERENCE: {
+				PointerType pointerType = (PointerType) opNode.getArgument(0)
+						.getType();
+
+				result = pointerType.scope();
+				if (result == null)
+					result = entityAnalyzer.rootScope;
+			}
+			case SUBSCRIPT:
+				result = scopeOf(((OperatorNode) node).getArgument(0));
+				break;
+			default:
+				throw error("Illegal left-hand side expression", node);
+			}
+		} else if (node instanceof ArrowNode) {
+			// &(e->f) = &((*e).f)
+			ArrowNode arrowNode = (ArrowNode) node;
+			PointerType pointerType = (PointerType) arrowNode
+					.getStructurePointer().getType();
+
+			result = pointerType.scope();
+			if (result == null)
+				result = entityAnalyzer.rootScope;
+		} else if (node instanceof DotNode) { // &(e.f)
+			DotNode dotNode = (DotNode) node;
+			ExpressionNode expr = dotNode.getStructure();
+
+			result = scopeOf(expr);
+		} else if (node instanceof CompoundLiteralNode) {
+			result = node.getScope();
+		} else if (node instanceof StringLiteralNode) {
+			result = node.getScope();
+		} else
+			throw error("Illegal left-hand side expression", node);
+		return result;
+	}
+
+	private void processADDRESSOF(OperatorNode node) throws SyntaxException {
+		ExpressionNode arg0 = node.getArgument(0);
+		Scope scope = scopeOf(arg0);
+
+		node.setInitialType(typeFactory.pointerType(arg0.getType(), scope));
 	}
 
 	/**
@@ -623,6 +687,12 @@ public class ExpressionAnalyzer {
 	 */
 	private void processCOMMA(OperatorNode node) throws SyntaxException {
 		node.setInitialType(addStandardConversions(node.getArgument(1)));
+	}
+
+	private Scope join(Scope s1, Scope s2) {
+		if (s1 == null || s2 == null)
+			return entityAnalyzer.rootScope;
+		return entityAnalyzer.entityFactory.join(s1, s2);
 	}
 
 	/**
@@ -703,6 +773,9 @@ public class ExpressionAnalyzer {
 		} else if (type1 instanceof PointerType && type2 instanceof PointerType) {
 			PointerType p0 = (PointerType) type1;
 			PointerType p1 = (PointerType) type2;
+			Scope s0 = p0.scope();
+			Scope s1 = p1.scope();
+			Scope joinScope = join(s0, s1);
 			boolean atomicQ = false, constQ = false, volatileQ = false, restrictQ = false;
 			Type base0 = p0.referencedType();
 			Type base1 = p1.referencedType();
@@ -738,7 +811,7 @@ public class ExpressionAnalyzer {
 			else
 				throw error("Incompatible pointer types in conditional:\n"
 						+ type1 + "\n" + type2, node);
-			type = typeFactory.pointerType(type);
+			type = typeFactory.pointerType(type, joinScope);
 			if (atomicQ)
 				type = typeFactory.atomicType((PointerType) type);
 			type = typeFactory.qualify((ObjectType) type, constQ, volatileQ,
@@ -1298,12 +1371,13 @@ public class ExpressionAnalyzer {
 		return type instanceof ArithmeticType || type instanceof PointerType;
 	}
 
-	private void addArrayConversion(ExpressionNode node) {
+	private void addArrayConversion(ExpressionNode node) throws SyntaxException {
 		Type oldType = node.getConvertedType();
 
 		if (oldType instanceof ArrayType) {
-			Conversion conversion = conversionFactory
-					.arrayConversion((ArrayType) oldType);
+			Scope scope = scopeOf(node);
+			Conversion conversion = conversionFactory.arrayConversion(
+					(ArrayType) oldType, scope);
 
 			node.addConversion(conversion);
 		}
@@ -1340,8 +1414,10 @@ public class ExpressionAnalyzer {
 	 * @param node
 	 *            an expression node
 	 * @return the post-coversion type of the expression
+	 * @throws SyntaxException
 	 */
-	private Type addStandardConversions(ExpressionNode node) {
+	private Type addStandardConversions(ExpressionNode node)
+			throws SyntaxException {
 		addArrayConversion(node);
 		addFunctionConversion(node);
 		addLvalueConversion(node);
