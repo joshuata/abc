@@ -308,4 +308,23 @@ public interface Scope {
 	 */
 	void print(PrintStream out);
 
+	/**
+	 * Determines whether this scope is equal to or a descendant of the given
+	 * scope. This mean either this == that or the parent of this is a
+	 * descendant of that.
+	 * 
+	 * @param that
+	 *            another scope, not null
+	 * @return true iff this scope is a descendant (or equal to) that scope
+	 */
+	boolean isDescendantOf(Scope that);
+
+	/**
+	 * Returns first variable of type $scope delcared in this scope. This gives
+	 * a name to the scope.
+	 * 
+	 * @return first scope variable or null if there isn't one
+	 */
+	Variable getFirstScopeVariable();
+
 }

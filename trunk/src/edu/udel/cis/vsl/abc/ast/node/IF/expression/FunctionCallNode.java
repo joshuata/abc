@@ -1,5 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+
 public interface FunctionCallNode extends ExpressionNode {
 
 	/**
@@ -29,4 +32,16 @@ public interface FunctionCallNode extends ExpressionNode {
 
 	@Override
 	FunctionCallNode copy();
+
+	/**
+	 * Returns the actual scope parameter names used when instantiating
+	 * a scope-generic functions, as in 
+	 * 
+	 * <code>
+	 * f<s1,s2>(...)
+	 * </code>
+	 * @return
+	 */
+	SequenceNode<IdentifierNode> getScopeList();
+
 }

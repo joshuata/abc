@@ -133,6 +133,7 @@ OUTPUT		:	'$output';
 REQUIRES	:	'$requires';
 RESULT		:	'$result';
 SELF		:	'$self';
+SCOPE		:	'$scope';
 SPAWN		:	'$spawn';
 TRUE		:	'$true';
 WAIT		:	'$wait';

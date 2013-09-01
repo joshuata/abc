@@ -176,7 +176,8 @@ public interface NodeFactory {
 
 	AtomicTypeNode newAtomicTypeNode(Source source, TypeNode baseType);
 
-	PointerTypeNode newPointerTypeNode(Source source, TypeNode referencedType);
+	PointerTypeNode newPointerTypeNode(Source source, TypeNode referencedType,
+			IdentifierNode scopeModifier);
 
 	StructureOrUnionTypeNode newStructOrUnionTypeNode(Source source,
 			boolean isStruct, IdentifierNode tag,
@@ -186,13 +187,16 @@ public interface NodeFactory {
 			SequenceNode<VariableDeclarationNode> formals,
 			boolean hasIdentifierList);
 
+	TypeNode newScopeTypeNode(Source source);
+
 	/**
 	 * Source is same as that of the identifier name.
 	 * 
 	 * @param name
 	 * @return
 	 */
-	TypedefNameNode newTypedefNameNode(IdentifierNode name);
+	TypedefNameNode newTypedefNameNode(IdentifierNode name,
+			SequenceNode<IdentifierNode> scopeList);
 
 	// Expressions...
 
@@ -282,7 +286,8 @@ public interface NodeFactory {
 	CastNode newCastNode(Source source, TypeNode type, ExpressionNode argument);
 
 	FunctionCallNode newFunctionCallNode(Source source,
-			ExpressionNode function, List<ExpressionNode> arguments);
+			ExpressionNode function, List<ExpressionNode> arguments,
+			SequenceNode<IdentifierNode> scopeList);
 
 	DotNode newDotNode(Source source, ExpressionNode structure,
 			IdentifierNode fieldName);
@@ -368,7 +373,8 @@ public interface NodeFactory {
 	 */
 	FunctionDeclarationNode newFunctionDeclarationNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract);
+			SequenceNode<ContractNode> contract,
+			SequenceNode<IdentifierNode> scopeList);
 
 	EnumeratorDeclarationNode newEnumeratorDeclarationNode(Source source,
 			IdentifierNode name, ExpressionNode value);
@@ -389,7 +395,8 @@ public interface NodeFactory {
 			StatementNode statement);
 
 	TypedefDeclarationNode newTypedefDeclarationNode(Source source,
-			IdentifierNode name, TypeNode type);
+			IdentifierNode name, TypeNode type,
+			SequenceNode<IdentifierNode> scopeList);
 
 	CompoundInitializerNode newCompoundInitializerNode(Source source,
 			List<PairNode<DesignationNode, InitializerNode>> initList);
@@ -513,7 +520,8 @@ public interface NodeFactory {
 
 	FunctionDefinitionNode newFunctionDefinitionNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract, CompoundStatementNode body);
+			SequenceNode<ContractNode> contract,
+			SequenceNode<IdentifierNode> scopeList, CompoundStatementNode body);
 
 	ASTNode newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions);

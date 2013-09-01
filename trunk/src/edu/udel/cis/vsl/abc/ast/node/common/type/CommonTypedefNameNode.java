@@ -3,14 +3,16 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonTypedefNameNode extends CommonTypeNode implements
 		TypedefNameNode {
 
-	public CommonTypedefNameNode(Source source, IdentifierNode name) {
-		super(source, TypeNodeKind.TYPEDEF_NAME, name);
+	public CommonTypedefNameNode(Source source, IdentifierNode name,
+			SequenceNode<IdentifierNode> scopeList) {
+		super(source, TypeNodeKind.TYPEDEF_NAME, name, scopeList);
 	}
 
 	@Override
@@ -35,10 +37,16 @@ public class CommonTypedefNameNode extends CommonTypeNode implements
 	@Override
 	public TypedefNameNode copy() {
 		CommonTypedefNameNode result = new CommonTypedefNameNode(getSource(),
-				duplicate(getName()));
+				duplicate(getName()), duplicate(getScopeList()));
 
 		result.copyData(result);
 		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SequenceNode<IdentifierNode> getScopeList() {
+		return (SequenceNode<IdentifierNode>) child(1);
 	}
 
 }

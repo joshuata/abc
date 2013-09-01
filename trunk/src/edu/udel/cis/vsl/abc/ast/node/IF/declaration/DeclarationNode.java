@@ -18,6 +18,22 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
  * 
  * Every Declaration occurs in exactly one Scope.
  * 
+ * TODO: some declarations can have any number of scope parameters
+ * associated to them, e.g.:
+ * 
+ * <pre>
+ * <s1,s2,s3> double *<s2> f(double *<s1> x, double *<s3> y);
+ * </pre>
+ * 
+ * When f is called:
+ * 
+ * <pre>
+ * f<t1,t2,t3>(a,b)
+ * </pre>
+ * 
+ * Kinds of declarations that can have scope parameter lists:
+ * typedefs, functions.
+ * 
  * @author siegel
  * 
  */

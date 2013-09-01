@@ -36,4 +36,15 @@ public interface EntityFactory {
 
 	PragmaHandler newPragmaHandler(String name);
 
+	/**
+	 * Computes the join of the two scopes in the scope tree and returns it.
+	 * 
+	 * @param s1
+	 *            non-null scope
+	 * @param s2
+	 *            non-null scope
+	 * @return the youngest common ancestor of s1 and s2
+	 */
+	Scope join(Scope s1, Scope s2);
+
 }

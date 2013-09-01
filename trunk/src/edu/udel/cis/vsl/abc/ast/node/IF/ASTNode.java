@@ -196,7 +196,7 @@ public interface ASTNode {
 	 * will be cloned. The cloning does not copy analysis or attribute
 	 * information.
 	 * 
-	 * @return
+	 * @return deep copy of this node
 	 */
 	ASTNode copy();
 

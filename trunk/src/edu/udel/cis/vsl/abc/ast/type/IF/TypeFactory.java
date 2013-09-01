@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -177,9 +178,11 @@ public interface TypeFactory {
 	 * can return previously returned instances.
 	 * 
 	 * @param referencedType
+	 * @param scope
+	 *            scope restriction or null
 	 * @return a pointer type as specified
 	 */
-	PointerType pointerType(Type referencedType);
+	PointerType pointerType(Type referencedType, Scope scope);
 
 	/**
 	 * The atomic type associated to a base type. This type may be denoted
@@ -574,6 +577,9 @@ public interface TypeFactory {
 
 	/** Returns the heap type. */
 	ObjectType heapType();
+
+	/** Returns the scope type */
+	ObjectType scopeType();
 
 	/************************* Conversions *****************************/
 

@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
@@ -12,8 +13,9 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 		FunctionCallNode {
 
 	public CommonFunctionCallNode(Source source, ExpressionNode function,
-			SequenceNode<ExpressionNode> arguments) {
-		super(source, function, arguments);
+			SequenceNode<ExpressionNode> arguments,
+			SequenceNode<IdentifierNode> scopeList) {
+		super(source, function, arguments, scopeList);
 	}
 
 	@Override
@@ -55,9 +57,18 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 	public FunctionCallNode copy() {
 		@SuppressWarnings("unchecked")
 		SequenceNode<ExpressionNode> arguments = (SequenceNode<ExpressionNode>) child(1);
+		@SuppressWarnings("unchecked")
+		SequenceNode<IdentifierNode> scopeList = (SequenceNode<IdentifierNode>) child(2);
 
 		return new CommonFunctionCallNode(getSource(),
-				duplicate(getFunction()), duplicate(arguments));
+				duplicate(getFunction()), duplicate(arguments),
+				duplicate(scopeList));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public SequenceNode<IdentifierNode> getScopeList() {
+		return (SequenceNode<IdentifierNode>) child(2);
 	}
 
 }

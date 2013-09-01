@@ -77,4 +77,14 @@ public class CommonEntityFactory implements EntityFactory {
 		return new CommonPragmaHandler(name);
 	}
 
+	@Override
+	public Scope join(Scope scope1, Scope scope2) {
+		for (Scope scope1a = scope1; scope1a != null; scope1a = scope1a
+				.getParentScope())
+			for (Scope scope2a = scope2; scope2a != null; scope2a = scope2a
+					.getParentScope())
+				if (scope1a.equals(scope2a))
+					return scope2a;
+		return null;
+	}
 }

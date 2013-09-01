@@ -11,6 +11,8 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -291,10 +293,27 @@ public class SideEffectRemover implements Transformer {
 			StandardBasicType basicType = (StandardBasicType) type;
 			return factory.newBasicTypeNode(source,
 					basicType.getBasicTypeKind());
-		case POINTER:
+		case POINTER: {
 			PointerType pointerType = (PointerType) type;
+			Scope oldScope = pointerType.scope();
+			IdentifierNode identifierNode;
+
+			if (oldScope == null)
+				identifierNode = null;
+			else {
+				Variable scopeVariable = oldScope.getFirstScopeVariable();
+				String name;
+
+				if (scopeVariable == null)
+					name = "_scope_" + oldScope.getId();
+				else
+					name = scopeVariable.getName();
+				identifierNode = factory.newIdentifierNode(source, name);
+			}
 			return factory.newPointerTypeNode(source,
-					typeNode(source, pointerType.referencedType()));
+					typeNode(source, pointerType.referencedType()),
+					identifierNode);
+		}
 		case VOID:
 			return factory.newVoidTypeNode(source);
 		case ENUMERATION:
@@ -475,7 +494,9 @@ public class SideEffectRemover implements Transformer {
 					blockItems.add(factory.newExpressionStatementNode(factory
 							.newFunctionCallNode(statement.getSource(),
 									((FunctionCallNode) expression)
-											.getFunction(), arguments)));
+											.getFunction(), arguments,
+									((FunctionCallNode) expression)
+											.getScopeList())));
 					blockItems.addAll(after);
 					result = factory.newCompoundStatementNode(
 							statement.getSource(), blockItems);
@@ -515,7 +536,8 @@ public class SideEffectRemover implements Transformer {
 									statement.getSource(),
 									factory.newFunctionCallNode(
 											statement.getSource(),
-											call.getFunction(), arguments))));
+											call.getFunction(), arguments,
+											call.getScopeList()))));
 					blockItems.addAll(after);
 					result = factory.newCompoundStatementNode(
 							statement.getSource(), blockItems);
@@ -974,9 +996,22 @@ public class SideEffectRemover implements Transformer {
 			functionEntity = ((IdentifierExpressionNode) functionExpression)
 					.getIdentifier().getEntity();
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
+
+			// siegel: another possible way is to clone, but
+			// may not have as much info. as type:
+			//
+			// FunctionDeclarationNode declNode = (FunctionDeclarationNode)
+			// functionEntity
+			// .getFirstDeclaration();
+			// TypeNode oldReturnTypeNode =
+			// declNode.getTypeNode().getReturnType();
+			//
+			// returnTypeNode = oldReturnTypeNode.copy();
+
 			returnTypeNode = typeNode(functionEntity.getFirstDeclaration()
 					.getSource(), ((Function) functionEntity).getType()
 					.getReturnType());
+
 			tmpVariable = factory.newVariableDeclarationNode(expression
 					.getSource(), factory.newIdentifierNode(
 					expression.getSource(), tempVariablePrefix

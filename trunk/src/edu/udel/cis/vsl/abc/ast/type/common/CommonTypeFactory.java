@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -61,6 +62,8 @@ public class CommonTypeFactory implements TypeFactory {
 	private ObjectType processType = null;
 
 	private ObjectType heapType = null;
+
+	private ObjectType scopeType = null;
 
 	private UnsignedIntegerType size_t = null, char16_t = null,
 			char32_t = null;
@@ -213,8 +216,9 @@ public class CommonTypeFactory implements TypeFactory {
 	}
 
 	@Override
-	public PointerType pointerType(Type referencedType) {
-		return (PointerType) canonicalize(new CommonPointerType(referencedType));
+	public PointerType pointerType(Type referencedType, Scope scope) {
+		return (PointerType) canonicalize(new CommonPointerType(referencedType,
+				scope));
 	}
 
 	@Override
@@ -834,6 +838,15 @@ public class CommonTypeFactory implements TypeFactory {
 			insert(heapType);
 		}
 		return heapType;
+	}
+
+	@Override
+	public ObjectType scopeType() {
+		if (scopeType == null) {
+			scopeType = new CommonScopeType();
+			insert(scopeType);
+		}
+		return scopeType;
 	}
 
 }

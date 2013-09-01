@@ -16,6 +16,8 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -69,6 +71,8 @@ public class CommonScope implements Scope {
 	private ArrayList<Label> labelList = new ArrayList<Label>();
 
 	private int scopeDepth;
+
+	private Variable firstScopeVariable = null;
 
 	public CommonScope(ScopeKind kind, CommonScope parent, ASTNode root) {
 		this.scopeKind = kind;
@@ -140,6 +144,12 @@ public class CommonScope implements Scope {
 		switch (kind) {
 		case VARIABLE:
 			variableList.add((Variable) entity);
+			if (firstScopeVariable == null) {
+				Type type = entity.getType();
+
+				if (type != null && type.kind() == TypeKind.SCOPE)
+					firstScopeVariable = (Variable) entity;
+			}
 			break;
 		case FUNCTION:
 			functionList.add((Function) entity);
@@ -334,8 +344,21 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
+	public boolean isDescendantOf(Scope that) {
+		for (Scope scope = this; scope != null; scope = scope.getParentScope())
+			if (scope == that)
+				return true;
+		return false;
+	}
+
+	@Override
 	public void print(PrintStream out) {
 		print("", out);
+	}
+
+	@Override
+	public Variable getFirstScopeVariable() {
+		return firstScopeVariable;
 	}
 
 }

@@ -409,7 +409,9 @@ public class TypeAnalyzer {
 				&& ((QualifiedObjectType) elementType).getBaseType().kind() != TypeKind.POINTER)
 			throw error("Use of restrict qualifier with non-pointer type", node);
 		if (isParameter) {
-			PointerType pointerType = typeFactory.pointerType(elementType);
+			// no scope restriction on pointer given, so use null...
+			PointerType pointerType = typeFactory
+					.pointerType(elementType, null);
 			UnqualifiedObjectType unqualifiedType = (node.hasAtomicInBrackets() ? typeFactory
 					.atomicType(pointerType) : pointerType);
 
@@ -460,9 +462,18 @@ public class TypeAnalyzer {
 			throws SyntaxException {
 		TypeNode referencedTypeNode = node.referencedType();
 		Type referencedType = processTypeNode(referencedTypeNode);
-		UnqualifiedObjectType unqualifiedType = typeFactory
-				.pointerType(referencedType);
+		IdentifierNode scopeModifier = node.scopeModifier();
+		Scope pointerScope;
+		UnqualifiedObjectType unqualifiedType;
 
+		if (scopeModifier == null)
+			pointerScope = null;
+		else {
+			Variable scopeVariable = (Variable) scopeModifier.getEntity();
+
+			pointerScope = scopeVariable.getFirstDeclaration().getScope();
+		}
+		unqualifiedType = typeFactory.pointerType(referencedType, pointerScope);
 		if (node.isAtomicQualified())
 			unqualifiedType = typeFactory.atomicType(unqualifiedType);
 		return typeFactory.qualify(unqualifiedType, node.isConstQualified(),
@@ -584,7 +595,7 @@ public class TypeAnalyzer {
 					parameterTypes, hasVariableArgs);
 		}
 		if (isParameter)
-			result = typeFactory.pointerType(result);
+			result = typeFactory.pointerType(result, null);
 		return result;
 	}
 
