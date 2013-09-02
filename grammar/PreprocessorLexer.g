@@ -119,6 +119,8 @@ THREADLOCAL	:	'_Thread_local';
 
 /* Additional keywords and symbols used in CIVL-C */
 
+// be sure to add these to PreprocessorParser.g too!
+
 ASSERT		:	'$assert';
 ASSUME		:	'$assume';
 AT		:	'@';
