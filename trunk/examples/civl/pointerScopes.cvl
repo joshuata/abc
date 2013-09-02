@@ -1,0 +1,12 @@
+
+$scope root;
+double x;
+
+void main() {
+  $scope s1;
+  double y;
+  double *<s1> p;
+  
+  p = &y;
+
+}

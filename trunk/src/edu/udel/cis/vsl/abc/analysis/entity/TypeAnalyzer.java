@@ -127,6 +127,9 @@ public class TypeAnalyzer {
 		case TYPEDEF_NAME:
 			type = processTypedefName((TypedefNameNode) typeNode);
 			break;
+		case SCOPE:
+			type = typeFactory.scopeType();
+			break;
 		// case PROCESS:
 		// type = typeFactory.processType();
 		// break;
@@ -458,6 +461,27 @@ public class TypeAnalyzer {
 		return result;
 	}
 
+	private Variable processScopeModifier(IdentifierNode identifierNode)
+			throws SyntaxException {
+		String name = identifierNode.name();
+		OrdinaryEntity entity = identifierNode.getScope()
+				.getLexicalOrdinaryEntity(name);
+		EntityKind kind;
+
+		if (entity == null)
+			throw error("Undeclared identifier " + name, identifierNode);
+		kind = entity.getEntityKind();
+		switch (kind) {
+		case VARIABLE:
+			break;
+		default:
+			throw error("Use of " + kind + " " + name + " as scope name",
+					identifierNode);
+		}
+		identifierNode.setEntity(entity);
+		return (Variable) entity;
+	}
+
 	private Type processPointerType(PointerTypeNode node)
 			throws SyntaxException {
 		TypeNode referencedTypeNode = node.referencedType();
@@ -469,7 +493,7 @@ public class TypeAnalyzer {
 		if (scopeModifier == null)
 			pointerScope = null;
 		else {
-			Variable scopeVariable = (Variable) scopeModifier.getEntity();
+			Variable scopeVariable = processScopeModifier(scopeModifier);
 
 			pointerScope = scopeVariable.getFirstDeclaration().getScope();
 		}

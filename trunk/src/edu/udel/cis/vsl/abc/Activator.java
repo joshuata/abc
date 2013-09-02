@@ -367,8 +367,7 @@ public class Activator {
 	 * @throws IOException
 	 *             if file cannot be read
 	 */
-	public Program showTranslation(PrintStream out)
-			throws PreprocessorException, ParseException, SyntaxException,
+	public Program showTranslation(PrintStream out) throws ABCException,
 			IOException {
 		AST ast;
 		CParser parser;

@@ -8,10 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-
 public class CIVLTranslationTest {
 
 	private File[] systemIncludes, userIncludes;
@@ -30,8 +26,7 @@ public class CIVLTranslationTest {
 	public void tearDown() throws Exception {
 	}
 
-	private void check(String filenameRoot) throws PreprocessorException,
-			ParseException, SyntaxException, IOException {
+	private void check(String filenameRoot) throws ABCException, IOException {
 		Activator a;
 
 		this.systemIncludes = new File[0];
@@ -42,33 +37,32 @@ public class CIVLTranslationTest {
 	}
 
 	@Test
-	public void spawn() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void spawn() throws ABCException, IOException {
 		check("spawn");
 	}
 
 	@Test
-	public void choose() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void choose() throws ABCException, IOException {
 		check("choose");
 	}
-	
+
 	@Test
-	public void duffs() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void duffs() throws ABCException, IOException {
 		check("duffs");
 	}
 
 	@Test
-	public void sideEffects() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void sideEffects() throws ABCException, IOException {
 		check("sideEffects");
 	}
 
 	@Test
-	public void malloc() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void malloc() throws ABCException, IOException {
 		check("malloc");
 	}
 
+	@Test
+	public void pointerScopes() throws ABCException, IOException {
+		check("pointerScopes");
+	}
 }

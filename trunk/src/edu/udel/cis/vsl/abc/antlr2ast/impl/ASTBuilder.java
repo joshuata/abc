@@ -1418,7 +1418,8 @@ public class ASTBuilder {
 			CommonTree qualifiers = (CommonTree) starNode.getChild(0);
 			CommonTree scopeModifierTree = (CommonTree) starNode.getChild(1);
 			IdentifierNode scopeModifierNode = scopeModifierTree.getType() == ABSENT ? null
-					: translateIdentifier(scopeModifierTree);
+					: translateIdentifier((CommonTree) scopeModifierTree
+							.getChild(0));
 
 			source = sourceFactory.join(source, newSource(starNode));
 			type = nodeFactory.newPointerTypeNode(source, type,

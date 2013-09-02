@@ -214,8 +214,7 @@ public class ABC {
 	// add -D support. Need to create a token with "source" the command line.
 	// may treat command line as (virtual) file called "commandline"?
 
-	public static void main(String[] args) throws PreprocessorException,
-			ParseException, SyntaxException, IOException {
+	public static void main(String[] args) throws ABCException, IOException {
 		Config config;
 
 		System.out.println("ABC v" + version + " of " + date

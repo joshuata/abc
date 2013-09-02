@@ -8,10 +8,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-
 public class CTranslationTest {
 
 	private File[] systemIncludes, userIncludes;
@@ -30,8 +26,7 @@ public class CTranslationTest {
 	public void tearDown() throws Exception {
 	}
 
-	private void check(String filenameRoot) throws PreprocessorException,
-			ParseException, SyntaxException, IOException {
+	private void check(String filenameRoot) throws ABCException, IOException {
 		Activator a;
 
 		this.systemIncludes = new File[0];
@@ -42,26 +37,22 @@ public class CTranslationTest {
 	}
 
 	@Test
-	public void adder_seq() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void adder_seq() throws ABCException, IOException {
 		check("adder_seq");
 	}
 
 	@Test
-	public void useNull() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void useNull() throws ABCException, IOException {
 		check("parse/useNull");
 	}
 
 	@Test
-	public void pointer1() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void pointer1() throws ABCException, IOException {
 		check("parse/pointer1");
 	}
 
 	@Test
-	public void pointer2() throws PreprocessorException, ParseException,
-			SyntaxException, IOException {
+	public void pointer2() throws ABCException, IOException {
 		check("parse/pointer2");
 	}
 }
