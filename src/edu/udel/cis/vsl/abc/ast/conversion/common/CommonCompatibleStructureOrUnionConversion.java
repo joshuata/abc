@@ -23,8 +23,7 @@ public class CommonCompatibleStructureOrUnionConversion extends
 
 	@Override
 	public String toString() {
-		return "CompatibleStructureOrUnionConversion[" + getOldType().getId()
-				+ ", " + getNewType().getId() + "]";
+		return "CompatibleStructureOrUnion" + super.toString();
 	}
 
 }

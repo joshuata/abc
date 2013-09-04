@@ -26,7 +26,8 @@ public class CommonScope implements Scope {
 	private ScopeKind scopeKind;
 
 	/**
-	 * The root node of this scope in the AST.
+	 * The root node of this scope in the AST. Used only for printing as a way
+	 * to identify the scope easily.
 	 */
 	private ASTNode root;
 
@@ -302,8 +303,7 @@ public class CommonScope implements Scope {
 		this.id = id;
 	}
 
-	@Override
-	public String toString() {
+	public String toStringLong() {
 		String result = "Scope[id=" + id + ", " + scopeKind;
 
 		if (parentScope != null)
@@ -311,6 +311,16 @@ public class CommonScope implements Scope {
 		result += ", root=" + root.id() + "]";
 
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		Variable variable = getFirstScopeVariable();
+
+		if (variable == null)
+			return toStringLong();
+		else
+			return variable.getName();
 	}
 
 	@Override

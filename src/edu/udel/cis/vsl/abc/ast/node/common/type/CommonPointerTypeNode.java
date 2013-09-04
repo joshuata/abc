@@ -2,7 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 
 import java.io.PrintStream;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -11,7 +11,7 @@ public class CommonPointerTypeNode extends CommonTypeNode implements
 		PointerTypeNode {
 
 	public CommonPointerTypeNode(Source source, TypeNode baseType,
-			IdentifierNode scopeModifier) {
+			ExpressionNode scopeModifier) {
 		super(source, TypeNodeKind.POINTER, baseType, scopeModifier);
 	}
 
@@ -39,8 +39,8 @@ public class CommonPointerTypeNode extends CommonTypeNode implements
 	}
 
 	@Override
-	public IdentifierNode scopeModifier() {
-		return (IdentifierNode) child(1);
+	public ExpressionNode scopeModifier() {
+		return (ExpressionNode) child(1);
 	}
 
 }

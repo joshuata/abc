@@ -23,7 +23,6 @@ public class CommonCompatiblePointerConversion extends CommonConversion
 
 	@Override
 	public String toString() {
-		return "CompatiblePointerConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "CompatiblePointer" + super.toString();
 	}
 }

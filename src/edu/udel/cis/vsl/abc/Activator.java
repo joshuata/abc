@@ -425,6 +425,12 @@ public class Activator {
 		program.print(out);
 		out.println();
 		out.flush();
+		
+		out.println("\n\n" + bar + " Types " + bar + "\n");
+		typeFactory.printTypes(out);
+		out.println();
+		out.flush();
+		
 		return program;
 	}
 }

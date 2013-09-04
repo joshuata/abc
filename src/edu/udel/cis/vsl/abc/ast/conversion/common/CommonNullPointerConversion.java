@@ -23,8 +23,7 @@ public class CommonNullPointerConversion extends CommonConversion implements
 
 	@Override
 	public String toString() {
-		return "NullPointerConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "NullPointer" + super.toString();
 	}
 
 }

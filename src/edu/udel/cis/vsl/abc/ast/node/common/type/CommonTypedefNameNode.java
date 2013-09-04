@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -11,7 +12,7 @@ public class CommonTypedefNameNode extends CommonTypeNode implements
 		TypedefNameNode {
 
 	public CommonTypedefNameNode(Source source, IdentifierNode name,
-			SequenceNode<IdentifierNode> scopeList) {
+			SequenceNode<ExpressionNode> scopeList) {
 		super(source, TypeNodeKind.TYPEDEF_NAME, name, scopeList);
 	}
 
@@ -45,8 +46,8 @@ public class CommonTypedefNameNode extends CommonTypeNode implements
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public SequenceNode<IdentifierNode> getScopeList() {
-		return (SequenceNode<IdentifierNode>) child(1);
+	public SequenceNode<ExpressionNode> getScopeList() {
+		return (SequenceNode<ExpressionNode>) child(1);
 	}
 
 }

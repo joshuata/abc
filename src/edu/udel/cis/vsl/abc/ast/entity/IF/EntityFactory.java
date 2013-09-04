@@ -14,6 +14,20 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 public interface EntityFactory {
 
+	/**
+	 * Creates a new scope.
+	 * 
+	 * @param kind
+	 *            the kind of scope to create
+	 * @param parent
+	 *            the scope immediately containing the new scope; can be null
+	 *            for the root scope
+	 * @param root
+	 *            an AST node to associate to the new scope; it is used only for
+	 *            printing to make it easy for the reader to identify where the
+	 *            scope comes from
+	 * @return the new Scope
+	 */
 	Scope newScope(ScopeKind kind, Scope parent, ASTNode root);
 
 	Variable newVariable(String name, LinkageKind linkage, Type type);

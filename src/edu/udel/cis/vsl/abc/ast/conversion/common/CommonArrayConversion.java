@@ -24,7 +24,6 @@ public class CommonArrayConversion extends CommonConversion implements
 
 	@Override
 	public String toString() {
-		return "ArrayConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "Array" + super.toString();
 	}
 }

@@ -23,6 +23,8 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * function prototype, i.e., a function delcaration without body; such a scope
  * extends to the end of the declarator for the function prototype.
  * 
+ * 
+ * 
  * The set of all scopes in a translation unit forms a tree. The root of the
  * tree is the FILE scope.
  * 

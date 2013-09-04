@@ -96,6 +96,7 @@ scope Symbols {
 
 scope DeclarationScope {
     boolean isTypedef; // is the current declaration a typedef
+    Set<String> scopeNames; // to keep track of CIVL-C scope names
 }
 
 @header
@@ -129,8 +130,16 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 	
 	boolean isScopeName(String name) {
 		for (Object scope : Symbols_stack)
-			if (((Symbols_scope)scope).scopeNames.contains(name))
-				return true;
+			if (((Symbols_scope)scope).scopeNames.contains(name)) {
+				System.err.println("Found scope "+name+" in symbol stack");
+				return true;				
+			}
+		for (Object scope : DeclarationScope_stack)
+			if (((DeclarationScope_scope)scope).scopeNames.contains(name)) {
+				System.err.println("Found scope "+name+" in decl stack");
+				return true; 
+			}
+		System.err.println("Did not find scope "+name);
 		return false;
 	}
 
@@ -152,33 +161,110 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 
 /* ****** CIVL-C Scopes ********* */
 
+/* Use of a CIVL-C scope name.   The scope name must have
+ * been declared previously, and therefore entered into
+ * the scope name set of the current scope or one of its
+ * containing scopes. */
+//scopeName
+//	: {isScopeName(input.LT(1).getText())}? IDENTIFIER
+//	  -> ^(SCOPE_NAME IDENTIFIER)
+//	;
 
-/*
- * An optional scope modifier, providing a non-empty tree
- * "ABSENT" which matches nothing.
- */
-scopeModifier_opt
-	: -> ABSENT
-	| scopeModifier
-	;
+
+// uses: double *<s>, f<s1,s2>, typedefName<s1,s2>
+
 
 /*
  * A scope modifier, a CIVL-C construct such as the "<s>"
  * in the declaration "double *<s> p;" meaning p is a
  * pointer-to-double-in-scope-s.
  */
-scopeModifier
+scopeUse
 	: {input.LT(1).getType()==LT && isScopeName(input.LT(2).getText())}?
 	  LT IDENTIFIER GT -> ^(SCOPE_NAME IDENTIFIER)
 	;
 
 
-scopeParameterList_opt
+/*
+ * An optional scope modifier, providing a non-empty tree
+ * "ABSENT" which matches nothing.
+ */
+scopeUse_opt
 	: -> ABSENT
-	| scopeParameterList
+	| scopeUse
 	;
 
-scopeParameterList
+
+/* Used to match a scope list but not produce any tree
+ * or modify any sets.  Used in predicates only.
+
+scopeList
+	: LT ( GT
+	     | IDENTIFIER (COMMA IDENTIFIER)* GT
+	     )
+	;
+*/	  
+
+
+/* This rule is used to match a list of scopes enclosed in
+ * in angular brackets, as in <s1,s2>.  This construct
+ * defines new scope symbols (s1 and s2) in the current
+ * declaration being parsed.  The strings "s1" and "s2"
+ * will be added to the scopeNames set in the current
+ * DeclarationScope if this rule is matched.  When that
+ * DeclarationScope is popped, that set will disappear.
+ * We need to keep track of the scope symbols that are
+ * defined at any point in order to resolve ambiguities
+ * such as "a<b>(c)" which could be an expression or
+ * an invocation of a function a with scope parameter b
+ * and argument c.  The ambiguity is resolved by determining
+ * whether b is a scope symbol.
+ *
+ * In CIVL-C, this construct can precede a function declaration
+ * or definition, or a typedef.
+ */
+scopeListDef
+	:  LT	(
+		  GT -> ^(SCOPE_LIST) // empty list
+		| scopeIdentifier (COMMA scopeIdentifier)* GT
+		  -> ^(SCOPE_LIST scopeIdentifier+)
+		)
+	;
+
+/* Matches an identifier and then puts the name of that identifier
+ * in the scopeNames set of the current DeclarationScope.
+ */
+scopeIdentifier
+	: IDENTIFIER 
+	  {
+		$DeclarationScope::scopeNames.add($IDENTIFIER.text);
+		System.err.println("Adding scope name "+$IDENTIFIER.text);
+	  }
+	;
+
+/* Matches either nothing and returns the trivial tree "ABSENT"
+ * or a scopeListDef.  Used to avoid holes in the tree.
+ */
+scopeListDef_opt
+	: -> ABSENT
+	| scopeListDef
+	;
+
+/* This rule is used to match a list of scopes contained
+ * in angular brackets when that list represents a USE
+ * (as opposed to a DEFINITION) of scopes.  In CIVL-C,
+ * this can be used when using a typedef name or
+ * invoking a function.  The scopes occurring in the
+ * list should have been defined earlier.
+ *
+ * To resolve ambiguity with expressions, this rule looks
+ * for either "<>" (the empty list) or if the list is non-
+ * empty it looks at the first symbol in the list and
+ * looks to see if a scope symbol with that name has
+ * been defined.  If this condition holds, it applies
+ * the rule.
+ */
+scopeListUse
 	: {input.LT(1).getType()==LT &&
 		(input.LT(2).getType()==GT ||
 			isScopeName(input.LT(2).getText()))}?
@@ -189,14 +275,15 @@ scopeParameterList
 		)
 	;
 
-/* Use of a CIVL-C scope name.   The scope name must have
- * been declared previously, and therefore entered into
- * the scope name set of the current scope or one of its
- * containing scopes. */
-scopeName
-	: {isScopeName(input.LT(1).getText())}? IDENTIFIER
-	  -> ^(SCOPE_NAME IDENTIFIER)
+/* Matches nothing or a scopeListUse, to avoid holes in the
+ * tree by returning the "ABSENT" trivial tree for nothing.
+ */
+scopeListUse_opt
+	: -> ABSENT
+	| scopeListUse
 	;
+
+
 
 
 /* ***** A.2.1: Expressions ***** */
@@ -259,10 +346,10 @@ postfixExpression
 	           ^(ARGUMENT_LIST $postfixExpression expression)
 	           RSQUARE)
 	  |	// function call with scope parameters:
-	    scopeParameterList
+	    scopeListUse
 	    LPAREN argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
-	    	 RPAREN scopeParameterList)
+	    	 RPAREN scopeListUse)
 	  |	// function call without scope modifier:
 	    LPAREN argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
@@ -335,10 +422,10 @@ unaryExpression
 
 
 spawnExpression
-	: SPAWN postfixExpressionRoot scopeParameterList_opt LPAREN 
+	: SPAWN postfixExpressionRoot scopeListUse_opt LPAREN 
 	  argumentExpressionList RPAREN 
 	  -> ^(SPAWN LPAREN postfixExpressionRoot
-	       argumentExpressionList RPAREN scopeParameterList_opt)
+	       argumentExpressionList RPAREN scopeListUse_opt)
 	;
 
 
@@ -544,27 +631,53 @@ constantExpression
  * names.
  *
  */
-declaration
+declarationOLD
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
+  $DeclarationScope::scopeNames = new HashSet<String>();
 }
 	: SCOPE IDENTIFIER SEMI
 	  {
 		$Symbols::scopeNames.add($IDENTIFIER.text);
 	  }
 	  -> ^(SCOPE IDENTIFIER)
-	| s=scopeParameterList_opt d=declarationSpecifiers
+	| s=scopeListDef_opt d=declarationSpecifiers
 	  ( 
 	    i=initDeclaratorList contract_opt SEMI
 	    -> ^(DECLARATION $d $i contract_opt $s)
 	  | SEMI
-	    -> ^(DECLARATION $d ABSENT ABSENT ABSENT)
+	    -> ^(DECLARATION $d ABSENT ABSENT $s)
 	  )
 	| staticAssertDeclaration
 	;
 
 
+declaration
+scope DeclarationScope;
+@init {
+  $DeclarationScope::isTypedef = false;
+  $DeclarationScope::scopeNames = new HashSet<String>();
+}
+	: scopeListDef_opt! declarationInScopeList[(CommonTree)$scopeListDef_opt.tree]
+	| SCOPE IDENTIFIER SEMI
+	  {
+		$Symbols::scopeNames.add($IDENTIFIER.text);
+	  }
+	  -> ^(SCOPE IDENTIFIER)
+	| staticAssertDeclaration
+	;
+
+
+declarationInScopeList[CommonTree scopes]
+	: d=declarationSpecifiers
+	  ( 
+	    i=initDeclaratorList contract_opt SEMI
+	    -> ^(DECLARATION $d $i contract_opt {$scopes})
+	  | SEMI
+	    -> ^(DECLARATION $d ABSENT ABSENT {$scopes})
+	  )
+	;
 
 /* 6.7
  * Root: DECLARATION_SPECIFIERS
@@ -686,6 +799,7 @@ structDeclaration
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
+  $DeclarationScope::scopeNames = new HashSet<String>();
 }
     : s=specifierQualifierList
       ( -> ^(STRUCT_DECLARATION $s ABSENT)
@@ -919,8 +1033,8 @@ pointer
  * child 1 : SCOPE_MODIFIER or ABSENT
  */
 pointer_part
-	: STAR scopeModifier_opt typeQualifierList_opt
-	-> ^(STAR typeQualifierList_opt scopeModifier_opt)
+	: STAR scopeUse_opt typeQualifierList_opt
+	-> ^(STAR typeQualifierList_opt scopeUse_opt)
 	;
 
 /* 6.7.6
@@ -984,6 +1098,7 @@ parameterDeclaration
 scope DeclarationScope;
 @init {
 	$DeclarationScope::isTypedef = false;
+	$DeclarationScope::scopeNames = new HashSet<String>();
 }
     : declarationSpecifiers
       ( -> ^(PARAMETER_DECLARATION declarationSpecifiers ABSENT)
@@ -1085,8 +1200,8 @@ directAbstractDeclarator
 typedefName
     : {isTypeName(input.LT(1).getText())}?
       IDENTIFIER
-      scopeParameterList_opt
-      -> ^(TYPEDEF_NAME IDENTIFIER scopeParameterList_opt)
+      scopeUse_opt
+      -> ^(TYPEDEF_NAME IDENTIFIER scopeUse_opt)
     ;
 
 /* 6.7.7
@@ -1252,12 +1367,34 @@ blockItemList
     ;
 
 /* 6.8.2 */
-blockItem
+
+/*
+blockItemOLD
     : (declarationSpecifiers declarator declarationList_opt LCURLY)=>
       functionDefinition
     | declaration
     | statement
     ;
+*/
+
+// Overkill: create new DeclarationScope for every little
+// statement???
+
+blockItem
+scope DeclarationScope;
+@init {
+  $DeclarationScope::isTypedef = false;
+  $DeclarationScope::scopeNames = new HashSet<String>();
+}
+	: scopeListDef_opt!
+		( (declarationSpecifiers declarator contract_opt
+	   	    declarationList_opt LCURLY)=>
+		  functionDefinition[(CommonTree)$scopeListDef_opt.tree]
+		| declarationInScopeList[(CommonTree)$scopeListDef_opt.tree]
+		) 
+	| statement
+	;
+
 
 /* 6.8.3
  * Root: EXPRESSION_STATEMENT
@@ -1430,6 +1567,7 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
     $Symbols::enumerationConstants = new HashSet<String>();
     $Symbols::isFunctionDefinition = false;
     $DeclarationScope::isTypedef = false;
+    $DeclarationScope::scopeNames = new HashSet<String>();
 }
 	:	externalDeclaration* EOF
 		-> ^(TRANSLATION_UNIT externalDeclaration*)
@@ -1441,15 +1579,26 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
  * are in a function definition.
  */
 externalDeclaration
-    : (scopeParameterList_opt declarationSpecifiers declarator 
-       contract_opt declarationList_opt LCURLY)=>
-      functionDefinition
-    | declaration
-    | pragma
-    | assumeStatement
-    ;
+scope DeclarationScope;
+@init {
+  $DeclarationScope::isTypedef = false;
+  $DeclarationScope::scopeNames = new HashSet<String>();
+}
+	: scopeListDef_opt!
+		( (declarationSpecifiers declarator contract_opt
+	   	    declarationList_opt LCURLY)=>
+		  functionDefinition[(CommonTree)$scopeListDef_opt.tree]
+		| declarationInScopeList[(CommonTree)$scopeListDef_opt.tree]
+		) 
+	| pragma
+	| assumeStatement
+	;
+
 
 /* 6.9.1
+ *
+ * Takes as argument a scope list tree s, which may be ABSENT.
+ *
  * Root: FUNCTION_DEFINITION
  * Child 0: declarationSpecifiers
  * Child 1: declarator
@@ -1458,7 +1607,7 @@ externalDeclaration
  * Child 4: contract or ABSENT (code contract)
  * Child 5: scope parameter list or ABSENT (scope formal params)
  */
-functionDefinition
+functionDefinition[CommonTree s]
 scope Symbols; // "function scope"
 @init {
     $Symbols::types = new HashSet<String>();
@@ -1466,15 +1615,14 @@ scope Symbols; // "function scope"
     $Symbols::scopeNames = new HashSet<String>();
     $Symbols::isFunctionDefinition = true;
 }
-	: scopeParameterList_opt
-	  declarationSpecifiers
+	: declarationSpecifiers
 	  declarator
 	  contract_opt
 	  declarationList_opt
 	  compoundStatement
 	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
 	       declarationList_opt compoundStatement contract_opt
-	       scopeParameterList_opt)
+	       {$s})
 	;
 
 

@@ -24,8 +24,7 @@ public class CommonPointerBoolConversion extends CommonConversion implements
 
 	@Override
 	public String toString() {
-		return "PointerBoolConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "PointerBool" + super.toString();
 	}
 
 }

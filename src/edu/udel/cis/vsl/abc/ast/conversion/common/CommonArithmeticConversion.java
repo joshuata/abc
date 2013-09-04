@@ -23,8 +23,7 @@ public class CommonArithmeticConversion extends CommonConversion implements
 
 	@Override
 	public String toString() {
-		return "ArithmeticConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "Arithmetic" + super.toString();
 	}
 
 }

@@ -41,4 +41,9 @@ public class CommonConversion implements Conversion {
 		return classCode + oldType.hashCode() + newType.hashCode();
 	}
 
+	@Override
+	public String toString() {
+		return "Conversion[" + oldType.getId() + "(" + oldType + "), "
+				+ newType.getId() + "(" + newType + ")]";
+	}
 }

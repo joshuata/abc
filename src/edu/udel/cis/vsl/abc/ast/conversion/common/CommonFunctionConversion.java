@@ -23,8 +23,7 @@ public class CommonFunctionConversion extends CommonConversion implements
 
 	@Override
 	public String toString() {
-		return "FunctionConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "Function" + super.toString();
 	}
 
 }

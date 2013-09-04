@@ -66,6 +66,11 @@ public class DeclarationAnalyzer {
 		this.ignoredTypes = ignoredTypes;
 	}
 
+	// TODO: for each decl, before processing, need to process
+	// scope list and treat same as scope declarations....
+	// is this a new kind of scope? You may need to create
+	// a scope around the decl.
+
 	void processTypedefDeclaration(TypedefDeclarationNode node)
 			throws SyntaxException {
 		IdentifierNode identifier = node.getIdentifier();
@@ -347,11 +352,19 @@ public class DeclarationAnalyzer {
 
 		if (identifier == null)
 			return null;
-		scope = node.getScope();
+		// scope = node.getScope();
+
+		// the scope to which this entity belong is the scope in which
+		// the Identifier in the declaration occurs:
+
+		scope = identifier.getScope();
+
 		// if node is function definition, then scope is function scope.
 		// want to add entity to parent scope. Otherwise fine.
-		if (scope.getScopeKind() == ScopeKind.FUNCTION)
-			scope = scope.getParentScope();
+		// if (scope.getScopeKind() == ScopeKind.FUNCTION)
+		// scope = scope.getParentScope();
+		//
+
 		isFunction = node instanceof FunctionDeclarationNode;
 		linkage = computeLinkage(node);
 		name = identifier.name();

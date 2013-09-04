@@ -24,8 +24,7 @@ public class CommonLvalueConversion extends CommonConversion implements
 
 	@Override
 	public String toString() {
-		return "LvalueConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "Lvalue" + super.toString();
 	}
 
 }

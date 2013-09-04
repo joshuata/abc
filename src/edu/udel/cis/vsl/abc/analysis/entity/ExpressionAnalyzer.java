@@ -360,6 +360,18 @@ public class ExpressionAnalyzer {
 		boolean hasVariableNumArgs;
 
 		processExpression(functionNode);
+		
+		// TODO: for a parameterized function call, need
+		// to evaluate the functionNode typenode to get
+		// the function type.
+		
+		// Ditto for use of parameterized typedef name.
+		
+		// so not every node has a type, or, need
+		// to add parameterized type
+		// functionNodes do not have types....
+		
+		
 		tmpType = functionNode.getType();
 		tmpKind = tmpType.kind();
 		if (tmpKind == TypeKind.POINTER) {
