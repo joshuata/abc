@@ -27,9 +27,14 @@ public class ArithmeticConversionType extends CommonIntegerType {
 
 	@Override
 	public String toString() {
-		return "ArithmeticConversionType[" + type1.getId() + ", "
-				+ type2.getId() + "]";
+		return "ArithmeticConversionType[" + type1 + ", " + type2 + "]";
 	}
+
+	// @Override
+	// public String toString() {
+	// return "ArithmeticConversionType[" + type1.getId() + ", "
+	// + type2.getId() + "]";
+	// }
 
 	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {

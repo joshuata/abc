@@ -231,4 +231,12 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 		fields = null;
 	}
 
+	@Override
+	public String toString() {
+		if (isStruct)
+			return "struct " + tag;
+		else
+			return "union " + tag;
+	}
+
 }

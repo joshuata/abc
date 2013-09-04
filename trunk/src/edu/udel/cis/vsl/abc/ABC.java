@@ -6,10 +6,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
-import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * The main class for the ABC C front end. Provides a simple command line

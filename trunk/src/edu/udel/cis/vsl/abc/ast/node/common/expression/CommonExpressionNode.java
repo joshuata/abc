@@ -96,7 +96,7 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 	protected void printExtras(String prefix, PrintStream out) {
 		int numConversions = getNumConversions();
 		String typeDescriptor = (initialType == null ? "UNKNOWN" : ""
-				+ initialType.getId());
+				+ initialType.toString());
 
 		out.println();
 		out.print(prefix + "initial type: " + typeDescriptor);

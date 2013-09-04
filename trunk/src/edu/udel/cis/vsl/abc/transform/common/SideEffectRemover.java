@@ -296,23 +296,25 @@ public class SideEffectRemover implements Transformer {
 		case POINTER: {
 			PointerType pointerType = (PointerType) type;
 			Scope oldScope = pointerType.scope();
-			IdentifierNode identifierNode;
+			ExpressionNode scopeNode;
 
 			if (oldScope == null)
-				identifierNode = null;
+				scopeNode = null;
 			else {
 				Variable scopeVariable = oldScope.getFirstScopeVariable();
 				String name;
+				IdentifierNode identifierNode;
 
 				if (scopeVariable == null)
 					name = "_scope_" + oldScope.getId();
 				else
 					name = scopeVariable.getName();
 				identifierNode = factory.newIdentifierNode(source, name);
+				scopeNode = factory.newIdentifierExpressionNode(source,
+						identifierNode);
 			}
 			return factory.newPointerTypeNode(source,
-					typeNode(source, pointerType.referencedType()),
-					identifierNode);
+					typeNode(source, pointerType.referencedType()), scopeNode);
 		}
 		case VOID:
 			return factory.newVoidTypeNode(source);

@@ -7,7 +7,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonFunctionDeclarationNode extends
@@ -18,12 +18,10 @@ public class CommonFunctionDeclarationNode extends
 	private boolean noreturnFunctionSpecifier = false;
 
 	public CommonFunctionDeclarationNode(Source source,
-			IdentifierNode identifier, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract,
-			SequenceNode<IdentifierNode> scopeList) {
+			IdentifierNode identifier, TypeNode type,
+			SequenceNode<ContractNode> contract) {
 		super(source, identifier, type);
 		addChild(contract); // child 2
-		addChild(scopeList); // child 3
 	}
 
 	@Override
@@ -96,27 +94,15 @@ public class CommonFunctionDeclarationNode extends
 	}
 
 	@Override
-	public FunctionTypeNode getTypeNode() {
-		return (FunctionTypeNode) super.getTypeNode();
-	}
-
-	@Override
 	public FunctionDeclarationNode copy() {
 		CommonFunctionDeclarationNode result = new CommonFunctionDeclarationNode(
 				getSource(), duplicate(getIdentifier()),
-				duplicate(getTypeNode()), duplicate(getContract()),
-				duplicate(getScopeList()));
+				duplicate(getTypeNode()), duplicate(getContract()));
 
 		result.setInlineFunctionSpecifier(hasInlineFunctionSpecifier());
 		result.setNoreturnFunctionSpecifier(hasNoreturnFunctionSpecifier());
 		copyStorage(result);
 		return result;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public SequenceNode<IdentifierNode> getScopeList() {
-		return (SequenceNode<IdentifierNode>) child(3);
 	}
 
 }

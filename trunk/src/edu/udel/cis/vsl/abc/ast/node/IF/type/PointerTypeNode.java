@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.type;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
 public interface PointerTypeNode extends TypeNode {
 
@@ -14,7 +14,7 @@ public interface PointerTypeNode extends TypeNode {
 	 * 
 	 * @return scope modifier or null if absent
 	 */
-	IdentifierNode scopeModifier();
+	ExpressionNode scopeModifier();
 
 	@Override
 	PointerTypeNode copy();

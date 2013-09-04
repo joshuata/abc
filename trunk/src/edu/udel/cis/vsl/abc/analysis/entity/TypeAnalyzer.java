@@ -28,12 +28,14 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.ScopeParameterizedTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
@@ -133,6 +135,9 @@ public class TypeAnalyzer {
 		// case PROCESS:
 		// type = typeFactory.processType();
 		// break;
+		case SCOPE_PARAMETERIZED:
+			type = processScopeParameterizedType((ScopeParameterizedTypeNode) typeNode);
+			break;
 		default:
 			throw new RuntimeException("Unreachable");
 		}
@@ -461,32 +466,38 @@ public class TypeAnalyzer {
 		return result;
 	}
 
-	private Variable processScopeModifier(IdentifierNode identifierNode)
+	private Variable processScopeModifier(ExpressionNode expressionNode)
 			throws SyntaxException {
-		String name = identifierNode.name();
-		OrdinaryEntity entity = identifierNode.getScope()
-				.getLexicalOrdinaryEntity(name);
-		EntityKind kind;
+		if (expressionNode instanceof IdentifierExpressionNode) {
+			IdentifierNode identifierNode = ((IdentifierExpressionNode) expressionNode)
+					.getIdentifier();
+			String name = identifierNode.name();
+			OrdinaryEntity entity = identifierNode.getScope()
+					.getLexicalOrdinaryEntity(name);
+			EntityKind kind;
 
-		if (entity == null)
-			throw error("Undeclared identifier " + name, identifierNode);
-		kind = entity.getEntityKind();
-		switch (kind) {
-		case VARIABLE:
-			break;
-		default:
-			throw error("Use of " + kind + " " + name + " as scope name",
-					identifierNode);
-		}
-		identifierNode.setEntity(entity);
-		return (Variable) entity;
+			if (entity == null)
+				throw error("Undeclared identifier " + name, identifierNode);
+			kind = entity.getEntityKind();
+			switch (kind) {
+			case VARIABLE:
+				break;
+			default:
+				throw error("Use of " + kind + " " + name + " as scope name",
+						identifierNode);
+			}
+			identifierNode.setEntity(entity);
+			return (Variable) entity;
+		} else
+			throw new SyntaxException("Unknown kind of scope expression",
+					expressionNode.getSource());
 	}
 
 	private Type processPointerType(PointerTypeNode node)
 			throws SyntaxException {
 		TypeNode referencedTypeNode = node.referencedType();
 		Type referencedType = processTypeNode(referencedTypeNode);
-		IdentifierNode scopeModifier = node.scopeModifier();
+		ExpressionNode scopeModifier = node.scopeModifier();
 		Scope pointerScope;
 		UnqualifiedObjectType unqualifiedType;
 
@@ -503,6 +514,57 @@ public class TypeAnalyzer {
 		return typeFactory.qualify(unqualifiedType, node.isConstQualified(),
 				node.isVolatileQualified(), node.isRestrictQualified(),
 				node.isInputQualified(), node.isOutputQualified());
+	}
+
+	private Type processScopeParameterizedType(ScopeParameterizedTypeNode node)
+			throws SyntaxException {
+		TypeNode baseTypeNode = node.getBody();
+		Type baseType;
+		SequenceNode<VariableDeclarationNode> scopeDecls = node
+				.getScopeParameters();
+		int numDecls = scopeDecls.numChildren();
+		Type result;
+
+		for (int i = 0; i < numDecls; i++) {
+			VariableDeclarationNode decl = scopeDecls.getSequenceChild(i);
+
+			entityAnalyzer.declarationAnalyzer.processVariableDeclaration(decl);
+		}
+		baseType = processTypeNode(baseTypeNode);
+		
+		// TODO!!
+		
+		// result = typeFactory.scopeParameterizedType(scopeDecls, baseType);
+		
+		// some computation must be done:
+		// when scope parameterized function returns
+		// the thing it returns has type *<s>
+		// the thing to which it will be assigned has type *<s0>
+		// but s=s0 because the call was with s=s0:
+		// so when analyzing the call, set parameters?
+		/*
+		 * <pre>
+		 * double *<s> f(double *<s> p);
+		 * 
+		 * double *<s0> q = f<s0>(&x);
+		 * 
+		 * </pre>
+		 * 
+		 * Need to set s=s0 in f type before completing
+		 * type check.  Then you can evalute the type nodes
+		 * to get actual types.
+		 * 
+		 * f has type node "ScopeParamedTypeNode(s,double*<s>...)"
+		 * Evaluate that type at s=s0 to get a type
+		 * Function(double*<s0>->double*<s0>)
+		 * Use that to check function call.
+		 * 
+		 */
+		
+		result = null;
+		
+		return result;
+
 	}
 
 	private Type processAtomicType(AtomicTypeNode node) throws SyntaxException {

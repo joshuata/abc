@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF.type;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
 public interface TypedefNameNode extends TypeNode {
 
@@ -36,6 +37,6 @@ public interface TypedefNameNode extends TypeNode {
 	 * @return the list of scope identifiers in the declaration, or null if no
 	 *         such list occurred
 	 */
-	SequenceNode<IdentifierNode> getScopeList();
+	SequenceNode<ExpressionNode> getScopeList();
 
 }

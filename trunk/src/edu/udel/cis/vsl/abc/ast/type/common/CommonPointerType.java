@@ -109,7 +109,21 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 			out.println();
 			out.print(prefix + "| ");
 			referencedType.print(prefix + "| ", out, true);
+			out.println();
+			if (scope != null)
+				out.print(prefix + "| " + scope);
 		}
+	}
+
+	@Override
+	public String toString() {
+		String result = "pointer<";
+
+		if (scope != null) {
+			result += scope.toString();
+		}
+		result += ">[" + referencedType + "]";
+		return result;
 	}
 
 	@Override

@@ -161,6 +161,31 @@ public class CommonConversionFactory implements ConversionFactory {
 					+ "is incompatible with corresponding type on right-hand side");
 	}
 
+	/**
+	 * Checks that the scope of type1 is a descendant of that of type2.
+	 * 
+	 * @param type1
+	 *            right-hand side type
+	 * @param type2
+	 *            left-hand side type
+	 * @throws UnsourcedException
+	 *             if condition fails
+	 */
+	private void checkScopeConsistency(PointerType type1, PointerType type2)
+			throws UnsourcedException {
+		Scope scope1 = type1.scope();
+		Scope scope2 = type2.scope();
+
+		if (scope2 == null) // scope2 is root
+			return;
+		if (scope1 == null) { // scope1 is root
+			if (scope2.getParentScope() == null) // both are root
+				return;
+		} else if (scope1.isDescendantOf(scope2))
+			return;
+		throw error("Scope of pointer on right is not descendant of that on left");
+	}
+
 	@Override
 	public boolean isNullPointerConstant(ExpressionNode node) {
 		if (node instanceof CastNode) {
@@ -231,6 +256,7 @@ public class CommonConversionFactory implements ConversionFactory {
 				return voidPointerConversion(type1, type2);
 			}
 			checkQualifierConsistency(type1, type2, true);
+			checkScopeConsistency(type1, type2);
 			return new CommonCompatiblePointerConversion(type1, type2);
 		}
 		throw error("No conversion from type of right hand side to that of left:\n"

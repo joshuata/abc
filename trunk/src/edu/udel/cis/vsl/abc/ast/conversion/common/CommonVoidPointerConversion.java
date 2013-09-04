@@ -19,11 +19,10 @@ public class CommonVoidPointerConversion extends CommonConversion implements
 	public PointerType getNewType() {
 		return (PointerType) super.getNewType();
 	}
-	
+
 	@Override
 	public String toString() {
-		return "VoidPointerConversion[" + getOldType().getId() + ", "
-				+ getNewType().getId() + "]";
+		return "VoidPointer" + super.toString();
 	}
 
 }

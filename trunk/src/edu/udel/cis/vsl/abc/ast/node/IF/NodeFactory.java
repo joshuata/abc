@@ -65,6 +65,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.ScopeParameterizedTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
@@ -177,7 +178,7 @@ public interface NodeFactory {
 	AtomicTypeNode newAtomicTypeNode(Source source, TypeNode baseType);
 
 	PointerTypeNode newPointerTypeNode(Source source, TypeNode referencedType,
-			IdentifierNode scopeModifier);
+			ExpressionNode scopeModifier);
 
 	StructureOrUnionTypeNode newStructOrUnionTypeNode(Source source,
 			boolean isStruct, IdentifierNode tag,
@@ -189,6 +190,9 @@ public interface NodeFactory {
 
 	TypeNode newScopeTypeNode(Source source);
 
+	ScopeParameterizedTypeNode newScopeParameterizedTypeNode(Source source,
+			SequenceNode<VariableDeclarationNode> scopeList, TypeNode body);
+
 	/**
 	 * Source is same as that of the identifier name.
 	 * 
@@ -196,7 +200,7 @@ public interface NodeFactory {
 	 * @return
 	 */
 	TypedefNameNode newTypedefNameNode(IdentifierNode name,
-			SequenceNode<IdentifierNode> scopeList);
+			SequenceNode<ExpressionNode> scopeList);
 
 	// Expressions...
 
@@ -287,7 +291,7 @@ public interface NodeFactory {
 
 	FunctionCallNode newFunctionCallNode(Source source,
 			ExpressionNode function, List<ExpressionNode> arguments,
-			SequenceNode<IdentifierNode> scopeList);
+			SequenceNode<ExpressionNode> scopeList);
 
 	DotNode newDotNode(Source source, ExpressionNode structure,
 			IdentifierNode fieldName);
@@ -369,12 +373,15 @@ public interface NodeFactory {
 	 * @param source
 	 * @param name
 	 * @param type
+	 *            type of the function: can be either a FunctionTypeNode or a
+	 *            ScopeParameterizedTypeNode whose body is a FunctionTypeNode
+	 * @param contract
+	 *            sequence of contract elements or null
 	 * @return
 	 */
 	FunctionDeclarationNode newFunctionDeclarationNode(Source source,
-			IdentifierNode name, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract,
-			SequenceNode<IdentifierNode> scopeList);
+			IdentifierNode name, TypeNode type,
+			SequenceNode<ContractNode> contract);
 
 	EnumeratorDeclarationNode newEnumeratorDeclarationNode(Source source,
 			IdentifierNode name, ExpressionNode value);
@@ -394,9 +401,21 @@ public interface NodeFactory {
 	SwitchLabelNode newDefaultLabelDeclarationNode(Source source,
 			StatementNode statement);
 
+	/**
+	 * Returns a new typedef declaration. If the typedef was scope
+	 * parameterized, the type argument will be a ScopeParameterizedTypeNode.
+	 * 
+	 * @param source
+	 *            source code reference
+	 * @param name
+	 *            the name of the typedef as an IdentifierNode
+	 * @param type
+	 *            the type node being bound to the identifier (this may be scope
+	 *            parameterized)
+	 * @return a new typedef declaration node
+	 */
 	TypedefDeclarationNode newTypedefDeclarationNode(Source source,
-			IdentifierNode name, TypeNode type,
-			SequenceNode<IdentifierNode> scopeList);
+			IdentifierNode name, TypeNode type);
 
 	CompoundInitializerNode newCompoundInitializerNode(Source source,
 			List<PairNode<DesignationNode, InitializerNode>> initList);
@@ -519,9 +538,8 @@ public interface NodeFactory {
 	// external definitions...
 
 	FunctionDefinitionNode newFunctionDefinitionNode(Source source,
-			IdentifierNode name, FunctionTypeNode type,
-			SequenceNode<ContractNode> contract,
-			SequenceNode<IdentifierNode> scopeList, CompoundStatementNode body);
+			IdentifierNode name, TypeNode type,
+			SequenceNode<ContractNode> contract, CompoundStatementNode body);
 
 	ASTNode newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions);
