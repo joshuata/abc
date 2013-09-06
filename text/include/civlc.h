@@ -161,7 +161,7 @@ $proc * $comm_procs($comm * comm) {
 }
 
 /* adds the message to the comm */
-void $comm_enqueue($comm * comm, $message * message);
+void $comm_enqueue($comm * comm, $message message);
 
 // to implement this, just need $append, $remove
 
@@ -206,7 +206,7 @@ $message * $comm_seek($comm * comm, int source, int dest, int tag) {
 
 /* finds the first matching message, removes it from
  * comm, and returns pointer to message */ 
-$message * $comm_dequeue($comm * comm, int source, int dest, int tag);
+$message $comm_dequeue($comm * comm, int source, int dest, int tag);
 
 /* returns the number of messages from source to dest stored
  * in comm */ 
