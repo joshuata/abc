@@ -102,29 +102,29 @@ $message $message_pack(int source, int dest, int tag,
 }
   
 /* returns the message source */ 
-int $message_source($message * message) {
-  return message->source;
+int $message_source($message message) {
+  return message.source;
 }
 
 /* returns the message tag */
-int $message_tag($message * message) {
-  return message->tag;
+int $message_tag($message message) {
+  return message.tag;
 }
 
 /* returns the message destination */ 
-int $message_dest($message * message) {
-  return message->dest;
+int $message_dest($message message) {
+  return message.dest;
 }
 
 /* returns the message size */ 
-int $message_size($message * message) {
-  return message->size;
+int $message_size($message message) {
+  return message.size;
 }
 
 /* transfers message data to buf, throwing exception if message
  * size exceeds specified size */ 
-void $message_unpack($message * message, void *buf, int size) {
-  $bundle_unpack(message->data, buf);
+void $message_unpack($message message, void *buf, int size) {
+  $bundle_unpack(message.data, buf);
 }
 
 /* A datatype representing a queue of messages.  All message
