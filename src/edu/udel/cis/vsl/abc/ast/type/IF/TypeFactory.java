@@ -4,7 +4,7 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -182,7 +182,7 @@ public interface TypeFactory {
 	 *            scope restriction or null
 	 * @return a pointer type as specified
 	 */
-	PointerType pointerType(Type referencedType, Scope scope);
+	PointerType pointerType(Type referencedType, ScopeValue scopeRestriction);
 
 	/**
 	 * The atomic type associated to a base type. This type may be denoted

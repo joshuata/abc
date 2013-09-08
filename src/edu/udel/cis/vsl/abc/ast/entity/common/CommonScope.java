@@ -13,11 +13,10 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -73,7 +72,7 @@ public class CommonScope implements Scope {
 
 	private int scopeDepth;
 
-	private Variable firstScopeVariable = null;
+	private ScopeVariable scopeName = null;
 
 	public CommonScope(ScopeKind kind, CommonScope parent, ASTNode root) {
 		this.scopeKind = kind;
@@ -145,12 +144,6 @@ public class CommonScope implements Scope {
 		switch (kind) {
 		case VARIABLE:
 			variableList.add((Variable) entity);
-			if (firstScopeVariable == null) {
-				Type type = entity.getType();
-
-				if (type != null && type.kind() == TypeKind.SCOPE)
-					firstScopeVariable = (Variable) entity;
-			}
 			break;
 		case FUNCTION:
 			functionList.add((Function) entity);
@@ -158,6 +151,11 @@ public class CommonScope implements Scope {
 		default:
 		}
 		return result;
+	}
+
+	@Override
+	public void setScopeName(ScopeVariable variable) {
+		this.scopeName = variable;
 	}
 
 	@Override
@@ -315,7 +313,7 @@ public class CommonScope implements Scope {
 
 	@Override
 	public String toString() {
-		Variable variable = getFirstScopeVariable();
+		Variable variable = getScopeName();
 
 		if (variable == null)
 			return toStringLong();
@@ -367,8 +365,8 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public Variable getFirstScopeVariable() {
-		return firstScopeVariable;
+	public ScopeVariable getScopeName() {
+		return scopeName;
 	}
 
 }

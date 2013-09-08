@@ -12,6 +12,7 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.NullPointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.PointerBoolConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.VoidPointerConversion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
@@ -173,16 +174,24 @@ public class CommonConversionFactory implements ConversionFactory {
 	 */
 	private void checkScopeConsistency(PointerType type1, PointerType type2)
 			throws UnsourcedException {
-		Scope scope1 = type1.scope();
-		Scope scope2 = type2.scope();
+		ScopeValue scopeValue1 = type1.scopeRestriction();
+		ScopeValue scopeValue2 = type2.scopeRestriction();
 
-		if (scope2 == null) // scope2 is root
+		if (scopeValue2 == null) // scope2 is root
 			return;
-		if (scope1 == null) { // scope1 is root
-			if (scope2.getParentScope() == null) // both are root
+		if (scopeValue1 == null) { // scope1 is root
+			if (scopeValue2 instanceof Scope
+					&& ((Scope) scopeValue2).getParentScope() == null)
+				// both are root
 				return;
-		} else if (scope1.isDescendantOf(scope2))
-			return;
+		} else {// both non-null
+			if (scopeValue1.equals(scopeValue2))
+				return;
+			if (scopeValue1 instanceof Scope && scopeValue2 instanceof Scope) {
+				if (((Scope) scopeValue1).isDescendantOf((Scope) scopeValue2))
+					return;
+			}
+		}
 		throw error("Scope of pointer on right is not descendant of that on left");
 	}
 

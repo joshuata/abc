@@ -131,15 +131,15 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 	boolean isScopeName(String name) {
 		for (Object scope : Symbols_stack)
 			if (((Symbols_scope)scope).scopeNames.contains(name)) {
-				System.err.println("Found scope "+name+" in symbol stack");
+				//System.err.println("Found scope "+name+" in symbol stack");
 				return true;				
 			}
 		for (Object scope : DeclarationScope_stack)
 			if (((DeclarationScope_scope)scope).scopeNames.contains(name)) {
-				System.err.println("Found scope "+name+" in decl stack");
+				//System.err.println("Found scope "+name+" in decl stack");
 				return true; 
 			}
-		System.err.println("Did not find scope "+name);
+		//System.err.println("Did not find scope "+name);
 		return false;
 	}
 
@@ -238,7 +238,7 @@ scopeIdentifier
 	: IDENTIFIER 
 	  {
 		$DeclarationScope::scopeNames.add($IDENTIFIER.text);
-		System.err.println("Adding scope name "+$IDENTIFIER.text);
+		//System.err.println("Adding scope name "+$IDENTIFIER.text);
 	  }
 	;
 
@@ -660,17 +660,25 @@ scope DeclarationScope;
   $DeclarationScope::scopeNames = new HashSet<String>();
 }
 	: scopeListDef_opt! declarationInScopeList[(CommonTree)$scopeListDef_opt.tree]
+	;
+
+/*
 	| SCOPE IDENTIFIER SEMI
 	  {
 		$Symbols::scopeNames.add($IDENTIFIER.text);
 	  }
 	  -> ^(SCOPE IDENTIFIER)
 	| staticAssertDeclaration
-	;
-
+*/
 
 declarationInScopeList[CommonTree scopes]
-	: d=declarationSpecifiers
+	: SCOPE IDENTIFIER SEMI
+	  {
+	  		$Symbols::scopeNames.add($IDENTIFIER.text);
+	  }
+	  -> ^(SCOPE IDENTIFIER)
+	| staticAssertDeclaration
+	| d=declarationSpecifiers
 	  ( 
 	    i=initDeclaratorList contract_opt SEMI
 	    -> ^(DECLARATION $d $i contract_opt {$scopes})

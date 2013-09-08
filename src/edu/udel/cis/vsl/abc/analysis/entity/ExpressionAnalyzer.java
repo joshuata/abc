@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -360,18 +361,17 @@ public class ExpressionAnalyzer {
 		boolean hasVariableNumArgs;
 
 		processExpression(functionNode);
-		
+
 		// TODO: for a parameterized function call, need
 		// to evaluate the functionNode typenode to get
 		// the function type.
-		
+
 		// Ditto for use of parameterized typedef name.
-		
+
 		// so not every node has a type, or, need
 		// to add parameterized type
 		// functionNodes do not have types....
-		
-		
+
 		tmpType = functionNode.getType();
 		tmpKind = tmpType.kind();
 		if (tmpKind == TypeKind.POINTER) {
@@ -609,9 +609,11 @@ public class ExpressionAnalyzer {
 			case DEREFERENCE: {
 				PointerType pointerType = (PointerType) opNode.getArgument(0)
 						.getType();
+				ScopeValue scopeValue = pointerType.scopeRestriction();
 
-				result = pointerType.scope();
-				if (result == null)
+				if (scopeValue instanceof Scope)
+					result = (Scope) scopeValue;
+				else
 					result = entityAnalyzer.rootScope;
 			}
 			case SUBSCRIPT:
@@ -625,9 +627,11 @@ public class ExpressionAnalyzer {
 			ArrowNode arrowNode = (ArrowNode) node;
 			PointerType pointerType = (PointerType) arrowNode
 					.getStructurePointer().getType();
+			ScopeValue scopeValue = pointerType.scopeRestriction();
 
-			result = pointerType.scope();
-			if (result == null)
+			if (scopeValue instanceof Scope)
+				result = (Scope) scopeValue;
+			else
 				result = entityAnalyzer.rootScope;
 		} else if (node instanceof DotNode) { // &(e.f)
 			DotNode dotNode = (DotNode) node;
@@ -701,11 +705,21 @@ public class ExpressionAnalyzer {
 		node.setInitialType(addStandardConversions(node.getArgument(1)));
 	}
 
-	private Scope join(Scope s1, Scope s2) {
+	private ScopeValue joinScopeValue(ScopeValue s1, ScopeValue s2) {
 		if (s1 == null || s2 == null)
 			return entityAnalyzer.rootScope;
-		return entityAnalyzer.entityFactory.join(s1, s2);
+		if (s1.equals(s2))
+			return s1;
+		if (s1 instanceof Scope && s2 instanceof Scope)
+			return entityAnalyzer.entityFactory.join((Scope) s1, (Scope) s2);
+		return entityAnalyzer.rootScope;
 	}
+
+	// private Scope join(Scope s1, Scope s2) {
+	// if (s1 == null || s2 == null)
+	// return entityAnalyzer.rootScope;
+	// return entityAnalyzer.entityFactory.join(s1, s2);
+	// }
 
 	/**
 	 * From C11 Sec. 6.5.15:
@@ -785,9 +799,9 @@ public class ExpressionAnalyzer {
 		} else if (type1 instanceof PointerType && type2 instanceof PointerType) {
 			PointerType p0 = (PointerType) type1;
 			PointerType p1 = (PointerType) type2;
-			Scope s0 = p0.scope();
-			Scope s1 = p1.scope();
-			Scope joinScope = join(s0, s1);
+			ScopeValue s0 = p0.scopeRestriction();
+			ScopeValue s1 = p1.scopeRestriction();
+			ScopeValue joinScopeValue = joinScopeValue(s0, s1);
 			boolean atomicQ = false, constQ = false, volatileQ = false, restrictQ = false;
 			Type base0 = p0.referencedType();
 			Type base1 = p1.referencedType();
@@ -823,7 +837,8 @@ public class ExpressionAnalyzer {
 			else
 				throw error("Incompatible pointer types in conditional:\n"
 						+ type1 + "\n" + type2, node);
-			type = typeFactory.pointerType(type, joinScope);
+
+			type = typeFactory.pointerType(type, joinScopeValue);
 			if (atomicQ)
 				type = typeFactory.atomicType((PointerType) type);
 			type = typeFactory.qualify((ObjectType) type, constQ, volatileQ,

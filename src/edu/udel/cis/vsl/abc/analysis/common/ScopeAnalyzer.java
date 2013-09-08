@@ -11,8 +11,10 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -20,48 +22,16 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.ScopeParameterizedTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * Given an AST, determines and sets scope of every node.
  * 
- * Scope structure of a function definition with scope parameters:
+ * Scope structure of a function definition:
  * 
  * <pre>
  * { ...current parent scope...
- *   identifier
- *   { block scope:
- *     type node - formals (including scopeParams, return type)
- *     { function scope:
- *       function defn node
- *       labels
- *       { block scope: formals
- *         { block scope: contract if contract!=null }
- *         body (will be block scope because is compound stmt)
- *       }
- *     }
- *   }
- *   ...current parent scope...
- * }
- * </pre>
- * 
- * In the above: the identifier is the name of the function. The scopeParams is
- * the sequence node consisting of variable declaration nodes for the scope
- * parameters. In "type node - formals" the "-" means "minus", i.e., we want the
- * type node and all its descendants other than the formals in that scope; this
- * includes the type node for the return type of the function and the scope
- * parameters.
- * 
- * Scope structure of a function definition without scope parameters: very
- * similar but without the extra block scope:
- * 
- * <pre>
- * { ...current parent scope...
- *   identifier
- *   type node - formals (including return type)
+ *   declNode - formals (incl. return type, identifier)
  *   { function scope:
  *     labels
  *     { block scope: formals
@@ -73,27 +43,12 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * }
  * </pre>
  * 
- * Scope structure of a function declaration with scope parameters:
+ * 
+ * Scope structure for function declaration:
  * 
  * <pre>
  * { ...current parent scope...
- *   identifier
- *   { block scope:
- *     typeNode - formals (including scopeParams, return type)
- *     { function prototype scope: formals
- *       { block scope: contract }
- *     }
- *   }
- *   ...current parent scope...
- * }
- * </pre>
- * 
- * Scope structure for function declaration without scope parameters:
- * 
- * <pre>
- * { ...current parent scope...
- *   identifier
- *   typeNode - formals
+ *   decl - formals (including return type, identifier)
  *   { function prototype scope: formals
  *     { block scope: contract }
  *   }
@@ -101,13 +56,16 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * }
  * </pre>
  * 
- * Scope structure of a parameterized scope type node used any place other than
- * the situations above:
+ * Scope structure of a parameterized scope decl node used any place other than
+ * the situations above (i.e., typedefs):
  * 
  * <pre>
  * { ...current parent scope...
- *   { block scope: scopeParams
- *     body type
+ *   decl - scopeList - baseDecl
+ *   identifier
+ *   { block scope: 
+ *     scopeList
+ *     baseDecl - identifier
  *   }
  *   ...current parent scope...
  * }
@@ -135,29 +93,16 @@ public class ScopeAnalyzer implements Analyzer {
 	private void processFunctionDefinitionNode(FunctionDefinitionNode funcNode,
 			Scope parentScope) throws SyntaxException {
 		// children: identifier, type, contract (optional), body
-		IdentifierNode identifier = funcNode.getIdentifier();
-		TypeNode typeNode = funcNode.getTypeNode();
+		FunctionTypeNode typeNode = funcNode.getTypeNode();
 		SequenceNode<ContractNode> contract = funcNode.getContract();
 		CompoundStatementNode body = funcNode.getBody();
-		FunctionTypeNode funcTypeNode;
-		SequenceNode<VariableDeclarationNode> paramsNode;
-		Scope typeScope, parameterScope, newFunctionScope;
-
-		if (typeNode.kind() == TypeNodeKind.SCOPE_PARAMETERIZED) {
-			ScopeParameterizedTypeNode scopedNode = (ScopeParameterizedTypeNode) typeNode;
-
-			typeScope = scopeFactory.newScope(ScopeKind.BLOCK, parentScope,
-					typeNode);
-			funcTypeNode = (FunctionTypeNode) scopedNode.getBody();
-		} else {
-			typeScope = parentScope;
-			funcTypeNode = (FunctionTypeNode) typeNode;
-		}
-		newFunctionScope = scopeFactory.newScope(ScopeKind.FUNCTION, typeScope,
-				funcNode);
-		paramsNode = funcTypeNode.getParameters();
-		parameterScope = scopeFactory.newScope(ScopeKind.BLOCK,
+		SequenceNode<VariableDeclarationNode> paramsNode = typeNode
+				.getParameters();
+		Scope newFunctionScope = scopeFactory.newScope(ScopeKind.FUNCTION,
+				parentScope, funcNode);
+		Scope parameterScope = scopeFactory.newScope(ScopeKind.BLOCK,
 				newFunctionScope, paramsNode);
+
 		if (paramsNode != null)
 			processRecursive(paramsNode, parameterScope, null);
 		if (contract != null) {
@@ -166,7 +111,6 @@ public class ScopeAnalyzer implements Analyzer {
 
 			processRecursive(contract, contractScope, null);
 		}
-		processRecursive(typeNode, typeScope, null);
 		processNode(body, parameterScope, newFunctionScope);
 		processRecursive(funcNode, parentScope, null);
 	}
@@ -175,26 +119,13 @@ public class ScopeAnalyzer implements Analyzer {
 			FunctionDeclarationNode funcNode, Scope parentScope)
 			throws SyntaxException {
 		// children: ident, type, contract.
-		IdentifierNode identifier = funcNode.getIdentifier();
-		TypeNode typeNode = funcNode.getTypeNode();
+		FunctionTypeNode typeNode = funcNode.getTypeNode();
 		SequenceNode<ContractNode> contract = funcNode.getContract();
-		FunctionTypeNode funcTypeNode;
-		SequenceNode<VariableDeclarationNode> paramsNode;
-		Scope typeScope, parameterScope;
+		SequenceNode<VariableDeclarationNode> paramsNode = typeNode
+				.getParameters();
+		Scope parameterScope = scopeFactory.newScope(ScopeKind.BLOCK,
+				parentScope, paramsNode);
 
-		if (typeNode.kind() == TypeNodeKind.SCOPE_PARAMETERIZED) {
-			ScopeParameterizedTypeNode scopedNode = (ScopeParameterizedTypeNode) typeNode;
-
-			typeScope = scopeFactory.newScope(ScopeKind.BLOCK, parentScope,
-					typeNode);
-			funcTypeNode = (FunctionTypeNode) scopedNode.getBody();
-		} else {
-			typeScope = parentScope;
-			funcTypeNode = (FunctionTypeNode) typeNode;
-		}
-		paramsNode = funcTypeNode.getParameters();
-		parameterScope = scopeFactory.newScope(ScopeKind.BLOCK, typeScope,
-				paramsNode);
 		if (paramsNode != null)
 			processRecursive(paramsNode, parameterScope, null);
 		if (contract != null) {
@@ -203,7 +134,6 @@ public class ScopeAnalyzer implements Analyzer {
 
 			processRecursive(contract, contractScope, null);
 		}
-		processRecursive(typeNode, typeScope, null);
 		processRecursive(funcNode, parentScope, null);
 	}
 
@@ -234,6 +164,18 @@ public class ScopeAnalyzer implements Analyzer {
 			return;
 		if (parentScope == null) {
 			parentScope = scopeFactory.newScope(ScopeKind.FILE, null, node);
+		} else if (node instanceof ScopeParameterizedDeclarationNode) {
+			DeclarationNode base = ((ScopeParameterizedDeclarationNode) node)
+					.baseDeclaration();
+			SequenceNode<VariableDeclarationNode> scopeList = ((ScopeParameterizedDeclarationNode) node)
+					.parameters();
+			IdentifierNode identifier = base.getIdentifier();
+			Scope blockScope = scopeFactory.newScope(ScopeKind.BLOCK,
+					parentScope, node);
+
+			processRecursive(identifier, parentScope, null);
+			processRecursive(scopeList, blockScope, null);
+			processNode(base, blockScope, functionScope);
 		} else if (node instanceof FunctionDefinitionNode) {
 			processFunctionDefinitionNode((FunctionDefinitionNode) node,
 					parentScope);

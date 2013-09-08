@@ -365,7 +365,7 @@ public class CommonValueFactory implements ValueFactory {
 		// might need to strip qualifiers?
 		ObjectType elementType = arrayType.getElementType();
 		PointerType elementReferenceType = typeFactory.pointerType(elementType,
-				arrayReference.getType().scope());
+				arrayReference.getType().scopeRestriction());
 
 		return (ArrayElementReference) canonic(new CommonArrayElementReference(
 				elementReferenceType, arrayReference, index));
@@ -375,7 +375,7 @@ public class CommonValueFactory implements ValueFactory {
 			AddressValue structureOrUnionReference, Field field) {
 		ObjectType memberType = field.getType();
 		PointerType memberReferenceType = typeFactory.pointerType(memberType,
-				structureOrUnionReference.getType().scope());
+				structureOrUnionReference.getType().scopeRestriction());
 
 		return (MemberReference) canonic(new CommonMemberReference(
 				memberReferenceType, structureOrUnionReference, field));
