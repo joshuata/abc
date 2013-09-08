@@ -1,5 +1,5 @@
 
-/*
+int y;
 $scope root;
 double x;
 
@@ -14,21 +14,27 @@ void main() {
   q = p; // ok
   // p = q; // syntax error
 }
-*/
 
-/*
+// need to add scopes to structs too...
+
+<t> typedef struct _Node {
+  struct _Node *<t> next;
+  int id;
+} Node;
+
+
+typedef struct __heap $heap;
+
+<s> void *<s> $malloc($heap *<s> heap, int size);
+
 double * g(double * p) {
   return p;
 }
-*/
+
 
 <s> double *<s> f(double *<s> p)  {
   return p;
 }
 
-// what about
-/*
-<s> t<s> f() { }
-*/
 
 

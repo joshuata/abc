@@ -54,7 +54,7 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * name; they are not the same entity. It is as if each is given a new name
  * distinct from all other names.
  */
-public interface Scope {
+public interface Scope extends ScopeValue {
 
 	/**
 	 * These are the four different kinds of scopes.
@@ -321,12 +321,8 @@ public interface Scope {
 	 */
 	boolean isDescendantOf(Scope that);
 
-	/**
-	 * Returns first variable of type $scope delcared in this scope. This gives
-	 * a name to the scope.
-	 * 
-	 * @return first scope variable or null if there isn't one
-	 */
-	Variable getFirstScopeVariable();
+	void setScopeName(ScopeVariable variable);
+
+	ScopeVariable getScopeName();
 
 }

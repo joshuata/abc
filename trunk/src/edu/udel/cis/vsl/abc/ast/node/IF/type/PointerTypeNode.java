@@ -7,10 +7,17 @@ public interface PointerTypeNode extends TypeNode {
 	TypeNode referencedType();
 
 	/**
-	 * Returns the name of the CIVL-C scope used in the scope modifier
-	 * associated to this pointer. For example <code>double *<s> p;</code>
-	 * indicates that p is a pointer-to-double-in-s, i.e., the scope modifier is
-	 * s.
+	 * Returns the CIVL-C scope modifier expression associated to the pointer.
+	 * May be null, if no modifier is present (equivalent to using the root
+	 * scope).
+	 * 
+	 * The type of this exprssion will be $scope, the scope type.
+	 * 
+	 * The expression may be an identifier expression, in which case the
+	 * identifier is the name of a scope variable.
+	 * 
+	 * The expression may be a ScopeOfNode, which is an expression that takes a
+	 * variable and returns the scope in which the variable is declared.
 	 * 
 	 * @return scope modifier or null if absent
 	 */

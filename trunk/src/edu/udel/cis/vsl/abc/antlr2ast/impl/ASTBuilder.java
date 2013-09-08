@@ -23,12 +23,12 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
@@ -935,10 +935,7 @@ public class ASTBuilder {
 			// $input const double a[n];
 
 			if (analysis.typedefCount > 0) {
-				TypeNode typeNode = scopeList == null ? data.type : nodeFactory
-						.newScopeParameterizedTypeNode(sourceFactory.join(
-								scopeList.getSource(), data.type.getSource()),
-								scopeList, data.type);
+				TypeNode typeNode = data.type;
 				String name;
 
 				definition = nodeFactory.newTypedefDeclarationNode(source,
@@ -948,10 +945,7 @@ public class ASTBuilder {
 				name = data.identifier.name();
 				scope.putMapping(name, data.type);
 			} else if (isFunction(data.type, scope)) {
-				TypeNode typeNode = scopeList == null ? data.type : nodeFactory
-						.newScopeParameterizedTypeNode(sourceFactory.join(
-								scopeList.getSource(), data.type.getSource()),
-								scopeList, data.type);
+				FunctionTypeNode typeNode = (FunctionTypeNode) data.type;
 				FunctionDeclarationNode declaration = nodeFactory
 						.newFunctionDeclarationNode(source, data.identifier,
 								typeNode, contract);
@@ -978,6 +972,12 @@ public class ASTBuilder {
 				setAlignmentSpecifiers(declaration, analysis, scope);
 				checkFunctionSpecifiers(declaration, analysis);
 				definition = declaration;
+			}
+			if (scopeList != null) {
+				definition = nodeFactory.newScopeParameterizedDeclarationNode(
+						sourceFactory.join(scopeList.getSource(),
+								definition.getSource()), scopeList,
+						(DeclarationNode) definition);
 			}
 			definitionList.add(definition);
 		}
@@ -2010,7 +2010,8 @@ public class ASTBuilder {
 			} else if (kind == STATICASSERT) {
 				items.add(translateStaticAssertion(childTree, newScope));
 			} else if (kind == FUNCTION_DEFINITION) {
-				items.add(translateFunctionDefinition(childTree, newScope));
+				items.add((BlockItemNode) translateFunctionDefinition(
+						childTree, newScope));
 			} else {
 				items.add(translateStatement(childTree, newScope));
 			}
@@ -2061,7 +2062,7 @@ public class ASTBuilder {
 	 * @return
 	 * @throws SyntaxException
 	 */
-	private FunctionDefinitionNode translateFunctionDefinition(
+	private ExternalDefinitionNode translateFunctionDefinition(
 			CommonTree functionDefinitionTree, SimpleScope scope)
 			throws SyntaxException {
 		// two different ways of declaring parameters:
@@ -2083,9 +2084,8 @@ public class ASTBuilder {
 		TypeNode baseType = newSpecifierType(analysis, newScope);
 		DeclaratorData data = processDeclarator(declarator, baseType, newScope);
 		FunctionTypeNode functionType = (FunctionTypeNode) data.type;
-		TypeNode finalTypeNode;
 		CompoundStatementNode body;
-		FunctionDefinitionNode result;
+		ExternalDefinitionNode result;
 
 		if (functionType.hasIdentifierList()) {
 			SequenceNode<VariableDeclarationNode> formalSequenceNode = functionType
@@ -2158,15 +2158,16 @@ public class ASTBuilder {
 				functionType.setParameters(newFormalSequenceNode);
 			}
 		}
-		finalTypeNode = scopeListNode == null ? data.type : nodeFactory
-				.newScopeParameterizedTypeNode(
-						sourceFactory.join(scopeListNode.getSource(),
-								data.type.getSource()), scopeListNode,
-						data.type);
 		body = translateCompoundStatement(compoundStatementTree, newScope);
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
-				finalTypeNode, getContract(contractTree, newScope), body);
+				(FunctionTypeNode) data.type,
+				getContract(contractTree, newScope), body);
+		if (scopeListNode != null)
+			result = nodeFactory.newScopeParameterizedDeclarationNode(
+					sourceFactory.join(scopeListNode.getSource(),
+							result.getSource()), scopeListNode,
+					(DeclarationNode) result);
 		return result;
 	}
 

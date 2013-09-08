@@ -18,8 +18,7 @@ public interface TypeNode extends SizeableNode {
 		POINTER,
 		ATOMIC,
 		TYPEDEF_NAME,
-		SCOPE,
-		SCOPE_PARAMETERIZED
+		SCOPE
 	};
 
 	/**

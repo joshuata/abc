@@ -5,6 +5,7 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
@@ -15,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -34,6 +36,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
@@ -65,7 +68,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.ScopeParameterizedTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
@@ -189,9 +191,6 @@ public interface NodeFactory {
 			boolean hasIdentifierList);
 
 	TypeNode newScopeTypeNode(Source source);
-
-	ScopeParameterizedTypeNode newScopeParameterizedTypeNode(Source source,
-			SequenceNode<VariableDeclarationNode> scopeList, TypeNode body);
 
 	/**
 	 * Source is same as that of the identifier name.
@@ -339,6 +338,9 @@ public interface NodeFactory {
 			ExpressionNode processPointerExpression,
 			ExpressionNode lengthExpression, ExpressionNode body);
 
+	ScopeOfNode newScopeOfNode(Source source,
+			IdentifierExpressionNode variableExpression);
+
 	// Declarations...
 
 	/**
@@ -380,7 +382,7 @@ public interface NodeFactory {
 	 * @return
 	 */
 	FunctionDeclarationNode newFunctionDeclarationNode(Source source,
-			IdentifierNode name, TypeNode type,
+			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract);
 
 	EnumeratorDeclarationNode newEnumeratorDeclarationNode(Source source,
@@ -428,6 +430,10 @@ public interface NodeFactory {
 
 	ArrayDesignatorNode newArrayDesignatorNode(Source source,
 			ExpressionNode index);
+
+	ScopeParameterizedDeclarationNode newScopeParameterizedDeclarationNode(
+			Source source, SequenceNode<VariableDeclarationNode> scopeList,
+			DeclarationNode baseDeclaration);
 
 	// Statements...
 
@@ -538,7 +544,7 @@ public interface NodeFactory {
 	// external definitions...
 
 	FunctionDefinitionNode newFunctionDefinitionNode(Source source,
-			IdentifierNode name, TypeNode type,
+			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract, CompoundStatementNode body);
 
 	ASTNode newTranslationUnitNode(Source source,

@@ -11,7 +11,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -31,6 +31,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -177,7 +178,6 @@ public class DeclarationAnalyzer {
 			boolean isParameter) throws SyntaxException {
 		Variable result = (Variable) processOrdinaryDeclaration(node,
 				isParameter);
-		// when do you process type?
 		InitializerNode initializer = node.getInitializer();
 
 		if (result != null) {
@@ -187,6 +187,13 @@ public class DeclarationAnalyzer {
 			type = result.getType();
 			if (initializer != null)
 				processInitializer(initializer, type);
+			// if this is a scope variable but not a scope parameter,
+			// it becomes the name of the scope:
+			if (!isParameter && result instanceof ScopeVariable) {
+				Scope scope = node.getIdentifier().getScope();
+
+				scope.setScopeName((ScopeVariable) result);
+			}
 		}
 		return result;
 	}
@@ -266,6 +273,25 @@ public class DeclarationAnalyzer {
 
 	}
 
+	public void processScopeParameterizedDeclaration(
+			ScopeParameterizedDeclarationNode decl) throws SyntaxException {
+		DeclarationNode baseDecl = decl.baseDeclaration();
+		SequenceNode<VariableDeclarationNode> scopeList = decl.parameters();
+		int numVars = scopeList.numChildren();
+
+		for (int i = 0; i < numVars; i++) {
+			VariableDeclarationNode varDecl = scopeList.getSequenceChild(i);
+
+			processVariableDeclaration(varDecl, true);
+		}
+		if (baseDecl instanceof TypedefDeclarationNode)
+			processTypedefDeclaration((TypedefDeclarationNode) baseDecl);
+		else if (baseDecl instanceof FunctionDeclarationNode)
+			processFunctionDeclaration((FunctionDeclarationNode) baseDecl);
+		else
+			throw error("Unexpected scoped declaration", decl);
+	}
+
 	// ************************* Private Methods **************************
 
 	private SyntaxException error(String message, ASTNode node) {
@@ -333,7 +359,8 @@ public class DeclarationAnalyzer {
 	 * @param node
 	 *            the declaration node
 	 * @param isParameter
-	 *            is the declaration the declaration of a function parameter?
+	 *            is the declaration the declaration of a function parameter or
+	 *            scope parameter?
 	 * @throws SyntaxException
 	 */
 	private OrdinaryEntity processOrdinaryDeclaration(

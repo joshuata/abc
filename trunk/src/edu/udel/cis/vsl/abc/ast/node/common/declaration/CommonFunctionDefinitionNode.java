@@ -7,14 +7,14 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonFunctionDefinitionNode extends CommonFunctionDeclarationNode
 		implements FunctionDefinitionNode {
 
 	public CommonFunctionDefinitionNode(Source source,
-			IdentifierNode identifier, TypeNode type,
+			IdentifierNode identifier, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract, CompoundStatementNode statement) {
 		super(source, identifier, type, contract);
 		addChild(statement);

@@ -38,11 +38,9 @@ public class CommonProgram implements Program {
 	public void removeSideEffects() throws SyntaxException {
 		ast = sideEffectRemover.transform(ast);
 		standardAnalyzer.clear(ast);
-		
 		// debugging code...
-		System.out.println("\n\nRemoved side effects...\n\n");
-		ast.print(System.out);
-		
+		// System.out.println("\n\nRemoved side effects...\n\n");
+		// ast.print(System.out);
 		standardAnalyzer.analyze(ast);
 	}
 

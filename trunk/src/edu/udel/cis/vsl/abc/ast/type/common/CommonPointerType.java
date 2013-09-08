@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
@@ -12,12 +13,12 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 
 	private Type referencedType;
 
-	private Scope scope; // may be null
+	private ScopeValue scopeRestriction; // may be null
 
-	public CommonPointerType(Type referencedType, Scope scope) {
+	public CommonPointerType(Type referencedType, ScopeValue scopeRestriction) {
 		super(TypeKind.POINTER);
 		this.referencedType = referencedType;
-		this.scope = scope;
+		this.scopeRestriction = scopeRestriction;
 	}
 
 	@Override
@@ -39,8 +40,8 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 	public int hashCode() {
 		int result = classCode + referencedType.hashCode();
 
-		if (scope != null)
-			result += scope.hashCode();
+		if (scopeRestriction != null)
+			result += scopeRestriction.hashCode();
 		return result;
 	}
 
@@ -53,10 +54,10 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 
 			if (!referencedType.equals(that.referencedType))
 				return false;
-			if (scope == null)
-				return that.scope == null;
+			if (scopeRestriction == null)
+				return that.scopeRestriction == null;
 			else
-				return scope.equals(that.scope);
+				return scopeRestriction.equals(that.scopeRestriction);
 		}
 		return false;
 	}
@@ -73,15 +74,21 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 
 			if (!this.referencedType().compatibleWith(that.referencedType()))
 				return false;
-			if (scope == null || that.scope == null)
-				return true;
 			else {
-				Scope thisScope = this.scope();
-				Scope thatScope = that.scope();
+				ScopeValue thisScopeValue = this.scopeRestriction();
+				ScopeValue thatScopeValue = that.scopeRestriction();
 
-				if (thisScope.isDescendantOf(thatScope)
-						|| thatScope.isDescendantOf(thisScope))
+				if (thisScopeValue == null || thatScopeValue == null)
 					return true;
+				if (thisScopeValue instanceof Scope
+						&& thatScopeValue instanceof Scope) {
+					Scope thisScope = (Scope) thisScopeValue;
+					Scope thatScope = (Scope) thatScopeValue;
+
+					if (thisScope.isDescendantOf(thatScope)
+							|| thatScope.isDescendantOf(thisScope))
+						return true;
+				}
 			}
 		}
 		return false;
@@ -110,8 +117,8 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 			out.print(prefix + "| ");
 			referencedType.print(prefix + "| ", out, true);
 			out.println();
-			if (scope != null)
-				out.print(prefix + "| " + scope);
+			if (scopeRestriction != null)
+				out.print(prefix + "| " + scopeRestriction);
 		}
 	}
 
@@ -119,8 +126,8 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 	public String toString() {
 		String result = "pointer<";
 
-		if (scope != null) {
-			result += scope.toString();
+		if (scopeRestriction != null) {
+			result += scopeRestriction.toString();
 		}
 		result += ">[" + referencedType + "]";
 		return result;
@@ -132,12 +139,8 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 	}
 
 	@Override
-	public Scope scope() {
-		return scope;
+	public ScopeValue scopeRestriction() {
+		return scopeRestriction;
 	}
 
-	// @Override
-	// public VariableDeclarationNode scopeModifier() {
-	// return scopeModifier;
-	// }
 }

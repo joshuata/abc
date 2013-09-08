@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 
 public interface PointerType extends UnqualifiedObjectType {
 
@@ -49,5 +49,5 @@ public interface PointerType extends UnqualifiedObjectType {
 	 * 
 	 * @return scope restriction of this pointer type, or null
 	 */
-	Scope scope();
+	ScopeValue scopeRestriction();
 }

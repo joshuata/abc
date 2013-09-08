@@ -14,6 +14,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
@@ -24,6 +25,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -43,6 +45,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
@@ -76,7 +79,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.ScopeParameterizedTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
@@ -90,6 +92,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFieldDesignatorNod
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonRequiresNode;
+import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonTypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonVariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonAlignOfNode;
@@ -107,6 +110,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonRemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonResultNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSelfNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSpawnNode;
@@ -135,7 +139,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.type.CommonBasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonEnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonPointerTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.common.type.CommonScopeParameterizedTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonScopeTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonStructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonTypedefNameNode;
@@ -267,10 +270,11 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public ScopeParameterizedTypeNode newScopeParameterizedTypeNode(
+	public ScopeParameterizedDeclarationNode newScopeParameterizedDeclarationNode(
 			Source source, SequenceNode<VariableDeclarationNode> scopeList,
-			TypeNode body) {
-		return new CommonScopeParameterizedTypeNode(source, scopeList, body);
+			DeclarationNode baseDeclaration) {
+		return new CommonScopeParameterizedDeclarationNode(source, scopeList,
+				baseDeclaration);
 	}
 
 	@Override
@@ -386,7 +390,7 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public FunctionDeclarationNode newFunctionDeclarationNode(Source source,
-			IdentifierNode name, TypeNode type,
+			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract) {
 		return new CommonFunctionDeclarationNode(source, name, type, contract);
 	}
@@ -577,7 +581,7 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public FunctionDefinitionNode newFunctionDefinitionNode(Source source,
-			IdentifierNode name, TypeNode type,
+			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract, CompoundStatementNode body) {
 		return new CommonFunctionDefinitionNode(source, name, type, contract,
 				body);
@@ -621,6 +625,12 @@ public class CommonNodeFactory implements NodeFactory {
 			ExpressionNode lengthExpression, ExpressionNode body) {
 		return new CommonCollectiveExpressionNode(source,
 				processPointerExpression, lengthExpression, body);
+	}
+
+	@Override
+	public ScopeOfNode newScopeOfNode(Source source,
+			IdentifierExpressionNode variableExpression) {
+		return new CommonScopeOfNode(source, variableExpression);
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
@@ -210,6 +211,9 @@ public class EntityAnalyzer implements Analyzer {
 					.processEnumerationType((EnumerationTypeNode) node));
 		} else if (node instanceof AssumeNode) {
 			statementAnalyzer.processStatement((AssumeNode) node);
+		} else if (node instanceof ScopeParameterizedDeclarationNode) {
+			declarationAnalyzer
+					.processScopeParameterizedDeclaration((ScopeParameterizedDeclarationNode) node);
 		} else {
 			throw new RuntimeException("Unreachable");
 		}
