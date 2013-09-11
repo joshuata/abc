@@ -3,17 +3,7 @@ int y;
 $scope root;
 double x;
 
-void main() {
-  $scope s1;
-  double y;
-  double *<s1> p;
-  double *<root> q;
-  
-  p = &y;
-  q = &x;
-  q = p; // ok
-  // p = q; // syntax error
-}
+
 
 // need to add scopes to structs too...
 
@@ -31,10 +21,20 @@ double * g(double * p) {
   return p;
 }
 
-
-<s> double *<s> f(double *<s> p)  {
-  return p;
+<s,t> double *<s> f(double *<t> p)  {
+  return f<s,t>(f<t,s>(f<s,t>(p)));
 }
 
-
+void main() {
+  $scope s1;
+  double y;
+  double *<s1> p;
+  double *<root> q;
+  
+  p = &y;
+  q = &x;
+  q = p; // ok
+  // p = q; // syntax error
+  f<s1,s1>(p);
+}
 

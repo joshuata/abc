@@ -3,8 +3,10 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -183,6 +185,18 @@ public interface TypeFactory {
 	 * @return a pointer type as specified
 	 */
 	PointerType pointerType(Type referencedType, ScopeValue scopeRestriction);
+
+	/**
+	 * Returns the type obtained by replacing scopes in pointer modifiers as
+	 * specified by the map.
+	 * 
+	 * @param type
+	 *            any ABC Type
+	 * @param map
+	 *            map from scope variables to scope values
+	 * @return type after substitutions performed
+	 */
+	Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map);
 
 	/**
 	 * The atomic type associated to a base type. This type may be denoted

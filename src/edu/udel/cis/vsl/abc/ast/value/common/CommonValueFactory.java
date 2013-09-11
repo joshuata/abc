@@ -108,12 +108,15 @@ public class CommonValueFactory implements ValueFactory {
 	}
 
 	/**
+	 * Evaluates a constant expression.
+	 * 
 	 * Should apply conversions to result.
 	 * 
 	 * @param expr
 	 * @return
 	 * @throws SyntaxException
 	 * @throws UnsourcedException
+	 *             if expr is not a constant expression
 	 */
 	private Value evaluateHelper(ExpressionNode expr) throws SyntaxException,
 			UnsourcedException {
@@ -416,34 +419,112 @@ public class CommonValueFactory implements ValueFactory {
 		return null;
 	}
 
+	private Value evalMinus(Type type, Value arg0) throws UnsourcedException {
+		if (arg0 instanceof IntegerValue) {
+			BigInteger big = ((IntegerValue) arg0).getIntegerValue();
+			BigInteger neg = big.negate();
+			Value result = integerValue((IntegerType) type, neg);
+
+			return result;
+		}
+		throw new UnsourcedException(
+				"Unsupported feature: non-integer negative");
+	}
+
+	private Value evalBinaryNumericOp(Type type, Operator operator, Value arg0,
+			Value arg1) throws UnsourcedException {
+		Object val0, val1;
+
+		if (arg0 instanceof IntegerValue) {
+			val0 = ((IntegerValue) arg0).getIntegerValue();
+		} else if (arg0 instanceof RealFloatingValue) {
+			val0 = ((RealFloatingValue) arg0).getDoubleValue();
+		} else
+			throw new UnsourcedException(
+					"Expected integer or real constant, not " + arg0);
+		if (arg1 instanceof IntegerValue) {
+			val1 = ((IntegerValue) arg1).getIntegerValue();
+		} else if (arg1 instanceof RealFloatingValue) {
+			val1 = ((RealFloatingValue) arg1).getDoubleValue();
+		} else
+			throw new UnsourcedException(
+					"Expected integer or real constant, not " + arg1);
+		if (val0 instanceof BigInteger && val1 instanceof BigInteger) {
+			BigInteger big0 = ((BigInteger) val0);
+			BigInteger big1 = ((BigInteger) val1);
+			BigInteger bigVal;
+
+			switch (operator) {
+			case TIMES:
+				bigVal = big0.multiply(big1);
+				break;
+			case PLUS:
+				bigVal = big0.add(big1);
+				break;
+			case MINUS:
+				bigVal = big0.subtract(big1);
+				break;
+			case DIV:
+				bigVal = big0.divide(big1);
+				break;
+			case MOD:
+				bigVal = big0.mod(big1);
+			default:
+				throw new UnsourcedException("Unexpected operator: " + operator);
+			}
+			return integerValue((IntegerType) type, bigVal);
+		} else {
+			throw new UnsourcedException("multiplication of floating constants");
+		}
+
+	}
+
+	/**
+	 * Applies an operator to some arguments to yield a constant expression.
+	 * 
+	 * @param type
+	 * @param operator
+	 * @param args
+	 * @return
+	 * @throws UnsourcedException
+	 *             if result is not a constant expression
+	 */
 	private Value apply(Type type, Operator operator, Value[] args)
 			throws UnsourcedException {
+		int numArgs = args.length;
+
 		switch (operator) {
-		case BITAND: // & bit-wise and</li>
-		case BITCOMPLEMENT: // ~ bit-wise complement</li>
-		case BITOR: // | bit-wise inclusive or</li>
-		case BITXOR: // ^ bit-wise exclusive or</li>
-		case CONDITIONAL: // ?: the conditional operator</li>
-		case DEREFERENCE: // * pointer dereference</li>
-		case DIV: // / numerical division</li>
-		case EQUALS: // == equality</li>
-		case GT: // > greater than</li>
-		case GTE: // >= greater than or equals</li>
-		case LAND: // && logical and</li>
-		case LOR: // || logical or</li>
-		case LT: // < less than</li>
-		case LTE: // <= less than or equals</li>
-		case MINUS: // - binary subtraction (numbers and pointers)</li>
-		case MOD: // % integer modulus</li>
-		case NEQ: // != not equals</li>
-		case NOT: // ! logical not</li>
-		case PLUS: // + binary addition, numeric or pointer</li>
-		case SHIFTLEFT: // << shift left</li>
-		case SHIFTRIGHT: // >> shift right</li>
-		case SUBSCRIPT: // [] array subscript</li>
-		case TIMES: // * numeric multiplication</li>
-		case UNARYMINUS: // - numeric negative</li>
+		case BITAND: // & bit-wise and
+		case BITCOMPLEMENT: // ~ bit-wise complement
+		case BITOR: // | bit-wise inclusive or
+		case BITXOR: // ^ bit-wise exclusive or
+		case CONDITIONAL: // ?: the conditional operator
+		case DEREFERENCE: // * pointer dereference
+		case EQUALS: // == equality
+		case GT: // > greater than
+		case GTE: // >= greater than or equals
+		case LAND: // && logical and
+		case LOR: // || logical or
+		case LT: // < less than
+		case LTE: // <= less than or equals
+		case NEQ: // != not equals
+		case NOT: // ! logical not
+		case SHIFTLEFT: // << shift left
+		case SHIFTRIGHT: // >> shift right
+		case SUBSCRIPT: // [] array subscript
+			break;
+
+		case PLUS: // + binary addition, numeric or pointer
+		case DIV: // / numerical division
+		case TIMES: // numeric multiplication
+		case MOD: // % integer modulus
+		case MINUS: // - binary subtraction (numbers and pointers)
+			if (numArgs == 2)
+				return evalBinaryNumericOp(type, operator, args[0], args[1]);
+		case UNARYMINUS: // - numeric negative
+			return evalMinus(type, args[0]);
 		case UNARYPLUS: // + numeric no-op</li>
+			return args[0];
 		}
 		// TODO: handle specials cases for all of above
 		return canonic(new CommonOperatorValue(type, operator, args));
@@ -451,7 +532,7 @@ public class CommonValueFactory implements ValueFactory {
 
 	private Value applyConversions(ExpressionNode expr, Value value) {
 		// TODO
-		return null;
+		return value;
 	}
 
 	/**
