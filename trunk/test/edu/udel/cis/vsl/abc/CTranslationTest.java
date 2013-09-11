@@ -37,6 +37,11 @@ public class CTranslationTest {
 	}
 
 	@Test
+	public void constants() throws ABCException, IOException {
+		check("constants");
+	}
+	
+	@Test
 	public void adder_seq() throws ABCException, IOException {
 		check("adder_seq");
 	}
