@@ -35,6 +35,6 @@ void main() {
   q = &x;
   q = p; // ok
   // p = q; // syntax error
-  f<s1,s1>(p);
+  f<s1,s1>(p); // fine but check not yet implemented correctly
 }
 
