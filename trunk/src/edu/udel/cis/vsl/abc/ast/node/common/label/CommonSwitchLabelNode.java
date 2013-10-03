@@ -55,6 +55,9 @@ public class CommonSwitchLabelNode extends CommonASTNode implements
 
 	@Override
 	public SwitchLabelNode copy() {
+		if (isDefault) {
+			return new CommonSwitchLabelNode(getSource());
+		}
 		return new CommonSwitchLabelNode(getSource(),
 				duplicate(getExpression()));
 	}
