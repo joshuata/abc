@@ -10,7 +10,7 @@ openjdk-7-jdk.
 2. Install Apache ant, if you don't already have it
 (http://ant.apache.org).
 
-3. Download dependent materials.
+3. Download dependent packages.
 	a. If you are using 64-bit mac os, download the tgz archives from http://vsl.cis.udel.edu/tools/vsl_depend_osx.tgz 
 	   and unzip it some where on your system. 
 
@@ -60,7 +60,7 @@ a bunch of work.
 by Eclipse, but you will want to run Ant to build the jar file.)
 
 7. The platform-specific information are handled in Eclipse by
-defining Classpath variables.  Navigate to Preferences->Java->Build
+defining Classpath variables. Navigate to Preferences->Java->Build
 Path->Classpath Variables->New and define a new variable called
 "ANTLR". To define it, navigate to and select the complete ANTLR jar
 file you downloaded above.  In addition, you may also define
