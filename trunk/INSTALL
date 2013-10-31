@@ -11,20 +11,23 @@ openjdk-7-jdk.
 (http://ant.apache.org).
 
 3. Download dependent packages.
-	a. If you are using 64-bit mac os, download the tgz archives from http://vsl.cis.udel.edu/tools/vsl_depend_osx.tgz 
+	a. If you are using 64-bit mac os, download the tgz archives from 
+	   http://vsl.cis.udel.edu/tools/vsl_depend_osx.tgz 
 	   and unzip it some where on your system. 
 
-	b. Otherwise, download the JUnit jar (v. 4.11), hamcrest-core jar (v. 1.3), ANTLR complete jar, 
-	   and the ANTLR runtime and Jacoco gzipped tar archives from http://vsl.cis.udel.edu/tools.  
-	   Put these files somewhere on your system and untar the ANTLR runtime and Jacoco archives.
+	b. Otherwise, download the JUnit jar (v. 4.11), hamcrest-core jar (v. 1.3), 
+	   ANTLR complete jar, and the ANTLR runtime and Jacoco gzipped tar archives 
+	   from http://vsl.cis.udel.edu/tools. Put these files somewhere on your 
+	   system and untar the ANTLR runtime and Jacoco archives.
 
 4. svn checkout svn://vsl.cis.udel.edu/abc
 
 5. cd abc/trunk
 
 6. Create a file named build.properties in the directory where build.xml is in.
-	a. If you are using 64-bit mac os, copy and paste the content from properties/build.properties.osx.
-	   Edit the entry "root" to point to the corresponding directory that you download at step 3.a.
+	a. If you are using 64-bit mac os, copy and paste the content from 
+	   properties/build.properties.osx. Edit the entry "root" to point to 
+	   the corresponding directory that you download at step 3.a.
 	
 	b. Otherwise, copy and edit one of the examples in the properties directory. 
 	   Edit each entry to point to the corresponding items you downloaded in step 3.b.
@@ -59,13 +62,20 @@ a bunch of work.
 6. Create the build.properties files as step 6 above. (This is not used
 by Eclipse, but you will want to run Ant to build the jar file.)
 
-7. The platform-specific information are handled in Eclipse by
-defining Classpath variables. Navigate to Preferences->Java->Build
-Path->Classpath Variables->New and define a new variable called
-"ANTLR". To define it, navigate to and select the complete ANTLR jar
-file you downloaded above.  In addition, you may also define
-ANTLR_SOURCE to point to the root of the ANTLR source tree (this step
-is optional but helps with debugging).
+7. Define Classpath variables.
+
+	a. (Recommended) If you have put all dependent packages as Step 3.a above,
+	   you only need to modify one classpath variables. Go to 
+	   Preferences -> Java -> Build Path -> Classpath Variables, 
+	   and edit the entry “VSL_DEPEND” to point to the directory 
+	   where you put the dependent packages.
+	
+	b. Otherwise, navigate to Preferences->Java->Build
+       Path->Classpath Variables->New and define a new variable called
+       "ANTLR". To define it, navigate to and select the complete ANTLR jar
+       file you downloaded above.  In addition, you may also define
+       ANTLR_SOURCE to point to the root of the ANTLR source tree (this step
+       is optional but helps with debugging).
 
 8.  Do a clean build.  Everything should compile.  To build the jar,
 right click (or ctrl-click on Mac) on build.xml and select
