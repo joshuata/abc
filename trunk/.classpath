@@ -4,7 +4,7 @@
 	<classpathentry kind="src" output="text/include" path="text/include"/>
 	<classpathentry kind="src" output="bin-test" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="ANTLR" sourcepath="/ANTLR_SOURCE"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="var" path="VSL_DEPEND/lib/antlr-3.4-complete.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
