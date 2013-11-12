@@ -10,31 +10,36 @@ openjdk-7-jdk.
 2. Install Apache ant, if you don't already have it
 (http://ant.apache.org).
 
-3. Download dependent packages.
-	a. If you are using 64-bit mac os, 64-bit linux or 32-bit linux, 
-	   download the tgz archives from 
-	   http://vsl.cis.udel.edu/tools/vsl_depend 
-	   and unzip it some where on your system. 
+3. Download the tgz archive of VSL dependencies from 
+   http://vsl.cis.udel.edu/tools/vsl_depend,
+   choosing the right .tgz according to your platform:
+	
+	vsl_linux32-1.0.tgz	- 32-bit linux
+	vsl_linux64-1.0.tgz	- 64-bit linux
+	vsl_osx64-1.0.tgz	- 64-bit osx
+	
+   Unzip the .tgz file and you will have the folder vsl.
+   Move vsl to /opt (you might need to use “sudo” for this.
+   Also, if you don't already have a directory called /opt, 
+   you will have to create it with mkdir /opt).
 
-	b. Otherwise, download the JUnit jar (v. 4.11), hamcrest-core jar (v. 1.3), 
-	   ANTLR complete jar, and the ANTLR runtime and Jacoco gzipped tar archives 
-	   from http://vsl.cis.udel.edu/tools. Put these files somewhere on your 
-	   system and untar the ANTLR runtime and Jacoco archives.
+   Suppose that you put the .tgz file (or .tar file if your browser
+   unzipped it automatically to a .tar file) in the directory $Download.
+   You can use the following commands:
+
+   		$ cd $Download
+   		$ tar xzf YourTgzOrTarFile vsl
+   		$ sudo mv vsl /opt
+
+   Now you can type "ls /opt/vsl", and the output should be
+
+   		README.txt    lib        licenses    src
 
 4. svn checkout svn://vsl.cis.udel.edu/abc
 
 5. cd abc/trunk
 
-6. Create a file named build.properties in the directory where build.xml is in.
-	a. If you are using 64-bit mac os, 64-bit linux or 32-bit linux, 
-	   copy and paste the content from 
-	   properties/build.properties.osx. Edit the entry "root" to point to 
-	   the corresponding directory that you download at step 3.a.
-	
-	b. Otherwise, copy and edit one of the examples in the properties directory. 
-	   Edit each entry to point to the corresponding items you downloaded in step 3.b.
-
-7. Type "ant" and everything should build without warnings or errors
+6. Type "ant" and everything should build without warnings or errors
 and produce abc.jar.  Type "ant test" to run a JUnit test suite.  All
 tests should pass.
 
@@ -61,29 +66,15 @@ Project Wizard as usual, naming it "ABC".  The .project, .classpath,
 and other Eclipse meta-data are already in the SVN archive, saving you
 a bunch of work.
 
-6. Create the build.properties files as step 6 above. (This is not used
-by Eclipse, but you will want to run Ant to build the jar file.)
+6. Navigate to Preferences -> Java -> Build Path -> ClassPath 
+Variables, and then select “New…” to create a classpath variable VSL, 
+and specify its value to be /opt/vsl.
 
-7. Define Classpath variables.
-
-	a. (Recommended) If you have put all dependent packages as Step 3.a above,
-	   you only need to modify one classpath variables. Go to 
-	   Preferences -> Java -> Build Path -> Classpath Variables, 
-	   and edit the entry “VSL_DEPEND” to point to the directory 
-	   where you put the dependent packages.
-	
-	b. Otherwise, navigate to Preferences->Java->Build
-       Path->Classpath Variables->New and define a new variable called
-       "ANTLR". To define it, navigate to and select the complete ANTLR jar
-       file you downloaded above.  In addition, you may also define
-       ANTLR_SOURCE to point to the root of the ANTLR source tree (this step
-       is optional but helps with debugging).
-
-8.  Do a clean build.  Everything should compile.  To build the jar,
+7.  Do a clean build.  Everything should compile.  To build the jar,
 right click (or ctrl-click on Mac) on build.xml and select
 Run As->Ant Build.
 
-9. To run the JUnit tests through Eclipse: Select Run->Run Configurations...
+8. To run the JUnit tests through Eclipse: Select Run->Run Configurations...
 Create a new JUnit configuration called "ABC Tests".  Select
 "Run all tests in the selected project..." and navigate to the "test"
 folder in the ABC project.  Under the Arguments tab, type "-ea"
