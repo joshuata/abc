@@ -14,7 +14,7 @@
 
 	<!-- Directories -->
 
-	<property file="build.properties" />
+	<property file="build_default.properties" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="real.src.dir" value="${src.dir}/edu/udel/cis/vsl/abc" />
 	<property name="bin.dir" value="${basedir}/bin" />
@@ -133,7 +133,8 @@
 	<target name="jar" depends="compile" description="Jar up all class files.">
 		<jar destfile="${jar-path}">
 			<fileset dir="${bin.dir}" />
-			<fileset dir="${antlr.runtime.bin}" />
+			<!--<fileset dir="${antlr.runtime.bin}" />-->
+			<zipfileset includes="**/*.class" src="${antlr.runtime.jar}" />
 			<fileset dir="${basedir}/text/include" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
