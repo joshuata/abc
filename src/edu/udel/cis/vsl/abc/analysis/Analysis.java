@@ -18,25 +18,25 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public class Analysis {
 
-	public static Analyzer newStandardAnalyzer(EntityFactory entityFactory,
-			NodeFactory nodeFactory, TokenFactory sourceFactory,
-			ConversionFactory conversionFactory) {
-		return new StandardAnalyzer(entityFactory, nodeFactory, sourceFactory,
-				conversionFactory);
+	public static Analyzer newStandardAnalyzer(ASTFactory astFactory,
+			EntityFactory entityFactory, NodeFactory nodeFactory,
+			TokenFactory sourceFactory, ConversionFactory conversionFactory) {
+		return new StandardAnalyzer(astFactory, entityFactory, nodeFactory,
+				sourceFactory, conversionFactory);
 	}
 
 	public static void performStandardAnalysis(AST unit) throws SyntaxException {
 		EntityFactory entityFactory = Entities.newEntityFactory();
-		ASTFactory unitFactory = unit.getASTFactory();
-		TypeFactory typeFactory = unitFactory.getTypeFactory();
+		ASTFactory astFactory = unit.getASTFactory();
+		TypeFactory typeFactory = astFactory.getTypeFactory();
 		ConversionFactory conversionFactory = Conversions
 				.newConversionFactory(typeFactory);
-		TokenFactory sourceFactory = unitFactory.getTokenFactory();
+		TokenFactory sourceFactory = astFactory.getTokenFactory();
 		ValueFactory valueFactory = Values.newValueFactory(typeFactory);
 		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 				valueFactory);
-		Analyzer analyzer = newStandardAnalyzer(entityFactory, nodeFactory,
-				sourceFactory, conversionFactory);
+		Analyzer analyzer = newStandardAnalyzer(astFactory, entityFactory,
+				nodeFactory, sourceFactory, conversionFactory);
 
 		analyzer.clear(unit);
 		analyzer.analyze(unit);

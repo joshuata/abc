@@ -1,10 +1,15 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.udel.cis.vsl.abc.ABC;
 import edu.udel.cis.vsl.abc.ABC.Language;
 import edu.udel.cis.vsl.abc.ast.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
@@ -12,9 +17,14 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
@@ -34,6 +44,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ResultNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SelfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
@@ -69,6 +80,8 @@ public class ExpressionAnalyzer {
 
 	private TypeFactory typeFactory;
 
+	private ASTFactory astFactory;
+
 	private IntegerType intType;
 
 	// ************************** Constructors ****************************
@@ -79,6 +92,7 @@ public class ExpressionAnalyzer {
 		this.conversionFactory = conversionFactory;
 		this.typeFactory = typeFactory;
 		this.intType = typeFactory.signedIntegerType(SignedIntKind.INT);
+		this.astFactory = entityAnalyzer.astFactory;
 	}
 
 	// ************************* Exported Methods **************************
@@ -116,6 +130,8 @@ public class ExpressionAnalyzer {
 			processSizeof((SizeofNode) node);
 		else if (node instanceof SpawnNode)
 			processSpawn((SpawnNode) node);
+		else if (node instanceof ScopeOfNode)
+			processScopeOf((ScopeOfNode) node);
 		// @ collective, result
 		else if (node instanceof RemoteExpressionNode) {
 			// need to find variable in scope
@@ -350,40 +366,143 @@ public class ExpressionAnalyzer {
 		node.setInitialType(type);
 	}
 
+	private Scope processScopeOf(ScopeOfNode node) throws SyntaxException {
+		IdentifierExpressionNode expressionNode = node.variableExpression();
+		IdentifierNode identifierNode = expressionNode.getIdentifier();
+		Entity entity = identifierNode.getEntity();
+		DeclarationNode decl;
+		Scope scope;
+
+		if (entity == null)
+			processIdentifierExpression(expressionNode);
+		entity = identifierNode.getEntity();
+		decl = entity.getFirstDeclaration();
+		scope = decl.getScope();
+		return scope;
+	}
+
+	private boolean isScopeParameter(ScopeVariable variable) {
+		DeclarationNode decl = variable.getFirstDeclaration();
+		ASTNode parent = decl.parent();
+
+		if (parent != null && parent instanceof SequenceNode<?>) {
+			ASTNode grandparent = parent.parent();
+
+			if (grandparent != null
+					&& grandparent instanceof ScopeParameterizedDeclarationNode)
+				return true;
+		}
+		return false;
+	}
+
+	private ScopeValue evaluateScopeExpression(ExpressionNode expr)
+			throws SyntaxException {
+		ScopeValue result;
+
+		if (expr instanceof IdentifierExpressionNode) {
+			// identifier must be a scope variable
+			IdentifierExpressionNode identifierExprNode = (IdentifierExpressionNode) expr;
+			IdentifierNode identifierNode = identifierExprNode.getIdentifier();
+			Entity entity = identifierNode.getEntity();
+
+			if (entity == null) {
+				processIdentifierExpression(identifierExprNode);
+				entity = identifierNode.getEntity();
+			}
+			if (entity instanceof ScopeVariable) {
+				ScopeVariable variable = (ScopeVariable) entity;
+
+				if (isScopeParameter(variable))
+					result = variable;
+				else
+					result = variable.getFirstDeclaration().getScope();
+			} else {
+				throw error("Expected scope variable, saw " + entity, expr);
+			}
+		} else if (expr instanceof ScopeOfNode) {
+			result = processScopeOf((ScopeOfNode) expr);
+		} else
+			throw error("Unknown kind of scope expression", expr);
+		return result;
+	}
+
 	private void processFunctionCall(FunctionCallNode node)
 			throws SyntaxException {
 		ExpressionNode functionNode = node.getFunction();
 		int numArgs = node.getNumberOfArguments();
-		Type tmpType;
-		TypeKind tmpKind;
+		SequenceNode<ExpressionNode> actualScopes = node.getScopeList();
 		FunctionType functionType;
+		boolean isScopeParameterized = false;
 		int expectedNumArgs;
 		boolean hasVariableNumArgs;
 
 		processExpression(functionNode);
+		{
+			Type tmpType = functionNode.getType();
+			TypeKind tmpKind = tmpType.kind();
 
-		// TODO: for a parameterized function call, need
-		// to evaluate the functionNode typenode to get
-		// the function type.
-
-		// Ditto for use of parameterized typedef name.
-
-		// so not every node has a type, or, need
-		// to add parameterized type
-		// functionNodes do not have types....
-
-		tmpType = functionNode.getType();
-		tmpKind = tmpType.kind();
-		if (tmpKind == TypeKind.POINTER) {
-			tmpType = ((PointerType) tmpType).referencedType();
-			tmpKind = tmpType.kind();
+			if (tmpKind == TypeKind.POINTER) {
+				tmpType = ((PointerType) tmpType).referencedType();
+				tmpKind = tmpType.kind();
+			}
+			if (tmpKind == TypeKind.FUNCTION)
+				functionType = (FunctionType) tmpType;
+			else
+				throw error(
+						"Function expression in function call does not have function "
+								+ "type or pointer to function type",
+						functionNode);
 		}
-		if (tmpKind == TypeKind.FUNCTION)
-			functionType = (FunctionType) tmpType;
-		else
-			throw error(
-					"Function expression in function call does not have function "
-							+ "type or pointer to function type", functionNode);
+		if (functionNode instanceof IdentifierExpressionNode) {
+			IdentifierNode identifierNode = ((IdentifierExpressionNode) functionNode)
+					.getIdentifier();
+			Entity entity = identifierNode.getEntity();
+
+			if (entity instanceof Function) {
+				Function function = (Function) entity;
+				DeclarationNode declarationNode = function
+						.getFirstDeclaration();
+
+				if (declarationNode.parent() instanceof ScopeParameterizedDeclarationNode) {
+					// this is a scope-parameterized procedure call
+					// DeclarationNode baseDeclarationNode =
+					// ((ScopeParameterizedDeclarationNode) declarationNode)
+					// .baseDeclaration();
+					SequenceNode<VariableDeclarationNode> formalScopes = ((ScopeParameterizedDeclarationNode) declarationNode
+							.parent()).parameters();
+					int numFormalScopes, numActualScopes;
+					Map<ScopeVariable, ScopeValue> scopeMap = new HashMap<>();
+
+					if (actualScopes == null)
+						throw error(
+								"Function call is missing scope parameters",
+								node);
+					numFormalScopes = formalScopes.numChildren();
+					numActualScopes = actualScopes.numChildren();
+					if (numFormalScopes != numActualScopes)
+						throw error(
+								"Expected " + numFormalScopes
+										+ " scope arguments but saw "
+										+ numActualScopes, node);
+					for (int i = 0; i < numFormalScopes; i++) {
+						VariableDeclarationNode decl = formalScopes
+								.getSequenceChild(i);
+						ScopeVariable scopeVariable = (ScopeVariable) decl
+								.getEntity();
+						ExpressionNode scopeExpression = actualScopes
+								.getSequenceChild(i);
+						ScopeValue scopeValue = evaluateScopeExpression(scopeExpression);
+
+						scopeMap.put(scopeVariable, scopeValue);
+					}
+					functionType = (FunctionType) astFactory.substituteScopes(
+							functionType, scopeMap);
+					isScopeParameterized = true;
+				}
+			}
+		}
+		if (actualScopes != null && !isScopeParameterized)
+			throw error("Scope parameters used where none expected", node);
 		expectedNumArgs = functionType.getNumParameters();
 		hasVariableNumArgs = functionType.isVariablyModified();
 		if (hasVariableNumArgs) {

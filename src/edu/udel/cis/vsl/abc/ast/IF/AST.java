@@ -10,9 +10,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * An abstract representation of a C "translation unit"---the thing that results
  * from translating a file (which may in turn include other files).
  * 
- * The clone method returns a new AST identical to this one, with all new nodes.
- * The tokens and attributed referenced by the nodes are not cloned; those
- * references are just copied.
+ * Each AST encompasses a set of AST nodes. Those nodes are "owned" by the AST.
+ * A node can owned by at most one AST. A node may also be free---not owned by
+ * any AST.
+ * 
+ * With few exceptions, nodes owned by an AST cannot be modified. If you want to
+ * modify them (for example, to implement an AST transformation), you first have
+ * to release the AST using the method {@link #release}.
  * 
  * @author siegel
  * 

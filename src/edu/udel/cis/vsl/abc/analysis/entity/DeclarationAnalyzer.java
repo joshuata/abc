@@ -44,10 +44,19 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
+/**
+ * A tool to analyze declarations in an AST.
+ * 
+ * @author siegel
+ * 
+ */
 public class DeclarationAnalyzer {
 
 	// ***************************** Fields *******************************
 
+	/**
+	 * The entity analyzer controlling this declaration analyzer.
+	 */
 	private EntityAnalyzer entityAnalyzer;
 
 	/**
@@ -57,12 +66,25 @@ public class DeclarationAnalyzer {
 
 	// ************************** Constructors ****************************
 
+	/**
+	 * Creates new declaration analyzer with the given controlling entity
+	 * analyzer.
+	 * 
+	 * @param entityAnalyzer
+	 *            the entity analyzer in charge
+	 */
 	DeclarationAnalyzer(EntityAnalyzer entityAnalyzer) {
 		this.entityAnalyzer = entityAnalyzer;
 	}
 
 	// ************************* Exported Methods *************************
 
+	/**
+	 * Sets the ignoredTypes to the given collection. Elements are not copied.
+	 * 
+	 * @param ignoredTypes
+	 *            names of types for which typedefs will be ignored
+	 */
 	void setIgnoredTypes(Collection<String> ignoredTypes) {
 		this.ignoredTypes = ignoredTypes;
 	}
@@ -72,6 +94,13 @@ public class DeclarationAnalyzer {
 	// is this a new kind of scope? You may need to create
 	// a scope around the decl.
 
+	/**
+	 * Processes a typedef declaration.
+	 * 
+	 * @param node
+	 *            a typedef declaration node that has not yet been processes
+	 * @throws SyntaxException
+	 */
 	void processTypedefDeclaration(TypedefDeclarationNode node)
 			throws SyntaxException {
 		IdentifierNode identifier = node.getIdentifier();
@@ -290,6 +319,11 @@ public class DeclarationAnalyzer {
 			processFunctionDeclaration((FunctionDeclarationNode) baseDecl);
 		else
 			throw error("Unexpected scoped declaration", decl);
+		// TODO: actually, don't do that. The above create entities
+		// and add to those entities the wrong declarations/definitions.
+		// or do they? It depends: do you want the declaration node
+		// of f to be the scope-parameterized node or the function
+		// decl node?
 	}
 
 	// ************************* Private Methods **************************

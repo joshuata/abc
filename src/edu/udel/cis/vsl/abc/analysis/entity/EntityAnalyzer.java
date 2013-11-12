@@ -6,6 +6,7 @@ import java.util.Map;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -78,6 +79,8 @@ public class EntityAnalyzer implements Analyzer {
 
 	NodeFactory nodeFactory;
 
+	ASTFactory astFactory;
+
 	ValueFactory valueFactory;
 
 	StandardTypes standardTypes;
@@ -94,8 +97,10 @@ public class EntityAnalyzer implements Analyzer {
 
 	// Constructors...
 
-	public EntityAnalyzer(EntityFactory entityFactory, NodeFactory nodeFactory,
-			TokenFactory sourceFactory, ConversionFactory conversionFactory) {
+	public EntityAnalyzer(ASTFactory astFactory, EntityFactory entityFactory,
+			NodeFactory nodeFactory, TokenFactory sourceFactory,
+			ConversionFactory conversionFactory) {
+		this.astFactory = astFactory;
 		this.nodeFactory = nodeFactory;
 		this.typeFactory = conversionFactory.getTypeFactory();
 		this.valueFactory = nodeFactory.getValueFactory();
