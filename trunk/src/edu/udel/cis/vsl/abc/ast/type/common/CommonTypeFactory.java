@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -250,6 +249,7 @@ public class CommonTypeFactory implements TypeFactory {
 		return (ArrayType) canonicalize(new CommonArrayType(elementType,
 				constantSize));
 	}
+
 
 	@Override
 	public StructureOrUnionType structureOrUnionType(Object key,
@@ -851,54 +851,6 @@ public class CommonTypeFactory implements TypeFactory {
 		return scopeType;
 	}
 
-	@Override
-	public Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map) {
-		// TODO
-		
-		// use this in expansion of scope parameterized declarations
-		TypeKind kind = type.kind();
-		
-		
-		// do you need to do it to expressions as well?
-		
-		switch (kind) {
-		case ARRAY: {
-			ArrayType arrayType = (ArrayType)type;
-			
-			
-			
-			break;
-		}
-		case ATOMIC:
-			break;
-		case BASIC:
-			break;
-		case ENUMERATION:
-			break;
-		case FUNCTION:
-			break;
-		case HEAP:
-			break;
-		case OTHER_INTEGER:
-			break;
-		case POINTER:
-			break;
-		case PROCESS:
-			break;
-		case QUALIFIED:
-			break;
-		case SCOPE:
-			break;
-		case STRUCTURE_OR_UNION:
-			break;
-		case VOID:
-			break;
-		default:
-			break;
-				
-		}
-		
-		return null;
-	}
+	
 
 }

@@ -86,7 +86,8 @@ public class Activator {
 			.newConversionFactory(typeFactory);
 
 	private Analyzer standardAnalyzer = Analysis.newStandardAnalyzer(
-			entityFactory, nodeFactory, sourceFactory, conversionFactory);
+			astFactory, entityFactory, nodeFactory, sourceFactory,
+			conversionFactory);
 
 	private Transformer sideEffectRemover = new SideEffectRemover();
 
@@ -425,12 +426,12 @@ public class Activator {
 		program.print(out);
 		out.println();
 		out.flush();
-		
+
 		out.println("\n\n" + bar + " Types " + bar + "\n");
 		typeFactory.printTypes(out);
 		out.println();
 		out.flush();
-		
+
 		return program;
 	}
 }

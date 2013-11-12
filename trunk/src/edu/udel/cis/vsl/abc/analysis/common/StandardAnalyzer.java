@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.analysis.common;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.analysis.entity.EntityAnalyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -22,12 +23,12 @@ public class StandardAnalyzer implements Analyzer {
 
 	private EntityAnalyzer entityAnalyzer;
 
-	public StandardAnalyzer(EntityFactory entityFactory,
+	public StandardAnalyzer(ASTFactory astFactory, EntityFactory entityFactory,
 			NodeFactory nodeFactory, TokenFactory tokenFactory,
 			ConversionFactory conversionFactory) {
 		scopeAnalyzer = new ScopeAnalyzer(entityFactory);
-		entityAnalyzer = new EntityAnalyzer(entityFactory, nodeFactory,
-				tokenFactory, conversionFactory);
+		entityAnalyzer = new EntityAnalyzer(astFactory, entityFactory,
+				nodeFactory, tokenFactory, conversionFactory);
 	}
 
 	@Override

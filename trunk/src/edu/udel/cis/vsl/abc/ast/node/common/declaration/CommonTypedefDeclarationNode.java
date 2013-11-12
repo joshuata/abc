@@ -4,9 +4,7 @@ import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -44,10 +42,10 @@ public class CommonTypedefDeclarationNode extends CommonDeclarationNode
 				duplicate(getIdentifier()), duplicate(getTypeNode()));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public SequenceNode<VariableDeclarationNode> getScopeList() {
-		return (SequenceNode<VariableDeclarationNode>) child(2);
-	}
+	// @SuppressWarnings("unchecked")
+	// @Override
+	// public SequenceNode<VariableDeclarationNode> getScopeList() {
+	// return (SequenceNode<VariableDeclarationNode>) child(2);
+	// }
 
 }

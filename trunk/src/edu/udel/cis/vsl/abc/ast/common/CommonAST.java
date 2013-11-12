@@ -14,9 +14,15 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
+/**
+ * Standard implementation of the {@link AST} interface.
+ * 
+ * @author siegel
+ * 
+ */
 public class CommonAST implements AST {
 
-	private ASTFactory unitFactory;
+	private ASTFactory astFactory;
 
 	private ASTNode root;
 
@@ -30,16 +36,16 @@ public class CommonAST implements AST {
 
 	private ArrayList<OrdinaryEntity> externalEntities = new ArrayList<OrdinaryEntity>();
 
-	public CommonAST(ASTFactory unitFactory, ASTNode root)
+	public CommonAST(ASTFactory astFactory, ASTNode root)
 			throws SyntaxException {
 		this.root = root;
-		this.unitFactory = unitFactory;
+		this.astFactory = astFactory;
 		initialize();
 	}
 
 	@Override
 	public ASTFactory getASTFactory() {
-		return unitFactory;
+		return astFactory;
 	}
 
 	@Override
@@ -95,7 +101,7 @@ public class CommonAST implements AST {
 		nodeCount = 0;
 		nodes = null;
 		root = null;
-		unitFactory = null;
+		astFactory = null;
 	}
 
 	private void nullifyOwners(ASTNode node) {
