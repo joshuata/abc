@@ -319,11 +319,8 @@ public class DeclarationAnalyzer {
 			processFunctionDeclaration((FunctionDeclarationNode) baseDecl);
 		else
 			throw error("Unexpected scoped declaration", decl);
-		// TODO: actually, don't do that. The above create entities
-		// and add to those entities the wrong declarations/definitions.
-		// or do they? It depends: do you want the declaration node
-		// of f to be the scope-parameterized node or the function
-		// decl node?
+		// Note: the declaration node for f will be the function declaration
+		// node, not the scope parameterized declaration node.
 	}
 
 	// ************************* Private Methods **************************
