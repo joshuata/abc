@@ -698,4 +698,9 @@ public class CommonNodeFactory implements NodeFactory {
 		return new CommonEnsuresNode(source, expression);
 	}
 
+	@Override
+	public void setConstantValue(ExpressionNode expression, Value value) {
+		((CommonExpressionNode) expression).setConstantValue(value);
+	}
+
 }

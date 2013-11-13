@@ -21,6 +21,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
@@ -70,6 +71,39 @@ import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
+/**
+ * Analyzes expressions in an AST.
+ * 
+ * Scopes: can occur in the following situations:
+ * 
+ * <pre>
+ * $scope s;       // declaration of concrete scope variable s
+ * <s> f(...)      // introduction of scope variable s in function decl
+ * <s> typedef ... // introduction of scope variable s in typedef decl
+ * <s> struct ...  // introduction of scope variables s in struct decl
+ * double *<s> p;  // use of scope expr s in pointer restriction
+ * f<s>(...)       // use of scope expr s in function call instance
+ * t<s> x;         // use of scope expr s in typedef instance
+ * struct t<s> x;  // use of scope expr s in struct instance
+ * 
+ * </pre>
+ * 
+ * The scope expressions (i.e., expressions of scope type) are: ScopeVariables
+ * and expressions of the form ScopeOf(lhs). Later expression may be added (like
+ * join).
+ * 
+ * A ScopeValue can be either a (concrete) scope (an instance of Scope), or a
+ * ScopeVariable (a parameter scope variable, not a concrete one). Later values
+ * may be added (like join).
+ * 
+ * A scope expression can always be evaluated statically to a ScopeValue.
+ * 
+ * Need to process a scope expression and to evaluate a scope expression to get
+ * the ScopeValue.
+ * 
+ * @author siegel
+ * 
+ */
 public class ExpressionAnalyzer {
 
 	// ***************************** Fields *******************************
@@ -82,6 +116,8 @@ public class ExpressionAnalyzer {
 
 	private ASTFactory astFactory;
 
+	private NodeFactory nodeFactory;
+
 	private IntegerType intType;
 
 	// ************************** Constructors ****************************
@@ -93,6 +129,7 @@ public class ExpressionAnalyzer {
 		this.typeFactory = typeFactory;
 		this.intType = typeFactory.signedIntegerType(SignedIntKind.INT);
 		this.astFactory = entityAnalyzer.astFactory;
+		this.nodeFactory = astFactory.getNodeFactory();
 	}
 
 	// ************************* Exported Methods **************************
@@ -378,6 +415,7 @@ public class ExpressionAnalyzer {
 		entity = identifierNode.getEntity();
 		decl = entity.getFirstDeclaration();
 		scope = decl.getScope();
+		nodeFactory.setConstantValue(node, scope);
 		return scope;
 	}
 
@@ -388,41 +426,58 @@ public class ExpressionAnalyzer {
 		if (parent != null && parent instanceof SequenceNode<?>) {
 			ASTNode grandparent = parent.parent();
 
-			if (grandparent != null
-					&& grandparent instanceof ScopeParameterizedDeclarationNode)
-				return true;
+			return grandparent != null
+					&& grandparent instanceof ScopeParameterizedDeclarationNode;
 		}
 		return false;
 	}
 
-	private ScopeValue evaluateScopeExpression(ExpressionNode expr)
+	/**
+	 * Given an expression of scope type, evaluates that expression statically
+	 * to yield a {@link ScopeValue}. The given expression may or may not have
+	 * been processed already. If not, it will be processed in the course of
+	 * executing this method.
+	 * 
+	 * @param expr
+	 *            an expression node of type scope; may or may not have been
+	 *            processed
+	 * @return the scope value obtained by evaluating this expression
+	 * @throws SyntaxException
+	 *             if expression is not a kind of expression that could be a
+	 *             scope
+	 */
+	public ScopeValue evaluateScopeExpression(ExpressionNode expr)
 			throws SyntaxException {
-		ScopeValue result;
+		ScopeValue result = (ScopeValue) nodeFactory.getConstantValue(expr);
 
-		if (expr instanceof IdentifierExpressionNode) {
-			// identifier must be a scope variable
-			IdentifierExpressionNode identifierExprNode = (IdentifierExpressionNode) expr;
-			IdentifierNode identifierNode = identifierExprNode.getIdentifier();
-			Entity entity = identifierNode.getEntity();
+		if (result == null) {
+			if (expr instanceof IdentifierExpressionNode) {
+				// identifier must be a scope variable
+				IdentifierExpressionNode identifierExprNode = (IdentifierExpressionNode) expr;
+				IdentifierNode identifierNode = identifierExprNode
+						.getIdentifier();
+				Entity entity = identifierNode.getEntity();
 
-			if (entity == null) {
-				processIdentifierExpression(identifierExprNode);
-				entity = identifierNode.getEntity();
-			}
-			if (entity instanceof ScopeVariable) {
-				ScopeVariable variable = (ScopeVariable) entity;
+				if (entity == null) {
+					processIdentifierExpression(identifierExprNode);
+					entity = identifierNode.getEntity();
+				}
+				if (entity instanceof ScopeVariable) {
+					ScopeVariable variable = (ScopeVariable) entity;
 
-				if (isScopeParameter(variable))
-					result = variable;
-				else
-					result = variable.getFirstDeclaration().getScope();
-			} else {
-				throw error("Expected scope variable, saw " + entity, expr);
-			}
-		} else if (expr instanceof ScopeOfNode) {
-			result = processScopeOf((ScopeOfNode) expr);
-		} else
-			throw error("Unknown kind of scope expression", expr);
+					if (isScopeParameter(variable))
+						result = variable;
+					else
+						result = variable.getFirstDeclaration().getScope();
+				} else {
+					throw error("Expected scope variable, saw " + entity, expr);
+				}
+			} else if (expr instanceof ScopeOfNode) {
+				result = processScopeOf((ScopeOfNode) expr);
+			} else
+				throw error("Unknown kind of scope expression", expr);
+			nodeFactory.setConstantValue(expr, result);
+		}
 		return result;
 	}
 

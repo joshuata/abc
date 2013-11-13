@@ -36,7 +36,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
@@ -307,14 +309,21 @@ public class EntityAnalyzer implements Analyzer {
 				((IdentifierNode) node).setEntity(null);
 			}
 			if (node instanceof ExpressionNode) {
-				if (node instanceof ConstantNode) {
-					if (node instanceof EnumerationConstantNode) {
-						((ConstantNode) node).setInitialType(null);
+				ExpressionNode expr = (ExpressionNode) node;
+				Type type = expr.getType();
+
+				if (expr instanceof ConstantNode) {
+					if (expr instanceof EnumerationConstantNode) {
+						((ConstantNode) expr).setInitialType(null);
 					}
 				} else {
-					((ExpressionNode) node).setInitialType(null);
+					expr.setInitialType(null);
 				}
 				((ExpressionNode) node).removeConversions();
+				// clear constant value for scopes only, because they will
+				// change (maybe they shouldn't be constant?)
+				if (type != null && type.kind() == TypeKind.SCOPE)
+					nodeFactory.setConstantValue(expr, null);
 			}
 			if (node instanceof LabelNode) {
 				((LabelNode) node).setStatement(null);

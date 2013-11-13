@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
+import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+
 /**
  * A scope value is a general abstract expression that represents a scope. It
  * may be thought of as a symbolic expression of type "scope". The "concrete"
@@ -12,6 +14,6 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
  * @author siegel
  * 
  */
-public interface ScopeValue {
+public interface ScopeValue extends Value {
 
 }

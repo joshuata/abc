@@ -219,6 +219,16 @@ public interface NodeFactory {
 	 */
 	Value getConstantValue(ExpressionNode expression) throws SyntaxException;
 
+	/**
+	 * If for some reason you know what the constant value of a node is supposed
+	 * to be, tell it by invoking this method.
+	 * 
+	 * @param expression
+	 * @param value
+	 * @return
+	 */
+	void setConstantValue(ExpressionNode expression, Value value);
+
 	// Constant and literal expressions ...
 
 	CharacterConstantNode newCharacterConstantNode(Source source,
