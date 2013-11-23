@@ -21,13 +21,6 @@ double * g(double * p) {
   return p;
 }
 
-// note: type of p should be pointer-to-double-in-scope t, not
-// in scope 7, because t is not a concrete scope.
-// need to distinguish between concrete scopes (declared
-// as regular variables) and symbolic scopes (declared
-// in scope parameterized declarations).  See how decl
-// of formal p is analyzed.
-
 <s,t> double *<s> f(double *<t> p)  {
   return f<s,t>(f<t,s>(f<s,t>(p)));
 }
@@ -42,6 +35,6 @@ void main() {
   q = &x;
   q = p; // ok
   // p = q; // syntax error
-  f<s1,s1>(p); // fine but check not yet implemented correctly
+  f<s1,s1>(p); // ok
 }
 

@@ -110,13 +110,17 @@ public class PrunerWorker {
 	 *            an Entity occurring in the AST
 	 */
 	private void explore(Entity entity) {
-		DeclarationNode defn = entity.getDefinition();
+		Iterator<DeclarationNode> declIter = entity.getDeclarations();
 
-		if (defn == null) {
-			if (entity.getNumDeclarations() != 0)
-				markReachable(entity.getFirstDeclaration());
-		} else
-			markReachable(defn);
+		while (declIter.hasNext())
+			markReachable(declIter.next());
+		/*
+		 * DeclarationNode defn = entity.getDefinition();
+		 * 
+		 * if (defn == null) { if (entity.getNumDeclarations() != 0)
+		 * markReachable(entity.getFirstDeclaration()); } else
+		 * markReachable(defn);
+		 */
 	}
 
 	/**
