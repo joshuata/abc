@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 void test(int a);
 
 void main(){
