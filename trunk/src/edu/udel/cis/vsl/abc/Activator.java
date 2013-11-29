@@ -355,7 +355,7 @@ public class Activator {
 
 	/**
 	 * Show every stage of translation. This is a lot of output and is only
-	 * recommended for small examples.
+	 * recommended for small examples. Applies pruner and side-effect-remover.
 	 * 
 	 * @param out
 	 * @return the AST

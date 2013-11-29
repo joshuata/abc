@@ -12,7 +12,7 @@ public class SyntaxException extends ABCException {
 	private Source source;
 
 	public SyntaxException(String message, Source source) {
-		super(message, source.getSummary());
+		super("Syntax error: " + message, source.getSummary());
 		this.source = source;
 	}
 

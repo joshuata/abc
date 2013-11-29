@@ -14,7 +14,7 @@ public class ParseException extends ABCException {
 	private Token token;
 
 	public ParseException(String msg, Token token) {
-		super(token == null ? msg : msg + "\nAt " + token);
+		super("Parse error: " + token == null ? msg : msg + "\nAt " + token);
 		this.token = token;
 	}
 
