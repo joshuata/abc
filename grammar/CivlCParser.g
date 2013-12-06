@@ -85,6 +85,9 @@ tokens
 	TOKEN_LIST;
 	SCOPE_NAME;		// use of a CIVL-C scope name
 	SCOPE_LIST;		// e.g., "<s1,s2,s3>"
+	PARTIAL;
+	PARTIAL_LIST;
+	DERIVATIVE_EXPRESSION;
 }
 
 scope Symbols {
@@ -312,6 +315,7 @@ primaryExpression
 	| LPAREN expression RPAREN 
 	  -> ^(PARENTHESIZED_EXPRESSION LPAREN expression RPAREN)
 	| genericSelection
+	| derivativeExpression
 	;
 
 /* 6.5.1.1 */
@@ -431,7 +435,7 @@ spawnExpression
 
 /* 6.5.3 */
 unaryOperator
-	: AMPERSAND | STAR | PLUS | SUB | TILDE | NOT
+	: AMPERSAND | STAR | PLUS | SUB | TILDE | NOT | BIG_O
 	;
 
 /* 6.5.4 */
@@ -596,11 +600,38 @@ expression
 	  body=conditionalExpression
 	  -> ^(COLLECTIVE $proc $intExpr $body)
 	| commaExpression
+	| quantifierExpression
 	;
+			
+derivativeExpression
+	: DERIV LSQUARE IDENTIFIER COMMA partialList RSQUARE 
+	  LPAREN argumentExpressionList RPAREN
+	  -> ^(DERIVATIVE_EXPRESSION IDENTIFIER partialList argumentExpressionList RPAREN)
+	;
+
+partialList
+	: partial (COMMA partial)* -> ^(PARTIAL_LIST partial+)
+	;
+
+partial
+	: LCURLY IDENTIFIER COMMA INTEGER_CONSTANT RCURLY 
+	  -> ^(PARTIAL IDENTIFIER INTEGER_CONSTANT)
+    ;
 
 /* 6.6 */
 constantExpression
 	: conditionalExpression
+	;
+	
+quantifierExpression
+	: quantifier LCURLY type=typeName id=IDENTIFIER
+	  BITOR restrict=conditionalExpression RCURLY 
+	  cond=expression
+	  -> ^(quantifier $type $id $restrict $cond)
+	;
+	
+quantifier
+	: FORALL | EXISTS | UNIFORM
 	;
 
 /* ***** A.2.2: Declarations ***** */
@@ -907,7 +938,9 @@ typeQualifier
 
 /* 6.7.4 */
 functionSpecifier
-    : INLINE | NORETURN
+    : INLINE | NORETURN 
+    | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
+      -> ^(ABSTRACT INTEGER_CONSTANT)
     ;
 
 /* 6.7.5

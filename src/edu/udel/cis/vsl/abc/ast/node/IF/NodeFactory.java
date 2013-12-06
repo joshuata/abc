@@ -35,6 +35,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode.Quantifier;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
@@ -350,6 +352,25 @@ public interface NodeFactory {
 
 	ScopeOfNode newScopeOfNode(Source source,
 			IdentifierExpressionNode variableExpression);
+
+	/**
+	 * 
+	 * @param source
+	 *            The source code elements.
+	 * @param quantifier
+	 *            The quantifier. One of {EXISTS, FORALL, UNIFORM}.
+	 * @param variable
+	 *            The quantified variable.
+	 * @param restriction
+	 *            A boolean-valued expression that holds true when the
+	 *            quantified variable is in the domain.
+	 * @param expression
+	 *            The quantified expression.
+	 * @return The new quantified expression with the given children.
+	 */
+	QuantifiedExpressionNode newQuantifiedExpressionNode(Source source,
+			Quantifier quantifier, VariableDeclarationNode variable,
+			ExpressionNode restriction, ExpressionNode expression);
 
 	// Declarations...
 

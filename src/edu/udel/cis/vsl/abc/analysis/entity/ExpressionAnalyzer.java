@@ -43,6 +43,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ResultNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
@@ -184,6 +185,8 @@ public class ExpressionAnalyzer {
 			processExpression(collective.getLengthExpression());
 			processExpression(collective.getBody());
 			node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
+		} else if (node instanceof QuantifiedExpressionNode) {
+			processQuantifiedExpression((QuantifiedExpressionNode) node);
 		} else
 			throw error("Unknown expression kind", node);
 	}
@@ -640,6 +643,9 @@ public class ExpressionAnalyzer {
 		case ASSIGN: // = standard assignment operator
 			processASSIGN(node);
 			break;
+		case BIG_O: // big-O expresion
+			processBIG_O(node);
+			break;
 		case BITAND: // & bit-wise and
 		case BITOR: // | bit-wise inclusive or
 		case BITXOR: // ^ bit-wise exclusive or
@@ -723,6 +729,15 @@ public class ExpressionAnalyzer {
 		default:
 			throw new RuntimeException("Unknown operator: " + operator);
 		}
+	}
+
+	private void processQuantifiedExpression(QuantifiedExpressionNode node)
+			throws SyntaxException {
+		entityAnalyzer.declarationAnalyzer.processVariableDeclaration(node
+				.variable());
+		processExpression(node.restriction());
+		processExpression(node.expression());
+		node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
 	}
 
 	private void processSizeof(SizeofNode node) throws SyntaxException {
@@ -848,6 +863,23 @@ public class ExpressionAnalyzer {
 		} catch (UnsourcedException e) {
 			throw error(e, node);
 		}
+		node.setInitialType(type);
+	}
+
+	/**
+	 * Complete processing of BIG_O node. The operand must be arithmetic, and
+	 * the integer promotions are performed. The type is the promoted type.
+	 * 
+	 */
+	private void processBIG_O(OperatorNode node) throws SyntaxException {
+		ExpressionNode arg = node.getArgument(0);
+		Type type = addStandardConversions(arg);
+
+		if (!(type instanceof ArithmeticType))
+			throw error("Argument to unary operator " + node.getOperator()
+					+ " has non-arithmetic type: " + type, node);
+		if (type instanceof IntegerType)
+			type = doIntegerPromotion(arg);
 		node.setInitialType(type);
 	}
 

@@ -44,6 +44,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode.Quantifier;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
@@ -108,6 +110,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonFunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonQuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonRemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonResultNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonScopeOfNode;
@@ -696,6 +699,14 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public EnsuresNode newEnsuresNode(Source source, ExpressionNode expression) {
 		return new CommonEnsuresNode(source, expression);
+	}
+
+	@Override
+	public QuantifiedExpressionNode newQuantifiedExpressionNode(Source source,
+			Quantifier quantifier, VariableDeclarationNode variable,
+			ExpressionNode restriction, ExpressionNode expression) {
+		return new CommonQuantifiedExpressionNode(source, quantifier, variable,
+				restriction, expression);
 	}
 
 	@Override

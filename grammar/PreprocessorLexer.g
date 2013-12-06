@@ -121,13 +121,19 @@ THREADLOCAL	:	'_Thread_local';
 
 // be sure to add these to PreprocessorParser.g too!
 
+ABSTRACT	:	'$abstract';
 ASSERT		:	'$assert';
 ASSUME		:	'$assume';
 AT		:	'@';
+BIG_O	:	'$O';
 CHOOSE		:	'$choose';
 COLLECTIVE	:	'$collective';
+CONTIN			:	'$contin';
+DERIV			: '$D';
 ENSURES		:	'$ensures';
+EXISTS			: 	'$exits';
 FALSE		:	'$false';
+FORALL		:	'$forall';
 INPUT		:	'$input';
 INVARIANT	:	'$invariant';
 OUTPUT		:	'$output';
@@ -138,6 +144,7 @@ SELF		:	'$self';
 SCOPE		:	'$scope';
 SPAWN		:	'$spawn';
 TRUE		:	'$true';
+UNIFORM	:	'$uniform';
 WAIT		:	'$wait';
 WHEN		:	'$when';
 
