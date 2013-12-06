@@ -30,19 +30,6 @@ typedef struct __heap__ $heap;
 /* The CIVL-C dynamic type, used to represent a symbolic type */
 typedef struct __dynamic__ $dynamic;
 
-
-// Memory functions:
-
-/* The CIVL-C malloc function, which takes a reference to a heap */
-void* $malloc($heap *h, int size);
-
-/* Copies a region of memory, just as in standard C */
-void memcpy(void *p, void *q, size_t size);
-
-/* The CIVL-C de-allocation function, which takes a reference to a heap */
-void $free($heap *h, void *p);
-
-
 // Misc. functions:
 
 /* Nondeterministic choice of integer i, such that 0<=i<n. */
@@ -67,6 +54,19 @@ $bundle $bundle_pack(void *ptr, int size);
  * specified */
 void $bundle_unpack($bundle bundle, void *ptr);
 
+// Memory functions:
+
+/* The CIVL-C malloc function, which takes a reference to a heap */
+void* $malloc($heap *h, int size);
+
+/* Copies a region of memory, just as in standard C */
+void memcpy(void *p, void *q, size_t size) {
+  $bundle bundle = $bundle_pack(q, size);
+  $bundle_unpack(bundle, p);
+}
+
+/* The CIVL-C de-allocation function, which takes a reference to a heap */
+void $free($heap *h, void *p);
 
 // Message passing:
 
