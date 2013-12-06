@@ -123,6 +123,8 @@ public class SpecifierAnalysis {
 	// function specifiers: may appear multiple times
 	boolean inlineSpecifier = false;
 	boolean noreturnSpecifier = false;
+	boolean abstractSpecifier = false;
+	int continuity = 0;
 	// alignment specifiers
 	List<CommonTree> alignmentTypeNodes = new LinkedList<CommonTree>();
 	List<CommonTree> alignmentExpressionNodes = new LinkedList<CommonTree>();
@@ -257,6 +259,10 @@ public class SpecifierAnalysis {
 				}
 				break;
 			}
+			case CivlCParser.ABSTRACT:
+				abstractSpecifier = true;
+				// TODO: Get continuity.
+				break;
 			default:
 				throw error("Unknown declaration specifier", node);
 			}

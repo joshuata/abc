@@ -12,6 +12,7 @@ public interface OperatorNode extends ExpressionNode {
 	public enum Operator {
 		ADDRESSOF, // & pointer to object
 		ASSIGN, // = standard assignment operator
+		BIG_O, // O(...) Big-O notation
 		BITAND, // & bit-wise and
 		BITANDEQ, // &= bit-wise and assignment
 		BITCOMPLEMENT, // ~ bit-wise complement

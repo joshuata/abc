@@ -41,6 +41,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode.Quantifier;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
@@ -90,6 +91,7 @@ public class ASTBuilder {
 	static final int ASSIGN = CivlCParser.ASSIGN;
 	static final int ATOMIC = CivlCParser.ATOMIC;
 	static final int AUTO = CivlCParser.AUTO;
+	static final int BIG_O = CivlCParser.BIG_O;
 	static final int BITANDEQ = CivlCParser.BITANDEQ;
 	static final int BITOR = CivlCParser.BITOR;
 	static final int BITOREQ = CivlCParser.BITOREQ;
@@ -263,6 +265,9 @@ public class ASTBuilder {
 	static final int COLLECTIVE = CivlCParser.COLLECTIVE;
 	static final int SCOPE = CivlCParser.SCOPE;
 	static final int SCOPE_NAME = CivlCParser.SCOPE_NAME;
+	static final int FORALL = CivlCParser.FORALL;
+	static final int EXISTS = CivlCParser.EXISTS;
+	static final int UNIFORM = CivlCParser.UNIFORM;
 
 	// Instance fields...
 
@@ -587,6 +592,65 @@ public class ASTBuilder {
 							(CommonTree) expressionTree.getChild(1), scope),
 					translateExpression(
 							(CommonTree) expressionTree.getChild(2), scope));
+		case FORALL: {
+			SimpleScope newScope = new SimpleScope(scope);
+			VariableDeclarationNode variable = nodeFactory
+					.newVariableDeclarationNode(
+							source,
+							translateIdentifier((CommonTree) expressionTree
+									.getChild(1)),
+							translateTypeName(
+									(CommonTree) expressionTree.getChild(0),
+									newScope));
+			ExpressionNode restriction = translateExpression(
+					(CommonTree) expressionTree.getChild(2), newScope);
+
+			return nodeFactory.newQuantifiedExpressionNode(
+					source,
+					Quantifier.FORALL,
+					variable,
+					restriction,
+					translateExpression(
+							(CommonTree) expressionTree.getChild(3), newScope));
+		}
+		case UNIFORM: {
+			VariableDeclarationNode variable = nodeFactory
+					.newVariableDeclarationNode(
+							source,
+							translateIdentifier((CommonTree) expressionTree
+									.getChild(1)),
+							translateTypeName(
+									(CommonTree) expressionTree.getChild(0),
+									scope));
+
+			return nodeFactory.newQuantifiedExpressionNode(
+					source,
+					Quantifier.UNIFORM,
+					variable,
+					translateExpression(
+							(CommonTree) expressionTree.getChild(2), scope),
+					translateExpression(
+							(CommonTree) expressionTree.getChild(3), scope));
+		}
+		case EXISTS: {
+			VariableDeclarationNode variable = nodeFactory
+					.newVariableDeclarationNode(
+							source,
+							translateIdentifier((CommonTree) expressionTree
+									.getChild(1)),
+							translateTypeName(
+									(CommonTree) expressionTree.getChild(0),
+									scope));
+
+			return nodeFactory.newQuantifiedExpressionNode(
+					source,
+					Quantifier.EXISTS,
+					variable,
+					translateExpression(
+							(CommonTree) expressionTree.getChild(2), scope),
+					translateExpression(
+							(CommonTree) expressionTree.getChild(3), scope));
+		}
 		default:
 			throw error("Unknown expression kind", expressionTree);
 		}
@@ -690,6 +754,9 @@ public class ASTBuilder {
 			break;
 		case ASSIGN:
 			operator = Operator.ASSIGN;
+			break;
+		case BIG_O:
+			operator = Operator.BIG_O;
 			break;
 		case BITANDEQ:
 			operator = Operator.BITANDEQ;
