@@ -18,7 +18,7 @@ public class PreprocessorException extends ABCException {
 	private Token token;
 
 	public PreprocessorException(String msg, Token token) {
-		super(token == null ? msg : msg + "\nAt " + token);
+		super(msg);
 		this.token = token;
 	}
 
@@ -28,6 +28,15 @@ public class PreprocessorException extends ABCException {
 
 	public Token getToken() {
 		return token;
+	}
+
+	@Override
+	public String toString() {
+		String result = "Preprocessor error: " + super.getMessage();
+
+		if (token != null)
+			result += "\nAt " + token;
+		return result;
 	}
 
 }
