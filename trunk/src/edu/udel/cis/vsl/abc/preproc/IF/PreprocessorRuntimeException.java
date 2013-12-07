@@ -17,8 +17,12 @@ public class PreprocessorRuntimeException extends ABCRuntimeException {
 	private Token token;
 
 	public PreprocessorRuntimeException(String msg, Token token) {
-		super(token == null ? msg : msg + "\nAt " + token);
+		super(msg);
 		this.token = token;
+	}
+
+	public PreprocessorRuntimeException(PreprocessorException e) {
+		this(e.getMessage(), e.getToken());
 	}
 
 	public PreprocessorRuntimeException(String msg) {
@@ -27,6 +31,15 @@ public class PreprocessorRuntimeException extends ABCRuntimeException {
 
 	public Token getToken() {
 		return token;
+	}
+
+	@Override
+	public String toString() {
+		String result = "Preprocessor error: " + super.getMessage();
+
+		if (token != null)
+			result += "\nAt " + token;
+		return result;
 	}
 
 }

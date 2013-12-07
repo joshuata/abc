@@ -268,8 +268,9 @@ public class CommonCTokenSource implements CTokenSource {
 			try {
 				processNextNode();
 			} catch (PreprocessorException e) {
-				throw new PreprocessorRuntimeException(e.getMessage(),
-						e.getToken());
+				throw new PreprocessorRuntimeException(e);
+			} catch (PreprocessorRuntimeException e) {
+				throw e;
 			} catch (RuntimeException e) {
 				throw new PreprocessorRuntimeException(e.toString(),
 						firstOutput);
@@ -937,9 +938,9 @@ public class CommonCTokenSource implements CTokenSource {
 			}
 		}
 		if (argCount != numFormals)
-			throw new PreprocessorException("Invocation of macro " + macro
-					+ ": expected " + numFormals + " arguments but saw "
-					+ argCount, token);
+			throw new PreprocessorException("Invocation of macro "
+					+ macro.getName() + ": expected " + numFormals
+					+ " arguments but saw " + argCount, token);
 		return result;
 	}
 
