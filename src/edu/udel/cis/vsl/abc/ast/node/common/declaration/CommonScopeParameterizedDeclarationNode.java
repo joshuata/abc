@@ -77,4 +77,9 @@ public class CommonScopeParameterizedDeclarationNode extends CommonASTNode
 		out.print("ScopeParameterizedDeclaration");
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.SCOPE_PARAMETERIZED_DECLARATION;
+	}
+
 }

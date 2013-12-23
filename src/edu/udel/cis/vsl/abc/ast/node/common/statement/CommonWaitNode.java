@@ -28,4 +28,13 @@ public class CommonWaitNode extends CommonASTNode implements WaitNode {
 		return new CommonWaitNode(getSource(), duplicate(getExpression()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.WAIT;
+	}
 }

@@ -83,4 +83,13 @@ public class CommonSwitchNode extends CommonASTNode implements SwitchNode {
 		defaultCase = null;
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.SWITCH;
+	}
 }

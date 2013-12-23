@@ -35,4 +35,9 @@ public class CommonScopeOfNode extends CommonExpressionNode implements
 		return (IdentifierExpressionNode) child(0);
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.SCOPEOF;
+	}
+
 }

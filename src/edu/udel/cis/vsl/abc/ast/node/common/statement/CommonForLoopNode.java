@@ -33,4 +33,14 @@ public class CommonForLoopNode extends CommonLoopNode implements ForLoopNode {
 				duplicate(getIncrementer()), duplicate(getInvariant()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.FOR;
+	}
+
 }

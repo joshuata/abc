@@ -112,4 +112,9 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 		keepOnlyAndShift(keep);
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.SEQUENCE;
+	}
+
 }

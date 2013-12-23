@@ -85,6 +85,16 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 		return new CommonPragmaNode(getSource(), identifierCopy, bodyCopy,
 				eofToken);
 	}
+
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.PRAGMA;
+	}
+	
+	@Override
+	public StatementKind statementKind(){
+		return StatementKind.PRAGMA;
+	}
 }
 
 class GenericTokenSource implements TokenSource {

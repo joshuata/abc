@@ -28,4 +28,9 @@ public class CommonRequiresNode extends CommonASTNode implements RequiresNode {
 		return new CommonRequiresNode(getSource(), duplicate(getExpression()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.REQUIRES;
+	}
+
 }

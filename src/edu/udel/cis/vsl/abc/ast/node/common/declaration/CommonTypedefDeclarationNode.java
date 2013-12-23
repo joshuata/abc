@@ -42,6 +42,11 @@ public class CommonTypedefDeclarationNode extends CommonDeclarationNode
 				duplicate(getIdentifier()), duplicate(getTypeNode()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.TYPEDEF;
+	}
+
 	// @SuppressWarnings("unchecked")
 	// @Override
 	// public SequenceNode<VariableDeclarationNode> getScopeList() {

@@ -33,4 +33,14 @@ public class CommonChooseStatementNode extends
 		return new CommonChooseStatementNode(getSource(), childListCopy());
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.CHOOSE;
+	}
+
 }

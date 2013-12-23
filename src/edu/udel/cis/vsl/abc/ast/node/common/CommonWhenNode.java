@@ -39,4 +39,14 @@ public class CommonWhenNode extends CommonASTNode implements WhenNode {
 		return new CommonWhenNode(getSource(), guardCopy, bodyCopy);
 	}
 
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.WHEN;
+	}
+
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
 }

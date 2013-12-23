@@ -32,4 +32,9 @@ public class CommonSpawnNode extends CommonExpressionNode implements SpawnNode {
 		return new CommonSpawnNode(getSource(), duplicate(getCall()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.SPAWN;
+	}
+
 }

@@ -191,4 +191,9 @@ public class CommonVariableDeclarationNode extends
 		return result;
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.VARIABLE_DECLARATION;
+	}
+
 }

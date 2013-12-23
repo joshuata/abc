@@ -21,4 +21,9 @@ public class CommonDeclarationListNode extends
 		return new CommonDeclarationListNode(getSource(), childListCopy());
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.DECLARATION_LIST;
+	}
+
 }

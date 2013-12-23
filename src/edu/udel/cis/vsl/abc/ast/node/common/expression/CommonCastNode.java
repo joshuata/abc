@@ -51,4 +51,9 @@ public class CommonCastNode extends CommonExpressionNode implements CastNode {
 				duplicate(getArgument()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.CAST;
+	}
+
 }

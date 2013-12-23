@@ -64,4 +64,5 @@ public class CommonFloatingConstantNode extends CommonConstantNode implements
 				getStringRepresentation(), wholePart(), fractionPart(),
 				exponent(), getConstantValue());
 	}
+
 }

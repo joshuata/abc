@@ -55,4 +55,13 @@ public class CommonIfNode extends CommonASTNode implements IfNode {
 					duplicate(getTrueBranch()), duplicate(falseBranch));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.IF;
+	}
 }

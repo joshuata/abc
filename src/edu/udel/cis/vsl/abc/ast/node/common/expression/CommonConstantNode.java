@@ -34,5 +34,9 @@ public abstract class CommonConstantNode extends CommonExpressionNode implements
 	public boolean isConstantExpression() {
 		return true;
 	}
-
+	
+	@Override
+	public ExpressionKind expressionKind(){
+		return ExpressionKind.CONSTANT;
+	}
 }

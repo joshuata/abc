@@ -30,4 +30,5 @@ public class CommonStringLiteralNode extends CommonConstantNode implements
 		return new CommonStringLiteralNode(getSource(),
 				getStringRepresentation(), getConstantValue());
 	}
+
 }

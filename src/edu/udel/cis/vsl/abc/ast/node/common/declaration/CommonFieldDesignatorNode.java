@@ -34,4 +34,9 @@ public class CommonFieldDesignatorNode extends CommonASTNode implements
 		return new CommonFieldDesignatorNode(getSource(), duplicate(getField()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.FIELD_DESIGNATOR;
+	}
+
 }

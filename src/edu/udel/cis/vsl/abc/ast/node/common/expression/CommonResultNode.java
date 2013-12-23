@@ -27,4 +27,9 @@ public class CommonResultNode extends CommonExpressionNode implements
 		return new CommonResultNode(getSource());
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.RESULT;
+	}
+
 }

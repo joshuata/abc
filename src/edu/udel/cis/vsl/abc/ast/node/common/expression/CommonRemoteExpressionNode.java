@@ -43,4 +43,9 @@ public class CommonRemoteExpressionNode extends CommonExpressionNode implements
 				duplicate(getProcessExpression()),
 				duplicate(getIdentifierNode()));
 	}
+
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.REMOTE_REFERENCE;
+	}
 }

@@ -45,4 +45,14 @@ public class CommonJumpNode extends CommonASTNode implements JumpNode {
 		return new CommonJumpNode(getSource(), getKind());
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.JUMP;
+	}
+
 }

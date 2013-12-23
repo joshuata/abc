@@ -116,5 +116,5 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 	public void makeIncomplete() {
 		removeChild(1);
 	}
-
+	
 }

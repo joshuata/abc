@@ -75,4 +75,9 @@ public class CommonIdentifierNode extends CommonASTNode implements
 		return new CommonIdentifierNode(getSource(), name);
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.IDENTIFIER;
+	}
+
 }

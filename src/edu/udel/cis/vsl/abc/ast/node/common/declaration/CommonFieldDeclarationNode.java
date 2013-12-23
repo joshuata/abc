@@ -68,4 +68,9 @@ public class CommonFieldDeclarationNode extends CommonDeclarationNode implements
 					typeCopy, width);
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.FIELD_DECLARATION;
+	}
+
 }

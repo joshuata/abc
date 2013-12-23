@@ -28,4 +28,13 @@ public class CommonAssumeNode extends CommonASTNode implements AssumeNode {
 		return new CommonAssumeNode(getSource(), duplicate(getExpression()));
 	}
 
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.ASSUME;
+	}
+
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
 }

@@ -51,4 +51,9 @@ public class CommonAlignOfNode extends CommonExpressionNode implements
 		return new CommonAlignOfNode(getSource(), duplicate(getArgument()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.ALIGNOF;
+	}
+
 }

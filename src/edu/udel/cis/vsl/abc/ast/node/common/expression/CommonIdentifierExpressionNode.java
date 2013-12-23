@@ -45,4 +45,9 @@ public class CommonIdentifierExpressionNode extends CommonExpressionNode
 				duplicate(getIdentifier()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.IDENTIFIER_EXPRESSION;
+	}
+
 }

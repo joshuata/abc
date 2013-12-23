@@ -23,6 +23,33 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
  */
 public interface ExpressionNode extends InitializerNode, SizeableNode,
 		ForLoopInitializerNode {
+	
+	/**
+	 * The different kind of nodes. Not yet using this, but could if it turns
+	 * out to be useful.
+	 * 
+	 * @author siegel
+	 * 
+	 */
+	public enum ExpressionKind {
+		OPERATOR,
+		IDENTIFIER_EXPRESSION,
+		CONSTANT,
+		DOT, 
+		ARROW,
+		RESULT,
+		SELF,
+		CAST,
+		SIZEOF,
+		QUANTIFIED_EXPRESSION, 
+		ALIGNOF, 
+		COLLECTIVE, 
+		COMPOUND_LITERAL, 
+		FUNCTION_CALL, 
+		REMOTE_REFERENCE, 
+		SCOPEOF, 
+		SPAWN
+	}
 
 	/**
 	 * Returns the number of conversions in the chain leading from the initial
@@ -110,5 +137,7 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 
 	@Override
 	ExpressionNode copy();
+	
+	ExpressionKind expressionKind();
 
 }

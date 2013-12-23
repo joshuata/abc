@@ -34,4 +34,9 @@ public class CommonArrayDesignatorNode extends CommonASTNode implements
 		return new CommonArrayDesignatorNode(getSource(), duplicate(getIndex()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.ARRAY_DESIGNATOR;
+	}
+
 }
