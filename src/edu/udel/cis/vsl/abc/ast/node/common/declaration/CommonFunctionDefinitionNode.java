@@ -48,4 +48,8 @@ public class CommonFunctionDefinitionNode extends CommonFunctionDeclarationNode
 		return result;
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.FUNCTION_DEFINITION;
+	}
 }
