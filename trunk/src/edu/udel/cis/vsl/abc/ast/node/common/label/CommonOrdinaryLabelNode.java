@@ -61,4 +61,9 @@ public class CommonOrdinaryLabelNode extends CommonDeclarationNode implements
 				duplicate(getIdentifier()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.ORDINARY_LABEL;
+	}
+
 }

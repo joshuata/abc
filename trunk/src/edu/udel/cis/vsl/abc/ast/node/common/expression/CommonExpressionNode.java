@@ -138,4 +138,8 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 		conversions = new ArrayList<Conversion>();
 	}
 
+	@Override
+	public NodeKind nodeKind(){
+		return NodeKind.EXPRESSION;
+	}
 }

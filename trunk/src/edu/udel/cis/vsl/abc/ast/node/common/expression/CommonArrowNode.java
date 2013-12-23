@@ -54,4 +54,9 @@ public class CommonArrowNode extends CommonExpressionNode implements ArrowNode {
 				duplicate(getStructurePointer()), duplicate(getFieldName()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.ARROW;
+	}
+
 }

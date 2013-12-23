@@ -50,4 +50,9 @@ public class CommonPairNode<S extends ASTNode, T extends ASTNode> extends
 
 		return new CommonPairNode<S, T>(getSource(), leftCopy, rightCopy);
 	}
+
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.PAIR;
+	}
 }

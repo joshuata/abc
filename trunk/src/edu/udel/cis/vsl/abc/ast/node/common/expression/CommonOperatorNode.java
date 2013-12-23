@@ -95,4 +95,8 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 		return new CommonOperatorNode(getSource(), getOperator(), arguments);
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.OPERATOR;
+	}
 }

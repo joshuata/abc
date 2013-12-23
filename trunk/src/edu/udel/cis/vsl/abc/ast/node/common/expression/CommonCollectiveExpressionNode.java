@@ -47,4 +47,8 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 				duplicate(getLengthExpression()), duplicate(getBody()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.COLLECTIVE;
+	}
 }

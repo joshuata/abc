@@ -42,4 +42,9 @@ public class CommonEnumeratorDeclarationNode extends CommonDeclarationNode
 				duplicate(getIdentifier()), duplicate(getValue()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.ENUMERATOR_DECLARATION;
+	}
+
 }

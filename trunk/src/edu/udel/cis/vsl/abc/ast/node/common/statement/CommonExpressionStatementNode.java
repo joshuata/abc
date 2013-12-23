@@ -31,4 +31,14 @@ public class CommonExpressionStatementNode extends CommonASTNode implements
 				duplicate(getExpression()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.EXPRESSION;
+	}
+
 }

@@ -160,4 +160,10 @@ public abstract class CommonTypeNode extends CommonASTNode implements TypeNode {
 		node.setRestrictQualified(isRestrictQualified());
 		node.setVolatileQualified(isVolatileQualified());
 	}
+	
+	@Override
+	public NodeKind nodeKind(){
+		return NodeKind.TYPE;
+	}
+	
 }

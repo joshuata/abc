@@ -50,4 +50,8 @@ public class CommonDotNode extends CommonExpressionNode implements DotNode {
 				duplicate(getFieldName()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.DOT;
+	}
 }

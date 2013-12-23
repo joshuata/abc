@@ -41,4 +41,8 @@ public class CommonCompoundLiteralNode extends CommonExpressionNode implements
 				duplicate(getTypeNode()), duplicate(getInitializerList()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.COMPOUND_LITERAL;
+	}
 }

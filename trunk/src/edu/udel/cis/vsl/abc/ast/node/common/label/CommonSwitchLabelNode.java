@@ -62,4 +62,9 @@ public class CommonSwitchLabelNode extends CommonASTNode implements
 				duplicate(getExpression()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.SWITCH_LABEL;
+	}
+
 }

@@ -110,4 +110,9 @@ public class CommonFunctionDeclarationNode extends
 		return result;
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.FUNCTION_DECLARATION;
+	}
+
 }

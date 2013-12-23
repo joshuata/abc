@@ -28,4 +28,9 @@ public class CommonEnsuresNode extends CommonASTNode implements EnsuresNode {
 		return new CommonEnsuresNode(getSource(), duplicate(getExpression()));
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.ENSURES;
+	}
+
 }

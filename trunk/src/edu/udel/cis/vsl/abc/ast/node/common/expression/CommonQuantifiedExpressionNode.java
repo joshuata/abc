@@ -139,4 +139,8 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 		out.print(output);
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.QUANTIFIED_EXPRESSION;
+	}
 }

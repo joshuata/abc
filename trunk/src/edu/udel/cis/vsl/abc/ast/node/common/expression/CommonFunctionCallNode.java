@@ -70,4 +70,8 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 		return (SequenceNode<ExpressionNode>) child(2);
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.FUNCTION_CALL;
+	}
 }

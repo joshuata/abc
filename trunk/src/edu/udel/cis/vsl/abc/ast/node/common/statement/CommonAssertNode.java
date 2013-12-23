@@ -28,4 +28,14 @@ public class CommonAssertNode extends CommonASTNode implements AssertNode {
 		return new CommonAssertNode(getSource(), duplicate(getExpression()));
 	}
 
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.ASSERT;
+	}
+
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
 }

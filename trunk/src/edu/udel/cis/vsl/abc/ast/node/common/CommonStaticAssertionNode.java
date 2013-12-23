@@ -42,4 +42,9 @@ public class CommonStaticAssertionNode extends CommonASTNode implements
 				messageCopy);
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATIC_ASSERTION;
+	}
+
 }

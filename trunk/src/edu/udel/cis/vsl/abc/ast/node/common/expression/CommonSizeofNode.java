@@ -38,4 +38,8 @@ public class CommonSizeofNode extends CommonExpressionNode implements
 		return new CommonSizeofNode(getSource(), duplicate(getArgument()));
 	}
 
+	@Override
+	public ExpressionKind expressionKind() {
+		return ExpressionKind.SIZEOF;
+	}
 }

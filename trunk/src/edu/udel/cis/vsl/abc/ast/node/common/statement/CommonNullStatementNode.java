@@ -23,4 +23,13 @@ public class CommonNullStatementNode extends CommonASTNode implements
 		return new CommonNullStatementNode(getSource());
 	}
 
+	@Override
+	public NodeKind nodeKind() {
+		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	public StatementKind statementKind() {
+		return StatementKind.NULL;
+	}
 }
