@@ -65,4 +65,9 @@ public class CIVLTranslationTest {
 	public void pointerScopes() throws ABCException, IOException {
 		check("pointerScopes");
 	}
+	
+	@Test
+	public void atomicBlock() throws ABCException, IOException {
+		check("atomicStatement");
+	}
 }

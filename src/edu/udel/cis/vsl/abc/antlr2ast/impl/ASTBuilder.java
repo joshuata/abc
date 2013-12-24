@@ -268,6 +268,7 @@ public class ASTBuilder {
 	static final int FORALL = CivlCParser.FORALL;
 	static final int EXISTS = CivlCParser.EXISTS;
 	static final int UNIFORM = CivlCParser.UNIFORM;
+	static final int CIVLATOMIC = CivlCParser.CIVLATOMIC;
 
 	// Instance fields...
 
@@ -2012,6 +2013,12 @@ public class ASTBuilder {
 							scope));
 		case CHOOSE:
 			return translateChooseStatement(statementTree, scope);
+		case CIVLATOMIC:
+			StatementNode body = translateStatement(
+					(CommonTree) statementTree.getChild(0), new SimpleScope(
+							scope));
+			
+			return nodeFactory.newAtomicStatementNode(statementSource, body);
 		default:
 			throw error("Unknown statement type", statementTree);
 		}

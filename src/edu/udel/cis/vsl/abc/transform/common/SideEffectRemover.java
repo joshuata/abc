@@ -31,6 +31,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -198,10 +199,18 @@ public class SideEffectRemover implements Transformer {
 			result = waitStatement((WaitNode) statement);
 		} else if (statement instanceof WhenNode) {
 			result = whenStatement((WhenNode) statement);
+		} else if (statement instanceof AtomicNode) {
+			result = atomicStatement((AtomicNode) statement);
 		} else {
 			result = statement;
 		}
 		return result;
+	}
+
+	private StatementNode atomicStatement(AtomicNode statement) throws SyntaxException {
+		StatementNode bodyNode = processStatement(statement.getBody());
+
+		return factory.newAtomicStatementNode(statement.getSource(), bodyNode);		
 	}
 
 	private StatementNode chooseStatement(ChooseStatementNode statement)

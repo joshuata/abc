@@ -17,6 +17,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -158,6 +159,8 @@ public class StatementAnalyzer {
 				processStatement(children.next());
 		} else if (statement instanceof WaitNode) {
 			processExpression(((WaitNode) statement).getExpression());
+		}else if(statement instanceof AtomicNode){
+			processStatement(((AtomicNode) statement).getBody());
 		}
 		// TODO:
 		// expressions: add @ collective, result, self, true, false

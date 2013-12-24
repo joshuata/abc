@@ -57,6 +57,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -122,6 +123,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.label.CommonOrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonSwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssertNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonCompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonDeclarationListNode;
@@ -712,6 +714,12 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public void setConstantValue(ExpressionNode expression, Value value) {
 		((CommonExpressionNode) expression).setConstantValue(value);
+	}
+
+	@Override
+	public AtomicNode newAtomicStatementNode(Source statementSource,
+			StatementNode body) {
+		return new CommonAtomicNode(statementSource, body);
 	}
 
 }

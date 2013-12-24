@@ -147,7 +147,7 @@ TRUE		:	'$true';
 UNIFORM	:	'$uniform';
 WAIT		:	'$wait';
 WHEN		:	'$when';
-
+CIVLATOMIC	:	'$atomic';
 
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/
