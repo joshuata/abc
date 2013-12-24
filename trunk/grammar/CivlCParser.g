@@ -1342,6 +1342,7 @@ statement
     | waitStatement
     | whenStatement
     | chooseStatement
+    | atomicStatement
     ;
 
 statementWithScope
@@ -1591,6 +1592,12 @@ whenStatement
 chooseStatement
 	:	CHOOSE LCURLY statement+ RCURLY 
 		-> ^(CHOOSE statement+)
+	;
+
+// atomic block "$atomic{...} or atomic statement;"
+atomicStatement
+	:	CIVLATOMIC s=statementWithScope
+		-> ^(CIVLATOMIC $s)
 	;
 
 /* ***** A.2.4: External Definitions ***** */
