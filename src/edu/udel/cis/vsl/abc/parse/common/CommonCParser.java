@@ -87,7 +87,10 @@ public class CommonCParser implements CParser {
 		} catch (RecognitionException e) {
 			throw new ParseException(e.getMessage(), e.token);
 		} catch (RuntimeParseException e) {
-			throw new ParseException(e.getMessage(), e.getToken());
+			// throw new ParseException(e.getMessage(), e.getToken());
+			// RuntimeParseException e already contains the token information in
+			// its getMessage()
+			throw new ParseException(e.getMessage());
 		}
 	}
 
