@@ -207,10 +207,12 @@ public class SideEffectRemover implements Transformer {
 		return result;
 	}
 
-	private StatementNode atomicStatement(AtomicNode statement) throws SyntaxException {
+	private StatementNode atomicStatement(AtomicNode statement)
+			throws SyntaxException {
 		StatementNode bodyNode = processStatement(statement.getBody());
 
-		return factory.newAtomicStatementNode(statement.getSource(), bodyNode);		
+		return factory.newAtomicStatementNode(statement.getSource(),
+				statement.isDeterministic(), bodyNode);
 	}
 
 	private StatementNode chooseStatement(ChooseStatementNode statement)

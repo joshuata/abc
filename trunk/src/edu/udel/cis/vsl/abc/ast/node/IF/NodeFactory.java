@@ -584,6 +584,19 @@ public interface NodeFactory {
 
 	ValueFactory getValueFactory();
 
-	AtomicNode newAtomicStatementNode(Source statementSource, StatementNode body);
+	/**
+	 * Create a new atomic statement node with the data provided.
+	 * 
+	 * @param statementSource
+	 *            The source information of the node
+	 * @param deterministic
+	 *            The flag to denote whether the atomic node is $datomic or
+	 *            $atomic
+	 * @param body
+	 *            The body statement node of the atomic node
+	 * @return The new atomic statement node
+	 */
+	AtomicNode newAtomicStatementNode(Source statementSource,
+			boolean deterministic, StatementNode body);
 
 }

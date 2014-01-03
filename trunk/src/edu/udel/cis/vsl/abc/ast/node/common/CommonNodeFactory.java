@@ -717,9 +717,9 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public AtomicNode newAtomicStatementNode(Source statementSource,
+	public AtomicNode newAtomicStatementNode(Source statementSource, boolean deterministic,
 			StatementNode body) {
-		return new CommonAtomicNode(statementSource, body);
+		return new CommonAtomicNode(statementSource, deterministic, body);
 	}
 
 }

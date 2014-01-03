@@ -269,6 +269,7 @@ public class ASTBuilder {
 	static final int EXISTS = CivlCParser.EXISTS;
 	static final int UNIFORM = CivlCParser.UNIFORM;
 	static final int CIVLATOMIC = CivlCParser.CIVLATOMIC;
+	static final int CIVLATOM = CivlCParser.CIVLATOM;
 
 	// Instance fields...
 
@@ -2017,8 +2018,16 @@ public class ASTBuilder {
 			StatementNode body = translateStatement(
 					(CommonTree) statementTree.getChild(0), new SimpleScope(
 							scope));
-			
-			return nodeFactory.newAtomicStatementNode(statementSource, body);
+
+			return nodeFactory.newAtomicStatementNode(statementSource, false,
+					body);
+		case CIVLATOM:
+			StatementNode datomicBody = translateStatement(
+					(CommonTree) statementTree.getChild(0), new SimpleScope(
+							scope));
+
+			return nodeFactory.newAtomicStatementNode(statementSource, true,
+					datomicBody);
 		default:
 			throw error("Unknown statement type", statementTree);
 		}
