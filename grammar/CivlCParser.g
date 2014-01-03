@@ -1343,6 +1343,7 @@ statement
     | whenStatement
     | chooseStatement
     | atomicStatement
+    | datomicStatement
     ;
 
 statementWithScope
@@ -1594,10 +1595,16 @@ chooseStatement
 		-> ^(CHOOSE statement+)
 	;
 
-// atomic block "$atomic{...} or atomic statement;"
+// general atomic block "$atomic{...} or $atomic statement;"
 atomicStatement
 	:	CIVLATOMIC s=statementWithScope
 		-> ^(CIVLATOMIC $s)
+	;
+
+// deterministic atomic block "$datomic{...} or $datomic statement;"
+datomicStatement
+	:	CIVLATOM s=statementWithScope
+		-> ^(CIVLATOM $s)
 	;
 
 /* ***** A.2.4: External Definitions ***** */
