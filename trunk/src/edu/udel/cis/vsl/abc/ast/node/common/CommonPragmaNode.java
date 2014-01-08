@@ -67,8 +67,8 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 	@Override
 	public TokenSource getTokenSource() {
 		TokenSource tokenSource = new GenericTokenSource(
-				TokenUtils.getShortFilename(getSource().getFirstToken()), body,
-				eofToken);
+				TokenUtils.getShortFilename(getSource().getFirstToken(), false),
+				body, eofToken);
 
 		return tokenSource;
 	}
@@ -90,9 +90,9 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 	public NodeKind nodeKind() {
 		return NodeKind.PRAGMA;
 	}
-	
+
 	@Override
-	public StatementKind statementKind(){
+	public StatementKind statementKind() {
 		return StatementKind.PRAGMA;
 	}
 }

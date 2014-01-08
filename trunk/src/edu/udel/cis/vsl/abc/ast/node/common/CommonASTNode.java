@@ -15,6 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodePredicate;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 public abstract class CommonASTNode implements ASTNode {
 
@@ -183,7 +184,7 @@ public abstract class CommonASTNode implements ASTNode {
 		}
 		if (includeSource) {
 			out.println();
-			out.print(prefix + "| source: " + source.getSummary());
+			out.print(prefix + "| source: " + source.getSummary(false));
 		}
 		printExtras(prefix + "| ", out);
 	}
@@ -311,9 +312,12 @@ public abstract class CommonASTNode implements ASTNode {
 			ASTNode child = child(i);
 
 			if (child != null) {
-				if (keep.holds(child))
+				if (keep.holds(child)) {
+					// add the file name to the file name map
+					TokenUtils.addFileName(TokenUtils.getShortFilename(this
+							.getSource().getFirstToken(), false));
 					child.keepOnly(keep);
-				else
+				} else
 					removeChild(i);
 			}
 		}
@@ -362,8 +366,8 @@ public abstract class CommonASTNode implements ASTNode {
 
 	@Override
 	public String toString() {
-		return "Node[" + id + ", " + instanceId + ", " + source.getSummary()
-				+ "]";
+		return "Node[" + id + ", " + instanceId + ", "
+				+ source.getSummary(false) + "]";
 	}
 
 }
