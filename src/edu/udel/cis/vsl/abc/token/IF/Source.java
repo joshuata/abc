@@ -57,16 +57,30 @@ public interface Source {
 	 * Returns location information only (not actual source text). For example
 	 * "foo.c:127.4-128.1".
 	 * 
+	 * @param abbreviated
+	 *            true iff want to have the shorter file name, e.g,
+	 *            "f1:127.4-128.1" instead of "longOrignialFile.c:127.4-128.1"
 	 */
 	String getLocation(boolean abbreviated);
 
 	/**
 	 * Returns summary of location and text.
 	 * 
+	 * @param abbreviated
+	 *            true iff want to have the shorter file name in the location,
+	 *            e.g, "f1:127.4-128.1" instead of
+	 *            "longOrignialFile.c:127.4-128.1"
 	 * @return
 	 */
 	String getSummary(boolean abbreviated);
-	
+
+	/**
+	 * Print the list of shorter file names and the corresponding original file
+	 * names.
+	 * 
+	 * @param out
+	 *            The output stream to be used.
+	 */
 	void printShorterFileNameMap(PrintStream out);
 
 }

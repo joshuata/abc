@@ -34,6 +34,9 @@ public class TokenUtils {
 	 * 
 	 * @param token
 	 *            any instance of Token
+	 * @param abbreviated
+	 *            true iff the resulting file name a the shorter one (f1, f2,
+	 *            ...) instead of the original one.
 	 * @return string explaining where the token came from
 	 */
 	public static String location(Token token, boolean abbreviated) {
@@ -48,8 +51,8 @@ public class TokenUtils {
 	 * 
 	 * @param token
 	 * @param abbreviated
-	 *            If the result is an abbreviated file name, i.e., shorter file
-	 *            name, which is calculated by the static hash map.
+	 *            true iff the result is an abbreviated file name, i.e., shorter
+	 *            file name, which is calculated by the static hash map.
 	 * @return
 	 */
 	public static String getShortFilename(Token token, boolean abbreviated) {
@@ -93,6 +96,13 @@ public class TokenUtils {
 		}
 	}
 
+	/**
+	 * Print the list of shorter file names and the corresponding original file
+	 * names
+	 * 
+	 * @param out
+	 *            The output stream to be used.
+	 */
 	public static void printShorterFileNameMap(PrintStream out) {
 		if (fileNameMap.size() > 0) {
 			out.println();
