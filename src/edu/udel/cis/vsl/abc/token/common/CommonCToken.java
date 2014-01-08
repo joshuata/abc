@@ -106,7 +106,7 @@ public class CommonCToken extends CommonToken implements CToken {
 			return "EOF";
 		else {
 			String result = TokenUtils.quotedText(this) + " in "
-					+ TokenUtils.location(this);
+					+ TokenUtils.location(this, false);
 
 			if (formation != null)
 				result += formation.suffix();

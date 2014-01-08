@@ -58,13 +58,15 @@ public interface Source {
 	 * "foo.c:127.4-128.1".
 	 * 
 	 */
-	String getLocation();
+	String getLocation(boolean abbreviated);
 
 	/**
 	 * Returns summary of location and text.
 	 * 
 	 * @return
 	 */
-	String getSummary();
+	String getSummary(boolean abbreviated);
+	
+	void printShorterFileNameMap(PrintStream out);
 
 }

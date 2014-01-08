@@ -26,5 +26,4 @@ public interface BlockItemNode extends ASTNode {
 
 	@Override
 	BlockItemNode copy();
-
 }

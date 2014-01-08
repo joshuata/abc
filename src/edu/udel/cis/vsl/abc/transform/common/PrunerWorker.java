@@ -87,7 +87,7 @@ public class PrunerWorker {
 
 						if (entity == null)
 							throw new ASTException("Identifier not resolved: "
-									+ child.getSource().getSummary());
+									+ child.getSource().getSummary(false));
 						explore(entity);
 					}
 					if (child instanceof OrdinaryDeclarationNode

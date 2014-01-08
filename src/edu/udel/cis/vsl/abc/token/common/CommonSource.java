@@ -51,24 +51,29 @@ public class CommonSource implements Source {
 
 	@Override
 	public String toString() {
-		return getSummary();
+		return getSummary(false);
 	}
 
 	@Override
 	public void print(PrintStream out) {
-		out.print(getSummary());
+		out.print(getSummary(false));
 	}
 
 	@Override
-	public String getLocation() {
-		return TokenUtils.summarizeRangeLocation(firstToken, lastToken);
+	public String getLocation(boolean abbreviated) {
+		return TokenUtils.summarizeRangeLocation(firstToken, lastToken,
+				abbreviated);
 	}
 
 	@Override
-	public String getSummary() {
-		return TokenUtils.summarizeRange(firstToken, lastToken);
+	public String getSummary(boolean abbreviated) {
+		return TokenUtils.summarizeRange(firstToken, lastToken, abbreviated);
 	}
 
+	@Override
+	public void printShorterFileNameMap(PrintStream out) {
+		TokenUtils.printShorterFileNameMap(out);
+	}
 }
 
 class SourceTokenIterator implements Iterator<CToken> {

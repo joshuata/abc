@@ -244,7 +244,7 @@ public class SideEffectRemover implements Transformer {
 			throw new ABCUnsupportedException(
 					"side effects in a switch condition. "
 							+ statement.getCondition(), statement
-							.getCondition().getSource().getSummary());
+							.getCondition().getSource().getSummary(false));
 		}
 		body = processStatement(statement.getBody().copy());
 		result = factory.newSwitchNode(statement.getSource(), statement
@@ -363,7 +363,7 @@ public class SideEffectRemover implements Transformer {
 		case STRUCTURE_OR_UNION:
 		default:
 			throw new ABCUnsupportedException("converting type " + type
-					+ " to a type node.", source.getSummary());
+					+ " to a type node.", source.getSummary(false));
 		}
 	}
 
@@ -769,12 +769,12 @@ public class SideEffectRemover implements Transformer {
 					break;
 				default:
 					throw new ABCUnsupportedException("this operation: "
-							+ statement, statement.getSource().getSummary());
+							+ statement, statement.getSource().getSummary(false));
 				}
 			} else {
 				throw new ABCUnsupportedException(
 						"removing side effects from this expression statement: "
-								+ statement, statement.getSource().getSummary());
+								+ statement, statement.getSource().getSummary(false));
 			}
 		}
 		return result;
@@ -873,7 +873,7 @@ public class SideEffectRemover implements Transformer {
 				} else {
 					throw new ABCUnsupportedException(
 							"converting initializer declaration to statement list.",
-							initializer.getSource().getSummary());
+							initializer.getSource().getSummary(false));
 				}
 				allItems.add(loop);
 				result = factory.newCompoundStatementNode(
@@ -1019,7 +1019,7 @@ public class SideEffectRemover implements Transformer {
 			default:
 				throw new ABCUnsupportedException(
 						"removing side effects from: " + expression, expression
-								.getSource().getSummary());
+								.getSource().getSummary(false));
 			}
 		} else if (expression instanceof FunctionCallNode) {
 			Vector<BlockItemNode> before = new Vector<BlockItemNode>();
@@ -1088,7 +1088,7 @@ public class SideEffectRemover implements Transformer {
 					expression.copy(), new Vector<BlockItemNode>());
 		} else {
 			throw new ABCUnsupportedException("removing side effects from:  "
-					+ expression, expression.getSource().getSummary());
+					+ expression, expression.getSource().getSummary(false));
 		}
 		return result;
 	}

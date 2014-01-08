@@ -1,6 +1,9 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
 import java.io.File;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.Token;
@@ -20,6 +23,10 @@ public class TokenUtils {
 	 */
 	public final static int summaryBound = 10;
 
+	private static HashMap<String, Integer> fileNameMap = new LinkedHashMap<String, Integer>();
+
+	public final static String SHORT_FILE_NAME_PREFIX = "f";
+
 	/**
 	 * A utility function to extract the filename, line number, and character
 	 * index of a token of any type, and return a string representation of this
@@ -29,15 +36,23 @@ public class TokenUtils {
 	 *            any instance of Token
 	 * @return string explaining where the token came from
 	 */
-	public static String location(Token token) {
-		String filename = getShortFilename(token);
+	public static String location(Token token, boolean abbreviated) {
+		String filename = getShortFilename(token, abbreviated);
 		int line = token.getLine();
 		int pos = token.getCharPositionInLine();
 
 		return filename + " " + line + "." + pos;
 	}
 
-	public static String getShortFilename(Token token) {
+	/**
+	 * 
+	 * @param token
+	 * @param abbreviated
+	 *            If the result is an abbreviated file name, i.e., shorter file
+	 *            name, which is calculated by the static hash map.
+	 * @return
+	 */
+	public static String getShortFilename(Token token, boolean abbreviated) {
 		String filename;
 		int separatorIndex;
 
@@ -57,13 +72,43 @@ public class TokenUtils {
 		separatorIndex = filename.lastIndexOf(File.pathSeparatorChar);
 		if (separatorIndex >= 0 && separatorIndex < filename.length() - 1)
 			filename = filename.substring(separatorIndex + 1);
+		if (abbreviated) {
+			if (fileNameMap.containsKey(filename)) {
+				filename = SHORT_FILE_NAME_PREFIX + fileNameMap.get(filename);
+			} else {
+				int index = fileNameMap.size() + 1;
+
+				fileNameMap.put(filename, index);
+				filename = SHORT_FILE_NAME_PREFIX + index;
+			}
+		}
 		return filename;
 	}
 
-	public static String summarizeRangeLocation(CToken first, CToken last) {
+	public static void addFileName(String fileName) {
+		if (!fileNameMap.containsKey(fileName)) {
+			int index = fileNameMap.size() + 1;
+
+			fileNameMap.put(fileName, index);
+		}
+	}
+
+	public static void printShorterFileNameMap(PrintStream out) {
+		if (fileNameMap.size() > 0) {
+			out.println();
+			out.println("File name list:");
+			for (String fileName : fileNameMap.keySet()) {
+				out.println(SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName)
+						+ "\t: " + fileName);
+			}
+		}
+	}
+
+	public static String summarizeRangeLocation(CToken first, CToken last,
+			boolean abbreviated) {
 		String result;
-		String filename1 = getShortFilename(first);
-		String filename2 = getShortFilename(last);
+		String filename1 = getShortFilename(first, abbreviated);
+		String filename2 = getShortFilename(last, abbreviated);
 		int line1 = first.getLine();
 		int pos1 = first.getCharPositionInLine();
 		String endPosition;
@@ -112,8 +157,9 @@ public class TokenUtils {
 		return result;
 	}
 
-	public static String summarizeRange(CToken first, CToken last) {
-		String result = summarizeRangeLocation(first, last);
+	public static String summarizeRange(CToken first, CToken last,
+			boolean abbreviated) {
+		String result = summarizeRangeLocation(first, last, abbreviated);
 		String excerpt = "";
 		int tokenCount = 0;
 		CToken token = first;
