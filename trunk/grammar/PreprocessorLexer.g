@@ -131,7 +131,7 @@ COLLECTIVE	:	'$collective';
 CONTIN			:	'$contin';
 DERIV			: '$D';
 ENSURES		:	'$ensures';
-EXISTS			: 	'$exits';
+EXISTS			: 	'$exists';
 FALSE		:	'$false';
 FORALL		:	'$forall';
 INPUT		:	'$input';
