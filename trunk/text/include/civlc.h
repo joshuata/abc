@@ -32,6 +32,9 @@ typedef struct __dynamic__ $dynamic;
 
 // Misc. functions:
 
+/* Terminate the calling process. */
+void $exit(void);
+
 /* Nondeterministic choice of integer i, such that 0<=i<n. */
 int $choose_int(int n);
 
