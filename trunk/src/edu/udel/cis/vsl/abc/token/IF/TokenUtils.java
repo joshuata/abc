@@ -79,7 +79,7 @@ public class TokenUtils {
 			if (fileNameMap.containsKey(filename)) {
 				filename = SHORT_FILE_NAME_PREFIX + fileNameMap.get(filename);
 			} else {
-				int index = fileNameMap.size() + 1;
+				int index = fileNameMap.size();
 
 				fileNameMap.put(filename, index);
 				filename = SHORT_FILE_NAME_PREFIX + index;
@@ -90,7 +90,7 @@ public class TokenUtils {
 
 	public static void addFileName(String fileName) {
 		if (!fileNameMap.containsKey(fileName)) {
-			int index = fileNameMap.size() + 1;
+			int index = fileNameMap.size();
 
 			fileNameMap.put(fileName, index);
 		}
