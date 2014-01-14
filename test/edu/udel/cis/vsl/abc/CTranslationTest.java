@@ -40,7 +40,7 @@ public class CTranslationTest {
 	public void constants() throws ABCException, IOException {
 		check("constants");
 	}
-	
+
 	@Test
 	public void adder_seq() throws ABCException, IOException {
 		check("adder_seq");
@@ -59,5 +59,10 @@ public class CTranslationTest {
 	@Test
 	public void pointer2() throws ABCException, IOException {
 		check("parse/pointer2");
+	}
+
+	@Test
+	public void varargs() throws ABCException, IOException {
+		check("varargs");
 	}
 }

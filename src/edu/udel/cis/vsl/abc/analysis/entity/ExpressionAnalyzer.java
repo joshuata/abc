@@ -562,7 +562,7 @@ public class ExpressionAnalyzer {
 		if (actualScopes != null && !isScopeParameterized)
 			throw error("Scope parameters used where none expected", node);
 		expectedNumArgs = functionType.getNumParameters();
-		hasVariableNumArgs = functionType.isVariablyModified();
+		hasVariableNumArgs = functionType.hasVariableArgs();
 		if (hasVariableNumArgs) {
 			// if function has variable number of args then the number of
 			// actual parameters must be at least the number expected
