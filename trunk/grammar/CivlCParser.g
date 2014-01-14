@@ -543,15 +543,22 @@ logicalOrExpression
 	  )*
 	;
 	
+/* Added for CIVL-C.  Usually 6.5.15 would use logicalOrExpression. */
+logicalImpliesExpression
+	: ( logicalOrExpression -> logicalOrExpression )
+	  ( IMPLIES y=logicalOrExpression
+	    -> ^(OPERATOR IMPLIES ^(ARGUMENT_LIST $logicalImpliesExpression $y))
+	  )*
+    	;
 
 /* 6.5.15 */
 conditionalExpression
-	: logicalOrExpression
-	( -> logicalOrExpression
+	: logicalImpliesExpression
+	( -> logicalImpliesExpression
     	| QMARK expression COLON conditionalExpression
     	  -> ^(OPERATOR QMARK
     	       ^(ARGUMENT_LIST
-    	         logicalOrExpression
+    	         logicalImpliesExpression
     	         expression
     	         conditionalExpression))
     	)

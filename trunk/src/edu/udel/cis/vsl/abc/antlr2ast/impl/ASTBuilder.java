@@ -270,7 +270,8 @@ public class ASTBuilder {
 	static final int UNIFORM = CivlCParser.UNIFORM;
 	static final int CIVLATOMIC = CivlCParser.CIVLATOMIC;
 	static final int CIVLATOM = CivlCParser.CIVLATOM;
-
+	static final int IMPLIES = CivlCParser.IMPLIES;
+	
 	// Instance fields...
 
 	private CParser parser;
@@ -807,6 +808,9 @@ public class ASTBuilder {
 			break;
 		case OR:
 			operator = Operator.LOR;
+			break;
+		case IMPLIES:
+			operator = Operator.IMPLIES;
 			break;
 		case LT:
 			operator = Operator.LT;

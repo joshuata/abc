@@ -228,6 +228,7 @@ nonPoundPunctuator
 		|	GT
 		|	GTE
 		|	HASHHASH
+		|	IMPLIES
 		|	LCURLY
 		|	LPAREN
 		|	LSQUARE
