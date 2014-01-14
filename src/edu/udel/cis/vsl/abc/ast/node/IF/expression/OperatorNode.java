@@ -28,6 +28,7 @@ public interface OperatorNode extends ExpressionNode {
 		EQUALS, // == equality
 		GT, // > greater than
 		GTE, // >= greater than or equals
+		IMPLIES, // => logical implication
 		LAND, // && logical and
 		LOR, // || logical or
 		LT, // < less than

@@ -134,6 +134,7 @@ ENSURES		:	'$ensures';
 EXISTS			: 	'$exists';
 FALSE		:	'$false';
 FORALL		:	'$forall';
+IMPLIES		:	'=>'	|	NotLineStart;
 INPUT		:	'$input';
 INVARIANT	:	'$invariant';
 OUTPUT		:	'$output';
