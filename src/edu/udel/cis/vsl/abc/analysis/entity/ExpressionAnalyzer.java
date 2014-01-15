@@ -680,6 +680,7 @@ public class ExpressionAnalyzer {
 		case LAND: // && logical and
 		case LOR: // || logical or
 		case NOT: // ! logical not
+		case IMPLIES: // => logical implication
 			processLANDorLORorNOT(node);
 			break;
 		case GT: // > greater than
