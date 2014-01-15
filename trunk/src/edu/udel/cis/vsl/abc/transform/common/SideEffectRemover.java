@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
+import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
@@ -508,36 +509,45 @@ public class SideEffectRemover implements Transformer {
 				if (sideEffectFree) {
 					result = statement;
 				} else {
-					Vector<BlockItemNode> before = new Vector<BlockItemNode>();
-					Vector<BlockItemNode> after = new Vector<BlockItemNode>();
-					Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
-					Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
-
-					for (int i = 0; i < ((FunctionCallNode) expression)
-							.getNumberOfArguments(); i++) {
-						ExpressionNode originalArgument = ((FunctionCallNode) expression)
-								.getArgument(i);
-
-						if (isSEF(originalArgument)) {
-							arguments.add(originalArgument);
-						} else {
-							SideEffectFreeTriple triple = processExpression(originalArgument);
-
-							before.addAll(triple.getBefore());
-							arguments.add(triple.getExpression());
-							after.addAll(triple.getAfter());
-						}
-					}
-					blockItems.addAll(before);
-					blockItems.add(factory.newExpressionStatementNode(factory
-							.newFunctionCallNode(statement.getSource(),
-									((FunctionCallNode) expression)
-											.getFunction(), arguments,
-									((FunctionCallNode) expression)
-											.getScopeList())));
-					blockItems.addAll(after);
-					result = factory.newCompoundStatementNode(
-							statement.getSource(), blockItems);
+					throw new ABCRuntimeException(
+							"arguments with possible side-effect: prohibited to avoid undefined behavior",
+							expression.getSource().getSummary(false));
+					// Vector<BlockItemNode> before = new
+					// Vector<BlockItemNode>();
+					// Vector<BlockItemNode> after = new
+					// Vector<BlockItemNode>();
+					// Vector<ExpressionNode> arguments = new
+					// Vector<ExpressionNode>();
+					// Vector<BlockItemNode> blockItems = new
+					// Vector<BlockItemNode>();
+					//
+					// for (int i = 0; i < ((FunctionCallNode) expression)
+					// .getNumberOfArguments(); i++) {
+					// ExpressionNode originalArgument = ((FunctionCallNode)
+					// expression)
+					// .getArgument(i);
+					//
+					// if (isSEF(originalArgument)) {
+					// arguments.add(originalArgument);
+					// } else {
+					// SideEffectFreeTriple triple =
+					// processExpression(originalArgument);
+					//
+					// before.addAll(triple.getBefore());
+					// arguments.add(triple.getExpression());
+					// after.addAll(triple.getAfter());
+					// }
+					// }
+					// blockItems.addAll(before);
+					// blockItems.add(factory.newExpressionStatementNode(factory
+					// .newFunctionCallNode(statement.getSource(),
+					// ((FunctionCallNode) expression)
+					// .getFunction(), arguments,
+					// ((FunctionCallNode) expression)
+					// .getScopeList())));
+					// blockItems.addAll(after);
+					// result = factory.newCompoundStatementNode(
+					// statement.getSource(), blockItems);
 				}
 			} else if (expression instanceof SpawnNode) {
 				FunctionCallNode call = ((SpawnNode) expression).getCall();
@@ -641,10 +651,26 @@ public class SideEffectRemover implements Transformer {
 							Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
 
 							if (rhs instanceof FunctionCallNode) {
-								// TODO check that arguments are SEF
+								for (int i = 0; i < ((FunctionCallNode) rhs)
+										.getNumberOfArguments(); i++) {
+									if (!isSEF(((FunctionCallNode) rhs)
+											.getArgument(i)))
+										throw new ABCRuntimeException(
+												"arguments with possible side-effect: prohibited to avoid undefined behavior",
+												rhs.getSource().getSummary(
+														false));
+								}
 								result = statement;
 							} else if (rhs instanceof SpawnNode) {
-								// TODO check that arguments are SEF
+								for (int i = 0; i < ((SpawnNode) rhs).getCall()
+										.getNumberOfArguments(); i++) {
+									if (!isSEF(((SpawnNode) rhs).getCall()
+											.getArgument(i)))
+										throw new ABCRuntimeException(
+												"arguments with possible side-effect: prohibited to avoid undefined behavior",
+												rhs.getSource().getSummary(
+														false));
+								}
 								result = statement;
 							} else {
 								Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
@@ -769,12 +795,14 @@ public class SideEffectRemover implements Transformer {
 					break;
 				default:
 					throw new ABCUnsupportedException("this operation: "
-							+ statement, statement.getSource().getSummary(false));
+							+ statement, statement.getSource()
+							.getSummary(false));
 				}
 			} else {
 				throw new ABCUnsupportedException(
 						"removing side effects from this expression statement: "
-								+ statement, statement.getSource().getSummary(false));
+								+ statement, statement.getSource().getSummary(
+								false));
 			}
 		}
 		return result;
@@ -1045,7 +1073,13 @@ public class SideEffectRemover implements Transformer {
 			// declNode.getTypeNode().getReturnType();
 			//
 			// returnTypeNode = oldReturnTypeNode.copy();
-
+			for (int i = 0; i < ((FunctionCallNode) expression)
+					.getNumberOfArguments(); i++) {
+				if (!isSEF(((FunctionCallNode) expression).getArgument(i)))
+					throw new ABCRuntimeException(
+							"arguments with possible side-effect: prohibited to avoid undefined behavior",
+							expression.getSource().getSummary(false));
+			}
 			returnTypeNode = typeNode(functionEntity.getFirstDeclaration()
 					.getSource(), ((Function) functionEntity).getType()
 					.getReturnType());
