@@ -179,19 +179,27 @@ _Bool $comm_probe($comm * comm, int source, int dest, int tag) {
   int nprocs;
   $queue queue;
   int length;
+  _Bool result;
   
   $atom {
+    result = $false;
     nprocs = comm->nprocs;
     $assert(0 <= source && source < nprocs);
     $assert(0 <= dest && dest < nprocs);
     queue = comm->buf[source][dest];
     length = queue.length;
+    if (tag == $COMM_ANY_TAG) {
+      result = length > 0 ? $true : $false;
+    } else {
+      for (int i=0; i<length; i++) {
+        if (queue.messages[i].tag == tag) {
+          result = $true;
+          break;
+        }  
+      }
+    }
   }
-  if (tag == $COMM_ANY_TAG)
-    return length > 0 ? $true : $false;
-  for (int i=0; i<length; i++)
-    if (queue.messages[i].tag == tag) return $true;
-  return $false;
+  return result;
 }
 
 /* finds the first matching message and returns pointer
@@ -200,21 +208,28 @@ $message * $comm_seek($comm * comm, int source, int dest, int tag) {
   int nprocs;
   $queue queue;
   int length;
+  $message* result;
   
   $atom {
+    result = NULL;
     nprocs = comm->nprocs;
     $assert(0 <= source && source < nprocs);
     $assert(0 <= dest && dest < nprocs);
     queue = comm->buf[source][dest];
     length = queue.length;
+    if (tag == $COMM_ANY_TAG) {
+      result = length > 0 ? &queue.messages[0] : NULL;
+    } else {
+      for (int i=0; i<length; i++) {
+        $message m = queue.messages[i];
+        if (m.tag == tag) {
+          result = &m;
+          break;
+        }
+      }
+    }
   }
-  if (tag == $COMM_ANY_TAG)
-    return length > 0 ? &queue.messages[0] : NULL;
-  for (int i=0; i<length; i++) {
-    $message m = queue.messages[i];
-    if (m.tag == tag) return m;
-  }
-  return NULL;
+  return result;
 }
 
 
@@ -240,7 +255,7 @@ int $comm_total_size($comm * comm) {
   int result;
   int nprocs;
   
-  $atomic {
+  $atom {
     result = 0;
     nprocs = comm->nprocs;
     for (int i=0; i<nprocs; i++)
