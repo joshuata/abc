@@ -65,8 +65,10 @@ void* $malloc($heap *h, int size);
 
 /* Copies a region of memory, just as in standard C */
 void memcpy(void *p, void *q, size_t size) {
-  $bundle bundle = $bundle_pack(q, size);
-  $bundle_unpack(bundle, p);
+  $atom {
+    $bundle bundle = $bundle_pack(q, size);
+    $bundle_unpack(bundle, p);
+  }
 }
 
 /* The CIVL-C de-allocation function, which takes a reference to a heap */
@@ -97,11 +99,13 @@ $message $message_pack(int source, int dest, int tag,
     void *data, int size) {
   $message result;
   
-  result.source = source;
-  result.dest = dest;
-  result.tag = tag;
-  result.data = $bundle_pack(data, size);
-  result.size = size;
+  $atom {
+    result.source = source;
+    result.dest = dest;
+    result.tag = tag;
+    result.data = $bundle_pack(data, size);
+    result.size = size;
+  }
   return result;
 }
   
@@ -172,14 +176,17 @@ void $comm_enqueue($comm * comm, $message message);
 
 /* returns true iff a matching message exists in comm */
 _Bool $comm_probe($comm * comm, int source, int dest, int tag) {
-  int nprocs = comm->nprocs;
+  int nprocs;
   $queue queue;
   int length;
   
-  $assert(0 <= source && source < nprocs);
-  $assert(0 <= dest && dest < nprocs);
-  queue = comm->buf[source][dest];
-  length = queue.length;
+  $atom {
+    nprocs = comm->nprocs;
+    $assert(0 <= source && source < nprocs);
+    $assert(0 <= dest && dest < nprocs);
+    queue = comm->buf[source][dest];
+    length = queue.length;
+  }
   if (tag == $COMM_ANY_TAG)
     return length > 0 ? $true : $false;
   for (int i=0; i<length; i++)
@@ -190,14 +197,17 @@ _Bool $comm_probe($comm * comm, int source, int dest, int tag) {
 /* finds the first matching message and returns pointer
  * to it without modifying comm */
 $message * $comm_seek($comm * comm, int source, int dest, int tag) {
-  int nprocs = comm->nprocs;
+  int nprocs;
   $queue queue;
   int length;
   
-  $assert(0 <= source && source < nprocs);
-  $assert(0 <= dest && dest < nprocs);
-  queue = comm->buf[source][dest];
-  length = queue.length;
+  $atom {
+    nprocs = comm->nprocs;
+    $assert(0 <= source && source < nprocs);
+    $assert(0 <= dest && dest < nprocs);
+    queue = comm->buf[source][dest];
+    length = queue.length;
+  }
   if (tag == $COMM_ANY_TAG)
     return length > 0 ? &queue.messages[0] : NULL;
   for (int i=0; i<length; i++) {
@@ -215,21 +225,28 @@ $message $comm_dequeue($comm * comm, int source, int dest, int tag);
 /* returns the number of messages from source to dest stored
  * in comm */ 
 int $comm_chan_size($comm * comm, int source, int dest) {
-  int nprocs = comm->nprocs;
+  int nprocs;
   
-  $assert(0 <= source && source < nprocs);
-  $assert(0 <= dest && dest < nprocs);
+  $atom {
+    nprocs = comm->nprocs;
+    $assert(0 <= source && source < nprocs);
+    $assert(0 <= dest && dest < nprocs);
+  }
   return comm->buf[source][dest].length;
 }
 
 /* returns the total number of messages in the comm */ 
 int $comm_total_size($comm * comm) {
-  int result = 0;
-  int nprocs = comm->nprocs;
+  int result;
+  int nprocs;
   
-  for (int i=0; i<nprocs; i++)
-    for (int j=0; j<nprocs; j++)
-      result += comm->buf[i][j].length;
+  $atomic {
+    result = 0;
+    nprocs = comm->nprocs;
+    for (int i=0; i<nprocs; i++)
+      for (int j=0; j<nprocs; j++)
+        result += comm->buf[i][j].length;
+  }
   return result;
 }
 
