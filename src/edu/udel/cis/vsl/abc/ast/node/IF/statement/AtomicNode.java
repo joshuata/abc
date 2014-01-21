@@ -1,16 +1,18 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 
 /**
- * An atomic node is associated to <code>$atomic</code> or <code>$datomic</code>
- * , where $atomic requires its body to be finite and non-blocking; whereas
- * $datomic has an extra requirement that its body should be also
- * deterministic.
+ * An atomic node is associated to <code>$atomic</code> or <code>$atom</code> ,
+ * where $atomic has no restriction to its body; whereas $atom requires that its
+ * body should be finite, non-blocking and deterministic.
  * 
- * @author zheng
+ * @author Manchun Zheng (zmanchun)
  * 
  */
 
 public interface AtomicNode extends StatementNode {
+	@Override
+	AtomicNode copy();
+	
 	/**
 	 * The body of the "atomic" statement.
 	 * 
@@ -18,12 +20,9 @@ public interface AtomicNode extends StatementNode {
 	 */
 	StatementNode getBody();
 
-	@Override
-	AtomicNode copy();
-
 	/**
 	 * 
-	 * @return True iff this is a deterministic atomic node, i.e., $datomic.
+	 * @return True iff this is a deterministic atomic node, i.e., $atom.
 	 */
 	boolean isDeterministic();
 }

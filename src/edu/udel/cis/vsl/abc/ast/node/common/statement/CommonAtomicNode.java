@@ -9,7 +9,7 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 
 /**
  * An "atomic" statement has the form <code>$atomic body</code> or
- * <code>$datomic body</code>, where body is a list of statements.
+ * <code>$atom body</code>, where body is a list of statements.
  * 
  * @author zheng
  * 
@@ -18,11 +18,10 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 
 	/**
-	 * True iff the atomic node is deterministic, i.e., starting with
-	 * <code>$datomic</code>; otherwise, it is general atomic node starting with
-	 * <code>$atomic</code>.
+	 * True iff the atomic node is declared by <code>$atom</code>; otherwise, it
+	 * is general atomic node starting with <code>$atomic</code>.
 	 */
-	private boolean isDeterministic = false;
+	private boolean isAtom  = false;
 
 	/**
 	 * Constructor
@@ -30,10 +29,10 @@ public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 	 * @param source
 	 * @param body
 	 */
-	public CommonAtomicNode(Source source, boolean deterministic,
+	public CommonAtomicNode(Source source, boolean isAtom,
 			StatementNode body) {
 		super(source, body);
-		this.isDeterministic = deterministic;
+		this.isAtom = isAtom;
 	}
 
 	@Override
@@ -56,7 +55,7 @@ public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 		StatementNode body = getBody();
 		StatementNode bodyCopy = body == null ? null : body.copy();
 
-		return new CommonAtomicNode(getSource(), this.isDeterministic, bodyCopy);
+		return new CommonAtomicNode(getSource(), this.isAtom, bodyCopy);
 	}
 
 	@Override
@@ -66,6 +65,6 @@ public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 
 	@Override
 	public boolean isDeterministic() {
-		return this.isDeterministic;
+		return this.isAtom;
 	}
 }
