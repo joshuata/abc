@@ -64,7 +64,7 @@ public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 	}
 
 	@Override
-	public boolean isDeterministic() {
+	public boolean isAtom() {
 		return this.isAtom;
 	}
 }

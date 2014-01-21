@@ -24,5 +24,5 @@ public interface AtomicNode extends StatementNode {
 	 * 
 	 * @return True iff this is a deterministic atomic node, i.e., $atom.
 	 */
-	boolean isDeterministic();
+	boolean isAtom();
 }

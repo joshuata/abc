@@ -213,7 +213,7 @@ public class SideEffectRemover implements Transformer {
 		StatementNode bodyNode = processStatement(statement.getBody());
 
 		return factory.newAtomicStatementNode(statement.getSource(),
-				statement.isDeterministic(), bodyNode);
+				statement.isAtom(), bodyNode);
 	}
 
 	private StatementNode chooseStatement(ChooseStatementNode statement)
