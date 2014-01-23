@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
@@ -35,6 +36,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.DerivativeExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -85,6 +87,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonAbstractFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonCompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonDesignationNode;
@@ -104,6 +107,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCastNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCollectiveExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCompoundLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonDerivativeExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonDotNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonEnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonExpressionNode;
@@ -593,6 +597,14 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public AbstractFunctionDefinitionNode newAbstractFunctionDefinitionNode(
+			Source source, IdentifierNode name, FunctionTypeNode type,
+			SequenceNode<ContractNode> contract, int continuity) {
+		return new CommonAbstractFunctionDefinitionNode(source, name, type,
+				contract, continuity);
+	}
+
+	@Override
 	public ASTNode newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions) {
 		return newSequenceNode(source, "TranslationUnit", definitions);
@@ -712,13 +724,23 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public DerivativeExpressionNode newDerivativeExpressionNode(
+			Source source,
+			ExpressionNode function,
+			SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials,
+			SequenceNode<ExpressionNode> arguments) {
+		return new CommonDerivativeExpressionNode(source, function, partials,
+				arguments);
+	}
+
+	@Override
 	public void setConstantValue(ExpressionNode expression, Value value) {
 		((CommonExpressionNode) expression).setConstantValue(value);
 	}
 
 	@Override
-	public AtomicNode newAtomicStatementNode(Source statementSource, boolean deterministic,
-			StatementNode body) {
+	public AtomicNode newAtomicStatementNode(Source statementSource,
+			boolean deterministic, StatementNode body) {
 		return new CommonAtomicNode(statementSource, deterministic, body);
 	}
 

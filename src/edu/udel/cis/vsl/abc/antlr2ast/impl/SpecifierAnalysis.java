@@ -261,7 +261,7 @@ public class SpecifierAnalysis {
 			}
 			case CivlCParser.ABSTRACT:
 				abstractSpecifier = true;
-				// TODO: Get continuity.
+				continuity = Integer.parseInt(node.getChild(0).getText());
 				break;
 			default:
 				throw error("Unknown declaration specifier", node);

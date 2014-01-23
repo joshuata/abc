@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
 
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
@@ -26,6 +27,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.DerivativeExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -373,6 +375,24 @@ public interface NodeFactory {
 			Quantifier quantifier, VariableDeclarationNode variable,
 			ExpressionNode restriction, ExpressionNode expression);
 
+	/**
+	 * 
+	 * @param source
+	 *            The source code elements.
+	 * @param function
+	 *            The abstract function whose derivative is being taken.
+	 * @param partials
+	 *            The list of partial derivatives.
+	 * @param arguments
+	 *            The arguments to the uninterpreted function evaluation.
+	 * @return The new derivative expression with the given children.
+	 */
+	DerivativeExpressionNode newDerivativeExpressionNode(
+			Source source,
+			ExpressionNode function,
+			SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials,
+			SequenceNode<ExpressionNode> arguments);
+
 	// Declarations...
 
 	/**
@@ -578,6 +598,26 @@ public interface NodeFactory {
 	FunctionDefinitionNode newFunctionDefinitionNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract, CompoundStatementNode body);
+
+	/**
+	 * Create a new abstract function definition.
+	 * 
+	 * @param source
+	 *            The source information for the abstract function definition.
+	 * @param name
+	 *            The name of the abstract function.
+	 * @param type
+	 *            The function type with the appropriate parameters and return
+	 *            type.
+	 * @param contract
+	 *            Any code contract associated with the function.
+	 * @param continuity
+	 *            The number of derivatives that may be taken.
+	 * @return An abstract function definition with the specified properties.
+	 */
+	AbstractFunctionDefinitionNode newAbstractFunctionDefinitionNode(
+			Source source, IdentifierNode name, FunctionTypeNode type,
+			SequenceNode<ContractNode> contract, int continuity);
 
 	ASTNode newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions);
