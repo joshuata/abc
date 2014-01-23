@@ -33,6 +33,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.DerivativeExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -187,6 +188,8 @@ public class ExpressionAnalyzer {
 			node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
 		} else if (node instanceof QuantifiedExpressionNode) {
 			processQuantifiedExpression((QuantifiedExpressionNode) node);
+		} else if (node instanceof DerivativeExpressionNode) {
+			processDerivativeExpression((DerivativeExpressionNode) node);
 		} else
 			throw error("Unknown expression kind", node);
 	}
@@ -739,6 +742,35 @@ public class ExpressionAnalyzer {
 		processExpression(node.restriction());
 		processExpression(node.expression());
 		node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
+	}
+
+	private void processDerivativeExpression(DerivativeExpressionNode node)
+			throws SyntaxException {
+		ExpressionNode functionNode = node.getFunction();
+		Type tmpType;
+		TypeKind tmpKind;
+		FunctionType functionType;
+
+		processExpression(functionNode);
+		tmpType = functionNode.getType();
+		tmpKind = tmpType.kind();
+		for (int i = 0; i < node.getNumberOfPartials(); i++) {
+			processExpression(node.getPartial(i).getRight());
+		}
+		for (int i = 0; i < node.getNumberOfArguments(); i++) {
+			processExpression(node.getArgument(i));
+		}
+		if (tmpKind == TypeKind.POINTER) {
+			tmpType = ((PointerType) tmpType).referencedType();
+			tmpKind = tmpType.kind();
+		}
+		if (tmpKind == TypeKind.FUNCTION)
+			functionType = (FunctionType) tmpType;
+		else
+			throw error(
+					"Function expression in derivative expression does not have function "
+							+ "type or pointer to function type", functionNode);
+		node.setInitialType(functionType.getReturnType());
 	}
 
 	private void processSizeof(SizeofNode node) throws SyntaxException {

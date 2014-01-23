@@ -34,6 +34,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.DerivativeExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FloatingConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
@@ -271,7 +272,8 @@ public class ASTBuilder {
 	static final int CIVLATOMIC = CivlCParser.CIVLATOMIC;
 	static final int CIVLATOM = CivlCParser.CIVLATOM;
 	static final int IMPLIES = CivlCParser.IMPLIES;
-	
+	static final int DERIVATIVE_EXPRESSION = CivlCParser.DERIVATIVE_EXPRESSION;
+
 	// Instance fields...
 
 	private CParser parser;
@@ -654,9 +656,63 @@ public class ASTBuilder {
 					translateExpression(
 							(CommonTree) expressionTree.getChild(3), scope));
 		}
+		case DERIVATIVE_EXPRESSION:
+			return translateDeriv(source, expressionTree, scope);
 		default:
 			throw error("Unknown expression kind", expressionTree);
 		}
+	}
+
+	/**
+	 * Translates a derivative expression
+	 * 
+	 * @param source
+	 *            The source information.
+	 * @param expressionTree
+	 *            CommonTree of type DERIV, representing a derivative
+	 *            expression.
+	 * @param scope
+	 *            The scope containing this expression.
+	 * @return A DerivativeExpressionNode corresponding to the ANTLR tree.
+	 * @throws SyntaxException
+	 */
+	private DerivativeExpressionNode translateDeriv(Source source,
+			CommonTree derivTree, SimpleScope scope) throws SyntaxException {
+		CommonTree functionTree = (CommonTree) derivTree.getChild(0);
+		CommonTree partialListTree = (CommonTree) derivTree.getChild(1);
+		CommonTree argumentListTree = (CommonTree) derivTree.getChild(2);
+		int numPartials = partialListTree.getChildCount();
+		int numArgs = argumentListTree.getChildCount();
+		ExpressionNode function = translateExpression(functionTree, scope);
+		List<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials;
+		List<ExpressionNode> arguments;
+
+		partials = new LinkedList<PairNode<IdentifierExpressionNode, IntegerConstantNode>>();
+		arguments = new LinkedList<ExpressionNode>();
+		for (int i = 0; i < numPartials; i++) {
+			CommonTree partialTree = (CommonTree) partialListTree.getChild(i);
+			ExpressionNode partialIdentifier = translateExpression(
+					(CommonTree) partialTree.getChild(0), scope);
+			ExpressionNode partialDegree = translateExpression(
+					(CommonTree) partialTree.getChild(1), scope);
+
+			assert partialIdentifier instanceof IdentifierExpressionNode;
+			assert partialDegree instanceof IntegerConstantNode;
+			partials.add(nodeFactory.newPairNode(newSource(partialTree),
+					(IdentifierExpressionNode) partialIdentifier,
+					(IntegerConstantNode) partialDegree));
+		}
+		for (int i = 0; i < numArgs; i++) {
+			CommonTree argumentTree = (CommonTree) argumentListTree.getChild(i);
+			ExpressionNode argumentNode = translateExpression(argumentTree,
+					scope);
+
+			arguments.add(argumentNode);
+		}
+		return nodeFactory.newDerivativeExpressionNode(source, function,
+				nodeFactory.newSequenceNode(newSource(partialListTree),
+						"partials", partials), nodeFactory.newSequenceNode(
+						newSource(argumentListTree), "arguments", arguments));
 	}
 
 	/**
@@ -1019,10 +1075,17 @@ public class ASTBuilder {
 				scope.putMapping(name, data.type);
 			} else if (isFunction(data.type, scope)) {
 				FunctionTypeNode typeNode = (FunctionTypeNode) data.type;
-				FunctionDeclarationNode declaration = nodeFactory
-						.newFunctionDeclarationNode(source, data.identifier,
-								typeNode, contract);
+				FunctionDeclarationNode declaration;
 
+				if (analysis.abstractSpecifier) {
+					declaration = nodeFactory
+							.newAbstractFunctionDefinitionNode(source,
+									data.identifier, typeNode, contract,
+									analysis.continuity);
+				} else {
+					declaration = nodeFactory.newFunctionDeclarationNode(
+							source, data.identifier, typeNode, contract);
+				}
 				setFunctionSpecifiers(declaration, analysis);
 				setStorageSpecifiers(declaration, analysis, scope);
 				if (initializer != null)

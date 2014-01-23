@@ -20,6 +20,8 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
@@ -923,7 +925,34 @@ public class SideEffectRemover implements Transformer {
 		boolean result = true;
 
 		if (expression instanceof FunctionCallNode) {
-			result = false;
+			ExpressionNode function = ((FunctionCallNode) expression)
+					.getFunction();
+			if (function instanceof IdentifierExpressionNode) {
+				IdentifierNode functionIdentifier = ((IdentifierExpressionNode) function)
+						.getIdentifier();
+				DeclarationNode functionDeclaration;
+
+				if (functionIdentifier.getEntity() == null) {
+					// FIXME: Why do we need this? Not having this check was
+					// causing a failure with ring2.cvl
+					return false;
+				}
+				functionDeclaration = functionIdentifier.getEntity().getFirstDeclaration();
+				// Check if this is an abstract function.
+				if (functionDeclaration instanceof AbstractFunctionDefinitionNode) {
+					for (int i = 0; i < ((FunctionCallNode) expression)
+							.getNumberOfArguments(); i++) {
+						result = result
+								&& isSEF(((FunctionCallNode) expression)
+										.getArgument(i));
+					}
+				} else {
+					result = false;
+				}
+			} else {
+				// Assume this isn't an abstract function.
+				result = false;
+			}
 		} else if (expression instanceof OperatorNode) {
 			switch (((OperatorNode) expression).getOperator()) {
 			case ASSIGN:
