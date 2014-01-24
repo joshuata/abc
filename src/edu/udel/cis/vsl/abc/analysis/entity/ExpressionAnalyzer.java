@@ -739,7 +739,12 @@ public class ExpressionAnalyzer {
 			throws SyntaxException {
 		entityAnalyzer.declarationAnalyzer.processVariableDeclaration(node
 				.variable());
-		processExpression(node.restriction());
+		if (node.isRange()) {
+			processExpression(node.lower());
+			processExpression(node.upper());
+		} else {
+			processExpression(node.restriction());
+		}
 		processExpression(node.expression());
 		node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
 	}

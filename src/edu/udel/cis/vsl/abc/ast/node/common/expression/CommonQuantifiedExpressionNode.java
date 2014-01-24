@@ -21,6 +21,9 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	private Quantifier quantifier;
 	private VariableDeclarationNode variable;
 	private ExpressionNode restriction;
+	private boolean isRange;
+	private ExpressionNode lower;
+	private ExpressionNode upper;
 	private ExpressionNode expression;
 
 	/**
@@ -42,6 +45,37 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 		this.variable = variable;
 		this.restriction = restriction;
 		this.expression = expression;
+		this.lower = null;
+		this.upper = null;
+		isRange = false;
+	}
+
+	/**
+	 * @param source
+	 *            The source code information for this expression.
+	 * @param quantifier
+	 *            The quantifier for this expression. One of {FORALL, EXISTS,
+	 *            UNIFORM}.
+	 * @param variable
+	 *            The quantified variable.
+	 * @param lower
+	 *            Integer-valued expression for the lower bound on the
+	 *            quantified variable.
+	 * @param upper
+	 *            Integer-valued expression for the upper bound on the
+	 *            quantified variable.
+	 */
+	public CommonQuantifiedExpressionNode(Source source, Quantifier quantifier,
+			VariableDeclarationNode variable, ExpressionNode lower,
+			ExpressionNode upper, ExpressionNode expression) {
+		super(source, variable, upper, expression);
+		this.quantifier = quantifier;
+		this.variable = variable;
+		this.lower = lower;
+		this.upper = upper;
+		this.expression = expression;
+		this.restriction = null;
+		isRange = true;
 	}
 
 	/*
@@ -142,5 +176,20 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	@Override
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.QUANTIFIED_EXPRESSION;
+	}
+
+	@Override
+	public boolean isRange() {
+		return isRange;
+	}
+
+	@Override
+	public ExpressionNode lower() {
+		return lower;
+	}
+
+	@Override
+	public ExpressionNode upper() {
+		return upper;
 	}
 }

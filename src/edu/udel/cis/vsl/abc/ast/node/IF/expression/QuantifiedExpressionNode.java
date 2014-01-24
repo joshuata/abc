@@ -30,10 +30,33 @@ public interface QuantifiedExpressionNode extends ExpressionNode {
 
 	/**
 	 * 
+	 * @return True iff the quantified variable in this expression is specified
+	 *         to have a range (e.g. i=0..n).
+	 */
+	boolean isRange();
+
+	/**
+	 * 
 	 * @return An expression involving the quantified variable which is expected
-	 *         to be true.
+	 *         to be true. Null iff isRange()==true.
 	 */
 	ExpressionNode restriction();
+
+	/**
+	 * 
+	 * @return If the quantified variable in this expression is specified to
+	 *         have a range, the lower end of the range (e.g. 0 in i=0..n). Null
+	 *         iff isRange() == false.
+	 */
+	ExpressionNode lower();
+
+	/**
+	 * 
+	 * @return If the quantified variable in this expression is specified to
+	 *         have a range, the upper end of the range (e.g. n in i=0..n). Null
+	 *         iff isRange() == false.
+	 */
+	ExpressionNode upper();
 
 	/**
 	 * @return The quantified expression.
