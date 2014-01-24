@@ -63,6 +63,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
@@ -599,62 +600,138 @@ public class ASTBuilder {
 							(CommonTree) expressionTree.getChild(2), scope));
 		case FORALL: {
 			SimpleScope newScope = new SimpleScope(scope);
-			VariableDeclarationNode variable = nodeFactory
-					.newVariableDeclarationNode(
-							source,
-							translateIdentifier((CommonTree) expressionTree
-									.getChild(1)),
-							translateTypeName(
-									(CommonTree) expressionTree.getChild(0),
-									newScope));
-			ExpressionNode restriction = translateExpression(
-					(CommonTree) expressionTree.getChild(2), newScope);
+			VariableDeclarationNode variable;
 
-			return nodeFactory.newQuantifiedExpressionNode(
-					source,
-					Quantifier.FORALL,
-					variable,
-					restriction,
-					translateExpression(
-							(CommonTree) expressionTree.getChild(3), newScope));
+			if (expressionTree.getChild(0).getType() == TYPE_NAME) {
+				ExpressionNode restriction = translateExpression(
+						(CommonTree) expressionTree.getChild(2), newScope);
+
+				variable = nodeFactory.newVariableDeclarationNode(
+						source,
+						translateIdentifier((CommonTree) expressionTree
+								.getChild(1)),
+						translateTypeName(
+								(CommonTree) expressionTree.getChild(0),
+								newScope));
+				return nodeFactory.newQuantifiedExpressionNode(
+						source,
+						Quantifier.FORALL,
+						variable,
+						restriction,
+						translateExpression(
+								(CommonTree) expressionTree.getChild(3),
+								newScope));
+			} else {
+				ExpressionNode lower, upper;
+
+				lower = translateExpression(
+						(CommonTree) expressionTree.getChild(1), newScope);
+				upper = translateExpression(
+						(CommonTree) expressionTree.getChild(2), newScope);
+				variable = nodeFactory.newVariableDeclarationNode(source,
+						translateIdentifier((CommonTree) expressionTree
+								.getChild(0)), nodeFactory.newBasicTypeNode(
+								source, BasicTypeKind.INT));
+				return nodeFactory.newQuantifiedExpressionNode(
+						source,
+						Quantifier.FORALL,
+						variable,
+						lower,
+						upper,
+						translateExpression(
+								(CommonTree) expressionTree.getChild(3),
+								newScope));
+			}
 		}
 		case UNIFORM: {
-			VariableDeclarationNode variable = nodeFactory
-					.newVariableDeclarationNode(
-							source,
-							translateIdentifier((CommonTree) expressionTree
-									.getChild(1)),
-							translateTypeName(
-									(CommonTree) expressionTree.getChild(0),
-									scope));
+			SimpleScope newScope = new SimpleScope(scope);
+			VariableDeclarationNode variable;
 
-			return nodeFactory.newQuantifiedExpressionNode(
-					source,
-					Quantifier.UNIFORM,
-					variable,
-					translateExpression(
-							(CommonTree) expressionTree.getChild(2), scope),
-					translateExpression(
-							(CommonTree) expressionTree.getChild(3), scope));
+			if (expressionTree.getChild(0).getType() == TYPE_NAME) {
+				ExpressionNode restriction = translateExpression(
+						(CommonTree) expressionTree.getChild(2), newScope);
+
+				variable = nodeFactory.newVariableDeclarationNode(
+						source,
+						translateIdentifier((CommonTree) expressionTree
+								.getChild(1)),
+						translateTypeName(
+								(CommonTree) expressionTree.getChild(0),
+								newScope));
+				return nodeFactory.newQuantifiedExpressionNode(
+						source,
+						Quantifier.UNIFORM,
+						variable,
+						restriction,
+						translateExpression(
+								(CommonTree) expressionTree.getChild(3),
+								newScope));
+			} else {
+				ExpressionNode lower, upper;
+
+				lower = translateExpression(
+						(CommonTree) expressionTree.getChild(1), newScope);
+				upper = translateExpression(
+						(CommonTree) expressionTree.getChild(2), newScope);
+				variable = nodeFactory.newVariableDeclarationNode(source,
+						translateIdentifier((CommonTree) expressionTree
+								.getChild(0)), nodeFactory.newBasicTypeNode(
+								source, BasicTypeKind.INT));
+				return nodeFactory.newQuantifiedExpressionNode(
+						source,
+						Quantifier.UNIFORM,
+						variable,
+						lower,
+						upper,
+						translateExpression(
+								(CommonTree) expressionTree.getChild(3),
+								newScope));
+			}
 		}
 		case EXISTS: {
-			VariableDeclarationNode variable = nodeFactory
-					.newVariableDeclarationNode(
-							source,
-							translateIdentifier((CommonTree) expressionTree
-									.getChild(1)),
-							translateTypeName(
-									(CommonTree) expressionTree.getChild(0),
-									scope));
+			SimpleScope newScope = new SimpleScope(scope);
+			VariableDeclarationNode variable;
 
-			return nodeFactory.newQuantifiedExpressionNode(
-					source,
-					Quantifier.EXISTS,
-					variable,
-					translateExpression(
-							(CommonTree) expressionTree.getChild(2), scope),
-					translateExpression(
-							(CommonTree) expressionTree.getChild(3), scope));
+			if (expressionTree.getChild(0).getType() == TYPE_NAME) {
+				ExpressionNode restriction = translateExpression(
+						(CommonTree) expressionTree.getChild(2), newScope);
+
+				variable = nodeFactory.newVariableDeclarationNode(
+						source,
+						translateIdentifier((CommonTree) expressionTree
+								.getChild(1)),
+						translateTypeName(
+								(CommonTree) expressionTree.getChild(0),
+								newScope));
+				return nodeFactory.newQuantifiedExpressionNode(
+						source,
+						Quantifier.EXISTS,
+						variable,
+						restriction,
+						translateExpression(
+								(CommonTree) expressionTree.getChild(3),
+								newScope));
+			} else {
+				ExpressionNode lower, upper;
+
+				lower = translateExpression(
+						(CommonTree) expressionTree.getChild(1), newScope);
+				upper = translateExpression(
+						(CommonTree) expressionTree.getChild(2), newScope);
+				variable = nodeFactory.newVariableDeclarationNode(source,
+						translateIdentifier((CommonTree) expressionTree
+								.getChild(0)), nodeFactory.newBasicTypeNode(
+								source, BasicTypeKind.INT));
+				return nodeFactory.newQuantifiedExpressionNode(
+						source,
+						Quantifier.EXISTS,
+						variable,
+						lower,
+						upper,
+						translateExpression(
+								(CommonTree) expressionTree.getChild(3),
+								newScope));
+			}
 		}
 		case DERIVATIVE_EXPRESSION:
 			return translateDeriv(source, expressionTree, scope);

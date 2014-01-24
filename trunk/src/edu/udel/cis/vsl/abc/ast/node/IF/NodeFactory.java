@@ -379,6 +379,29 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code elements.
+	 * @param quantifier
+	 *            The quantifier. One of {EXISTS, FORALL, UNIFORM}.
+	 * @param variable
+	 *            The quantified variable.
+	 * @param lower
+	 *            Integer-valued expression for the lower bound on the
+	 *            quantified variable.
+	 * @param upper
+	 *            Integer-valued expression for the upper bound on the
+	 *            quantified variable.
+	 * @param expression
+	 *            The quantified expression.
+	 * @return The new quantified expression with the given children.
+	 */
+	QuantifiedExpressionNode newQuantifiedExpressionNode(Source source,
+			Quantifier quantifier, VariableDeclarationNode variable,
+			ExpressionNode lower, ExpressionNode upper,
+			ExpressionNode expression);
+
+	/**
+	 * 
+	 * @param source
+	 *            The source code elements.
 	 * @param function
 	 *            The abstract function whose derivative is being taken.
 	 * @param partials

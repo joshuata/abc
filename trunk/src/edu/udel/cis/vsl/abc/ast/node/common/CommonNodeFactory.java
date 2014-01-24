@@ -724,6 +724,15 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public QuantifiedExpressionNode newQuantifiedExpressionNode(Source source,
+			Quantifier quantifier, VariableDeclarationNode variable,
+			ExpressionNode lower, ExpressionNode upper,
+			ExpressionNode expression) {
+		return new CommonQuantifiedExpressionNode(source, quantifier, variable,
+				lower, upper, expression);
+	}
+
+	@Override
 	public DerivativeExpressionNode newDerivativeExpressionNode(
 			Source source,
 			ExpressionNode function,
