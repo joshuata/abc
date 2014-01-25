@@ -65,4 +65,9 @@ public class CTranslationTest {
 	public void varargs() throws ABCException, IOException {
 		check("varargs");
 	}
+
+	@Test
+	public void printf() throws ABCException, IOException {
+		check("printf");
+	}
 }

@@ -2,9 +2,41 @@
  * MPI primitives, just to get things rolling. */
 
 #include<stdlib.h>
- 
-/* Communicators (type MPI_Comm): */
-#define MPI_COMM_WORLD 1
+#include<civlc.h>
+
+/********************************* Types **********************************************/
+
+struct __MPI_Comm {
+  int id; // place-holder for now
+};
+typedef struct __MPI_Comm __MPI_Comm_obj;
+typedef __MPI_Comm_obj *MPI_Comm;
+
+struct __MPI_Op {
+  int id;
+};
+typedef struct __MPI_Op MPI_Op;
+
+struct __MPI_Datatype {
+  int id;
+};
+typedef struct __MPI_Datatype MPI_Datatype;
+
+struct __MPI_Comm_record {
+  int id;
+  // TODO: will add a lot more fields here
+};
+typedef struct __MPI_Comm_record *MPI_Request;
+
+struct __MPI_Status {
+  int MPI_SOURCE;
+  int MPI_TAG;
+  int MPI_ERROR;
+  int size;
+};
+typedef struct __MPI_Status MPI_Status;
+
+/********************************* Constants *******************************************/
 
 /* Ranks and tags (type int): */
 
@@ -12,51 +44,39 @@
 #define MPI_ANY_TAG -2
 #define MPI_PROC_NULL -3
 
-/* Operations (type MPI_Op): */
-#define MPI_SUM 1
-#define MPI_MAX 2
-#define MPI_MIN 3
+/* Communicators (type MPI_Comm) */
 
-/* Datatypes (type MPI_Datatype): */
-#define MPI_INT 1
-#define MPI_FLOAT 2
-#define MPI_DOUBLE 3
-#define MPI_CHAR 4
-#define MPI_BYTE 5
+__MPI_Comm_obj __MPI_Comm_world;
+MPI_Comm MPI_COMM_WORLD = &__MPI_Comm_world;
 
+/* Communication request handles (type MPI_Request): */
 
-/********************************* Types **********************************************/
+struct __MPI_Comm_record __MPI_Request_null;
+MPI_Request MPI_REQUEST_NULL = &__MPI_Request_null;
 
-typedef int MPI_Comm;
+/* Status object pointers (type MPI_Status*): */
 
-typedef int MPI_Op;
+MPI_Status __MPI_Status_ignore;
+MPI_Status *MPI_STATUS_IGNORE = &__MPI_Status_ignore;
+MPI_Status __MPI_Statuses_ignore;
+MPI_Status *MPI_STATUSES_IGNORE = &__MPI_Statuses_ignore;
 
-typedef int MPI_Datatype;
+/* Datatypes (type MPI_Datatype) */
 
-typedef  struct MPIX_Comm_Record {
-  int id;
-} MPIX_Comm_Record;
+MPI_Datatype MPI_INT     = (struct __MPI_Datatype){ 1 };
+MPI_Datatype MPI_FLOAT   = (struct __MPI_Datatype){ 2 };
+MPI_Datatype MPI_DOUBLE  = (struct __MPI_Datatype){ 3 };
+MPI_Datatype MPI_CHAR    = (struct __MPI_Datatype){ 4 };
+MPI_Datatype MPI_BYTE    = (struct __MPI_Datatype){ 5 };
+// etc.
 
-typedef MPIX_Comm_Record *MPI_Request;
+/* Operators (type MPI_Op) */
 
-typedef struct MPI_Status {
-  int MPI_SOURCE;
-  int MPI_TAG;
-  int SIZE;
-} MPI_Status;
+MPI_Op MPI_SUM    = (struct __MPI_Op){ 1 };
+MPI_Op MPI_MAX    = (struct __MPI_Op){ 2 };
+MPI_Op MPI_MIN    = (struct __MPI_Op){ 3 };
+// etc.
 
-/********************************* Constants *******************************************/
-
-
-/* Communication requests (type MPI_Request): */
-
-#define MPI_REQUEST_NULL (MPIX_Comm_Record*)NULL
-
-/* Status objects (type MPI_Status and MPI_Status*): */
-
-#define MPI_STATUS_IGNORE (MPI_Status*)NULL
-
-#define MPI_STATUSES_IGNORE (MPI_Status*)NULL
 
 /*************************************** Functions ***************************************/
 
@@ -114,3 +134,5 @@ int MPI_Type_commit(MPI_Datatype *datatype);
 int MPI_Type_free(MPI_Datatype *datatype);
 
 double MPI_Wtime( void );
+
+// etc.

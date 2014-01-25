@@ -157,9 +157,15 @@ public class CommonConversionFactory implements ConversionFactory {
 			base1 = ((AtomicType) base1).getBaseType();
 			base2 = ((AtomicType) base2).getBaseType();
 		}
-		if (checkBaseCompatibility && !base1.compatibleWith(base2))
-			throw error("Type referenced by pointer on left-hand side of assignment "
-					+ "is incompatible with corresponding type on right-hand side");
+		if (checkBaseCompatibility) {
+			if (base1 instanceof QualifiedObjectType)
+				base1 = ((QualifiedObjectType) base1).getBaseType();
+			if (base2 instanceof QualifiedObjectType)
+				base2 = ((QualifiedObjectType) base2).getBaseType();
+			if (!base1.compatibleWith(base2))
+				throw error("Type referenced by pointer on left-hand side of assignment "
+						+ "is incompatible with corresponding type on right-hand side");
+		}
 	}
 
 	/**

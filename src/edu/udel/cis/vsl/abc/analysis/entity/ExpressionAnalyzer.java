@@ -583,10 +583,12 @@ public class ExpressionAnalyzer {
 			processExpression(argument);
 			addStandardConversions(argument);
 			if (!hasVariableNumArgs || i < expectedNumArgs) {
-				ObjectType expectedType = functionType.getParameterType(i);
+				ObjectType lhsType = functionType.getParameterType(i);
+				UnqualifiedObjectType type = conversionFactory
+						.lvalueConversionType(lhsType);
 
 				try {
-					convertRHS(argument, expectedType);
+					convertRHS(argument, type);
 				} catch (UnsourcedException e) {
 					throw error(e, argument);
 				}
