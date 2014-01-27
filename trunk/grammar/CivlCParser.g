@@ -635,7 +635,7 @@ quantifierExpression
 	  BITOR restrict=conditionalExpression RCURLY 
 	  cond=expression
 	  -> ^(quantifier $type $id $restrict $cond)
-	| quantifier LCURLY id=IDENTIFIER ASSIGN lower=expression TILDE upper=expression
+	| quantifier LCURLY id=IDENTIFIER ASSIGN lower=expression DOTDOT upper=expression
 	  RCURLY cond=expression
 	  -> ^(quantifier $id $lower $upper $cond)
 	;

@@ -240,8 +240,8 @@ DecimalFloatingConstant
 
 fragment
 FractionalConstant
-		:	Digit* '.' Digit+
-		|	Digit+ '.' 
+		:	Digit* DOT Digit+
+		|	Digit+ DOT
 		;
 
 fragment
@@ -260,8 +260,8 @@ HexadecimalFloatingConstant
 
 fragment
 HexFractionalConstant
-		:	HexadecimalDigit* '.' Digit+
-		|	HexadecimalDigit+ '.' 
+		:	HexadecimalDigit* DOT Digit+
+		|	HexadecimalDigit+ DOT 
 		;
 
 fragment
@@ -324,8 +324,12 @@ SChar		:	~('"' | '\\' | '\n') | EscapeSequence ;
 
 fragment ELLIPSIS :;
 
+fragment DOTDOT :;
+
 DOT		:	'.'
 			(   ('..')=> '..' { $type  = ELLIPSIS; }
+			|
+				('.')=> '.' {$type = DOTDOT; }
 			|
 			)
 			NotLineStart
