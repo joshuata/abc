@@ -39,6 +39,7 @@ import edu.udel.cis.vsl.abc.token.Tokens;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
+import edu.udel.cis.vsl.abc.transform.common.AccuracyHelper;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 import edu.udel.cis.vsl.abc.util.ANTLRUtils;
@@ -93,8 +94,11 @@ public class Activator {
 
 	private Transformer pruner = new Pruner(astFactory);
 
+	private Transformer accuracyHelper = new AccuracyHelper();
+
 	private ProgramFactory programFactory = Programs.newProgramFactory(
-			astFactory, standardAnalyzer, pruner, sideEffectRemover);
+			astFactory, standardAnalyzer, pruner, sideEffectRemover,
+			accuracyHelper);
 
 	private Preprocessor preprocessor;
 
@@ -426,7 +430,12 @@ public class Activator {
 		program.print(out);
 		out.println();
 		out.flush();
-
+		// print the results of annotating for accuracy...
+		out.println("\n\n" + bar + " Side-effect-free Pruned Program " + bar);
+		program.annotateForAccuracy();
+		program.print(out);
+		out.println();
+		out.flush();
 		out.println("\n\n" + bar + " Types " + bar + "\n");
 		typeFactory.printTypes(out);
 		out.println();

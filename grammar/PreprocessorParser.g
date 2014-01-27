@@ -223,6 +223,7 @@ nonPoundPunctuator
 		|	DIV
 		|	DIVEQ
 		|	DOT
+		|	DOTDOT
 		|	ELLIPSIS
 		|	EQUALS
 		|	GT

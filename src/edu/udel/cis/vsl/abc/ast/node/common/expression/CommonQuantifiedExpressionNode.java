@@ -96,6 +96,11 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	 */
 	@Override
 	public ExpressionNode copy() {
+		if (isRange()) {
+			return new CommonQuantifiedExpressionNode(this.getSource(),
+					quantifier, variable.copy(), lower.copy(), upper.copy(),
+					expression.copy());
+		}
 		return new CommonQuantifiedExpressionNode(this.getSource(), quantifier,
 				variable.copy(), restriction.copy(), expression.copy());
 	}
