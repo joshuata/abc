@@ -40,7 +40,8 @@ int $choose_int(int n);
 
 /* Printf, just as in standard C */
 //void printf(const char * restrict format, ...);
-void printf(char * format, ...);
+//moved to stdio.h
+//void printf(char * format, ...);
 
 // Special types and operations:
 
