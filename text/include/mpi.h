@@ -4,12 +4,41 @@
 #include<stdlib.h>
 
 /********************************* Types **********************************************/
+/* A system type for bundling any slice of memory into
+ * a single value. */
+typedef struct __bundle__ $bundle;
+
+/* The CIVL-C process reference type */ 
+typedef struct __proc__ $proc;
+
+/* A message formed by $message_pack */ 
+typedef struct __message__ {
+  int source;
+  int dest;
+  int tag;
+  $bundle data;
+  int size;
+} $message;
+
+typedef struct __queue__ {
+  int length;
+  $message messages[];
+} $queue;
 
 struct __MPI_Comm {
-  int id; // place-holder for now
+  int id;
+  int nprocs; // number of processes
+  $proc procs[]; // the processes in order
+  $queue buf[][]; // message buffers
 };
+
 typedef struct __MPI_Comm __MPI_Comm_obj;
 typedef __MPI_Comm_obj *MPI_Comm;
+
+/* creates a new comm from the given sequence of processes,
+ * by allocating memory and copying the process sequence;
+ * the new comm has no messages */
+__MPI_Comm_obj $comm_create(int nprocs, $proc * procs);
 
 struct __MPI_Op {
   int id;
@@ -62,24 +91,27 @@ MPI_Status *MPI_STATUSES_IGNORE = &__MPI_Statuses_ignore;
 
 /* Datatypes (type MPI_Datatype) */
 
-MPI_Datatype MPI_INT     = (struct __MPI_Datatype){ 1 };
-MPI_Datatype MPI_FLOAT   = (struct __MPI_Datatype){ 2 };
-MPI_Datatype MPI_DOUBLE  = (struct __MPI_Datatype){ 3 };
-MPI_Datatype MPI_CHAR    = (struct __MPI_Datatype){ 4 };
-MPI_Datatype MPI_BYTE    = (struct __MPI_Datatype){ 5 };
+MPI_Datatype MPI_INT     = { .id=1 };
+MPI_Datatype MPI_FLOAT   = { .id=2 };
+MPI_Datatype MPI_DOUBLE  = { .id=3 };
+/*
+MPI_Datatype MPI_CHAR    = (struct __MPI_Datatype){ .id=4 };
+MPI_Datatype MPI_BYTE    = (struct __MPI_Datatype){ .id=5 };
+*/
 // etc.
 
 /* Operators (type MPI_Op) */
-
-MPI_Op MPI_SUM    = (struct __MPI_Op){ 1 };
-MPI_Op MPI_MAX    = (struct __MPI_Op){ 2 };
-MPI_Op MPI_MIN    = (struct __MPI_Op){ 3 };
+/*
+MPI_Op MPI_SUM    = (struct __MPI_Op){ .id=1 };
+MPI_Op MPI_MAX    = (struct __MPI_Op){ .id=2 };
+MPI_Op MPI_MIN    = (struct __MPI_Op){ .id=3 };
+*/
 // etc.
 
 
 /*************************************** Functions ***************************************/
 
-int MPI_Init(int *argc, char* (*argv)[]);
+int MPI_Init(int *argc, char *** argv);
 
 int MPI_Finalize();
 
