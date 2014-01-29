@@ -36,7 +36,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -193,9 +193,11 @@ public class SideEffectRemover implements Transformer {
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
-		if (statement instanceof AssertNode) {
-			result = assertStatement((AssertNode) statement);
-		} else if (statement instanceof AssumeNode) {
+//		if (statement instanceof AssertNode) {
+//			result = assertStatement((AssertNode) statement);
+//		} else 
+			
+		if (statement instanceof AssumeNode) {
 			result = assumeStatement((AssumeNode) statement);
 		} else if (statement instanceof ChooseStatementNode) {
 			result = chooseStatement((ChooseStatementNode) statement);
@@ -462,26 +464,26 @@ public class SideEffectRemover implements Transformer {
 		return result;
 	}
 
-	private StatementNode assertStatement(AssertNode statement)
-			throws SyntaxException {
-		StatementNode result;
-
-		if (isSEF(statement.getExpression())) {
-			result = statement;
-		} else {
-			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
-			SideEffectFreeTriple triple = processExpression(statement
-					.getExpression());
-
-			newStatements.addAll(triple.getBefore());
-			newStatements.add(factory.newAssertNode(statement.getSource(),
-					triple.getExpression()));
-			newStatements.addAll(triple.getAfter());
-			result = factory.newCompoundStatementNode(statement.getSource(),
-					newStatements);
-		}
-		return result;
-	}
+//	private StatementNode assertStatement(AssertNode statement)
+//			throws SyntaxException {
+//		StatementNode result;
+//
+//		if (isSEF(statement.getExpression())) {
+//			result = statement;
+//		} else {
+//			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
+//			SideEffectFreeTriple triple = processExpression(statement
+//					.getExpression());
+//
+//			newStatements.addAll(triple.getBefore());
+//			newStatements.add(factory.newAssertNode(statement.getSource(),
+//					triple.getExpression()));
+//			newStatements.addAll(triple.getAfter());
+//			result = factory.newCompoundStatementNode(statement.getSource(),
+//					newStatements);
+//		}
+//		return result;
+//	}
 
 	private StatementNode assumeStatement(AssumeNode statement)
 			throws SyntaxException {

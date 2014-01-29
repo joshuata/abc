@@ -15,7 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -137,8 +137,8 @@ public class StatementAnalyzer {
 			entityAnalyzer.processPragma((PragmaNode) statement);
 		} else if (statement instanceof NullStatementNode) {
 			// nothing to do
-		} else if (statement instanceof AssertNode) {
-			processExpression(((AssertNode) statement).getExpression());
+//		} else if (statement instanceof AssertNode) {
+//			processExpression(((AssertNode) statement).getExpression());
 		} else if (statement instanceof AssumeNode) {
 			processExpression(((AssumeNode) statement).getExpression());
 		} else if (statement instanceof WhenNode) {

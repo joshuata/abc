@@ -48,7 +48,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -595,7 +595,7 @@ public interface NodeFactory {
 
 	WaitNode newWaitNode(Source source, ExpressionNode expression);
 
-	AssertNode newAssertNode(Source source, ExpressionNode expression);
+	// AssertNode newAssertNode(Source source, ExpressionNode expression);
 
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 

@@ -57,7 +57,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -125,7 +125,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonStringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonOrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonSwitchLabelNode;
-import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssertNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
@@ -655,10 +654,11 @@ public class CommonNodeFactory implements NodeFactory {
 		return new CommonWaitNode(source, expression);
 	}
 
-	@Override
-	public AssertNode newAssertNode(Source source, ExpressionNode expression) {
-		return new CommonAssertNode(source, expression);
-	}
+	// @Override
+	// public AssertNode newAssertNode(Source source, ExpressionNode expression)
+	// {
+	// return new CommonAssertNode(source, expression);
+	// }
 
 	@Override
 	public AssumeNode newAssumeNode(Source source, ExpressionNode expression) {
