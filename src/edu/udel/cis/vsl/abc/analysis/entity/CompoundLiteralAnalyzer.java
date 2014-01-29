@@ -29,6 +29,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
 /**
+ * An instance of this class is used to analyzer compound literals.
  * 
  * Initialization, including of compound objects, is specified in C11 6.7.9.
  * Note in particular the following:
@@ -61,36 +62,6 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * the first non-array type is reached from the root, they must all be
  * constants. Hence there is a prefix of array types which may or may not be
  * complete, followed by types which must be complete.
- * 
- * Strategy:
- * 
- * - LiteralTypeNode: construct a type tree representing the declared type of
- * the literal. nodes can be either array, or structOrUnion. Array nodes can be
- * either complete (with constant int) or incomplete. Incomplete nodes can only
- * occur in the prefix (before any non-array nodes occur). The tree will have a
- * spot in the incomplete type in the prefix which can be set. You must be able
- * to take a node and consider it the root of another tree. There is only one
- * copy of each node, they are shared by all methods. * the corresponding
- * declared Type * array, struct, or union (method) * fixed : boolean (is the
- * length fixed) * length : int * children LiteralTypeNode,
- * LiteralArrayTypeNode, LiteralStructOrUnionTypeNode (scalar type node will
- * belong to neither of above)
- * 
- * - create navigator and Designation with no mention of type
- * 
- * - increment: Designation, LiteralTypeNode (modifies Designation)
- * 
- * - create compound literal class that has no mention of type
- * 
- * - set: CompoundLiteral, Designation, LiteralTypeNode, Literal: modifies the
- * compound literal and possibly the literal type node
- * 
- * - get: CompoundLiteral, Designation, LiteralTypeNode: modifies nothing but
- * will throw exception if bounds are violated
- * 
- * - using the above tree, parse the literal nodes, building up the literal
- * object
- * 
  */
 public class CompoundLiteralAnalyzer {
 
@@ -276,9 +247,9 @@ public class CompoundLiteralAnalyzer {
 			} else {
 				ExpressionNode expr = (ExpressionNode) initNode;
 
-				position.descendToScalar();
+				entityAnalyzer.expressionAnalyzer.processExpression(expr);
+				position.descendToType((ObjectType) expr.getType());
 				subType = position.getDesignatedType();
-				assert subType instanceof LiteralScalarTypeNode;
 				entityAnalyzer.expressionAnalyzer.processExpression(expr);
 				// add conversions as necessary to expr:
 				try {

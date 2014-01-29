@@ -8,4 +8,19 @@ void main() {
     int y;
   };
   struct foo f = {.y=999};
+  
+  
+  typedef struct Interval {
+    int left;
+    int right;
+  } Interval;
+
+  typedef struct IntervalList {
+	Interval value;
+	Interval* next;
+  } IntervalList;
+
+  Interval result={.left = 2, .right = 3};
+  IntervalList list2 = {.value = result, .next = 0};
+
 }
