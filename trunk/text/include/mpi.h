@@ -2,7 +2,6 @@
  * MPI primitives, just to get things rolling. */
 
 #include<stdlib.h>
-#include<civlc.h>
 
 /********************************* Types **********************************************/
 
