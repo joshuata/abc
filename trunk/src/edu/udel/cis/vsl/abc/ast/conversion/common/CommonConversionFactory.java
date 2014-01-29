@@ -23,6 +23,8 @@ import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardUnsignedIntegerType.UnsignedIntKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -274,8 +276,15 @@ public class CommonConversionFactory implements ConversionFactory {
 			checkScopeConsistency(type1, type2);
 			return new CommonCompatiblePointerConversion(type1, type2);
 		}
+		if (oldType instanceof PointerType && isBool(newType))
+			return pointerBoolConversion((PointerType) oldType);
 		throw error("No conversion from type of right hand side to that of left:\n"
 				+ oldType + "\n" + newType);
+	}
+
+	private boolean isBool(Type type) {
+		return type instanceof StandardBasicType
+				&& ((StandardBasicType) type).getBasicTypeKind() == BasicTypeKind.BOOL;
 	}
 
 }
