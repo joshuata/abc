@@ -38,6 +38,9 @@ void $exit(void);
 /* Nondeterministic choice of integer i, such that 0<=i<n. */
 int $choose_int(int n);
 
+/* assertion */
+void $assert(_Bool expr, ...);
+
 /* Printf, just as in standard C */
 //void printf(const char * restrict format, ...);
 //moved to stdio.h
