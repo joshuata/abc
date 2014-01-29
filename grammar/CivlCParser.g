@@ -578,6 +578,7 @@ assignmentExpression
 	  -> ^(OPERATOR assignmentOperator
 	       ^(ARGUMENT_LIST unaryExpression assignmentExpression))
 	| conditionalExpression
+	| quantifierExpression
 	;
 
 /* 6.5.16 */
@@ -607,7 +608,6 @@ expression
 	  body=conditionalExpression
 	  -> ^(COLLECTIVE $proc $intExpr $body)
 	| commaExpression
-	| quantifierExpression
 	;
 			
 derivativeExpression
@@ -633,10 +633,10 @@ constantExpression
 quantifierExpression
 	: quantifier LCURLY type=typeName id=IDENTIFIER
 	  BITOR restrict=conditionalExpression RCURLY 
-	  cond=expression
+	  cond=assignmentExpression
 	  -> ^(quantifier $type $id $restrict $cond)
-	| quantifier LCURLY id=IDENTIFIER ASSIGN lower=expression DOTDOT upper=expression
-	  RCURLY cond=expression
+	| quantifier LCURLY id=IDENTIFIER ASSIGN lower=assignmentExpression DOTDOT upper=assignmentExpression
+	  RCURLY cond=assignmentExpression
 	  -> ^(quantifier $id $lower $upper $cond)
 	;
 	
