@@ -1,5 +1,7 @@
-void __assert__();
+void assert(_Bool expr);
 
-#define assert(expression) ((expression) ? (void)0 : __assert__())
+//void __assert__();
 
-#define static_assert _Static_assert
+//#define assert(expression) ((expression) ? (void)0 : __assert__())
+
+//#define static_assert _Static_assert

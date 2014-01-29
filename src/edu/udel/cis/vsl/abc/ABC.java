@@ -7,6 +7,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 /**
  * The main class for the ABC C front end. Provides a simple command line
@@ -44,6 +45,7 @@ public class ABC {
 
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes) {
+		TokenUtils.initialization();
 		return new Activator(file, systemIncludes, userIncludes);
 	}
 

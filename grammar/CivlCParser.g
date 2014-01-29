@@ -1347,7 +1347,7 @@ statement
     | iterationStatement
     | jumpStatement
     | pragma
-    | assertStatement
+    //| assertStatement
     | assumeStatement
     | waitStatement
     | whenStatement
@@ -1582,10 +1582,10 @@ pragma	:	PRAGMA IDENTIFIER pragmaBody NEWLINE
 pragmaBody
 	:	(~ NEWLINE)*
 	;
-
+/*
 assertStatement
 	:	ASSERT expression SEMI -> ^(ASSERT expression)
-	;
+	;*/
 
 assumeStatement
 	:	ASSUME expression SEMI -> ^(ASSUME expression)
