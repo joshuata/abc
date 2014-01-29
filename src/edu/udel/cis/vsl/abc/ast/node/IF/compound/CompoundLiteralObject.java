@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.compound;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+
 /**
  * A compound literal is an abstract representation of a literal array, struct,
  * or union value in a C program.
@@ -31,5 +33,12 @@ public interface CompoundLiteralObject extends LiteralObject {
 	 * @return
 	 */
 	LiteralObject get(int index);
+
+	/**
+	 * Return the corresponding AST node of the compound literal object.
+	 * 
+	 * @return
+	 */
+	ASTNode getSourceNode();
 
 }
