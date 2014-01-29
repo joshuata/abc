@@ -250,7 +250,6 @@ public class CommonTypeFactory implements TypeFactory {
 				constantSize));
 	}
 
-
 	@Override
 	public StructureOrUnionType structureOrUnionType(Object key,
 			boolean isStruct, String tag) {
@@ -311,11 +310,15 @@ public class CommonTypeFactory implements TypeFactory {
 	private ArrayType compositeArrayType(ArrayType type1, ArrayType type2) {
 		ObjectType elementType = (ObjectType) compositeType(
 				type1.getElementType(), type2.getElementType());
-		IntegerValue constantSize1 = type1.getConstantSize();
+		IntegerValue constantSize1 = type1.getConstantSize(), constantSize2;
 		ExpressionNode sizeExpression1, sizeExpression2;
 
 		if (constantSize1 != null)
 			return arrayType(elementType, constantSize1);
+		constantSize2 = type2.getConstantSize();
+		if (constantSize2 != null) {
+			return arrayType(elementType, constantSize2);
+		}
 		sizeExpression1 = type1.getVariableSize();
 		if (sizeExpression1 != null)
 			return variableLengthArrayType(elementType, sizeExpression1);
@@ -850,7 +853,5 @@ public class CommonTypeFactory implements TypeFactory {
 		}
 		return scopeType;
 	}
-
-	
 
 }

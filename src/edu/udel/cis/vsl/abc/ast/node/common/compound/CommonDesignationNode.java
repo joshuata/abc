@@ -1,9 +1,9 @@
-package edu.udel.cis.vsl.abc.ast.node.common.declaration;
+package edu.udel.cis.vsl.abc.ast.node.common.compound;
 
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignatorNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonSequenceNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 

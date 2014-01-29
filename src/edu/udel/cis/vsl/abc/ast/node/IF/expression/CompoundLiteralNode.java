@@ -1,25 +1,38 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 
 /**
  * Compound literals are used to represent literal array, structure, and union
  * values. See C11 Sec. 6.5.2.5 and Sec. 6.7.9.
  * 
- * This is almost the same as a compound initializer.  No need
- * to have both.  It need not be fully bracketed.  I just want
- * it in a standard form.  It is a form which can be unfolded
- * if all indexes involved are concrete.  That's why it
- * says getInitializerList.
+ * The syntax and interpretation of compound literals is exactly the same as for
+ * those of compound initializers. The only difference is that for compound
+ * initializers, the type is obtained from the declared type of the variable
+ * being initialized, while for compound literals the type is obtained by
+ * placing the type name in parentheses before the initialization list (similar
+ * to a cast in appearance).
  * 
  * @author siegel
  * 
  */
 public interface CompoundLiteralNode extends ExpressionNode {
 
+	/**
+	 * Theh type node for the type name placed in parentheses before the
+	 * initializer this.
+	 * 
+	 * @return the type node
+	 */
 	TypeNode getTypeNode();
 
+	/**
+	 * Returns the initializer list, which is exactly the same structure used in
+	 * a compound initializer.
+	 * 
+	 * @return the initializer list
+	 */
 	CompoundInitializerNode getInitializerList();
 
 	@Override

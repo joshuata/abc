@@ -53,9 +53,11 @@ public interface ArrayType extends UnqualifiedObjectType {
 
 	/**
 	 * The expression appearing in square brackets that specifies the length of
-	 * the array. This is optional. If absent, this method will return null.
+	 * the array, when that length is not a known constant. If the length in
+	 * brackets is a known constant, or is "*", or is absent, this will return
+	 * null.
 	 * 
-	 * @return the array extent expression
+	 * @return the variable array extent expression or null
 	 */
 	ExpressionNode getVariableSize();
 

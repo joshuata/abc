@@ -1,9 +1,9 @@
-package edu.udel.cis.vsl.abc.ast.node.common.declaration;
+package edu.udel.cis.vsl.abc.ast.node.common.compound;
 
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDesignatorNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 

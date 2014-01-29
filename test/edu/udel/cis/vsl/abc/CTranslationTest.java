@@ -70,4 +70,10 @@ public class CTranslationTest {
 	public void printf() throws ABCException, IOException {
 		check("printf");
 	}
+	
+	@Test
+	public void compound() throws ABCException, IOException {
+		check("compound");
+	}
+	
 }

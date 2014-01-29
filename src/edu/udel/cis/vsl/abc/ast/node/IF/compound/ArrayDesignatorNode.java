@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
+package edu.udel.cis.vsl.abc.ast.node.IF.compound;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 

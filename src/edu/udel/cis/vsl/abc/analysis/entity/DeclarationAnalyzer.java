@@ -16,16 +16,11 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ArrayDesignatorNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
@@ -38,10 +33,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.GotoNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
-import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonCompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonCompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.ArrayValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -216,8 +210,15 @@ public class DeclarationAnalyzer {
 
 			addDeclarationToVariable(result, node);
 			type = result.getType();
-			if (initializer != null)
+			if (initializer != null) {
 				processInitializer(initializer, type);
+				// if this is a compound initializer, the type
+				// of the initializer refines the type of the variable
+				if (initializer instanceof CompoundInitializerNode)
+					result.setType(entityAnalyzer.typeFactory.compositeType(
+							type,
+							((CompoundInitializerNode) initializer).getType()));
+			}
 			// if this is a scope variable but not a scope parameter,
 			// it becomes the name of the scope:
 			if (!isParameter && result instanceof ScopeVariable) {
@@ -227,113 +228,6 @@ public class DeclarationAnalyzer {
 			}
 		}
 		return result;
-	}
-
-	private ObjectType processDesignation(DesignationNode designation,
-			ObjectType currentType) throws SyntaxException {
-		Iterator<DesignatorNode> childIter = designation.childIterator();
-
-		while (childIter.hasNext()) {
-			DesignatorNode designator = childIter.next();
-
-			if (designator instanceof ArrayDesignatorNode) {
-				ExpressionNode index = ((ArrayDesignatorNode) designator)
-						.getIndex();
-
-				entityAnalyzer.expressionAnalyzer.processExpression(index);
-			} else if (designator instanceof FieldDesignatorNode) {
-				IdentifierNode identifier = ((FieldDesignatorNode) designator)
-						.getField();
-
-				// TODO find the field. What is the structure or union type?
-
-			} else {
-				throw new RuntimeException("Unexpected kind of designator: "
-						+ designator);
-			}
-		}
-		// TODO TODO!
-		return null;
-
-	}
-
-	// list of designation-initializer pairs.
-	// designation may be null.
-	// what we compute:
-	// the type of the initializer. Should be field in
-	// initializer for this. Should be a complete array type
-	// or...
-	// for each d-i pair, the type of the pair (type of i;
-	// d may be null).
-	// then: for initializer that can be exprssed in a concrete
-	// way, the concrete representation. array literal,
-	// struct literal, union literal, ...
-
-	// can we provide an ArrayLiteral, StructLiteral, etc?
-
-	/**
-	 * Processes the compound initializer. Accomplishes the following:
-	 * 
-	 * <ul>
-	 * <li>processes each designation node and initializer node occurring under
-	 * this compound initializer</li>
-	 * <li>sets the type of this compound initializer</li>
-	 * <li>if this initializer is concretizeable, determines and sets its
-	 * members field to the concrete array of members</li>
-	 * </ul>
-	 * 
-	 * @param initializer
-	 *            a compound initializer node
-	 * @param currentType
-	 *            the type that should be assigned to this compound initializer
-	 *            node
-	 * @throws SyntaxException
-	 */
-	private void processCompoundInitializer(
-			CommonCompoundInitializerNode initializer, ObjectType currentType)
-			throws SyntaxException {
-		Iterator<PairNode<DesignationNode, InitializerNode>> childIter = ((CompoundInitializerNode) initializer)
-				.childIterator();
-
-		// what are the expressions? need some kind of vector or
-		// array expression. Isn't that a sequence node?
-		// need the type of the array.
-		// problem is if there is a structure this will not be an array value.
-		// damn
-
-		//ArrayValue members = entityAnalyzer.valueFactory.newArrayValue();
-
-		initializer.setType(currentType);
-
-		while (childIter.hasNext()) {
-			PairNode<DesignationNode, InitializerNode> pair = childIter.next();
-			DesignationNode designation = pair.getLeft();
-			InitializerNode subInitializer = pair.getRight();
-
-			// need a type caled Navigator.
-			// method setValue(ArrayListNavigator, ExpressionNode)
-
-			// TODO
-
-			// the designation determines a type by starting from
-			// the current type and navigating within it.
-			// call this the designated type.
-
-			// designation may be null. in that case, the implicit
-			// designation is either the first element of the
-			// current type or the next element after the previous
-			// one.
-
-			// the subInitializer is either an object of the
-			// designated type, or an object of some sub-type
-			// of the designated type. This is because the
-			// curly braces are optional. Look to see if
-			// the
-
-			ObjectType subType = processDesignation(designation, currentType);
-
-			processInitializer(subInitializer, subType);
-		}
 	}
 
 	public void processInitializer(InitializerNode initializer,
@@ -351,7 +245,7 @@ public class DeclarationAnalyzer {
 				throw error(e, initializer);
 			}
 		} else if (initializer instanceof CompoundInitializerNode) {
-			processCompoundInitializer(
+			entityAnalyzer.compoundLiteralAnalyzer.processCompoundInitializer(
 					(CommonCompoundInitializerNode) initializer, currentType);
 		}
 	}
