@@ -1,3 +1,4 @@
+#include<civlc.h>
 int n = 0;
 void foo(){
 	int k = n;
@@ -20,7 +21,7 @@ void main(){
 		else 
 			i = 2;
 	
-	$assert i == 2;
+	$assert(i == 2);
 	
 	$atomic{
 		switch(i){
@@ -30,7 +31,7 @@ void main(){
 		}
 	}
 	
-	$assert i == 5;
+	$assert(i == 5);
 	
 	$atomic{
 		i = 0;
@@ -39,7 +40,7 @@ void main(){
 		}
 	}
 	
-	$assert i == 45;
+	$assert(i == 45);
 	
 	$spawn foo();
 	
@@ -52,5 +53,5 @@ void main(){
 		n += 9;
 	}
 	
-	$assert n == 10;
+	$assert(n == 10);
 }
