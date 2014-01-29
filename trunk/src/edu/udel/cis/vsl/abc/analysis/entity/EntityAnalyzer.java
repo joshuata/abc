@@ -37,8 +37,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
+import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
@@ -70,6 +70,8 @@ public class EntityAnalyzer implements Analyzer {
 	DeclarationAnalyzer declarationAnalyzer;
 
 	ExpressionAnalyzer expressionAnalyzer;
+
+	CompoundLiteralAnalyzer compoundLiteralAnalyzer;
 
 	StatementAnalyzer statementAnalyzer;
 
@@ -114,6 +116,7 @@ public class EntityAnalyzer implements Analyzer {
 				.getStandardTypeNames());
 		this.expressionAnalyzer = new ExpressionAnalyzer(this,
 				conversionFactory, typeFactory);
+		this.compoundLiteralAnalyzer = new CompoundLiteralAnalyzer(this);
 		this.statementAnalyzer = new StatementAnalyzer(this, expressionAnalyzer);
 		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory, entityFactory);
 		this.pragmaHandlerMap = new LinkedHashMap<String, PragmaHandler>();

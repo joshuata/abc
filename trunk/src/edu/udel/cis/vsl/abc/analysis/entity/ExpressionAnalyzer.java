@@ -23,6 +23,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
@@ -310,12 +311,13 @@ public class ExpressionAnalyzer {
 			throws SyntaxException {
 		Type type = entityAnalyzer.typeAnalyzer.processTypeNode(node
 				.getTypeNode());
+		CompoundInitializerNode initNode = node.getInitializerList();
 
 		if (!(type instanceof ObjectType))
 			throw error("Compound literal has non-object type: " + type, node);
-		entityAnalyzer.declarationAnalyzer.processInitializer(
-				node.getInitializerList(), (ObjectType) type);
-		node.setInitialType(type);
+		entityAnalyzer.compoundLiteralAnalyzer.processCompoundInitializer(
+				initNode, (ObjectType) type);
+		node.setInitialType(initNode.getType());
 	}
 
 	private void processConstant(ConstantNode node) throws SyntaxException {

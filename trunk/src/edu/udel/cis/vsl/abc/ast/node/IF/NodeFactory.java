@@ -2,17 +2,17 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
 
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.ArrayDesignatorNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ArrayDesignatorNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;

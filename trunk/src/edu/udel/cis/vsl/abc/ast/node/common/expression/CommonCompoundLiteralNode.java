@@ -2,7 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;

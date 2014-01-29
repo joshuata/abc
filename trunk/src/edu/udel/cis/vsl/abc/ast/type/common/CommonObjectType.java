@@ -18,7 +18,7 @@ public abstract class CommonObjectType extends CommonType implements ObjectType 
 	 */
 	@Override
 	public boolean hasKnownConstantSize() {
-		return !isComplete()
+		return isComplete()
 				&& !(this instanceof ArrayType && ((ArrayType) this)
 						.isVariableLengthArrayType());
 	}

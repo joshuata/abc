@@ -159,7 +159,7 @@ public class StatementAnalyzer {
 				processStatement(children.next());
 		} else if (statement instanceof WaitNode) {
 			processExpression(((WaitNode) statement).getExpression());
-		}else if(statement instanceof AtomicNode){
+		} else if (statement instanceof AtomicNode) {
 			processStatement(((AtomicNode) statement).getBody());
 		}
 		// TODO:
