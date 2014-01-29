@@ -253,7 +253,7 @@ public class ASTBuilder {
 	static final int OUTPUT = CivlCParser.OUTPUT;
 	static final int SPAWN = CivlCParser.SPAWN;
 	static final int WAIT = CivlCParser.WAIT;
-	static final int ASSERT = CivlCParser.ASSERT;
+	//static final int ASSERT = CivlCParser.ASSERT;
 	static final int TRUE = CivlCParser.TRUE;
 	static final int FALSE = CivlCParser.FALSE;
 	static final int ASSUME = CivlCParser.ASSUME;
@@ -2141,11 +2141,11 @@ public class ASTBuilder {
 					statementSource,
 					translateExpression((CommonTree) statementTree.getChild(0),
 							scope));
-		case ASSERT:
-			return nodeFactory.newAssertNode(
-					statementSource,
-					translateExpression((CommonTree) statementTree.getChild(0),
-							scope));
+//		case ASSERT:
+//			return nodeFactory.newAssertNode(
+//					statementSource,
+//					translateExpression((CommonTree) statementTree.getChild(0),
+//							scope));
 
 		case ASSUME:
 			return translateAssume(statementSource, statementTree, scope);
