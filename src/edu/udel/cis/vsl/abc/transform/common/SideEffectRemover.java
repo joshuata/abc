@@ -20,9 +20,13 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -114,7 +118,20 @@ public class SideEffectRemover implements Transformer {
 				if (((VariableDeclarationNode) item).getInitializer() == null) {
 					items.add(item);
 				} else {
-					if (isSEF((ExpressionNode) ((VariableDeclarationNode) item)
+					if (((VariableDeclarationNode) item).getInitializer() instanceof CompoundInitializerNode) {
+						if (isSEF((CompoundInitializerNode) ((VariableDeclarationNode) item)
+								.getInitializer())) {
+							items.add(item);
+						} else {
+							throw new ABCUnsupportedException(
+									"removing side effects from compound initializers:  "
+											+ ((VariableDeclarationNode) item)
+													.getInitializer(),
+									((VariableDeclarationNode) item)
+											.getInitializer().getSource()
+											.getSummary(false));
+						}
+					} else if (isSEF((ExpressionNode) ((VariableDeclarationNode) item)
 							.getInitializer())) {
 						// Only modify things if we need to.
 						items.add(item);
@@ -937,7 +954,8 @@ public class SideEffectRemover implements Transformer {
 					// causing a failure with ring2.cvl
 					return false;
 				}
-				functionDeclaration = functionIdentifier.getEntity().getFirstDeclaration();
+				functionDeclaration = functionIdentifier.getEntity()
+						.getFirstDeclaration();
 				// Check if this is an abstract function.
 				if (functionDeclaration instanceof AbstractFunctionDefinitionNode) {
 					for (int i = 0; i < ((FunctionCallNode) expression)
@@ -980,6 +998,29 @@ public class SideEffectRemover implements Transformer {
 			result = false;
 		} else if (expression instanceof CastNode) {
 			result = isSEF(((CastNode) expression).getArgument());
+		}
+		return result;
+	}
+
+	private boolean isSEF(CompoundInitializerNode initializer) {
+		boolean result = true;
+
+		Iterator<PairNode<DesignationNode, InitializerNode>> iter = initializer
+				.childIterator();
+		while (iter.hasNext()) {
+			InitializerNode init = iter.next().getRight();
+			boolean localResult;
+
+			if (init instanceof ExpressionNode) {
+				localResult = isSEF((ExpressionNode) init);
+			} else if (init instanceof CompoundInitializerNode) {
+				localResult = isSEF((CompoundInitializerNode) init);
+			} else {
+				throw new ABCUnsupportedException(
+						"initializers that are not expressions or compound initializers:  "
+								+ init, init.getSource().getSummary(false));
+			}
+			result = result && localResult;
 		}
 		return result;
 	}
