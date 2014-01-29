@@ -3,6 +3,9 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.ArrayList;
 
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
+import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
+import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 
 /**
  * A designation is specifies (or "designates") a point in a compound literal
@@ -118,10 +121,35 @@ public class Designation {
 		return result;
 	}
 
-	public void descendToScalar() {
-		LiteralTypeNode subtype = getDesignatedType();
+	private int distanceToScalar(ObjectType type) {
+		int result = 0;
 
-		while (!(subtype instanceof LiteralScalarTypeNode)) {
+		while (true) {
+			switch (type.kind()) {
+			case ARRAY:
+				result++;
+				type = ((ArrayType) type).getElementType();
+				break;
+			case STRUCTURE_OR_UNION:
+				result++;
+				type = ((StructureOrUnionType) type).getField(0).getType();
+				break;
+			default:
+				return result;
+			}
+		}
+	}
+
+	public void descendToType(ObjectType type) {
+		LiteralTypeNode subtype = getDesignatedType();
+		int upperDistance = distanceToScalar(subtype.getType());
+		int lowerDistance = distanceToScalar(type);
+		int difference = upperDistance - lowerDistance;
+
+		if (difference < 0)
+			throw new ABCRuntimeException(
+					"Literal member has incompatible type");
+		for (int i = 0; i < difference; i++) {
 			if (subtype instanceof LiteralArrayTypeNode) {
 				subtype = ((LiteralArrayTypeNode) subtype).getElementNode();
 				navigators.add(new Navigator(0));
@@ -133,5 +161,21 @@ public class Designation {
 				throw new ABCRuntimeException("unreachable");
 		}
 	}
+
+	// public void descendToScalar() {
+	// LiteralTypeNode subtype = getDesignatedType();
+	//
+	// while (!(subtype instanceof LiteralScalarTypeNode)) {
+	// if (subtype instanceof LiteralArrayTypeNode) {
+	// subtype = ((LiteralArrayTypeNode) subtype).getElementNode();
+	// navigators.add(new Navigator(0));
+	// } else if (subtype instanceof LiteralStructOrUnionTypeNode) {
+	// subtype = ((LiteralStructOrUnionTypeNode) subtype)
+	// .getMemberNode(0);
+	// navigators.add(new Navigator(0));
+	// } else
+	// throw new ABCRuntimeException("unreachable");
+	// }
+	// }
 
 }
