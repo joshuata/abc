@@ -1,6 +1,10 @@
 #define f() F
 #define g(x) Here is x.
-#define h(x, y) x and y went down the hill.
+/* This introduces a failure that is only 
+due to interpreting the "." as a single tokens here, 
+but expecting to see ".." as a single token in the other case. */
+//#define h(x, y) x and y went down the hill. 
+#define h(x, y) x and y went down the hill...
 f() is F
 g(      )
 g()
