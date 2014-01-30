@@ -17,17 +17,14 @@ public class CommonProgram implements Program {
 
 	private Transformer sideEffectRemover;
 
-	private Transformer accuracyHelper;
-
 	private AST ast;
 
 	public CommonProgram(Analyzer standardAnalyzer, Transformer pruner,
-			Transformer sideEffectRemover, Transformer accuracyHelper, AST ast)
+			Transformer sideEffectRemover, AST ast)
 			throws SyntaxException {
 		this.standardAnalyzer = standardAnalyzer;
 		this.pruner = pruner;
 		this.sideEffectRemover = sideEffectRemover;
-		this.accuracyHelper = accuracyHelper;
 		this.ast = ast;
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
@@ -51,13 +48,6 @@ public class CommonProgram implements Program {
 	@Override
 	public void prune() throws SyntaxException {
 		ast = pruner.transform(ast);
-		standardAnalyzer.clear(ast);
-		standardAnalyzer.analyze(ast);
-	}
-
-	@Override
-	public void annotateForAccuracy() throws SyntaxException {
-		ast = accuracyHelper.transform(ast);
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
 	}

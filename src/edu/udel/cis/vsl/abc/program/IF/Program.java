@@ -50,15 +50,6 @@ public interface Program {
 	void prune() throws SyntaxException;
 
 	/**
-	 * If this Program contains an abstract function, this method will add new
-	 * assumptions to assist with order of accuracy analysis. Otherwise, it does
-	 * nothing.
-	 * 
-	 * @throws SyntaxException
-	 */
-	void annotateForAccuracy() throws SyntaxException;
-
-	/**
 	 * Prints a human readable abstract representation of the program to the
 	 * given output stream. (Not in source code format.)
 	 * 

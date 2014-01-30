@@ -18,16 +18,12 @@ public class CommonProgramFactory implements ProgramFactory {
 
 	private Transformer sideEffectRemover;
 
-	private Transformer accuracyHelper;
-
 	public CommonProgramFactory(ASTFactory factory, Analyzer standardAnalyzer,
-			Transformer pruner, Transformer sideEffectRemover,
-			Transformer accuracyHelper) {
+			Transformer pruner, Transformer sideEffectRemover) {
 		this.astFactory = factory;
 		this.standardAnalyzer = standardAnalyzer;
 		this.pruner = pruner;
 		this.sideEffectRemover = sideEffectRemover;
-		this.accuracyHelper = accuracyHelper;
 	}
 
 	@Override
@@ -51,14 +47,9 @@ public class CommonProgramFactory implements ProgramFactory {
 	}
 
 	@Override
-	public Transformer getAccuracyHelper() {
-		return accuracyHelper;
-	}
-
-	@Override
 	public Program newProgram(AST ast) throws SyntaxException {
 		return new CommonProgram(standardAnalyzer, pruner, sideEffectRemover,
-				accuracyHelper, ast);
+				ast);
 	}
 
 }
