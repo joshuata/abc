@@ -16,8 +16,6 @@ public interface ProgramFactory {
 
 	Transformer getSideEffectRemover();
 
-	Transformer getAccuracyHelper();
-
 	Program newProgram(AST ast) throws SyntaxException;
 
 }

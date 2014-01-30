@@ -10,9 +10,9 @@ public class Programs {
 
 	public static ProgramFactory newProgramFactory(ASTFactory factory,
 			Analyzer standardAnalyzer, Transformer pruner,
-			Transformer sideEffectRemover, Transformer accuracyHelper) {
+			Transformer sideEffectRemover) {
 		return new CommonProgramFactory(factory, standardAnalyzer, pruner,
-				sideEffectRemover, accuracyHelper);
+				sideEffectRemover);
 	}
 
 }
