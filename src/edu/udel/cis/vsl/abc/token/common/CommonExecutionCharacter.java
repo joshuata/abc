@@ -76,6 +76,8 @@ public class CommonExecutionCharacter implements ExecutionCharacter {
 				return "'\\r'";
 			case ' ':
 				return "' '";
+			case '\007':
+				return "'\\a'";
 			}
 			return Character.toString(c);
 		} else {
