@@ -6,6 +6,8 @@ import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
+import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * A designation is specifies (or "designates") a point in a compound literal
@@ -67,8 +69,10 @@ public class Designation {
 	/**
 	 * Modifies this designation so that it refers to the next point in the
 	 * compound literal tree in depth-first-search order.
+	 * 
+	 * @throws SyntaxException
 	 */
-	public void increment(LiteralTypeNode typeNode) {
+	public void increment(LiteralTypeNode typeNode) throws SyntaxException {
 		LiteralTypeNode subType = getDesignatedType().parent();
 		int length = navigators.size();
 
@@ -84,7 +88,8 @@ public class Designation {
 				subType = subType.parent();
 				length--;
 			} else {
-				navigators.set(length - 1, new Navigator(newIndex));
+				navigators.set(length - 1,
+						new Navigator(newIndex, last.getSource()));
 				return;
 			}
 		}
@@ -103,7 +108,7 @@ public class Designation {
 		return rootType;
 	}
 
-	public LiteralTypeNode getDesignatedType() {
+	public LiteralTypeNode getDesignatedType() throws SyntaxException {
 		LiteralTypeNode result = rootType;
 
 		for (Navigator navigator : navigators) {
@@ -115,7 +120,9 @@ public class Designation {
 				result = ((LiteralStructOrUnionTypeNode) result)
 						.getMemberNode(index);
 			} else {
-				throw new ABCRuntimeException("unreachable");
+				throw new SyntaxException(
+						"Navigator in compound literal/initializer is incompatible with type",
+						navigator.getSource());
 			}
 		}
 		return result;
@@ -140,42 +147,29 @@ public class Designation {
 		}
 	}
 
-	public void descendToType(ObjectType type) {
+	public void descendToType(ObjectType type, Source source)
+			throws SyntaxException {
 		LiteralTypeNode subtype = getDesignatedType();
 		int upperDistance = distanceToScalar(subtype.getType());
 		int lowerDistance = distanceToScalar(type);
 		int difference = upperDistance - lowerDistance;
 
 		if (difference < 0)
-			throw new ABCRuntimeException(
-					"Literal member has incompatible type");
+			throw new SyntaxException("Literal member has incompatible type",
+					source);
 		for (int i = 0; i < difference; i++) {
 			if (subtype instanceof LiteralArrayTypeNode) {
 				subtype = ((LiteralArrayTypeNode) subtype).getElementNode();
-				navigators.add(new Navigator(0));
+				navigators.add(new Navigator(0, source));
 			} else if (subtype instanceof LiteralStructOrUnionTypeNode) {
 				subtype = ((LiteralStructOrUnionTypeNode) subtype)
 						.getMemberNode(0);
-				navigators.add(new Navigator(0));
+				navigators.add(new Navigator(0, source));
 			} else
-				throw new ABCRuntimeException("unreachable");
+				throw new ABCRuntimeException(
+						"Unreachable: subtype not array or struct/union: "
+								+ subtype);
 		}
 	}
-
-	// public void descendToScalar() {
-	// LiteralTypeNode subtype = getDesignatedType();
-	//
-	// while (!(subtype instanceof LiteralScalarTypeNode)) {
-	// if (subtype instanceof LiteralArrayTypeNode) {
-	// subtype = ((LiteralArrayTypeNode) subtype).getElementNode();
-	// navigators.add(new Navigator(0));
-	// } else if (subtype instanceof LiteralStructOrUnionTypeNode) {
-	// subtype = ((LiteralStructOrUnionTypeNode) subtype)
-	// .getMemberNode(0);
-	// navigators.add(new Navigator(0));
-	// } else
-	// throw new ABCRuntimeException("unreachable");
-	// }
-	// }
 
 }
