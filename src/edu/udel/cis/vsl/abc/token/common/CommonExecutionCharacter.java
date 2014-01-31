@@ -68,16 +68,25 @@ public class CommonExecutionCharacter implements ExecutionCharacter {
 			switch (c) {
 			case 0:
 				return "'\\0'";
+			case '\'':
+				return "'\\\''";
+			case '\b':
+				return "'\\b'";
+			case '\f':
+				return "'\\f'";
 			case '\n':
 				return "'\\n'";
-			case '\t':
-				return "'\\t'";
 			case '\r':
 				return "'\\r'";
+			case '\t':
+				return "'\\t'";
+			case '\013':
+				return "'\\v'";
 			case ' ':
 				return "' '";
 			case '\007':
 				return "'\\a'";
+			default:
 			}
 			return Character.toString(c);
 		} else {
