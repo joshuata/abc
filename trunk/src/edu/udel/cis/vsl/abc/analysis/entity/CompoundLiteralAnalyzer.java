@@ -147,15 +147,17 @@ public class CompoundLiteralAnalyzer {
 	}
 
 	/**
-	 * Extracts the complete type form the ltNode after it has been refined
-	 * through the constructions of the literal object.
+	 * Extracts the complete type from the ltNode after it has been refined
+	 * through the construction of the literal object.
 	 * 
 	 * As soon as you hit a non-array type, you can stop, because the fields of
 	 * structs or unions have to be complete, except for the last
 	 * "flexible member", but that can't be initialized.
 	 * 
 	 * @param ltNode
-	 * @return
+	 *            the literal type node, which has been updated after processing
+	 *            the compound literal
+	 * @return the complete Type specified by that node
 	 */
 	private ObjectType extractType(LiteralTypeNode ltNode) {
 		if (ltNode instanceof LiteralArrayTypeNode) {
@@ -210,8 +212,10 @@ public class CompoundLiteralAnalyzer {
 						.getConstantValue(indexExpr);
 				index = indexValue.getIntegerValue().intValue();
 			} else
-				throw new ABCRuntimeException("unreachable");
-			result.add(new Navigator(index));
+				throw new ABCRuntimeException(
+						"Unreachable: unknown kind of designator node: "
+								+ designatorNode);
+			result.add(new Navigator(index, designatorNode.getSource()));
 		}
 		return result;
 	}
@@ -236,7 +240,7 @@ public class CompoundLiteralAnalyzer {
 				position = processDesignation(desNode, ltNode);
 			} else {
 				if (position.length() == 0)
-					position.add(new Navigator(0));
+					position.add(new Navigator(0, initNode.getSource()));
 				else
 					position.increment(ltNode);
 			}
@@ -248,7 +252,8 @@ public class CompoundLiteralAnalyzer {
 				ExpressionNode expr = (ExpressionNode) initNode;
 
 				entityAnalyzer.expressionAnalyzer.processExpression(expr);
-				position.descendToType((ObjectType) expr.getType());
+				position.descendToType((ObjectType) expr.getType(),
+						initNode.getSource());
 				subType = position.getDesignatedType();
 				entityAnalyzer.expressionAnalyzer.processExpression(expr);
 				// add conversions as necessary to expr:

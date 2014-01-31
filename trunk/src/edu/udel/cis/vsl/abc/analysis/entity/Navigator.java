@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
+import edu.udel.cis.vsl.abc.token.IF.Source;
+
 /**
  * A Navigator is a reference to an immediate member of compound literal object.
  * It comprises a type (the type of the compound literal object) and an integer
@@ -10,26 +12,20 @@ package edu.udel.cis.vsl.abc.analysis.entity;
  */
 public class Navigator {
 
-	// /**
-	// * The type of the object to which this naviagator can be applied. Must be
-	// * either an array, struct, or union type. The type is not necessarily
-	// * complete.
-	// */
-	// private ObjectType type;
+	/**
+	 * Source code reference for error reporting.
+	 */
+	private Source source;
 
 	/**
 	 * The index of the member of the object to which this navigator applies.
 	 */
 	private int index;
 
-	public Navigator(int index) {
-		// this.type = type;
+	public Navigator(int index, Source source) {
 		this.index = index;
+		this.source = source;
 	}
-
-	// public ObjectType getType() {
-	// return type;
-	// }
 
 	public int getIndex() {
 		return index;
@@ -37,15 +33,11 @@ public class Navigator {
 
 	@Override
 	public String toString() {
-		// switch (type.kind()) {
-		// case STRUCTURE_OR_UNION:
-		// return "."
-		// + ((StructureOrUnionType) type).getField(index).getName();
-		// case ARRAY:
 		return "[" + index + "]";
-		// default:
-		// throw new ABCRuntimeException("unreachable");
-		// }
+	}
+
+	public Source getSource() {
+		return source;
 	}
 
 }
