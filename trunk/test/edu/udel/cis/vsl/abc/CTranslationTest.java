@@ -76,4 +76,9 @@ public class CTranslationTest {
 		check("compound");
 	}
 	
+	@Test
+	public void compound2() throws ABCException, IOException {
+		check("compound2");
+	}
+	
 }

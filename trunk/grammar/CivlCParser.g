@@ -439,10 +439,10 @@ unaryOperator
 	;
 
 /* 6.5.4 */
-// ambiguity: (expr) is a unary expression and looks
-// like (typeName).
+// ambiguity 1: (expr) is a unary expression and looks like (typeName).
+// ambiguity 2: (typeName){...} is a compound literal and looks like cast
 castExpression
-	: (LPAREN typeName RPAREN)=> l=LPAREN typeName RPAREN castExpression
+	: (LPAREN typeName RPAREN ~LCURLY)=> l=LPAREN typeName RPAREN castExpression
 	  -> ^(CAST typeName castExpression $l)
 	| unaryExpression
 	;
