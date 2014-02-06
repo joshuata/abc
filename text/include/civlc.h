@@ -151,11 +151,21 @@ typedef struct __queue__ {
  * of message channels between every pair of processes in a
  * set of processes.  All message and other data is encapsulated
  * in this value; no outside allocation is used. */
+ typedef struct __procQueue__ {
+  int queueLength;
+  $proc procs[];
+ }$procQueue;
+ 
+ 
 typedef struct __comm__ {
   int nprocs; // number of processes
-  $proc procs[]; // the processes in order
+  $procQueue procs[]; // the processes in order
   $queue buf[][]; // message buffers
 } $comm;
+
+/* Allows the given proc to participate in the communicator with same
+ * rank as the calling proc */
+$comm $comm_add($comm * comm, $proc proc);
 
 /* creates a new comm from the given sequence of processes,
  * by allocating memory and copying the process sequence;
