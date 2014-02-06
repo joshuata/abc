@@ -25,14 +25,14 @@ typedef struct __queue__ {
   $message messages[];
 } $queue;
 
-struct __MPI_Comm {
+struct __comm__ {
   int id;
   int nprocs; // number of processes
   $proc procs[]; // the processes in order
   $queue buf[][]; // message buffers
 };
 
-typedef struct __MPI_Comm __MPI_Comm_obj;
+typedef struct __comm__ __MPI_Comm_obj;
 typedef __MPI_Comm_obj *MPI_Comm;
 
 /* creates a new comm from the given sequence of processes,
@@ -94,10 +94,8 @@ MPI_Status *MPI_STATUSES_IGNORE = &__MPI_Statuses_ignore;
 MPI_Datatype MPI_INT     = { .id=1 };
 MPI_Datatype MPI_FLOAT   = { .id=2 };
 MPI_Datatype MPI_DOUBLE  = { .id=3 };
-/*
-MPI_Datatype MPI_CHAR    = (struct __MPI_Datatype){ .id=4 };
-MPI_Datatype MPI_BYTE    = (struct __MPI_Datatype){ .id=5 };
-*/
+MPI_Datatype MPI_CHAR    = { .id=4 };
+MPI_Datatype MPI_BYTE    = { .id=5 };
 // etc.
 
 /* Operators (type MPI_Op) */
