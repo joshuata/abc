@@ -165,7 +165,7 @@ typedef struct __comm__ {
 
 /* Allows the given proc to participate in the communicator with same
  * rank as the calling proc */
-$comm $comm_add($comm * comm, $proc proc);
+$comm $comm_add($comm * comm, $proc proc, int rank);
 
 /* creates a new comm from the given sequence of processes,
  * by allocating memory and copying the process sequence;
