@@ -11,7 +11,7 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 public interface FloatingType extends StandardBasicType {
 
 	public static enum FloatKind {
-		FLOAT, DOUBLE, LONG_DOUBLE
+		FLOAT, DOUBLE, LONG_DOUBLE, REAL
 	};
 
 	/**

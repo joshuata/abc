@@ -54,6 +54,7 @@ public class SpecifierAnalysis {
 	public final static int LONG = CivlCParser.LONG;
 	public final static int FLOAT = CivlCParser.FLOAT;
 	public final static int DOUBLE = CivlCParser.DOUBLE;
+	public final static int REAL = CivlCParser.REAL;
 	public final static int SIGNED = CivlCParser.SIGNED;
 	public final static int UNSIGNED = CivlCParser.UNSIGNED;
 	public final static int BOOL = CivlCParser.BOOL;
@@ -163,6 +164,7 @@ public class SpecifierAnalysis {
 			case LONG:
 			case FLOAT:
 			case DOUBLE:
+			case REAL:
 			case SIGNED:
 			case UNSIGNED:
 			case BOOL:

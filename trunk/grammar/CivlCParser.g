@@ -796,7 +796,7 @@ storageClassSpecifier
 /* 6.7.2 */
 typeSpecifier
 	: VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE
-	| SIGNED | UNSIGNED | BOOL | COMPLEX
+	| SIGNED | UNSIGNED | BOOL | COMPLEX | REAL
 	| atomicTypeSpecifier
 	| structOrUnionSpecifier
 	| enumSpecifier

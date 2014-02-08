@@ -35,6 +35,9 @@ public class BasicMultiset {
 	public final static int BOOL = CivlCParser.BOOL;
 	public final static int COMPLEX = CivlCParser.COMPLEX;
 
+	// Extra real type basic type specifier keyword
+	public final static int REAL = CivlCParser.REAL;
+
 	// The 18 basic multiset classes and their variants...
 
 	public final static BasicMultiset CHAR_TYPE = new BasicMultiset(CHAR);
@@ -95,6 +98,7 @@ public class BasicMultiset {
 			DOUBLE, COMPLEX);
 	public final static BasicMultiset LONG_DOUBLE_COMPLEX_TYPE = new BasicMultiset(
 			LONG, DOUBLE, COMPLEX);
+	public final static BasicMultiset REAL_TYPE = new BasicMultiset(REAL);
 
 	/**
 	 * A map used to specify the "acceptable" multisets and to map any
@@ -146,6 +150,7 @@ public class BasicMultiset {
 		map.put(FLOAT_COMPLEX_TYPE, BasicTypeKind.FLOAT_COMPLEX);
 		map.put(DOUBLE_COMPLEX_TYPE, BasicTypeKind.DOUBLE_COMPLEX);
 		map.put(LONG_DOUBLE_COMPLEX_TYPE, BasicTypeKind.LONG_DOUBLE_COMPLEX);
+		map.put(REAL_TYPE, BasicTypeKind.REAL);
 		return map;
 	}
 
@@ -171,6 +176,7 @@ public class BasicMultiset {
 	int longCount = 0;
 	int floatCount = 0;
 	int doubleCount = 0;
+	int realCount = 0;
 	int signedCount = 0;
 	int unsignedCount = 0;
 	int boolCount = 0;
@@ -295,6 +301,9 @@ public class BasicMultiset {
 		case DOUBLE:
 			doubleCount++;
 			break;
+		case REAL:
+			realCount++;
+			break;
 		case SIGNED:
 			signedCount++;
 			break;
@@ -324,8 +333,8 @@ public class BasicMultiset {
 	 */
 	public int size() {
 		return charCount + shortCount + intCount + longCount + floatCount
-				+ doubleCount + signedCount + unsignedCount + boolCount
-				+ complexCount;
+				+ doubleCount + realCount + signedCount + unsignedCount
+				+ boolCount + complexCount;
 	}
 
 	/**
@@ -343,7 +352,8 @@ public class BasicMultiset {
 					&& doubleCount == that.doubleCount
 					&& signedCount == that.signedCount
 					&& unsignedCount == that.unsignedCount
-					&& boolCount == that.boolCount;
+					&& boolCount == that.boolCount
+					&& realCount == that.realCount;
 		}
 		return false;
 	}
