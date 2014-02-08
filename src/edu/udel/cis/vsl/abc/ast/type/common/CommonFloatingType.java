@@ -14,6 +14,8 @@ public class CommonFloatingType extends CommonBasicType implements FloatingType 
 				return BasicTypeKind.DOUBLE_COMPLEX;
 			case LONG_DOUBLE:
 				return BasicTypeKind.LONG_DOUBLE_COMPLEX;
+			case REAL:
+				return BasicTypeKind.REAL;
 			}
 		} else {
 			switch (floatKind) {
@@ -23,6 +25,8 @@ public class CommonFloatingType extends CommonBasicType implements FloatingType 
 				return BasicTypeKind.DOUBLE;
 			case LONG_DOUBLE:
 				return BasicTypeKind.LONG_DOUBLE;
+			case REAL:
+				return BasicTypeKind.REAL;
 			}
 		}
 		throw new RuntimeException("Not reachable");

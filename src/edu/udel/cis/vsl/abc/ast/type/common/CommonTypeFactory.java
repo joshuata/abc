@@ -147,6 +147,9 @@ public class CommonTypeFactory implements TypeFactory {
 		case LONG_DOUBLE:
 			result = new CommonFloatingType(FloatKind.LONG_DOUBLE, false);
 			break;
+		case REAL:
+			result = new CommonFloatingType(FloatKind.REAL, false);
+			break;
 		case BOOL:
 			result = new CommonStandardUnsignedIntegerType(UnsignedIntKind.BOOL);
 			break;

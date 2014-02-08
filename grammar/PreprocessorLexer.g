@@ -150,6 +150,7 @@ WAIT		:	'$wait';
 WHEN		:	'$when';
 CIVLATOMIC	:	'$atomic';
 CIVLATOM	:	'$atom';
+REAL:	'$real';
 
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/

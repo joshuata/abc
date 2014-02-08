@@ -64,6 +64,7 @@ public interface StandardBasicType extends ArithmeticType {
 		FLOAT,
 		DOUBLE,
 		LONG_DOUBLE,
+		REAL,
 		BOOL,
 		FLOAT_COMPLEX,
 		DOUBLE_COMPLEX,
