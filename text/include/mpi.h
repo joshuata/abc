@@ -25,9 +25,18 @@ typedef struct __queue__ {
   $message messages[];
 } $queue;
 
+/* A datatype representing a communicator, or set
+ * of message channels between every pair of processes in a
+ * set of processes.  All message and other data is encapsulated
+ * in this value; no outside allocation is used. */
+ typedef struct __procQueue__ {
+  int queueLength;
+  $proc procs[];
+ }$procQueue;
+ 
 struct __comm__ {
   int id;
-  int nprocs; // number of processes
+  $procQueue nprocs[]; // number of processes
   $proc procs[]; // the processes in order
   $queue buf[][]; // message buffers
 };
