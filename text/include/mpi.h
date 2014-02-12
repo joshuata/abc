@@ -35,9 +35,8 @@ typedef struct __queue__ {
  }$procQueue;
  
 struct __comm__ {
-  int id;
-  $procQueue nprocs[]; // number of processes
-  $proc procs[]; // the processes in order
+  int nprocs; // number of processes
+  $procQueue procs[]; // the processes in order
   $queue buf[][]; // message buffers
 };
 
