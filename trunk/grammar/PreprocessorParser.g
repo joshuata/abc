@@ -233,6 +233,7 @@ nonPoundPunctuator
 		|	IMPLIES
 		|	LCURLY
 		|	LPAREN
+		|	LSLIST
 		|	LSQUARE
 		|	LT
 		|	LTE
@@ -248,6 +249,7 @@ nonPoundPunctuator
 		|	QMARK
 		|	RCURLY
 		|	RPAREN
+		|	RSLIST
 		|	RSQUARE
 		|	SEMI
 		|	SHIFTLEFT

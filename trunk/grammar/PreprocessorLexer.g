@@ -137,10 +137,12 @@ FORALL		:	'$forall';
 IMPLIES		:	'=>'	|	NotLineStart;
 INPUT		:	'$input';
 INVARIANT	:	'$invariant';
+LSLIST		:	'<|';  // LSLIST and RSLIST enclose a scope list
 OUTPUT		:	'$output';
 //PROC		:	'$proc';
 REQUIRES	:	'$requires';
 RESULT		:	'$result';
+RSLIST		:	'|>';  // LSLIST and RSLIST enclose a scope list
 SELF		:	'$self';
 SCOPE		:	'$scope';
 SPAWN		:	'$spawn';
