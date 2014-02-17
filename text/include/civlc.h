@@ -146,61 +146,56 @@ typedef struct __queue__ {
   int length;
   $message messages[];
 } $queue;
-
-/* A datatype representing a communicator, or set
- * of message channels between every pair of processes in a
- * set of processes.  All message and other data is encapsulated
- * in this value; no outside allocation is used. */
- typedef struct __procQueue__ {
-  int queueLength;
-  $proc procs[];
- }$procQueue;
  
- 
-typedef struct __comm__ {
+/* A globle communicator datatype which must be operated by local communicators.
+ * This communicator type has the same meaning as the communicator type in MPI
+ * standards*/
+typedef struct __gcomm__ {
   int nprocs; // number of processes
-  $procQueue procs[]; // the processes in order
+  _Bool isInit[]; // if the local comm has been initiated
   $queue buf[][]; // message buffers
-} $comm;
+} * $gcomm;
 
-/* Allows the given proc to participate in the communicator with same
- * rank as the calling proc */
-$comm $comm_add($comm * comm, $proc proc, int rank);
 
-/* creates a new comm from the given sequence of processes,
- * by allocating memory and copying the process sequence;
- * the new comm has no messages */
-$comm $comm_create(int nprocs, $proc * procs);
+/* A datatype representing a local communicator which used for 
+ * operating globle communicators. The local communicator type has 
+ * a handle of a globle communicator. This type represents for 
+ * a set of processes which have ranks in common.
+ * */
+ typedef struct __comm__ {
+  int rank;
+  $gcomm gcomm;
+ } * $comm;
+
+/* creates a new global communicator from the number of processes,
+ * the new comm has no messages no concrete procs */
+$gcomm $comm_create(int nprocs);
 
 /* returns the number of processes associated to the comm */ 
-int $comm_nprocs($comm * comm) {
-  return comm->nprocs;
-}
-
-/* returns a pointer to the procs array in comm */ 
-$proc * $comm_procs($comm * comm) {
-  return &comm->procs[0];
+int $comm_nprocs($comm comm) {
+  return comm->gcomm->nprocs;
 }
 
 /* adds the message to the comm */
-void $comm_enqueue($comm * comm, $message message);
+void $comm_enqueue($comm comm, $message message);
 
 // to implement this, just need $append, $remove
 
 
 /* returns true iff a matching message exists in comm */
-_Bool $comm_probe($comm * comm, int source, int dest, int tag) {
+_Bool $comm_probe($comm comm, int source, int dest, int tag) {
   int nprocs;
   $queue queue;
   int length;
   _Bool result;
+  $gcomm gcomm = comm->gcomm;
   
   $atom {
     result = $false;
-    nprocs = comm->nprocs;
+    nprocs = gcomm->nprocs;
     $assert(0 <= source && source < nprocs);
     $assert(0 <= dest && dest < nprocs);
-    queue = comm->buf[source][dest];
+    queue = gcomm->buf[source][dest];
     length = queue.length;
     if (tag == $COMM_ANY_TAG) {
       result = length > 0 ? $true : $false;
@@ -218,18 +213,20 @@ _Bool $comm_probe($comm * comm, int source, int dest, int tag) {
 
 /* finds the first matching message and returns pointer
  * to it without modifying comm */
-$message * $comm_seek($comm * comm, int source, int dest, int tag) {
+$message $comm_seek($comm comm, int source, int dest, int tag) {
   int nprocs;
   $queue queue;
   int length;
-  $message* result;
+  $message * result;
+  $message message;
+  $gcomm gcomm = comm->gcomm;
   
   $atom {
     result = NULL;
-    nprocs = comm->nprocs;
+    nprocs = gcomm->nprocs;
     $assert(0 <= source && source < nprocs);
     $assert(0 <= dest && dest < nprocs);
-    queue = comm->buf[source][dest];
+    queue = gcomm->buf[source][dest];
     length = queue.length;
     if (tag == $COMM_ANY_TAG) {
       result = length > 0 ? &queue.messages[0] : NULL;
@@ -243,41 +240,55 @@ $message * $comm_seek($comm * comm, int source, int dest, int tag) {
       }
     }
   }
-  return result;
+  $atom{
+    if(result == NULL){
+       message.source = -1;
+       message.dest = -1;
+       message.size = 0;
+       }
+    else{
+       message = *result;
+    }
+  }
+  return message;
 }
 
 
 /* finds the first matching message, removes it from
  * comm, and returns pointer to message */ 
-$message $comm_dequeue($comm * comm, int source, int dest, int tag);
+$message $comm_dequeue($comm comm, int source, int dest, int tag);
 
 /* returns the number of messages from source to dest stored
  * in comm */ 
-int $comm_chan_size($comm * comm, int source, int dest) {
+int $comm_chan_size($comm comm, int source, int dest) {
   int nprocs;
   
   $atom {
-    nprocs = comm->nprocs;
+    nprocs = comm->gcomm->nprocs;
     $assert(0 <= source && source < nprocs);
     $assert(0 <= dest && dest < nprocs);
   }
-  return comm->buf[source][dest].length;
+  return comm->gcomm->buf[source][dest].length;
 }
 
 /* returns the total number of messages in the comm */ 
-int $comm_total_size($comm * comm) {
+int $comm_total_size($comm comm) {
   int result;
   int nprocs;
   
   $atom {
     result = 0;
-    nprocs = comm->nprocs;
+    nprocs = comm->gcomm->nprocs;
     for (int i=0; i<nprocs; i++)
       for (int j=0; j<nprocs; j++)
-        result += comm->buf[i][j].length;
+        result += comm->gcomm->buf[i][j].length;
   }
   return result;
 }
+
+/* $comm_init is used for processes to add themselves into gcomms.
+ * Notice that only one process in each rank can call this. */
+$comm $comm_init($gcomm gcomm, int rank);
 
 
 #endif
