@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -78,16 +79,22 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 
 	@Override
 	public int getNumParameters() {
+		if (parameterTypes == null)
+			throw new ASTException("Unspecified parameters in function type");
 		return parameterTypes.size();
 	}
 
 	@Override
 	public ObjectType getParameterType(int index) {
+		if (parameterTypes == null)
+			throw new ASTException("Unspecified parameters in function type");
 		return parameterTypes.get(index);
 	}
 
 	@Override
 	public Iterator<ObjectType> getParameterTypes() {
+		if (parameterTypes == null)
+			throw new ASTException("Unspecified parameters in function type");
 		return parameterTypes.iterator();
 	}
 

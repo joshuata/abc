@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 
 import java.util.Iterator;
 
+import edu.udel.cis.vsl.abc.ast.ASTException;
+
 /**
  * According to C11, a function type is characterized by the return type and the
  * number and types of the arguments. In reality, it is also necessary to know
@@ -55,18 +57,18 @@ public interface FunctionType extends Type {
 	/**
 	 * Returns the number of parameters.
 	 * 
-	 * @exception RuntimeException
+	 * @exception ASTException
 	 *                if the parameter information is not known
 	 * 
 	 * @return the number of parameters
 	 */
-	int getNumParameters();
+	int getNumParameters() throws ASTException;
 
 	/**
 	 * 
 	 * @param index
 	 * 
-	 * @exception RuntimeException
+	 * @exception ASTException
 	 *                if the parameter information is not known
 	 * @return
 	 */
@@ -77,7 +79,7 @@ public interface FunctionType extends Type {
 	 * identifier list is represented by a sequence of declarations in which all
 	 * components other than the identifiers are null.
 	 * 
-	 * @exception RuntimeException
+	 * @exception ASTException
 	 *                if the parameter information is not known
 	 * @return sequence of parameter declarations
 	 */
