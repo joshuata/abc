@@ -146,53 +146,57 @@ public class ExpressionAnalyzer {
 	 * @throws SyntaxException
 	 */
 	void processExpression(ExpressionNode node) throws SyntaxException {
-		if (node instanceof AlignOfNode)
-			processAlignOf((AlignOfNode) node);
-		else if (node instanceof ArrowNode)
-			processArrow((ArrowNode) node);
-		else if (node instanceof CastNode)
-			processCast((CastNode) node);
-		else if (node instanceof CompoundLiteralNode)
-			processCompoundLiteral((CompoundLiteralNode) node);
-		else if (node instanceof ConstantNode)
-			processConstant((ConstantNode) node);
-		else if (node instanceof DotNode)
-			processDot((DotNode) node);
-		else if (node instanceof FunctionCallNode)
-			processFunctionCall((FunctionCallNode) node);
-		else if (node instanceof GenericSelectionNode)
-			processGenericSelection((GenericSelectionNode) node);
-		else if (node instanceof IdentifierExpressionNode)
-			processIdentifierExpression((IdentifierExpressionNode) node);
-		else if (node instanceof OperatorNode)
-			processOperator((OperatorNode) node);
-		else if (node instanceof SizeofNode)
-			processSizeof((SizeofNode) node);
-		else if (node instanceof SpawnNode)
-			processSpawn((SpawnNode) node);
-		else if (node instanceof ScopeOfNode)
-			processScopeOf((ScopeOfNode) node);
-		// @ collective, result
-		else if (node instanceof RemoteExpressionNode) {
-			// need to find variable in scope
-			processRemoteExpression((RemoteExpressionNode) node);
-		} else if (node instanceof ResultNode) {
-			// type is same as type returned by function to
-			// which it belongs.
-			processResult((ResultNode) node);
-		} else if (node instanceof CollectiveExpressionNode) {
-			CollectiveExpressionNode collective = (CollectiveExpressionNode) node;
+		try {
+			if (node instanceof AlignOfNode)
+				processAlignOf((AlignOfNode) node);
+			else if (node instanceof ArrowNode)
+				processArrow((ArrowNode) node);
+			else if (node instanceof CastNode)
+				processCast((CastNode) node);
+			else if (node instanceof CompoundLiteralNode)
+				processCompoundLiteral((CompoundLiteralNode) node);
+			else if (node instanceof ConstantNode)
+				processConstant((ConstantNode) node);
+			else if (node instanceof DotNode)
+				processDot((DotNode) node);
+			else if (node instanceof FunctionCallNode)
+				processFunctionCall((FunctionCallNode) node);
+			else if (node instanceof GenericSelectionNode)
+				processGenericSelection((GenericSelectionNode) node);
+			else if (node instanceof IdentifierExpressionNode)
+				processIdentifierExpression((IdentifierExpressionNode) node);
+			else if (node instanceof OperatorNode)
+				processOperator((OperatorNode) node);
+			else if (node instanceof SizeofNode)
+				processSizeof((SizeofNode) node);
+			else if (node instanceof SpawnNode)
+				processSpawn((SpawnNode) node);
+			else if (node instanceof ScopeOfNode)
+				processScopeOf((ScopeOfNode) node);
+			// @ collective, result
+			else if (node instanceof RemoteExpressionNode) {
+				// need to find variable in scope
+				processRemoteExpression((RemoteExpressionNode) node);
+			} else if (node instanceof ResultNode) {
+				// type is same as type returned by function to
+				// which it belongs.
+				processResult((ResultNode) node);
+			} else if (node instanceof CollectiveExpressionNode) {
+				CollectiveExpressionNode collective = (CollectiveExpressionNode) node;
 
-			processExpression(collective.getProcessPointerExpression());
-			processExpression(collective.getLengthExpression());
-			processExpression(collective.getBody());
-			node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
-		} else if (node instanceof QuantifiedExpressionNode) {
-			processQuantifiedExpression((QuantifiedExpressionNode) node);
-		} else if (node instanceof DerivativeExpressionNode) {
-			processDerivativeExpression((DerivativeExpressionNode) node);
-		} else
-			throw error("Unknown expression kind", node);
+				processExpression(collective.getProcessPointerExpression());
+				processExpression(collective.getLengthExpression());
+				processExpression(collective.getBody());
+				node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
+			} else if (node instanceof QuantifiedExpressionNode) {
+				processQuantifiedExpression((QuantifiedExpressionNode) node);
+			} else if (node instanceof DerivativeExpressionNode) {
+				processDerivativeExpression((DerivativeExpressionNode) node);
+			} else
+				throw error("Unknown expression kind", node);
+		} catch (ASTException e) {
+			throw new SyntaxException(e.getMessage(), node.getSource());
+		}
 	}
 
 	/**
