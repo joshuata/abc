@@ -80,21 +80,27 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 	@Override
 	public int getNumParameters() {
 		if (parameterTypes == null)
-			throw new ASTException("Unspecified parameters in function type");
+			throw new ASTException(
+					"The parameters for the function have not been specified."
+							+ "\nNote that a prototype for a function with 0 parameters must have the form \"f(void)\"");
 		return parameterTypes.size();
 	}
 
 	@Override
 	public ObjectType getParameterType(int index) {
 		if (parameterTypes == null)
-			throw new ASTException("Unspecified parameters in function type");
+			throw new ASTException(
+					"The parameters for the function have not been specified."
+							+ "\nNote that a prototype for a function with 0 parameters must have the form \"f(void)\"");
 		return parameterTypes.get(index);
 	}
 
 	@Override
 	public Iterator<ObjectType> getParameterTypes() {
 		if (parameterTypes == null)
-			throw new ASTException("Unspecified parameters in function type");
+			throw new ASTException(
+					"The parameters for the function have not been specified."
+							+ "\nNote that a prototype for a function with 0 parameters must have the form \"f(void)\"");
 		return parameterTypes.iterator();
 	}
 
