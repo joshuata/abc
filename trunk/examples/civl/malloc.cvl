@@ -3,8 +3,9 @@
 // void* $malloc($heap *h, int size);
 
 void main() {
-  $heap h;
-  double *p = (double *) $malloc(&h, 5*sizeof(double));
+  //$heap h;
+  $scope s;
+  double *p = (double *) $malloc<s>(5*sizeof(double));
   
-  $free(&h, p);
+  $free(p);
 }   
