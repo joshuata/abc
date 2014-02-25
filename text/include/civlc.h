@@ -22,7 +22,7 @@ typedef unsigned long int size_t;
 typedef struct __proc__ $proc;
 
 /* The CIVL-C heap type, used to represent a heap */
-typedef struct __heap__ $heap;
+//typedef struct __heap__ $heap;
 
 // /* The CIVL-C scope type, used to represent a scope */
 // typedef struct __scope__ $scope;
@@ -65,7 +65,7 @@ void $bundle_unpack($bundle bundle, void *ptr);
 // Memory functions:
 
 /* The CIVL-C malloc function, which takes a reference to a heap */
-void* $malloc($heap *h, int size);
+<s> void*<s> $malloc(int size);
 
 /* Copies a region of memory, just as in standard C */
 void memcpy(void *p, void *q, size_t size) {
@@ -76,7 +76,7 @@ void memcpy(void *p, void *q, size_t size) {
 }
 
 /* The CIVL-C de-allocation function, which takes a reference to a heap */
-void $free($heap *h, void *p);
+void $free(void *p);
 
 // Message passing:
 
