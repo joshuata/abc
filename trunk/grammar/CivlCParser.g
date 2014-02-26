@@ -299,6 +299,7 @@ constant
 	| FLOATING_CONSTANT
 	| CHARACTER_CONSTANT
 	| SELF | TRUE | FALSE | RESULT
+	| HERE | ROOT
 	;
 
 enumerationConstant

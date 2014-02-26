@@ -144,7 +144,9 @@ REQUIRES	:	'$requires';
 RESULT		:	'$result';
 RSLIST		:	'|>';  // LSLIST and RSLIST enclose a scope list
 SELF		:	'$self';
-SCOPE		:	'$scope';
+HERE		:	'$here';
+ROOT		:	'$root';
+SCOPE		:	'$scopeDUPLICATE';
 SPAWN		:	'$spawn';
 TRUE		:	'$true';
 UNIFORM	:	'$uniform';

@@ -54,7 +54,8 @@ public class StandardTypes {
 		add("char16_t", typeFactory.char16_t());
 		add("char32_t", typeFactory.char32_t());
 		add("$proc", typeFactory.processType());
-		add("$heap", typeFactory.heapType());
+		add("$scope", typeFactory.scopeType());
+		//add("$heap", typeFactory.heapType());
 	}
 
 	/**

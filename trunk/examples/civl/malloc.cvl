@@ -4,8 +4,10 @@
 
 void main() {
   //$heap h;
-  $scope s;
-  double *p = (double *) $malloc<s>(5*sizeof(double));
+  $scope s = $here;
+  double *p = (double *) $malloc(s, 5*sizeof(double));
+  double *z = (double *) $malloc($root,  5*sizeof(double));
   
   $free(p);
+  $free(z);
 }   

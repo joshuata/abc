@@ -24,8 +24,7 @@ typedef struct __proc__ $proc;
 /* The CIVL-C heap type, used to represent a heap */
 //typedef struct __heap__ $heap;
 
-// /* The CIVL-C scope type, used to represent a scope */
-// typedef struct __scope__ $scope;
+ typedef struct __scope__ $scope;
 
 /* The CIVL-C dynamic type, used to represent a symbolic type */
 typedef struct __dynamic__ $dynamic;
@@ -65,7 +64,7 @@ void $bundle_unpack($bundle bundle, void *ptr);
 // Memory functions:
 
 /* The CIVL-C malloc function, which takes a reference to a heap */
-<s> void*<s> $malloc(int size);
+void* $malloc($scope s, int size);
 
 /* Copies a region of memory, just as in standard C */
 void memcpy(void *p, void *q, size_t size) {
