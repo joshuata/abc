@@ -249,11 +249,13 @@ public class ASTBuilder {
 
 	// static final int PROC = CivlCParser.PROC;
 	static final int SELF = CivlCParser.SELF;
+	static final int HERE = CivlCParser.HERE;
+	static final int ROOT = CivlCParser.ROOT;
 	static final int INPUT = CivlCParser.INPUT;
 	static final int OUTPUT = CivlCParser.OUTPUT;
 	static final int SPAWN = CivlCParser.SPAWN;
 	static final int WAIT = CivlCParser.WAIT;
-	//static final int ASSERT = CivlCParser.ASSERT;
+	// static final int ASSERT = CivlCParser.ASSERT;
 	static final int TRUE = CivlCParser.TRUE;
 	static final int FALSE = CivlCParser.FALSE;
 	static final int ASSUME = CivlCParser.ASSUME;
@@ -569,6 +571,10 @@ public class ASTBuilder {
 							(CommonTree) expressionTree.getChild(1), scope));
 		case SELF:
 			return nodeFactory.newSelfNode(source);
+		case HERE:
+			return nodeFactory.newHereNode(source);
+		case ROOT:
+			return nodeFactory.newRootNode(source);
 		case SPAWN: {
 			return nodeFactory.newSpawnNode(source,
 					translateCall(source, expressionTree, scope));
@@ -2141,11 +2147,11 @@ public class ASTBuilder {
 					statementSource,
 					translateExpression((CommonTree) statementTree.getChild(0),
 							scope));
-//		case ASSERT:
-//			return nodeFactory.newAssertNode(
-//					statementSource,
-//					translateExpression((CommonTree) statementTree.getChild(0),
-//							scope));
+			// case ASSERT:
+			// return nodeFactory.newAssertNode(
+			// statementSource,
+			// translateExpression((CommonTree) statementTree.getChild(0),
+			// scope));
 
 		case ASSUME:
 			return translateAssume(statementSource, statementTree, scope);

@@ -112,6 +112,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonDotNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonEnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonFunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonHereOrRootNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
@@ -179,6 +180,8 @@ public class CommonNodeFactory implements NodeFactory {
 	private StandardUnsignedIntegerType booleanType;
 
 	private ObjectType processType;
+	
+	private ObjectType scopeType;
 
 	public CommonNodeFactory(TypeFactory typeFactory, ValueFactory valueFactory) {
 		this.literalInterpreter = new LiteralInterpreter(typeFactory,
@@ -188,6 +191,7 @@ public class CommonNodeFactory implements NodeFactory {
 		this.booleanType = typeFactory
 				.unsignedIntegerType(UnsignedIntKind.BOOL);
 		this.processType = typeFactory.processType();
+		this.scopeType = typeFactory.scopeType();
 	}
 
 	@Override
@@ -699,6 +703,24 @@ public class CommonNodeFactory implements NodeFactory {
 		result.setInitialType(processType);
 		return result;
 	}
+	
+	@Override
+	public ExpressionNode newHereNode(Source source) {
+		ExpressionNode result = new CommonHereOrRootNode(source, "$here", scopeType);
+
+		result.setInitialType(scopeType);
+		return result;
+	}
+	
+	@Override
+	public ExpressionNode newRootNode(Source source) {
+		ExpressionNode result = new CommonHereOrRootNode(source, "$root", scopeType);
+
+		result.setInitialType(scopeType);
+		return result;
+	}
+	
+	
 
 	@Override
 	public ExpressionNode newResultNode(Source source) {

@@ -1,6 +1,6 @@
 
 int y;
-$scope root;
+$scopeDUPLICATE root;
 double x;
 
 
@@ -15,7 +15,7 @@ double x;
 
 typedef struct __heap $heap;
 
-<s> void *<s> $malloc($heap *<s> heap, int size);
+<s> void *<s> $malloc(int size);
 
 double * g(double * p) {
   return p;
@@ -26,11 +26,14 @@ double * g(double * p) {
 }
 
 void main() {
-  $scope s1;
+  $scopeDUPLICATE s1;
   double y;
   double *<s1> p;
   double *<root> q;
+  double * t;
   
+  t = (double *) $malloc<s1>(8);
+  q = t;
   p = &y;
   q = &x;
   q = p; // ok

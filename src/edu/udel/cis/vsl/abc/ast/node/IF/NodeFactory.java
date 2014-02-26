@@ -662,4 +662,8 @@ public interface NodeFactory {
 	AtomicNode newAtomicStatementNode(Source statementSource,
 			boolean deterministic, StatementNode body);
 
+	ExpressionNode newHereNode(Source source);
+
+	ExpressionNode newRootNode(Source source);
+
 }

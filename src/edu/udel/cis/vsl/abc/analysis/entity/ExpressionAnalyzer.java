@@ -41,6 +41,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FloatingConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.GenericSelectionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.HereOrRootNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
@@ -351,6 +352,8 @@ public class ExpressionAnalyzer {
 			// type should already be set
 		} else if (node instanceof SelfNode) {
 			// type is process type, already set
+		} else if (node instanceof HereOrRootNode) {
+			// type is scope type, already set
 		} else
 			throw new RuntimeException("Unknown kind of constant node: " + node);
 		if (node.getInitialType() == null)
