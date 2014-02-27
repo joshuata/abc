@@ -31,6 +31,9 @@ typedef struct __dynamic__ $dynamic;
 
 // Misc. functions:
 
+/* Wait for another process p to terminate. */
+void $wait($proc p);
+
 /* Terminate the calling process. */
 void $exit(void);
 

@@ -254,7 +254,7 @@ public class ASTBuilder {
 	static final int INPUT = CivlCParser.INPUT;
 	static final int OUTPUT = CivlCParser.OUTPUT;
 	static final int SPAWN = CivlCParser.SPAWN;
-	static final int WAIT = CivlCParser.WAIT;
+//	static final int WAIT = CivlCParser.WAIT;
 	// static final int ASSERT = CivlCParser.ASSERT;
 	static final int TRUE = CivlCParser.TRUE;
 	static final int FALSE = CivlCParser.FALSE;
@@ -2142,11 +2142,11 @@ public class ASTBuilder {
 							scope));
 		case PRAGMA:
 			return translatePragma(statementSource, statementTree, scope);
-		case WAIT:
-			return nodeFactory.newWaitNode(
-					statementSource,
-					translateExpression((CommonTree) statementTree.getChild(0),
-							scope));
+//		case WAIT:
+//			return nodeFactory.newWaitNode(
+//					statementSource,
+//					translateExpression((CommonTree) statementTree.getChild(0),
+//							scope));
 			// case ASSERT:
 			// return nodeFactory.newAssertNode(
 			// statementSource,

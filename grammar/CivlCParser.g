@@ -1350,7 +1350,7 @@ statement
     | pragma
     //| assertStatement
     | assumeStatement
-    | waitStatement
+   // | waitStatement
     | whenStatement
     | chooseStatement
     | atomicStatement
@@ -1592,9 +1592,9 @@ assumeStatement
 	:	ASSUME expression SEMI -> ^(ASSUME expression)
 	;
 
-waitStatement
+/*waitStatement
 	:	WAIT expression SEMI -> ^(WAIT expression)
-	;
+	;*/
 
 whenStatement
 	:	WHEN LPAREN expression RPAREN statement
