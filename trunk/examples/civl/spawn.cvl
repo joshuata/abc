@@ -6,6 +6,6 @@ void f(int n) {
 void main() {
   $proc p = $spawn f(3);
   $proc q = $spawn f(1000);
-  $wait p;
-  $wait q;
+  $wait(p);
+  $wait(q);
 }

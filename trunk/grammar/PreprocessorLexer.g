@@ -150,7 +150,7 @@ SCOPE		:	'$scopeDUPLICATE';
 SPAWN		:	'$spawn';
 TRUE		:	'$true';
 UNIFORM	:	'$uniform';
-WAIT		:	'$wait';
+//WAIT		:	'$wait'; $wait is implemented as a system function
 WHEN		:	'$when';
 CIVLATOMIC	:	'$atomic';
 CIVLATOM	:	'$atom';
