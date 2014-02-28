@@ -106,13 +106,11 @@ $message $message_pack(int source, int dest, int tag,
     void *data, int size) {
   $message result;
   
-  $atom {
-    result.source = source;
-    result.dest = dest;
-    result.tag = tag;
-    result.data = $bundle_pack(data, size);
-    result.size = size;
-  }
+  result.source = source;
+  result.dest = dest;
+  result.tag = tag;
+  result.data = $bundle_pack(data, size);
+  result.size = size;
   return result;
 }
   
@@ -226,5 +224,8 @@ int $comm_total_size($comm comm);
  * Only one call to $comm_create may occur for each gcomm-place pair.
  * The new object will be allocated in the given scope. */
 $comm $comm_create($scope scope, $gcomm gcomm, int place);
+
+/* Returns the parent scope of the given scope */
+$scope $scope_parent($scope s);
 
 #endif

@@ -1122,7 +1122,10 @@ public class ExpressionAnalyzer {
 		Type type0 = addStandardConversions(arg0);
 		Type type1 = addStandardConversions(arg1);
 
-		if (type0 instanceof ArithmeticType && type1 instanceof ArithmeticType)
+		if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
+			// no conversions necessary
+		} else if (type0 instanceof ArithmeticType
+				&& type1 instanceof ArithmeticType)
 			node.setInitialType(doUsualArithmetic(arg0, arg1));
 		else if (isPointerToCompleteObjectType(type0)
 				&& type1 instanceof IntegerType)
@@ -1356,7 +1359,10 @@ public class ExpressionAnalyzer {
 		Type type0 = addStandardConversions(arg0);
 		Type type1 = addStandardConversions(arg1);
 
-		if (type0 instanceof ArithmeticType && type1 instanceof ArithmeticType) {
+		if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
+			// no conversions necessary
+		} else if (type0 instanceof ArithmeticType
+				&& type1 instanceof ArithmeticType) {
 			if (!((ArithmeticType) type0).inRealDomain())
 				throw error("Argument to relational operator " + operator
 						+ " must have real type", arg0);
@@ -1525,7 +1531,10 @@ public class ExpressionAnalyzer {
 		Type type0 = addStandardConversions(arg0);
 		Type type1 = addStandardConversions(arg1);
 
-		if (type0 instanceof ArithmeticType && type1 instanceof ArithmeticType) {
+		if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
+			// no conversions necessary
+		} else if (type0 instanceof ArithmeticType
+				&& type1 instanceof ArithmeticType) {
 			doUsualArithmetic(arg0, arg1);
 		} else if (pointerToCompatibleTypes(type0, type1)) {
 			// no conversions necessary
