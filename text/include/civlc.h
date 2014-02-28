@@ -24,6 +24,7 @@ typedef struct __proc__ $proc;
 /* The CIVL-C heap type, used to represent a heap */
 //typedef struct __heap__ $heap;
 
+// /* The CIVL-C scope type, used to represent a scope */
  typedef struct __scope__ $scope;
 
 /* The CIVL-C dynamic type, used to represent a symbolic type */
@@ -167,132 +168,63 @@ typedef struct __gcomm__ {
  * a set of processes which have ranks in common.
  * */
  typedef struct __comm__ {
-  int rank;
+  int place;
   $gcomm gcomm;
  } * $comm;
 
-/* creates a new global communicator from the number of processes,
- * the new comm has no messages no concrete procs */
-$gcomm $gcomm_create($scope s, int nprocs);
+/* Creates a new global communicator object and returns a handle to it.
+ * The global communicator will have size communication places.  The
+ * global communicator defines a communication "universe" and encompasses
+ * message buffers and all other components of the state associated to
+ * message-passing.  The new object will be allocated in the given scope. */
+$gcomm $gcomm_create($scope scope, int size);
 
-/* returns the number of processes associated to the comm */ 
-int $comm_nprocs($comm comm) {
-  return comm->gcomm->nprocs;
+/* Returns the size (number of places) in the global communicator associated
+ * to the given comm. */
+int $comm_size($comm comm);
+
+/* Returns the place of the local communicator.  This is the same as the
+ * place argument used to create the local communicator. */
+int $comm_place($comm comm){
+ return comm->place;
 }
 
-/* adds the message to the comm */
+/* Adds the message to the appropriate message queue in the communication
+ * universe specified by the comm.  The source of the message must equal
+ * the place of the comm. */
 void $comm_enqueue($comm comm, $message message);
 
-// to implement this, just need $append, $remove
+/* Returns true iff a matching message exists in the communication universe
+ * specified by the comm.  A message matches the arguments if the destination
+ * of the message is the place of the comm, and the sources and tags match. */
+_Bool $comm_probe($comm comm, int source, int tag);
 
+/* Finds the first matching message and returns it without modifying
+ * the communication universe.  If no matching message exists, returns a message
+ * with source, dest, and tag all negative. */
+$message $comm_seek($comm comm, int source, int tag);
 
-/* returns true iff a matching message exists in comm */
-_Bool $comm_probe($comm comm, int source, int dest, int tag) {
-  int nprocs;
-  $queue queue;
-  int length;
-  _Bool result;
-  $gcomm gcomm = comm->gcomm;
-  
-  $atom {
-    result = $false;
-    nprocs = gcomm->nprocs;
-    $assert(0 <= source && source < nprocs);
-    $assert(0 <= dest && dest < nprocs);
-    queue = gcomm->buf[source][dest];
-    length = queue.length;
-    if (tag == $COMM_ANY_TAG) {
-      result = length > 0 ? $true : $false;
-    } else {
-      for (int i=0; i<length; i++) {
-        if (queue.messages[i].tag == tag) {
-          result = $true;
-          break;
-        }  
-      }
-    }
-  }
-  return result;
-}
-
-/* finds the first matching message and returns pointer
- * to it without modifying comm */
-$message $comm_seek($comm comm, int source, int dest, int tag) {
-  int nprocs;
-  $queue queue;
-  int length;
-  $message * result;
-  $message message;
-  $gcomm gcomm = comm->gcomm;
-  
-  $atom {
-    result = NULL;
-    nprocs = gcomm->nprocs;
-    $assert(0 <= source && source < nprocs);
-    $assert(0 <= dest && dest < nprocs);
-    queue = gcomm->buf[source][dest];
-    length = queue.length;
-    if (tag == $COMM_ANY_TAG) {
-      result = length > 0 ? &queue.messages[0] : NULL;
-    } else {
-      for (int i=0; i<length; i++) {
-        $message m = queue.messages[i];
-        if (m.tag == tag) {
-          result = &m;
-          break;
-        }
-      }
-    }
-  }
-  $atom{
-    if(result == NULL){
-       message.source = -1;
-       message.dest = -1;
-       message.size = 0;
-       }
-    else{
-       message = *result;
-    }
-  }
-  return message;
-}
-
-
-/* finds the first matching message, removes it from
- * comm, and returns pointer to message */ 
-$message $comm_dequeue($comm comm, int source, int dest, int tag);
+/* Finds the first matching message, removes it from the communicator,
+ * and returns the message */
+$message $comm_dequeue($comm comm, int source, int tag);
 
 /* returns the number of messages from source to dest stored
  * in comm */ 
-int $comm_chan_size($comm comm, int source, int dest) {
-  int nprocs;
-  
-  $atom {
-    nprocs = comm->gcomm->nprocs;
-    $assert(0 <= source && source < nprocs);
-    $assert(0 <= dest && dest < nprocs);
-  }
-  return comm->gcomm->buf[source][dest].length;
-}
+int $comm_chan_size($comm comm, int source, int dest);
 
 /* returns the total number of messages in the comm */ 
-int $comm_total_size($comm comm) {
-  int result;
-  int nprocs;
-  
-  $atom {
-    result = 0;
-    nprocs = comm->gcomm->nprocs;
-    for (int i=0; i<nprocs; i++)
-      for (int j=0; j<nprocs; j++)
-        result += comm->gcomm->buf[i][j].length;
-  }
-  return result;
-}
+int $comm_total_size($comm comm);
 
-/* $comm_init is used for processes to add themselves into gcomms.
- * Notice that only one process in each rank can call this. */
-$comm $comm_init($gcomm gcomm, int rank);
-
+/* Creates a new local communicator object and returns a handle to it.
+ * The new communicator will be affiliated with the specified global
+ * communicator.   This local communicator handle will be used as an
+ * argument in most message-passing functions.  The place must be in
+ * [0,size-1] and specifies the place in the global communication universe
+ * that will be occupied by the local communicator.  The local communicator
+ * handle may be used by more than one process, but all of those
+ * processes will be viewed as occupying the same place.
+ * Only one call to $comm_create may occur for each gcomm-place pair.
+ * The new object will be allocated in the given scope. */
+$comm $comm_create($scope scope, $gcomm gcomm, int place);
 
 #endif
