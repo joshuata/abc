@@ -50,4 +50,8 @@ public class CommonIdentifierExpressionNode extends CommonExpressionNode
 		return ExpressionKind.IDENTIFIER_EXPRESSION;
 	}
 
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return true;
+	}
 }

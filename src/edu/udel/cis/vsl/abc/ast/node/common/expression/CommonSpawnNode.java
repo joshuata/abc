@@ -36,5 +36,10 @@ public class CommonSpawnNode extends CommonExpressionNode implements SpawnNode {
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.SPAWN;
 	}
+	
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return false;
+	}
 
 }

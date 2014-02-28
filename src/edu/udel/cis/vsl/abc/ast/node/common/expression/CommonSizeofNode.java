@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -42,4 +43,15 @@ public class CommonSizeofNode extends CommonExpressionNode implements
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.SIZEOF;
 	}
+	
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		if (child(0).nodeKind() == NodeKind.EXPRESSION) {
+			return ((ExpressionNode) child(0))
+					.isSideEffectFree(errorsAreSideEffects);
+		}
+		return true;
+	}
+	
+	
 }

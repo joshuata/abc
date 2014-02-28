@@ -39,4 +39,9 @@ public abstract class CommonConstantNode extends CommonExpressionNode implements
 	public ExpressionKind expressionKind(){
 		return ExpressionKind.CONSTANT;
 	}
+	
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return true;
+	}
 }

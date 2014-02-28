@@ -19,4 +19,14 @@ public interface InitializerNode extends ASTNode {
 	@Override
 	InitializerNode copy();
 
+	/**
+	 * Returns true iff this expression does not contain side effects.
+	 * 
+	 * @param errorsAreSideEffects
+	 *            Whether to consider potential errors (division by 0, array
+	 *            index out of bounds, etc.) as side effects.
+	 * @return true iff this expression does not contain side effects
+	 */
+	boolean isSideEffectFree(boolean errorsAreSideEffects);
+	
 }

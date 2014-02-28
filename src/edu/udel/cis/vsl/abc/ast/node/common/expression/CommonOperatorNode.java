@@ -99,4 +99,43 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.OPERATOR;
 	}
+
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		boolean result = true;
+		switch (getOperator()) {
+		case ASSIGN:
+		case BITANDEQ:
+		case BITOREQ:
+		case BITXOREQ:
+		case DIVEQ:
+		case MINUSEQ:
+		case MODEQ:
+		case PLUSEQ:
+		case POSTDECREMENT:
+		case POSTINCREMENT:
+		case PREDECREMENT:
+		case PREINCREMENT:
+		case SHIFTLEFTEQ:
+		case SHIFTRIGHTEQ:
+		case TIMESEQ:
+			result = false;
+			break;
+		case DIV:
+		case MOD:
+		case DEREFERENCE:
+		case SUBSCRIPT:
+			if (errorsAreSideEffects) {
+				result = false;
+				break;
+			}
+		default:
+			for (int i = 0; i < getNumberOfArguments(); i++) {
+				result = result
+						&& getArgument(i)
+								.isSideEffectFree(errorsAreSideEffects);
+			}
+		}
+		return result;
+	}
 }

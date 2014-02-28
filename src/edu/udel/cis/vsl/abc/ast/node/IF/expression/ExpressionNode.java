@@ -119,16 +119,6 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 	 */
 	boolean isConstantExpression();
 
-	/**
-	 * Returns true iff this expression does not contain side effects.
-	 * 
-	 * @param errorsAreSideEffects
-	 *            Whether to consider potential errors (division by 0, array
-	 *            index out of bounds, etc.) as side effects.
-	 * @return true iff this expression does not contain side effects
-	 */
-	boolean isSideEffectFree(boolean errorsAreSideEffects);
-
 	@Override
 	ExpressionNode copy();
 

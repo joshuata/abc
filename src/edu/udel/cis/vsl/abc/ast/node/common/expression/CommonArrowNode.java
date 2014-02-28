@@ -59,4 +59,10 @@ public class CommonArrowNode extends CommonExpressionNode implements ArrowNode {
 		return ExpressionKind.ARROW;
 	}
 
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return !errorsAreSideEffects
+				&& getStructurePointer().isSideEffectFree(errorsAreSideEffects);
+	}
+
 }

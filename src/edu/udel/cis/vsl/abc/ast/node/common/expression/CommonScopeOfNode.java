@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
@@ -40,4 +41,12 @@ public class CommonScopeOfNode extends CommonExpressionNode implements
 		return ExpressionKind.SCOPEOF;
 	}
 
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		if (child(0).nodeKind() == NodeKind.EXPRESSION) {
+			return ((ExpressionNode) child(0))
+					.isSideEffectFree(errorsAreSideEffects);
+		}
+		return true;
+	}
 }
