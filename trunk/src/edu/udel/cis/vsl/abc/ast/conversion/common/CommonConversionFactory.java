@@ -244,7 +244,7 @@ public class CommonConversionFactory implements ConversionFactory {
 			throws UnsourcedException {
 		Type oldType = rhs.getConvertedType();
 
-		if (newType.equals(oldType))
+		if (newType.kind() == TypeKind.SCOPE || newType.equals(oldType))
 			return null;
 		if (oldType instanceof ArithmeticType
 				&& newType instanceof ArithmeticType) {
