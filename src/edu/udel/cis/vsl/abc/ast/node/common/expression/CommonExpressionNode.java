@@ -137,9 +137,14 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 	public void removeConversions() {
 		conversions = new ArrayList<Conversion>();
 	}
-
+	
 	@Override
 	public NodeKind nodeKind(){
 		return NodeKind.EXPRESSION;
+	}
+	
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return false;
 	}
 }
