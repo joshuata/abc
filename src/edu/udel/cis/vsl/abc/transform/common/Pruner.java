@@ -110,6 +110,49 @@ public class Pruner implements Transformer {
 			}
 		}
 	}
+	
+	// /**
+	// * If any variable decl nodes have reachable initializer but unreachable
+	// * identifier and type nodes, replace those nodes with a simple
+	// * expression statement node wrapping the initializer.
+	// *
+	// * @param root
+	// */
+	// private void changeDecls(ASTNode node) {
+	// int numChildren = node.numChildren();
+	//
+	// for (int i=0; i<numChildren; i++) {
+	// ASTNode child = node.child(i);
+	//
+	// if (child instanceof VariableDeclarationNode) {
+	// VariableDeclarationNode decl = (VariableDeclarationNode)child;
+	// InitializerNode init = decl.getInitializer();
+	//
+	// if (init != null && init.getAttribute(reachedKey) == Reachability.KEEP) {
+	// // if all other children of decl will not be kept, do transform...
+	// boolean modify = true;
+	// Iterator<ASTNode> iter = decl.children();
+	//
+	// while (iter.hasNext()) {
+	// ASTNode grandchild = iter.next();
+	//
+	// if (grandchild != null && grandchild != init &&
+	// grandchild.getAttribute(reachedKey)==Reachability.KEEP) {
+	// modify = false;
+	// break;
+	// }
+	// }
+	// if (modify) {
+	// // replace child with new ExpressionStatement
+	//
+	// }
+	// }
+	//
+	// } else {
+	// changeDecls(child);
+	// }
+	// }
+	// }
 
 	@Override
 	public AST transform(AST ast) throws SyntaxException {
@@ -130,6 +173,9 @@ public class Pruner implements Transformer {
 			worker = new PrunerWorker(reachedKey, root);
 			reachableNodes = worker.getReachableNodes();
 			close(reachableNodes);
+			// TODO: for variable declarations: if the initializer is reachable
+			// but not the declaration, need to replace that node with an
+			// expression statement node.
 			root.keepOnly(reachable);
 			newAst = astFactory.newTranslationUnit(root);
 			return newAst;

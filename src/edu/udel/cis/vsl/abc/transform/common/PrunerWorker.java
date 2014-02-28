@@ -16,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
@@ -92,6 +93,15 @@ public class PrunerWorker {
 					}
 					if (child instanceof OrdinaryDeclarationNode
 							|| child instanceof TypedefDeclarationNode) {
+						if (child instanceof VariableDeclarationNode) {
+							InitializerNode init = ((VariableDeclarationNode) child)
+									.getInitializer();
+
+							// at some point improve this to keep the init
+							// but not necessarily the variable...
+							if (init != null && !init.isSideEffectFree(true))
+								markReachable(child);
+						}
 						// do nothing: we want to see if we can reach these
 					} else
 						markReachable(child);
@@ -101,10 +111,8 @@ public class PrunerWorker {
 	}
 
 	/**
-	 * Invokes {@link #markReachable(ASTNode)} on the definition node for the
-	 * entity. If the entity does not have a definition node, the first
-	 * declaration is used. If it has no declaration it is ignored as it is a
-	 * system entity.
+	 * Invokes {@link #markReachable(ASTNode)} on all declarations of the
+	 * entity.
 	 * 
 	 * @param entity
 	 *            an Entity occurring in the AST
@@ -114,13 +122,6 @@ public class PrunerWorker {
 
 		while (declIter.hasNext())
 			markReachable(declIter.next());
-		/*
-		 * DeclarationNode defn = entity.getDefinition();
-		 * 
-		 * if (defn == null) { if (entity.getNumDeclarations() != 0)
-		 * markReachable(entity.getFirstDeclaration()); } else
-		 * markReachable(defn);
-		 */
 	}
 
 	/**
