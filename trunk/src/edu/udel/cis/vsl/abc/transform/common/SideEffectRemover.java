@@ -193,10 +193,10 @@ public class SideEffectRemover implements Transformer {
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
-//		if (statement instanceof AssertNode) {
-//			result = assertStatement((AssertNode) statement);
-//		} else 
-			
+		// if (statement instanceof AssertNode) {
+		// result = assertStatement((AssertNode) statement);
+		// } else
+
 		if (statement instanceof AssumeNode) {
 			result = assumeStatement((AssumeNode) statement);
 		} else if (statement instanceof ChooseStatementNode) {
@@ -464,26 +464,26 @@ public class SideEffectRemover implements Transformer {
 		return result;
 	}
 
-//	private StatementNode assertStatement(AssertNode statement)
-//			throws SyntaxException {
-//		StatementNode result;
-//
-//		if (isSEF(statement.getExpression())) {
-//			result = statement;
-//		} else {
-//			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
-//			SideEffectFreeTriple triple = processExpression(statement
-//					.getExpression());
-//
-//			newStatements.addAll(triple.getBefore());
-//			newStatements.add(factory.newAssertNode(statement.getSource(),
-//					triple.getExpression()));
-//			newStatements.addAll(triple.getAfter());
-//			result = factory.newCompoundStatementNode(statement.getSource(),
-//					newStatements);
-//		}
-//		return result;
-//	}
+	// private StatementNode assertStatement(AssertNode statement)
+	// throws SyntaxException {
+	// StatementNode result;
+	//
+	// if (isSEF(statement.getExpression())) {
+	// result = statement;
+	// } else {
+	// Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
+	// SideEffectFreeTriple triple = processExpression(statement
+	// .getExpression());
+	//
+	// newStatements.addAll(triple.getBefore());
+	// newStatements.add(factory.newAssertNode(statement.getSource(),
+	// triple.getExpression()));
+	// newStatements.addAll(triple.getAfter());
+	// result = factory.newCompoundStatementNode(statement.getSource(),
+	// newStatements);
+	// }
+	// return result;
+	// }
 
 	private StatementNode assumeStatement(AssumeNode statement)
 			throws SyntaxException {
@@ -1340,6 +1340,8 @@ public class SideEffectRemover implements Transformer {
 						.getIdentifier().name();
 
 				if ("$malloc".equals(functionName))
+					return true;
+				if ("malloc".equals(functionName))
 					return true;
 			}
 		}
