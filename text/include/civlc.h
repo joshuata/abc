@@ -66,7 +66,7 @@ void $bundle_unpack($bundle bundle, void *ptr);
 
 // Memory functions:
 
-/* The CIVL-C malloc function, which takes a reference to a heap */
+/* The CIVL-C malloc function, which takes a reference to a scope */
 void* $malloc($scope s, int size);
 
 /* Copies a region of memory, just as in standard C */
@@ -78,7 +78,7 @@ void memcpy(void *p, void *q, size_t size) {
 }
 
 /* The CIVL-C de-allocation function, which takes a reference to a heap */
-void $free(void *p);
+void free(void *p);
 
 // Message passing:
 
@@ -139,6 +139,8 @@ int $message_size($message message) {
  * size exceeds specified size */ 
 void $message_unpack($message message, void *buf, int size) {
   $bundle_unpack(message.data, buf);
+  $assert(message.size <= size, 
+    "Message of size %d exceeds the specified size %d.", message.size, size);
 }
 
 /* A datatype representing a queue of messages.  All message
@@ -171,7 +173,7 @@ typedef struct __gcomm__ {
 
 /* creates a new global communicator from the number of processes,
  * the new comm has no messages no concrete procs */
-$gcomm $comm_create(int nprocs);
+$gcomm $gcomm_create($scope s, int nprocs);
 
 /* returns the number of processes associated to the comm */ 
 int $comm_nprocs($comm comm) {

@@ -8,6 +8,6 @@ void main() {
   double *p = (double *) $malloc(s, 5*sizeof(double));
   double *z = (double *) $malloc($root,  5*sizeof(double));
   
-  $free(p);
-  $free(z);
+  free(p);
+  free(z);
 }   
