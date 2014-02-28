@@ -48,4 +48,9 @@ public class CommonRemoteExpressionNode extends CommonExpressionNode implements
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.REMOTE_REFERENCE;
 	}
+
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return getProcessExpression().isSideEffectFree(errorsAreSideEffects);
+	}
 }

@@ -56,4 +56,9 @@ public class CommonCastNode extends CommonExpressionNode implements CastNode {
 		return ExpressionKind.CAST;
 	}
 
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return getArgument().isSideEffectFree(errorsAreSideEffects);
+	}
+
 }

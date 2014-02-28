@@ -32,4 +32,8 @@ public class CommonResultNode extends CommonExpressionNode implements
 		return ExpressionKind.RESULT;
 	}
 
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return true;
+	}
 }

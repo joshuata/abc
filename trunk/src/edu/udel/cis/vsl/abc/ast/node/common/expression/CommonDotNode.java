@@ -54,4 +54,9 @@ public class CommonDotNode extends CommonExpressionNode implements DotNode {
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.DOT;
 	}
+	
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return getStructure().isSideEffectFree(errorsAreSideEffects);
+	}
 }

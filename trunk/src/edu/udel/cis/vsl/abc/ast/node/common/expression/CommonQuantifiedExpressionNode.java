@@ -197,4 +197,18 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	public ExpressionNode upper() {
 		return upper;
 	}
+
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		boolean result = expression().isSideEffectFree(errorsAreSideEffects);
+
+		if (restriction == null) {
+			result = result && lower.isSideEffectFree(errorsAreSideEffects)
+					&& upper.isSideEffectFree(errorsAreSideEffects);
+		} else {
+			result = result
+					&& restriction.isSideEffectFree(errorsAreSideEffects);
+		}
+		return result;
+	}
 }

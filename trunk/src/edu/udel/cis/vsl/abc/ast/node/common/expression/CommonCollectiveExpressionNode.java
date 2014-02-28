@@ -51,4 +51,12 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.COLLECTIVE;
 	}
+
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return getBody().isSideEffectFree(errorsAreSideEffects)
+				&& getLengthExpression().isSideEffectFree(errorsAreSideEffects)
+				&& getProcessPointerExpression().isSideEffectFree(
+						errorsAreSideEffects);
+	}
 }

@@ -55,5 +55,10 @@ public class CommonAlignOfNode extends CommonExpressionNode implements
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.ALIGNOF;
 	}
+	
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		return true;
+	}
 
 }

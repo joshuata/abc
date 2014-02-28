@@ -2,9 +2,13 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -74,4 +78,39 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.FUNCTION_CALL;
 	}
+
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		ExpressionNode function = getFunction();
+		boolean result = true;
+
+		if (function instanceof IdentifierExpressionNode) {
+			IdentifierNode functionIdentifier = ((IdentifierExpressionNode) function)
+					.getIdentifier();
+			DeclarationNode functionDeclaration;
+
+			if (functionIdentifier.getEntity() == null) {
+				// FIXME: Why do we need this? Not having this check was
+				// causing a failure with ring2.cvl
+				return false;
+			}
+			functionDeclaration = functionIdentifier.getEntity()
+					.getFirstDeclaration();
+			// Check if this is an abstract function.
+			if (functionDeclaration instanceof AbstractFunctionDefinitionNode) {
+				for (int i = 0; i < getNumberOfArguments(); i++) {
+					result = result
+							&& getArgument(i).isSideEffectFree(
+									errorsAreSideEffects);
+				}
+			} else {
+				result = false;
+			}
+		} else {
+			// Assume this isn't an abstract function.
+			result = false;
+		}
+		return result;
+	}
+
 }

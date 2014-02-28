@@ -78,4 +78,15 @@ public class CommonDerivativeExpressionNode extends CommonExpressionNode
 		out.print("DerivativeExpression");
 	}
 
+	@Override
+	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
+		boolean result = true;
+
+		for (int i = 0; i < getNumberOfArguments(); i++) {
+			result = result
+					&& getArgument(i).isSideEffectFree(errorsAreSideEffects);
+		}
+		return true;
+	}
+
 }

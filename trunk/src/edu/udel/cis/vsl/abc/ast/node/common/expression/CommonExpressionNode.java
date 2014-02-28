@@ -143,8 +143,4 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 		return NodeKind.EXPRESSION;
 	}
 	
-	@Override
-	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
-		return false;
-	}
 }
