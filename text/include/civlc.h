@@ -170,12 +170,22 @@ typedef struct __gcomm__ {
   $gcomm gcomm;
  } * $comm;
 
+/* This version of gcomm_create should only be called if
+ * size is concrete. */ 
+$gcomm $gcomm_create2($scope scope, int size);
+
 /* Creates a new global communicator object and returns a handle to it.
  * The global communicator will have size communication places.  The
  * global communicator defines a communication "universe" and encompasses
  * message buffers and all other components of the state associated to
  * message-passing.  The new object will be allocated in the given scope. */
-$gcomm $gcomm_create($scope scope, int size);
+$gcomm $gcomm_create($scope scope, int size) {
+  $gcomm result;
+  
+  for (int i=0; i<size; i++) ;
+  result = $gcomm_create2(scope, size);
+  return result;
+}
 
 /* Returns the size (number of places) in the global communicator associated
  * to the given comm. */
