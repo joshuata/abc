@@ -418,20 +418,22 @@ public class ExpressionAnalyzer {
 		node.setInitialType(type);
 	}
 
-	private Scope processScopeOf(ScopeOfNode node) throws SyntaxException {
-		IdentifierExpressionNode expressionNode = node.variableExpression();
-		IdentifierNode identifierNode = expressionNode.getIdentifier();
-		Entity entity = identifierNode.getEntity();
-		DeclarationNode decl;
-		Scope scope;
+	private void processScopeOf(ScopeOfNode node) throws SyntaxException {
+		ExpressionNode expressionNode = node.expression();
+		// IdentifierNode identifierNode = expressionNode.getIdentifier();
+		// Entity entity = identifierNode.getEntity();
+		// DeclarationNode decl;
+		// Scope scope;
 
-		if (entity == null)
-			processIdentifierExpression(expressionNode);
-		entity = identifierNode.getEntity();
-		decl = entity.getFirstDeclaration();
-		scope = decl.getScope();
-		nodeFactory.setConstantValue(node, scope);
-		return scope;
+		// if (entity == null)
+		// processIdentifierExpression(expressionNode);
+		// entity = identifierNode.getEntity();
+		// decl = entity.getFirstDeclaration();
+		// scope = decl.getScope();
+		// nodeFactory.setConstantValue(node, scope);
+		processExpression(expressionNode);
+		node.setInitialType(typeFactory.scopeType());
+		// return scope;
 	}
 
 	private boolean isScopeParameter(ScopeVariable variable) {
@@ -487,8 +489,8 @@ public class ExpressionAnalyzer {
 				} else {
 					throw error("Expected scope variable, saw " + entity, expr);
 				}
-			} else if (expr instanceof ScopeOfNode) {
-				result = processScopeOf((ScopeOfNode) expr);
+//			} else if (expr instanceof ScopeOfNode) {
+//				result = processScopeOf((ScopeOfNode) expr);
 			} else
 				throw error("Unknown kind of scope expression", expr);
 			nodeFactory.setConstantValue(expr, result);
@@ -1124,6 +1126,7 @@ public class ExpressionAnalyzer {
 
 		if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
 			// no conversions necessary
+			node.setInitialType(type0);
 		} else if (type0 instanceof ArithmeticType
 				&& type1 instanceof ArithmeticType)
 			node.setInitialType(doUsualArithmetic(arg0, arg1));

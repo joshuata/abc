@@ -388,6 +388,11 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public ScopeOfNode newScopeOfNode(Source source, ExpressionNode argument) {
+		return new CommonScopeOfNode(source, argument);
+	}
+	
+	@Override
 	public VariableDeclarationNode newVariableDeclarationNode(Source source,
 			IdentifierNode name, TypeNode type) {
 		return new CommonVariableDeclarationNode(source, name, type);

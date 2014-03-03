@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -27,13 +26,12 @@ public class CommonScopeOfNode extends CommonExpressionNode implements
 
 	@Override
 	public ScopeOfNode copy() {
-		return new CommonScopeOfNode(getSource(),
-				duplicate(variableExpression()));
+		return new CommonScopeOfNode(getSource(), duplicate(expression()));
 	}
 
 	@Override
-	public IdentifierExpressionNode variableExpression() {
-		return (IdentifierExpressionNode) child(0);
+	public ExpressionNode expression() {
+		return (ExpressionNode) child(0);
 	}
 
 	@Override

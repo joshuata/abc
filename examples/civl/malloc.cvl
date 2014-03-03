@@ -1,13 +1,15 @@
 #include <civlc.h>
 
 // void* $malloc($heap *h, int size);
+$scope r = $root;
 
 void main() {
-  //$heap h;
   $scope s = $here;
   double *p = (double *) $malloc(s, 5*sizeof(double));
-  double *z = (double *) $malloc($root,  5*sizeof(double));
+  double *z = (double *) $malloc($scopeof(p),  5*sizeof(double));
   
-  free(p);
-  free(z);
+  $assert(r > s);
+  $assert(r == (r + s));
+  $free(p);
+  $free(z);
 }   
