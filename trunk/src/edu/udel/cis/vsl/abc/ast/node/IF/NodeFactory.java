@@ -666,4 +666,6 @@ public interface NodeFactory {
 
 	ExpressionNode newRootNode(Source source);
 
+	ScopeOfNode newScopeOfNode(Source source, ExpressionNode argument);
+
 }

@@ -420,6 +420,8 @@ unaryExpression
 	  -> ^(SIZEOF TYPE typeName)
 	| SIZEOF unaryExpression
 	  -> ^(SIZEOF EXPR unaryExpression)
+	| SCOPEOF unaryExpression
+	  -> ^(SCOPEOF unaryExpression)
 	| ALIGNOF LPAREN typeName RPAREN
 	  -> ^(ALIGNOF typeName)
 	| spawnExpression

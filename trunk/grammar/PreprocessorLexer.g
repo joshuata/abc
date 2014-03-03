@@ -96,6 +96,7 @@ RETURN		:	'return';
 SHORT		:	'short';
 SIGNED		:	'signed';
 SIZEOF		:	'sizeof';
+SCOPEOF		:	'$scopeof';
 STATIC		:	'static';
 STRUCT		:	'struct';
 SWITCH		:	'switch';

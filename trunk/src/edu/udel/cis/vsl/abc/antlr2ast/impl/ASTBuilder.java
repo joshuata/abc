@@ -174,6 +174,7 @@ public class ASTBuilder {
 	static final int SHORT = CivlCParser.SHORT;
 	static final int SIGNED = CivlCParser.SIGNED;
 	static final int SIZEOF = CivlCParser.SIZEOF;
+	static final int SCOPEOF = CivlCParser.SCOPEOF;
 	static final int STAR = CivlCParser.STAR;
 	static final int STAREQ = CivlCParser.STAREQ;
 	static final int STATIC = CivlCParser.STATIC;
@@ -254,7 +255,7 @@ public class ASTBuilder {
 	static final int INPUT = CivlCParser.INPUT;
 	static final int OUTPUT = CivlCParser.OUTPUT;
 	static final int SPAWN = CivlCParser.SPAWN;
-//	static final int WAIT = CivlCParser.WAIT;
+	// static final int WAIT = CivlCParser.WAIT;
 	// static final int ASSERT = CivlCParser.ASSERT;
 	static final int TRUE = CivlCParser.TRUE;
 	static final int FALSE = CivlCParser.FALSE;
@@ -557,6 +558,8 @@ public class ASTBuilder {
 			return translateOperatorExpression(source, expressionTree, scope);
 		case SIZEOF:
 			return translateSizeOf(source, expressionTree, scope);
+		case SCOPEOF:
+			return translateScopeOf(source, expressionTree, scope);
 		case ALIGNOF:
 			return nodeFactory.newAlignOfNode(
 					source,
@@ -744,6 +747,15 @@ public class ASTBuilder {
 		default:
 			throw error("Unknown expression kind", expressionTree);
 		}
+	}
+
+	private ExpressionNode translateScopeOf(Source source,
+			CommonTree expressionTree, SimpleScope scope)
+			throws SyntaxException {
+		ExpressionNode expression = this.translateExpression(
+				(CommonTree) expressionTree.getChild(0), scope);
+
+		return nodeFactory.newScopeOfNode(source, expression);
 	}
 
 	/**
@@ -2142,11 +2154,11 @@ public class ASTBuilder {
 							scope));
 		case PRAGMA:
 			return translatePragma(statementSource, statementTree, scope);
-//		case WAIT:
-//			return nodeFactory.newWaitNode(
-//					statementSource,
-//					translateExpression((CommonTree) statementTree.getChild(0),
-//							scope));
+			// case WAIT:
+			// return nodeFactory.newWaitNode(
+			// statementSource,
+			// translateExpression((CommonTree) statementTree.getChild(0),
+			// scope));
 			// case ASSERT:
 			// return nodeFactory.newAssertNode(
 			// statementSource,

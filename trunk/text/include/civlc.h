@@ -79,7 +79,7 @@ void memcpy(void *p, void *q, size_t size) {
 }
 
 /* The CIVL-C de-allocation function, which takes a reference to a heap */
-void free(void *p);
+void $free(void *p);
 
 // Message passing:
 
@@ -218,10 +218,10 @@ $message $comm_dequeue($comm comm, int source, int tag);
 
 /* returns the number of messages from source to dest stored
  * in comm */ 
-int $comm_chan_size($comm comm, int source, int dest);
+//int $comm_chan_size($comm comm, int source, int dest);
 
 /* returns the total number of messages in the comm */ 
-int $comm_total_size($comm comm);
+//int $comm_total_size($comm comm);
 
 /* Creates a new local communicator object and returns a handle to it.
  * The new communicator will be affiliated with the specified global
