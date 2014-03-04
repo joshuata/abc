@@ -70,11 +70,16 @@ a bunch of work.
 Variables, and then select New to create a classpath variable VSL, 
 and specify its value to be /opt/vsl.
 
-7.  Do a clean build.  Everything should compile.  To build the jar,
+7. If your VSL dependencies path is not in /opt/vsl, then you need
+to create a build.properties file by copying the content from the
+build_default.properties and modifying the value of entry "root"
+to be the path to your VSL dependencies folder.
+
+8. Do a clean build.  Everything should compile.  To build the jar,
 right click (or ctrl-click on Mac) on build.xml and select
 Run As->Ant Build.
 
-8. To run the JUnit tests through Eclipse: Select Run->Run Configurations...
+9. To run the JUnit tests through Eclipse: Select Run->Run Configurations...
 Create a new JUnit configuration called "ABC Tests".  Select
 "Run all tests in the selected project..." and navigate to the "test"
 folder in the ABC project.  Under the Arguments tab, type "-ea"
