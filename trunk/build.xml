@@ -13,8 +13,10 @@
 <project name="ABC" basedir="." default="jar" xmlns:jacoco="antlib:org.jacoco.ant">
 
 	<!-- Directories -->
-
-	<property file="build_default.properties" />
+	<condition property="properties.file" value="build.properties" else="build_default.properties">
+		<available file="build.properties" />
+	</condition>
+	<property file="${properties.file}" />
 	<property name="src.dir" value="${basedir}/src" />
 	<property name="real.src.dir" value="${src.dir}/edu/udel/cis/vsl/abc" />
 	<property name="bin.dir" value="${basedir}/bin" />
