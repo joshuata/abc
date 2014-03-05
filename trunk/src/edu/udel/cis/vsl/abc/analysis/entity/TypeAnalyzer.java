@@ -138,85 +138,143 @@ public class TypeAnalyzer {
 		return type;
 	}
 
-	Type processEnumerationType(EnumerationTypeNode node)
+	/**
+	 * Creates new enumeration entity and type and adds them to the scope of the
+	 * given node.
+	 * 
+	 * @param node
+	 *            an enumeration type node with non-null enumerators
+	 * @return the new enumeration entity
+	 * @throws SyntaxException
+	 */
+	private Enumeration createEnumeration(EnumerationTypeNode node)
 			throws SyntaxException {
-		IdentifierNode identifier = node.getIdentifier();
-		Scope scope = node.getScope();
-		String tag = node.getName(); // could be null
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
 				.enumerators();
-		Enumeration enumeration = null;
-		EnumerationType enumerationType = null;
+		Scope scope = node.getScope();
+		String tag = node.getName(); // could be null
+		Iterator<EnumeratorDeclarationNode> enumeratorIter = enumerators
+				.childIterator();
+		List<Enumerator> enumeratorList = new LinkedList<Enumerator>();
+		EnumerationType enumerationType = typeFactory
+				.enumerationType(node, tag);
+		Enumeration enumeration;
+
+		// clear it, in case it was used in previous analysis pass
+		enumerationType.clear();
+		enumeration = entityFactory.newEnumeration(enumerationType);
+		scope.add(enumeration);
+		enumeration.setDefinition(node);
+		while (enumeratorIter.hasNext()) {
+			EnumeratorDeclarationNode decl = enumeratorIter.next();
+			ExpressionNode constantNode = decl.getValue();
+			Value value;
+			Enumerator enumerator;
+
+			// TODO: none should be null. Add 1 using value factory.
+			// implement plus. What is type? some integer type?
+
+			if (constantNode == null) {
+				value = null;
+			} else {
+				if (!constantNode.isConstantExpression())
+					throw error(
+							"Non-constant expression used in enumerator definition",
+							constantNode);
+				value = nodeFactory.getConstantValue(constantNode);
+			}
+			enumerator = entityFactory.newEnumerator(decl, enumerationType,
+					value);
+			enumerator.setDefinition(decl);
+			decl.setEntity(enumerator);
+			decl.getIdentifier().setEntity(enumerator);
+			enumeratorList.add(enumerator);
+			try {
+				scope.add(enumerator);
+			} catch (UnsourcedException e) {
+				throw error(e, decl);
+			}
+		}
+		enumerationType.complete(enumeratorList);
+		return enumeration;
+	}
+
+	/**
+	 * See C11 6.7.2.2 and 6.7.2.3. The procedure is as follows:
+	 * 
+	 * If there is no tag: there has to be an enumerator list, and this defines
+	 * a new unnamed entity and enumeration type in the current scope.
+	 * 
+	 * If there is a tag, proceed as follows:
+	 * 
+	 * If there is an enumerator list: check that there is no tagged entity with
+	 * the same tag in the current scope. If this check fails, syntax error.
+	 * Create a new enumeration entity and type, add it to the current scope.
+	 * 
+	 * If there is not an enumerator list: check (1) there is a visible tagged
+	 * entity with the same tag; (2) that tagged entity is an enum; and (3) that
+	 * previous enum is complete. If any of these fails: syntax error. Else, use
+	 * the old entity and type.
+	 * 
+	 * @param node
+	 * @return
+	 * @throws SyntaxException
+	 */
+	Type processEnumerationType(EnumerationTypeNode node)
+			throws SyntaxException {
+		Scope scope = node.getScope();
+		IdentifierNode identifier = node.getIdentifier(); // could be null
+		String tag = node.getName(); // could be null
+		SequenceNode<EnumeratorDeclarationNode> enumerators = node
+				.enumerators(); // could be null
+		Enumeration enumeration;
 
 		if (node.isRestrictQualified())
 			throw error("Use of restrict qualifier with non-pointer type", node);
 		if (tag != null) {
-			TaggedEntity entity = scope.getTaggedEntity(tag);
+			if (enumerators != null) {
+				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
 
-			if (entity != null) {
-				if (entity.getEntityKind() != EntityKind.ENUMERATION)
+				if (oldEntity != null)
 					throw error("Re-use of tag " + tag
 							+ " for enumeration.  Previous use was at "
-							+ entity.getFirstDeclaration().getSource(), node);
-				enumeration = (Enumeration) entity;
-				enumerationType = enumeration.getType();
+							+ oldEntity.getFirstDeclaration().getSource(), node);
+				enumeration = createEnumeration(node);
+			} else {
+				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
+
+				if (oldEntity == null)
+					throw error(
+							"See C11 6.7.2.3(3):\n\"A type specifier of the form\n"
+									+ "    enum identifier\n"
+									+ "without an enumerator list shall only appear after the type\n"
+									+ "it specifies is complete.\"", node);
+				if (!(oldEntity instanceof Enumeration))
+					throw error(
+							"Re-use of tag "
+									+ tag
+									+ " for enumeration when tag is visible with different kind.  Previous use was at "
+									+ oldEntity.getFirstDeclaration()
+											.getSource(), node);
+				enumeration = (Enumeration) oldEntity;
+				assert enumeration.getType().isComplete();
+				// if not, you would have caught the earlier incomplete use
+				enumeration.addDeclaration(node);
 			}
-		}
-		if (enumeration == null) {
-			enumerationType = typeFactory.enumerationType(node, tag);
-			// clear it, in case it was used in previous analysis pass
-			enumerationType.clear();
-			enumeration = entityFactory.newEnumeration(enumerationType);
-			scope.add(enumeration);
+		} else {
+			// no tag: create new anonymous enumeration
+			if (enumerators == null)
+				throw error("Anonymous enumeration with no enumerator list",
+						node);
+			enumeration = createEnumeration(node);
 		}
 		node.setEntity(enumeration);
 		if (identifier != null)
 			identifier.setEntity(enumeration);
-		enumeration.addDeclaration(node);
-		if (enumerators != null) {
-			Iterator<EnumeratorDeclarationNode> enumeratorIter = enumerators
-					.childIterator();
-			List<Enumerator> enumeratorList = new LinkedList<Enumerator>();
-
-			if (enumerationType.isComplete())
-				throw error("Re-definition of enumeration", node);
-			enumeration.setDefinition(node);
-			while (enumeratorIter.hasNext()) {
-				EnumeratorDeclarationNode decl = enumeratorIter.next();
-				ExpressionNode constantNode = decl.getValue();
-				Value value;
-				Enumerator enumerator;
-
-				// TODO: none should be null. Add 1 using value factory.
-				// implement plus. What is type? some integer type?
-
-				if (constantNode == null) {
-					value = null;
-				} else {
-					if (!constantNode.isConstantExpression())
-						throw error(
-								"Non-constant expression used in enumerator definition",
-								constantNode);
-					value = nodeFactory.getConstantValue(constantNode);
-				}
-				enumerator = entityFactory.newEnumerator(decl, enumerationType,
-						value);
-				enumerator.setDefinition(decl);
-				decl.setEntity(enumerator);
-				decl.getIdentifier().setEntity(enumerator);
-				enumeratorList.add(enumerator);
-				try {
-					scope.add(enumerator);
-				} catch (UnsourcedException e) {
-					throw error(e, decl);
-				}
-			}
-			enumerationType.complete(enumeratorList);
-		}
 		{
 			boolean constQ = node.isConstQualified();
 			boolean volatileQ = node.isVolatileQualified();
-			UnqualifiedObjectType unqualifiedType = enumerationType;
+			UnqualifiedObjectType unqualifiedType = enumeration.getType();
 
 			if (node.isAtomicQualified())
 				unqualifiedType = typeFactory.atomicType(unqualifiedType);
@@ -227,6 +285,30 @@ public class TypeAnalyzer {
 		}
 	}
 
+	/**
+	 * See C11 6.7.2.1 and 6.7.2.3. The procedure is as follows:
+	 * 
+	 * If there is no tag, there has to be a declarator list, and this defines a
+	 * new unnamed struct or union entity and type in the current scope.
+	 * 
+	 * If there is a tag, proceed as follows:
+	 * 
+	 * If there is a declarator list: check that there is no tagged entity with
+	 * same tag in the current scope. If this check fails, syntax error. Else,
+	 * create a new struct/union entity and type and add it to the current
+	 * scope.
+	 * 
+	 * If there is no declarator list: see if there exists a visible tagged
+	 * entity with same tag. If there does exist such an entity, check it has
+	 * same kind as this one (struct or union), and use it. If there does not
+	 * exist such an entity, create a new incomplete struct or union entity and
+	 * type and add it to the current scope.
+	 * 
+	 * 
+	 * @param node
+	 * @return
+	 * @throws SyntaxException
+	 */
 	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
 			throws SyntaxException {
 		Scope scope = node.getScope();
