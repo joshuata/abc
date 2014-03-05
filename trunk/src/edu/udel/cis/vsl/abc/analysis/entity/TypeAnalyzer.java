@@ -151,7 +151,7 @@ public class TypeAnalyzer {
 		if (node.isRestrictQualified())
 			throw error("Use of restrict qualifier with non-pointer type", node);
 		if (tag != null) {
-			TaggedEntity entity = scope.getLexicalTaggedEntity(tag);
+			TaggedEntity entity = scope.getTaggedEntity(tag);
 
 			if (entity != null) {
 				if (entity.getEntityKind() != EntityKind.ENUMERATION)
@@ -240,7 +240,7 @@ public class TypeAnalyzer {
 		if (node.isRestrictQualified())
 			throw error("Use of restrict qualifier with non-pointer type", node);
 		if (tag != null) {
-			TaggedEntity entity = scope.getLexicalTaggedEntity(tag);
+			TaggedEntity entity = scope.getTaggedEntity(tag);
 
 			if (entity != null) {
 				if (entity.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
