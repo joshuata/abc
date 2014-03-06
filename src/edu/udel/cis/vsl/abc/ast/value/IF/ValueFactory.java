@@ -133,6 +133,8 @@ public interface ValueFactory {
 	Answer isZero(Value value);
 
 	// Value creation...
+	
+	IntegerValue plusOne(IntegerValue value);
 
 	CharacterValue characterValue(ExecutionCharacter character);
 

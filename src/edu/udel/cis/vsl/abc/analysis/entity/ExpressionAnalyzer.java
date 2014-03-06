@@ -346,6 +346,8 @@ public class ExpressionAnalyzer {
 			type = ((Enumerator) entity).getType();
 			node.setInitialType(type);
 			((EnumerationConstantNode) node).getName().setEntity(entity);
+			nodeFactory
+					.setConstantValue(node, ((Enumerator) entity).getValue());
 		} else if (node instanceof FloatingConstantNode) {
 			// type should already be set
 		} else if (node instanceof StringLiteralNode) {
@@ -489,8 +491,8 @@ public class ExpressionAnalyzer {
 				} else {
 					throw error("Expected scope variable, saw " + entity, expr);
 				}
-//			} else if (expr instanceof ScopeOfNode) {
-//				result = processScopeOf((ScopeOfNode) expr);
+				// } else if (expr instanceof ScopeOfNode) {
+				// result = processScopeOf((ScopeOfNode) expr);
 			} else
 				throw error("Unknown kind of scope expression", expr);
 			nodeFactory.setConstantValue(expr, result);

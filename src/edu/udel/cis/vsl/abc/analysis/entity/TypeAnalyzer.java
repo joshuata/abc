@@ -41,9 +41,11 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
@@ -51,6 +53,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -66,6 +69,14 @@ public class TypeAnalyzer {
 
 	private EntityFactory entityFactory;
 
+	private ValueFactory valueFactory;
+
+	/**
+	 * The type used for enumerators, i.e., the elements of enumeration types.
+	 * It is an unspecified integer type according to the C Standard.
+	 */
+	private IntegerType enumeratorType;
+
 	// ************************** Constructors ****************************
 
 	TypeAnalyzer(EntityAnalyzer entityAnalyzer, TypeFactory typeFactory,
@@ -74,6 +85,9 @@ public class TypeAnalyzer {
 		this.nodeFactory = entityAnalyzer.nodeFactory;
 		this.typeFactory = typeFactory;
 		this.entityFactory = entityFactory;
+		this.valueFactory = entityAnalyzer.valueFactory;
+		this.enumeratorType = (IntegerType) typeFactory
+				.basicType(BasicTypeKind.INT);
 	}
 
 	// ************************* Exported Methods **************************
@@ -159,6 +173,7 @@ public class TypeAnalyzer {
 		EnumerationType enumerationType = typeFactory
 				.enumerationType(node, tag);
 		Enumeration enumeration;
+		IntegerValue value = null;
 
 		// clear it, in case it was used in previous analysis pass
 		enumerationType.clear();
@@ -169,23 +184,37 @@ public class TypeAnalyzer {
 		while (enumeratorIter.hasNext()) {
 			EnumeratorDeclarationNode decl = enumeratorIter.next();
 			ExpressionNode constantNode = decl.getValue();
-			Value value;
 			Enumerator enumerator;
 
-			// TODO: none should be null. Add 1 using value factory.
-			// implement plus. What is type? some integer type?
+			// need to process the constantNode
+
+			// also: when you add an enumerator to a scope, that contains
+			// its value, right?
 
 			if (constantNode == null) {
-				value = null;
+				if (value == null)
+					value = valueFactory.integerValue(enumeratorType, 0);
+				else
+					value = valueFactory.plusOne(value);
 			} else {
+				Value tmpValue;
+
+				entityAnalyzer.expressionAnalyzer
+						.processExpression(constantNode);
 				if (!constantNode.isConstantExpression())
 					throw error(
 							"Non-constant expression used in enumerator definition",
 							constantNode);
-				value = nodeFactory.getConstantValue(constantNode);
+				tmpValue = nodeFactory.getConstantValue(constantNode);
+				if (!(tmpValue instanceof IntegerValue))
+					throw error(
+							"Constant expression of concrete integer type expected, not "
+									+ tmpValue, constantNode);
+				value = (IntegerValue) tmpValue;
 			}
 			enumerator = entityFactory.newEnumerator(decl, enumerationType,
 					value);
+			enumerator.addDeclaration(decl);
 			enumerator.setDefinition(decl);
 			decl.setEntity(enumerator);
 			decl.getIdentifier().setEntity(enumerator);

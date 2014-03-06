@@ -6,6 +6,7 @@ import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
@@ -19,6 +20,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
@@ -173,8 +175,23 @@ public class CommonValueFactory implements ValueFactory {
 			return sizeofValue((((SizeofNode) expr).getArgument()).getType());
 		} else if (expr instanceof StringLiteralNode) {
 			return ((StringLiteralNode) expr).getConstantValue();
+		} else if (expr instanceof EnumerationConstantNode) {
+			IdentifierNode identNode = ((EnumerationConstantNode) expr)
+					.getName();
+			Entity entity = identNode.getEntity();
+
+			if (entity.getEntityKind() == EntityKind.ENUMERATOR) {
+				return ((Enumerator) entity).getValue();
+			}
+			return null;
 		}
 		return null;
+	}
+
+	@Override
+	public IntegerValue plusOne(IntegerValue value) {
+		return integerValue(value.getType(),
+				value.getIntegerValue().add(BigInteger.ONE));
 	}
 
 	@Override
