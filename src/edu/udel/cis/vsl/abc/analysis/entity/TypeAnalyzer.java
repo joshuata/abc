@@ -165,6 +165,7 @@ public class TypeAnalyzer {
 		enumeration = entityFactory.newEnumeration(enumerationType);
 		scope.add(enumeration);
 		enumeration.setDefinition(node);
+		enumeration.addDeclaration(node);
 		while (enumeratorIter.hasNext()) {
 			EnumeratorDeclarationNode decl = enumeratorIter.next();
 			ExpressionNode constantNode = decl.getValue();
