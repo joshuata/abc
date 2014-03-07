@@ -23,7 +23,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
@@ -316,83 +315,42 @@ public class TypeAnalyzer {
 	}
 
 	/**
-	 * See C11 6.7.2.1 and 6.7.2.3. The procedure is as follows:
-	 * 
-	 * If there is no tag, there has to be a declarator list, and this defines a
-	 * new unnamed struct or union entity and type in the current scope.
-	 * 
-	 * If there is a tag, proceed as follows:
-	 * 
-	 * If there is a declarator list: check that there is no tagged entity with
-	 * same tag in the current scope. If this check fails, syntax error. Else,
-	 * create a new struct/union entity and type and add it to the current
-	 * scope.
-	 * 
-	 * If there is no declarator list: see if there exists a visible tagged
-	 * entity with same tag. If there does exist such an entity, check it has
-	 * same kind as this one (struct or union), and use it. If there does not
-	 * exist such an entity, create a new incomplete struct or union entity and
-	 * type and add it to the current scope.
-	 * 
+	 * Creates a new structure or union entity and type based on given node.
+	 * Adds it to the scope. This method should only be called if it is known no
+	 * such entity exists.
 	 * 
 	 * @param node
-	 * @return
+	 *            a structure or union node
+	 * @return the resulting structure or union entity
 	 * @throws SyntaxException
+	 *             if already exists in scope
 	 */
-	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
-			throws SyntaxException {
+	private StructureOrUnion createStructureOrUnion(
+			StructureOrUnionTypeNode node) throws SyntaxException {
 		Scope scope = node.getScope();
 		IdentifierNode identifier = node.getIdentifier();
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
-				.getStructDeclList();
-		StructureOrUnion structureOrUnion = null;
-		StructureOrUnionType structureOrUnionType = null;
+				.getStructDeclList(); // could be null
+		StructureOrUnion structureOrUnion;
+		StructureOrUnionType structureOrUnionType;
 
-		if (node.isRestrictQualified())
-			throw error("Use of restrict qualifier with non-pointer type", node);
-		if (tag != null) {
-			TaggedEntity entity = scope.getTaggedEntity(tag);
-
-			if (entity != null) {
-				if (entity.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
-					throw error("Re-use of tag " + tag
-							+ " for structure or union.  Previous use was at "
-							+ entity.getFirstDeclaration().getSource(), node);
-				structureOrUnion = (StructureOrUnion) entity;
-				structureOrUnionType = structureOrUnion.getType();
-				identifier.setEntity(structureOrUnion);
-			}
-		}
-		if (structureOrUnion == null) {
-			structureOrUnionType = typeFactory.structureOrUnionType(node,
-					node.isStruct(), tag);
-			// in case this was used in previous analysis pass, clear it:
-			structureOrUnionType.clear();
-			structureOrUnion = entityFactory
-					.newStructureOrUnion(structureOrUnionType);
-			structureOrUnion.addDeclaration(node);
-			scope.add(structureOrUnion);
-			if (identifier != null)
-				identifier.setEntity(structureOrUnion);
-		} else {
-			structureOrUnion.addDeclaration(node);
-		}
+		structureOrUnionType = typeFactory.structureOrUnionType(node,
+				node.isStruct(), tag);
+		// in case this was used in previous analysis pass, clear it:
+		structureOrUnionType.clear();
+		structureOrUnion = entityFactory
+				.newStructureOrUnion(structureOrUnionType);
+		structureOrUnion.addDeclaration(node);
+		scope.add(structureOrUnion);
+		if (identifier != null)
+			identifier.setEntity(structureOrUnion);
+		structureOrUnion.addDeclaration(node);
 		if (fieldDecls != null) {
 			Iterator<FieldDeclarationNode> fieldIter = fieldDecls
 					.childIterator();
 			List<Field> fieldList = new LinkedList<Field>();
 
-			if (structureOrUnionType.isComplete()) {
-				DeclarationNode definition = structureOrUnion.getDefinition();
-				String message = "";
-
-				if (definition != null)
-					message = "Original definition at "
-							+ definition.getSource();
-				throw error("Re-definition of structure or union.  " + message,
-						node);
-			}
 			structureOrUnion.setDefinition(node);
 			while (fieldIter.hasNext()) {
 				FieldDeclarationNode decl = fieldIter.next();
@@ -431,18 +389,95 @@ public class TypeAnalyzer {
 			}
 			structureOrUnionType.complete(fieldList);
 		}
+		return structureOrUnion;
+	}
+
+	/**
+	 * See C11 6.7.2.1 and 6.7.2.3. The procedure is as follows:
+	 * 
+	 * If there is no tag, there has to be a declarator list, and this defines a
+	 * new unnamed struct or union entity and type in the current scope.
+	 * 
+	 * If there is a tag, proceed as follows:
+	 * 
+	 * If there is a declarator list: check that there is no tagged entity with
+	 * same tag in the current scope. If this check fails, syntax error. Else,
+	 * create a new struct/union entity and type and add it to the current
+	 * scope.
+	 * 
+	 * If there is no declarator list: see if there exists a visible tagged
+	 * entity with same tag. If there does exist such an entity, check it has
+	 * same kind as this one (struct or union), and use it. If there does not
+	 * exist such an entity, create a new incomplete struct or union entity and
+	 * type and add it to the current scope.
+	 * 
+	 * @param node
+	 * @return
+	 * @throws SyntaxException
+	 */
+	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
+			throws SyntaxException {
+		Scope scope = node.getScope();
+		IdentifierNode identifier = node.getIdentifier(); // could be null
+		String tag = node.getName(); // could be null
+		SequenceNode<FieldDeclarationNode> fieldDecls = node
+				.getStructDeclList(); // could be null
+		StructureOrUnion structureOrUnion;
+		Type result;
+
+		if (node.isRestrictQualified())
+			throw error("Use of restrict qualifier with non-pointer type", node);
+		if (tag == null) {
+			if (fieldDecls == null)
+				throw error(
+						"Anonymous structure or union with no declarator list",
+						node);
+			structureOrUnion = createStructureOrUnion(node);
+		} else {
+			if (fieldDecls != null) {
+				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
+
+				if (oldEntity != null)
+					throw error(
+							"Previously declared entity with same tag and scope: "
+									+ oldEntity.getFirstDeclaration()
+											.getSource(), node);
+				structureOrUnion = createStructureOrUnion(node);
+			} else {
+				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
+
+				if (oldEntity != null) {
+					if (oldEntity.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
+						throw error(
+								"Re-use of tag "
+										+ tag
+										+ " for structure or union.  Previous use was at "
+										+ oldEntity.getFirstDeclaration()
+												.getSource(), node);
+					structureOrUnion = (StructureOrUnion) oldEntity;
+				} else {
+					structureOrUnion = createStructureOrUnion(node);
+				}
+			}
+		}
+		node.setEntity(structureOrUnion);
+		if (identifier != null)
+			identifier.setEntity(structureOrUnion);
 		{
 			boolean constQ = node.isConstQualified();
 			boolean volatileQ = node.isVolatileQualified();
-			UnqualifiedObjectType unqualifiedType = structureOrUnionType;
+			UnqualifiedObjectType unqualifiedType = structureOrUnion.getType();
 
 			if (node.isAtomicQualified())
 				unqualifiedType = typeFactory.atomicType(unqualifiedType);
 			if (constQ || volatileQ)
-				return typeFactory.qualifiedType(unqualifiedType, constQ,
+				result = typeFactory.qualifiedType(unqualifiedType, constQ,
 						volatileQ, false, false, false);
-			return unqualifiedType;
+			else
+				result = unqualifiedType;
 		}
+		node.setType(result);
+		return result;
 	}
 
 	// ************************** Private Methods *****************************
