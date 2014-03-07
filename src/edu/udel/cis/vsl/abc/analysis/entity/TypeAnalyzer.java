@@ -254,6 +254,7 @@ public class TypeAnalyzer {
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
 				.enumerators(); // could be null
 		Enumeration enumeration;
+		Type result;
 
 		if (node.isRestrictQualified())
 			throw error("Use of restrict qualifier with non-pointer type", node);
@@ -305,10 +306,13 @@ public class TypeAnalyzer {
 			if (node.isAtomicQualified())
 				unqualifiedType = typeFactory.atomicType(unqualifiedType);
 			if (constQ || volatileQ)
-				return typeFactory.qualifiedType(unqualifiedType, constQ,
+				result = typeFactory.qualifiedType(unqualifiedType, constQ,
 						volatileQ, false, false, false);
-			return unqualifiedType;
+			else
+				result = unqualifiedType;
 		}
+		node.setType(result);
+		return result;
 	}
 
 	/**
