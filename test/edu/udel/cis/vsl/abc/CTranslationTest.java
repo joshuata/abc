@@ -70,15 +70,29 @@ public class CTranslationTest {
 	public void printf() throws ABCException, IOException {
 		check("printf");
 	}
-	
+
 	@Test
 	public void compound() throws ABCException, IOException {
 		check("compound");
 	}
-	
+
 	@Test
 	public void compound2() throws ABCException, IOException {
 		check("compound2");
 	}
-	
+
+	@Test
+	public void enum1() throws ABCException, IOException {
+		check("enum1");
+	}
+
+	@Test(expected = ABCException.class)
+	public void tagBad1() throws ABCException, IOException {
+		check("tagBad1");
+	}
+
+	@Test
+	public void tagGood1() throws ABCException, IOException {
+		check("tagGood1");
+	}
 }
