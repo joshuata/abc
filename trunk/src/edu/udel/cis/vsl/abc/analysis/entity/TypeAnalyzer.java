@@ -148,6 +148,7 @@ public class TypeAnalyzer {
 		default:
 			throw new RuntimeException("Unreachable");
 		}
+		assert type != null;
 		typeNode.setType(type);
 		return type;
 	}
@@ -185,11 +186,6 @@ public class TypeAnalyzer {
 			EnumeratorDeclarationNode decl = enumeratorIter.next();
 			ExpressionNode constantNode = decl.getValue();
 			Enumerator enumerator;
-
-			// need to process the constantNode
-
-			// also: when you add an enumerator to a scope, that contains
-			// its value, right?
 
 			if (constantNode == null) {
 				if (value == null)
