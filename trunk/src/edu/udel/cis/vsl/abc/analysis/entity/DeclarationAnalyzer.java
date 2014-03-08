@@ -199,6 +199,20 @@ public class DeclarationAnalyzer {
 		return result;
 	}
 
+	/**
+	 * Processes a variable declaration node, creating the Variable entity if
+	 * this is the definition, adding it to the appropriate scope, processing
+	 * the type node, etc.
+	 * 
+	 * @param node
+	 *            a variable declaration node
+	 * @param isParameter
+	 *            is this variable a formal parameter in a function declaration
+	 *            or definition
+	 * @return the Variable the Variable represented by this declaration (either
+	 *         the existing one or a new one)
+	 * @throws SyntaxException
+	 */
 	Variable processVariableDeclaration(VariableDeclarationNode node,
 			boolean isParameter) throws SyntaxException {
 		Variable result = (Variable) processOrdinaryDeclaration(node,
@@ -358,19 +372,9 @@ public class DeclarationAnalyzer {
 
 		if (identifier == null)
 			return null;
-		// scope = node.getScope();
-
 		// the scope to which this entity belong is the scope in which
 		// the Identifier in the declaration occurs:
-
 		scope = identifier.getScope();
-
-		// if node is function definition, then scope is function scope.
-		// want to add entity to parent scope. Otherwise fine.
-		// if (scope.getScopeKind() == ScopeKind.FUNCTION)
-		// scope = scope.getParentScope();
-		//
-
 		isFunction = node instanceof FunctionDeclarationNode;
 		linkage = computeLinkage(node);
 		name = identifier.name();

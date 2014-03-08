@@ -61,6 +61,137 @@ public class StatementAnalyzer {
 		this.expressionAnalyzer = expressionAnalyzer;
 	}
 
+	// ************************* Private Methods **************************
+
+	private SyntaxException error(String message, ASTNode node) {
+		return entityAnalyzer.error(message, node);
+	}
+
+	private SyntaxException error(UnsourcedException e, ASTNode node) {
+		return entityAnalyzer.error(e, node);
+	}
+
+	private void processExpression(ExpressionNode expression)
+			throws SyntaxException {
+		if (expression != null)
+			expressionAnalyzer.processExpression(expression);
+	}
+
+	private void processIf(IfNode node) throws SyntaxException {
+		processExpression(node.getCondition());
+		processStatement(node.getTrueBranch());
+		if (node.getFalseBranch() != null)
+			processStatement(node.getFalseBranch());
+	}
+
+	private SwitchNode enclosingSwitch(SwitchLabelNode labelNode) {
+		for (ASTNode node = labelNode.parent(); node != null; node = node
+				.parent()) {
+			if (node instanceof SwitchNode)
+				return (SwitchNode) node;
+		}
+		return null;
+	}
+
+	private ASTNode enclosingSwitchOrChoose(SwitchLabelNode labelNode) {
+		for (ASTNode node = labelNode.parent(); node != null; node = node
+				.parent()) {
+			if (node instanceof SwitchNode
+					|| node instanceof ChooseStatementNode)
+				return node;
+		}
+		return null;
+	}
+
+	private void processLabeledStatement(LabeledStatementNode node)
+			throws SyntaxException {
+		LabelNode labelNode = node.getLabel();
+		StatementNode statementNode = node.getStatement();
+		Function function = entityAnalyzer.enclosingFunction(node);
+
+		if (function == null)
+			throw error("Label occurs outside of function", node);
+		labelNode.setStatement(statementNode);
+		if (labelNode instanceof OrdinaryLabelNode)
+			processOrdinaryLabel((OrdinaryLabelNode) labelNode, function);
+		else if (labelNode instanceof SwitchLabelNode)
+			processSwitchLabel(node, (SwitchLabelNode) labelNode, function);
+		else
+			throw new RuntimeException("unreachable");
+		processStatement(statementNode);
+
+	}
+
+	private void processOrdinaryLabel(OrdinaryLabelNode node, Function function)
+			throws SyntaxException {
+		Label label = entityAnalyzer.entityFactory.newLabel(node);
+
+		node.setFunction(function);
+		node.setEntity(label);
+		node.getIdentifier().setEntity(label);
+		try {
+			function.getScope().add(label);
+		} catch (UnsourcedException e) {
+			throw error(e, node);
+		}
+	}
+
+	private void processSwitchLabel(LabeledStatementNode labeledStatement,
+			SwitchLabelNode switchLabel, Function function)
+			throws SyntaxException {
+
+		if (switchLabel.isDefault()) {
+			ASTNode enclosing = enclosingSwitchOrChoose(switchLabel);
+
+			if (enclosing instanceof ChooseStatementNode) {
+				ChooseStatementNode choose = (ChooseStatementNode) enclosing;
+				LabeledStatementNode oldDefault = choose.getDefaultCase();
+
+				if (oldDefault != null)
+					throw error(
+							"Two default cases in choose statement.  First was at "
+									+ oldDefault.getSource(), switchLabel);
+				choose.setDefaultCase(labeledStatement);
+				return;
+			}
+		}
+
+		SwitchNode switchNode = enclosingSwitch(switchLabel);
+
+		if (switchNode == null)
+			throw error("Switch label occurs outside of any switch statement",
+					switchLabel);
+		if (switchLabel.isDefault()) {
+			LabeledStatementNode oldDefault = switchNode.getDefaultCase();
+
+			if (oldDefault != null)
+				throw error(
+						"Two default cases in switch statement.  First was at "
+								+ oldDefault.getSource(), switchLabel);
+			switchNode.setDefaultCase(labeledStatement);
+		} else {
+			ExpressionNode caseExpression = switchLabel.getExpression();
+			Iterator<LabeledStatementNode> cases = switchNode.getCases();
+			Value constant;
+
+			if (!caseExpression.isConstantExpression())
+				error("Case expression not constant", caseExpression);
+			constant = nodeFactory.getConstantValue(caseExpression);
+			while (cases.hasNext()) {
+				SwitchLabelNode labelNode = (SwitchLabelNode) cases.next()
+						.getLabel();
+				ExpressionNode oldExpression = labelNode.getExpression();
+				Value oldConstant = nodeFactory.getConstantValue(oldExpression);
+
+				if (constant.equals(oldConstant))
+					throw error(
+							"Case constant appears twice: first time was at "
+									+ oldExpression, caseExpression);
+			}
+			switchNode.addCase(labeledStatement);
+		}
+	}
+
 	// ************************* Exported Methods **************************
 
 	void processStatement(StatementNode statement) throws SyntaxException {
@@ -137,8 +268,6 @@ public class StatementAnalyzer {
 			entityAnalyzer.processPragma((PragmaNode) statement);
 		} else if (statement instanceof NullStatementNode) {
 			// nothing to do
-//		} else if (statement instanceof AssertNode) {
-//			processExpression(((AssertNode) statement).getExpression());
 		} else if (statement instanceof AssumeNode) {
 			processExpression(((AssumeNode) statement).getExpression());
 		} else if (statement instanceof WhenNode) {
@@ -147,9 +276,9 @@ public class StatementAnalyzer {
 
 			processExpression(guard);
 			guardType = guard.getConvertedType();
-			// TODO: check guardType is something that can
-			// be converted to a boolean...what is that?
-
+			// check guardType can be converted to a boolean...
+			if (!guardType.isScalar())
+				throw error("Guard has non-scalar type " + guardType, guard);
 			processStatement(((WhenNode) statement).getBody());
 		} else if (statement instanceof ChooseStatementNode) {
 			Iterator<StatementNode> children = ((ChooseStatementNode) statement)
@@ -161,11 +290,7 @@ public class StatementAnalyzer {
 			processExpression(((WaitNode) statement).getExpression());
 		} else if (statement instanceof AtomicNode) {
 			processStatement(((AtomicNode) statement).getBody());
-		}
-		// TODO:
-		// expressions: add @ collective, result, self, true, false
-		// check input output only at global scope, only vars
-		else
+		} else
 			throw error("Unknown kind of statement", statement);
 	}
 
@@ -212,139 +337,6 @@ public class StatementAnalyzer {
 						.processTypedefDeclaration((TypedefDeclarationNode) item);
 			else
 				throw error("Unknown kind of block item", item);
-		}
-	}
-
-	// ************************* Private Methods **************************
-
-	private SyntaxException error(String message, ASTNode node) {
-		return entityAnalyzer.error(message, node);
-	}
-
-	private SyntaxException error(UnsourcedException e, ASTNode node) {
-		return entityAnalyzer.error(e, node);
-	}
-
-	private void processExpression(ExpressionNode expression)
-			throws SyntaxException {
-		if (expression != null)
-			expressionAnalyzer.processExpression(expression);
-	}
-
-	private void processIf(IfNode node) throws SyntaxException {
-		processExpression(node.getCondition());
-		processStatement(node.getTrueBranch());
-		if (node.getFalseBranch() != null)
-			processStatement(node.getFalseBranch());
-	}
-
-	private SwitchNode enclosingSwitch(SwitchLabelNode labelNode) {
-		for (ASTNode node = labelNode.parent(); node != null; node = node
-				.parent()) {
-			if (node instanceof SwitchNode)
-				return (SwitchNode) node;
-		}
-		return null;
-	}
-
-	private ASTNode enclosingSwitchOrChoose(SwitchLabelNode labelNode) {
-		for (ASTNode node = labelNode.parent(); node != null; node = node
-				.parent()) {
-			if (node instanceof SwitchNode
-					|| node instanceof ChooseStatementNode)
-				return node;
-		}
-		return null;
-	}
-
-	private void processLabeledStatement(LabeledStatementNode node)
-			throws SyntaxException {
-		LabelNode labelNode = node.getLabel();
-		StatementNode statementNode = node.getStatement();
-		Function function = entityAnalyzer.enclosingFunction(node);
-
-		if (function == null)
-			throw error("Label occurs outside of function", node);
-		labelNode.setStatement(statementNode);
-		if (labelNode instanceof OrdinaryLabelNode)
-			processOrdinaryLabel((OrdinaryLabelNode) labelNode, function);
-		else if (labelNode instanceof SwitchLabelNode)
-			processSwitchLabel(node, (SwitchLabelNode) labelNode, function);
-		else
-			throw new RuntimeException("unreachable");
-		processStatement(statementNode);
-
-	}
-
-	private void processOrdinaryLabel(OrdinaryLabelNode node, Function function)
-			throws SyntaxException {
-		Label label = entityAnalyzer.entityFactory.newLabel(node);
-
-		node.setFunction(function);
-		node.setEntity(label);
-		node.getIdentifier().setEntity(label);
-		try {
-			function.getScope().add(label);
-		} catch (UnsourcedException e) {
-			throw error(e, node);
-		}
-	}
-
-	// TODO: switch or choose.
-	// make choose a generalized switch?
-	private void processSwitchLabel(LabeledStatementNode labeledStatement,
-			SwitchLabelNode switchLabel, Function function)
-			throws SyntaxException {
-
-		if (switchLabel.isDefault()) {
-			ASTNode enclosing = enclosingSwitchOrChoose(switchLabel);
-
-			if (enclosing instanceof ChooseStatementNode) {
-				ChooseStatementNode choose = (ChooseStatementNode) enclosing;
-				LabeledStatementNode oldDefault = choose.getDefaultCase();
-
-				if (oldDefault != null)
-					throw error(
-							"Two default cases in choose statement.  First was at "
-									+ oldDefault.getSource(), switchLabel);
-				choose.setDefaultCase(labeledStatement);
-				return;
-			}
-		}
-
-		SwitchNode switchNode = enclosingSwitch(switchLabel);
-
-		if (switchNode == null)
-			throw error("Switch label occurs outside of any switch statement",
-					switchLabel);
-		if (switchLabel.isDefault()) {
-			LabeledStatementNode oldDefault = switchNode.getDefaultCase();
-
-			if (oldDefault != null)
-				throw error(
-						"Two default cases in switch statement.  First was at "
-								+ oldDefault.getSource(), switchLabel);
-			switchNode.setDefaultCase(labeledStatement);
-		} else {
-			ExpressionNode caseExpression = switchLabel.getExpression();
-			Iterator<LabeledStatementNode> cases = switchNode.getCases();
-			Value constant;
-
-			if (!caseExpression.isConstantExpression())
-				error("Case expression not constant", caseExpression);
-			constant = nodeFactory.getConstantValue(caseExpression);
-			while (cases.hasNext()) {
-				SwitchLabelNode labelNode = (SwitchLabelNode) cases.next()
-						.getLabel();
-				ExpressionNode oldExpression = labelNode.getExpression();
-				Value oldConstant = nodeFactory.getConstantValue(oldExpression);
-
-				if (constant.equals(oldConstant))
-					throw error(
-							"Case constant appears twice: first time was at "
-									+ oldExpression, caseExpression);
-			}
-			switchNode.addCase(labeledStatement);
 		}
 	}
 }
