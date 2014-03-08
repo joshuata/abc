@@ -538,10 +538,16 @@ public class CommonValueFactory implements ValueFactory {
 		case MINUS: // - binary subtraction (numbers and pointers)
 			if (numArgs == 2)
 				return evalBinaryNumericOp(type, operator, args[0], args[1]);
+			else
+				throw new UnsourcedException(
+						"Expected two arguments for operator " + operator);
 		case UNARYMINUS: // - numeric negative
 			return evalMinus(type, args[0]);
 		case UNARYPLUS: // + numeric no-op</li>
 			return args[0];
+		default:
+			throw new UnsourcedException(
+					"Illegal operator in constant expression: " + operator);
 		}
 		// TODO: handle specials cases for all of above
 		return canonic(new CommonOperatorValue(type, operator, args));
@@ -578,6 +584,7 @@ public class CommonValueFactory implements ValueFactory {
 	 * @param newType
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private Value evaluateIntegerConversion(Value value, IntegerType newType) {
 		IntegerType oldType = (IntegerType) value.getType();
 
@@ -618,13 +625,13 @@ public class CommonValueFactory implements ValueFactory {
 		return castValue(newType, value);
 	}
 
-	private Value evaluateAndorOr(Operator operator, ExpressionNode expr1,
-			ExpressionNode expr2) throws SyntaxException {
-		boolean isAnd = operator == Operator.LAND;
-		Value v1 = evaluate(expr1);
-
-		return null;
-	}
+//	private Value evaluateAndorOr(Operator operator, ExpressionNode expr1,
+//			ExpressionNode expr2) throws SyntaxException {
+//		boolean isAnd = operator == Operator.LAND;
+//		Value v1 = evaluate(expr1);
+//
+//		return null;
+//	}
 
 	/**
 	 * Evaluates plus in case where both types are integers. NOTE types of these
@@ -634,6 +641,7 @@ public class CommonValueFactory implements ValueFactory {
 	 * @param a2
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private Value evaluateBinaryIntegerOperator(Operator operator, Value a1,
 			Value a2) {
 		IntegerType type1 = (IntegerType) a1.getType();

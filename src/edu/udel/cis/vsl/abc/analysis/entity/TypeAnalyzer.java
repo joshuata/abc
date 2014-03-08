@@ -18,7 +18,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -56,6 +55,13 @@ import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
+/**
+ * Analyzes types nodes in the AST, sets the type of the type node and processes
+ * all children.
+ * 
+ * @author siegel
+ * 
+ */
 public class TypeAnalyzer {
 
 	// ***************************** Fields *******************************
@@ -89,398 +95,7 @@ public class TypeAnalyzer {
 				.basicType(BasicTypeKind.INT);
 	}
 
-	// ************************* Exported Methods **************************
-
-	Type processTypeNode(TypeNode typeNode) throws SyntaxException {
-		return processTypeNode(typeNode, false);
-	}
-
-	/**
-	 * Process a TypeNode. The Type defined by that type node is computed and
-	 * associated to the TypeNode.
-	 * 
-	 * This method may also entail the creation and/or modification of entities.
-	 * For example, if the type node defines a strucuture or union type, or
-	 * enumeration type, then the corresponding entities may be created or
-	 * completed.
-	 * 
-	 * @param typeNode
-	 * @return
-	 * @throws SyntaxException
-	 */
-	Type processTypeNode(TypeNode typeNode, boolean isParameter)
-			throws SyntaxException {
-		TypeNodeKind kind = typeNode.kind();
-		Type type;
-
-		switch (kind) {
-		case VOID:
-			type = typeFactory.voidType();
-			break;
-		case BASIC:
-			type = processBasicType((BasicTypeNode) typeNode);
-			break;
-		case ENUMERATION:
-			type = processEnumerationType((EnumerationTypeNode) typeNode);
-			break;
-		case ARRAY:
-			type = processArrayType((ArrayTypeNode) typeNode, isParameter);
-			break;
-		case STRUCTURE_OR_UNION:
-			type = processStructureOrUnionType((StructureOrUnionTypeNode) typeNode);
-			break;
-		case FUNCTION:
-			type = processFunctionType((FunctionTypeNode) typeNode, isParameter);
-			break;
-		case POINTER:
-			type = processPointerType((PointerTypeNode) typeNode);
-			break;
-		case ATOMIC:
-			type = processAtomicType((AtomicTypeNode) typeNode);
-			break;
-		case TYPEDEF_NAME:
-			type = processTypedefName((TypedefNameNode) typeNode);
-			break;
-		case SCOPE:
-			type = typeFactory.scopeType();
-			break;
-		default:
-			throw new RuntimeException("Unreachable");
-		}
-		assert type != null;
-		typeNode.setType(type);
-		return type;
-	}
-
-	/**
-	 * Creates new enumeration entity and type and adds them to the scope of the
-	 * given node.
-	 * 
-	 * @param node
-	 *            an enumeration type node with non-null enumerators
-	 * @return the new enumeration entity
-	 * @throws SyntaxException
-	 */
-	private Enumeration createEnumeration(EnumerationTypeNode node)
-			throws SyntaxException {
-		SequenceNode<EnumeratorDeclarationNode> enumerators = node
-				.enumerators();
-		Scope scope = node.getScope();
-		String tag = node.getName(); // could be null
-		Iterator<EnumeratorDeclarationNode> enumeratorIter = enumerators
-				.childIterator();
-		List<Enumerator> enumeratorList = new LinkedList<Enumerator>();
-		EnumerationType enumerationType = typeFactory
-				.enumerationType(node, tag);
-		Enumeration enumeration;
-		IntegerValue value = null;
-
-		// clear it, in case it was used in previous analysis pass
-		enumerationType.clear();
-		enumeration = entityFactory.newEnumeration(enumerationType);
-		scope.add(enumeration);
-		enumeration.setDefinition(node);
-		enumeration.addDeclaration(node);
-		while (enumeratorIter.hasNext()) {
-			EnumeratorDeclarationNode decl = enumeratorIter.next();
-			ExpressionNode constantNode = decl.getValue();
-			Enumerator enumerator;
-
-			if (constantNode == null) {
-				if (value == null)
-					value = valueFactory.integerValue(enumeratorType, 0);
-				else
-					value = valueFactory.plusOne(value);
-			} else {
-				Value tmpValue;
-
-				entityAnalyzer.expressionAnalyzer
-						.processExpression(constantNode);
-				if (!constantNode.isConstantExpression())
-					throw error(
-							"Non-constant expression used in enumerator definition",
-							constantNode);
-				tmpValue = nodeFactory.getConstantValue(constantNode);
-				if (!(tmpValue instanceof IntegerValue))
-					throw error(
-							"Constant expression of concrete integer type expected, not "
-									+ tmpValue, constantNode);
-				value = (IntegerValue) tmpValue;
-			}
-			enumerator = entityFactory.newEnumerator(decl, enumerationType,
-					value);
-			enumerator.addDeclaration(decl);
-			enumerator.setDefinition(decl);
-			decl.setEntity(enumerator);
-			decl.getIdentifier().setEntity(enumerator);
-			enumeratorList.add(enumerator);
-			try {
-				scope.add(enumerator);
-			} catch (UnsourcedException e) {
-				throw error(e, decl);
-			}
-		}
-		enumerationType.complete(enumeratorList);
-		return enumeration;
-	}
-
-	/**
-	 * See C11 6.7.2.2 and 6.7.2.3. The procedure is as follows:
-	 * 
-	 * If there is no tag: there has to be an enumerator list, and this defines
-	 * a new unnamed entity and enumeration type in the current scope.
-	 * 
-	 * If there is a tag, proceed as follows:
-	 * 
-	 * If there is an enumerator list: check that there is no tagged entity with
-	 * the same tag in the current scope. If this check fails, syntax error.
-	 * Create a new enumeration entity and type, add it to the current scope.
-	 * 
-	 * If there is not an enumerator list: check (1) there is a visible tagged
-	 * entity with the same tag; (2) that tagged entity is an enum; and (3) that
-	 * previous enum is complete. If any of these fails: syntax error. Else, use
-	 * the old entity and type.
-	 * 
-	 * @param node
-	 * @return
-	 * @throws SyntaxException
-	 */
-	Type processEnumerationType(EnumerationTypeNode node)
-			throws SyntaxException {
-		Scope scope = node.getScope();
-		IdentifierNode identifier = node.getIdentifier(); // could be null
-		String tag = node.getName(); // could be null
-		SequenceNode<EnumeratorDeclarationNode> enumerators = node
-				.enumerators(); // could be null
-		Enumeration enumeration;
-		Type result;
-
-		if (node.isRestrictQualified())
-			throw error("Use of restrict qualifier with non-pointer type", node);
-		if (tag != null) {
-			if (enumerators != null) {
-				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
-
-				if (oldEntity != null)
-					throw error("Re-use of tag " + tag
-							+ " for enumeration.  Previous use was at "
-							+ oldEntity.getFirstDeclaration().getSource(), node);
-				enumeration = createEnumeration(node);
-			} else {
-				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
-
-				if (oldEntity == null)
-					throw error(
-							"See C11 6.7.2.3(3):\n\"A type specifier of the form\n"
-									+ "    enum identifier\n"
-									+ "without an enumerator list shall only appear after the type\n"
-									+ "it specifies is complete.\"", node);
-				if (!(oldEntity instanceof Enumeration))
-					throw error(
-							"Re-use of tag "
-									+ tag
-									+ " for enumeration when tag is visible with different kind.  Previous use was at "
-									+ oldEntity.getFirstDeclaration()
-											.getSource(), node);
-				enumeration = (Enumeration) oldEntity;
-				assert enumeration.getType().isComplete();
-				// if not, you would have caught the earlier incomplete use
-				enumeration.addDeclaration(node);
-			}
-		} else {
-			// no tag: create new anonymous enumeration
-			if (enumerators == null)
-				throw error("Anonymous enumeration with no enumerator list",
-						node);
-			enumeration = createEnumeration(node);
-		}
-		node.setEntity(enumeration);
-		if (identifier != null)
-			identifier.setEntity(enumeration);
-		{
-			boolean constQ = node.isConstQualified();
-			boolean volatileQ = node.isVolatileQualified();
-			UnqualifiedObjectType unqualifiedType = enumeration.getType();
-
-			if (node.isAtomicQualified())
-				unqualifiedType = typeFactory.atomicType(unqualifiedType);
-			if (constQ || volatileQ)
-				result = typeFactory.qualifiedType(unqualifiedType, constQ,
-						volatileQ, false, false, false);
-			else
-				result = unqualifiedType;
-		}
-		node.setType(result);
-		return result;
-	}
-
-	/**
-	 * Creates a new structure or union entity and type based on given node.
-	 * Adds it to the scope. This method should only be called if it is known no
-	 * such entity exists.
-	 * 
-	 * @param node
-	 *            a structure or union node
-	 * @return the resulting structure or union entity
-	 * @throws SyntaxException
-	 *             if already exists in scope
-	 */
-	private StructureOrUnion createStructureOrUnion(
-			StructureOrUnionTypeNode node) throws SyntaxException {
-		Scope scope = node.getScope();
-		IdentifierNode identifier = node.getIdentifier();
-		String tag = node.getName(); // could be null
-		SequenceNode<FieldDeclarationNode> fieldDecls = node
-				.getStructDeclList(); // could be null
-		StructureOrUnion structureOrUnion;
-		StructureOrUnionType structureOrUnionType;
-
-		structureOrUnionType = typeFactory.structureOrUnionType(node,
-				node.isStruct(), tag);
-		// in case this was used in previous analysis pass, clear it:
-		structureOrUnionType.clear();
-		structureOrUnion = entityFactory
-				.newStructureOrUnion(structureOrUnionType);
-		structureOrUnion.addDeclaration(node);
-		scope.add(structureOrUnion);
-		if (identifier != null)
-			identifier.setEntity(structureOrUnion);
-		structureOrUnion.addDeclaration(node);
-		if (fieldDecls != null) {
-			Iterator<FieldDeclarationNode> fieldIter = fieldDecls
-					.childIterator();
-			List<Field> fieldList = new LinkedList<Field>();
-
-			structureOrUnion.setDefinition(node);
-			while (fieldIter.hasNext()) {
-				FieldDeclarationNode decl = fieldIter.next();
-				TypeNode fieldTypeNode = decl.getTypeNode();
-				ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
-				Value bitWidth;
-				ObjectType fieldType;
-				Field field;
-
-				if (fieldTypeNode == null)
-					fieldType = null;
-				else {
-					Type tempType = processTypeNode(fieldTypeNode);
-
-					if (!(tempType instanceof ObjectType))
-						throw error(
-								"Non-object type for structure or union member",
-								fieldTypeNode);
-					fieldType = (ObjectType) tempType;
-				}
-				if (bitWidthExpression == null) {
-					bitWidth = null;
-				} else {
-					if (!bitWidthExpression.isConstantExpression())
-						throw error(
-								"Non-constant expression used for bit width in field declaration",
-								bitWidthExpression);
-					bitWidth = nodeFactory.getConstantValue(bitWidthExpression);
-				}
-				field = entityFactory.newField(decl, fieldType, bitWidth,
-						structureOrUnion);
-				decl.setEntity(field);
-				if (decl.getIdentifier() != null)
-					decl.getIdentifier().setEntity(field);
-				fieldList.add(field);
-			}
-			structureOrUnionType.complete(fieldList);
-		}
-		return structureOrUnion;
-	}
-
-	/**
-	 * See C11 6.7.2.1 and 6.7.2.3. The procedure is as follows:
-	 * 
-	 * If there is no tag, there has to be a declarator list, and this defines a
-	 * new unnamed struct or union entity and type in the current scope.
-	 * 
-	 * If there is a tag, proceed as follows:
-	 * 
-	 * If there is a declarator list: check that there is no tagged entity with
-	 * same tag in the current scope. If this check fails, syntax error. Else,
-	 * create a new struct/union entity and type and add it to the current
-	 * scope.
-	 * 
-	 * If there is no declarator list: see if there exists a visible tagged
-	 * entity with same tag. If there does exist such an entity, check it has
-	 * same kind as this one (struct or union), and use it. If there does not
-	 * exist such an entity, create a new incomplete struct or union entity and
-	 * type and add it to the current scope.
-	 * 
-	 * @param node
-	 * @return
-	 * @throws SyntaxException
-	 */
-	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
-			throws SyntaxException {
-		Scope scope = node.getScope();
-		IdentifierNode identifier = node.getIdentifier(); // could be null
-		String tag = node.getName(); // could be null
-		SequenceNode<FieldDeclarationNode> fieldDecls = node
-				.getStructDeclList(); // could be null
-		StructureOrUnion structureOrUnion;
-		Type result;
-
-		if (node.isRestrictQualified())
-			throw error("Use of restrict qualifier with non-pointer type", node);
-		if (tag == null) {
-			if (fieldDecls == null)
-				throw error(
-						"Anonymous structure or union with no declarator list",
-						node);
-			structureOrUnion = createStructureOrUnion(node);
-		} else {
-			if (fieldDecls != null) {
-				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
-
-				if (oldEntity != null)
-					throw error(
-							"Previously declared entity with same tag and scope: "
-									+ oldEntity.getFirstDeclaration()
-											.getSource(), node);
-				structureOrUnion = createStructureOrUnion(node);
-			} else {
-				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
-
-				if (oldEntity != null) {
-					if (oldEntity.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
-						throw error(
-								"Re-use of tag "
-										+ tag
-										+ " for structure or union.  Previous use was at "
-										+ oldEntity.getFirstDeclaration()
-												.getSource(), node);
-					structureOrUnion = (StructureOrUnion) oldEntity;
-				} else {
-					structureOrUnion = createStructureOrUnion(node);
-				}
-			}
-		}
-		node.setEntity(structureOrUnion);
-		if (identifier != null)
-			identifier.setEntity(structureOrUnion);
-		{
-			boolean constQ = node.isConstQualified();
-			boolean volatileQ = node.isVolatileQualified();
-			UnqualifiedObjectType unqualifiedType = structureOrUnion.getType();
-
-			if (node.isAtomicQualified())
-				unqualifiedType = typeFactory.atomicType(unqualifiedType);
-			if (constQ || volatileQ)
-				result = typeFactory.qualifiedType(unqualifiedType, constQ,
-						volatileQ, false, false, false);
-			else
-				result = unqualifiedType;
-		}
-		node.setType(result);
-		return result;
-	}
-
-	// ************************** Private Methods *****************************
+	// ************************** Private Methods **************************
 
 	private SyntaxException error(String message, ASTNode node) {
 		return entityAnalyzer.error(message, node);
@@ -722,6 +337,29 @@ public class TypeAnalyzer {
 		return false;
 	}
 
+	private void checkNoAlignments(VariableDeclarationNode node)
+			throws SyntaxException {
+		SequenceNode<ExpressionNode> seq1 = node.constantAlignmentSpecifiers();
+
+		if (seq1 != null && seq1.numChildren() > 0) {
+			ExpressionNode alignment = seq1.getSequenceChild(0);
+
+			throw error(
+					"Alignment attribute in parameter declaration; see C11 6.7.5(2)",
+					alignment);
+		}
+
+		SequenceNode<TypeNode> seq2 = node.typeAlignmentSpecifiers();
+
+		if (seq2 != null && seq2.numChildren() > 0) {
+			TypeNode alignment = seq2.getSequenceChild(0);
+
+			throw error(
+					"Alignment attribute in parameter declaration; see C11 6.7.5(2)",
+					alignment);
+		}
+	}
+
 	private Type processFunctionType(FunctionTypeNode node, boolean isParameter)
 			throws SyntaxException {
 		Type result;
@@ -745,7 +383,7 @@ public class TypeAnalyzer {
 					returnTypeNode);
 		returnType = (ObjectType) tempReturnType;
 		if (fromIdentifierList && !isDefinition && numParameters == 0) {
-			// no information know about parameters
+			// no information known about parameters
 			result = typeFactory.functionType(returnType);
 		} else {
 			List<ObjectType> parameterTypes = new LinkedList<ObjectType>();
@@ -757,17 +395,26 @@ public class TypeAnalyzer {
 				while (parameterIter.hasNext()) {
 					VariableDeclarationNode decl = parameterIter.next();
 					TypeNode parameterTypeNode;
-					Variable variable = entityAnalyzer.declarationAnalyzer
-							.processVariableDeclaration(decl, true);
 
+					// C11 6.7.5(2): "An alignment attribute shall not be
+					// specified in a declaration of a typedef, or a bit-field,
+					// or a function, or a parameter, or an object declared
+					// with the register storage-class specifier."
+					checkNoAlignments(decl);
+					// C11 6.7.6.3(2): "The only storage-class specifier that
+					// shall occur in a parameter declaration is register."
+					// the others are extern, static, _Thread_local, auto
+					if (decl.hasExternStorage() || decl.hasStaticStorage()
+							|| decl.hasThreadLocalStorage())
+						throw error(
+								"Illegal storage class specified in parameter declaration; see C11 6.7.6.3(2)",
+								decl);
+					entityAnalyzer.declarationAnalyzer
+							.processVariableDeclaration(decl, true);
 					parameterTypeNode = decl.getTypeNode();
 					if (parameterTypeNode == null)
 						throw error("No type specified for function parameter",
 								decl);
-					// TODO: check alignment specifiers, storage specifiers.
-					// decl.setEntity(variable);
-					// add to scope...?
-					// decl.getScope().\
 					parameterTypes
 							.add((ObjectType) parameterTypeNode.getType());
 				}
@@ -780,4 +427,394 @@ public class TypeAnalyzer {
 		return result;
 	}
 
+	/**
+	 * Creates new enumeration entity and type and adds them to the scope of the
+	 * given node.
+	 * 
+	 * @param node
+	 *            an enumeration type node with non-null enumerators
+	 * @return the new enumeration entity
+	 * @throws SyntaxException
+	 */
+	private Enumeration createEnumeration(EnumerationTypeNode node)
+			throws SyntaxException {
+		SequenceNode<EnumeratorDeclarationNode> enumerators = node
+				.enumerators();
+		Scope scope = node.getScope();
+		String tag = node.getName(); // could be null
+		Iterator<EnumeratorDeclarationNode> enumeratorIter = enumerators
+				.childIterator();
+		List<Enumerator> enumeratorList = new LinkedList<Enumerator>();
+		EnumerationType enumerationType = typeFactory
+				.enumerationType(node, tag);
+		Enumeration enumeration;
+		IntegerValue value = null;
+
+		// clear it, in case it was used in previous analysis pass
+		enumerationType.clear();
+		enumeration = entityFactory.newEnumeration(enumerationType);
+		scope.add(enumeration);
+		enumeration.setDefinition(node);
+		enumeration.addDeclaration(node);
+		while (enumeratorIter.hasNext()) {
+			EnumeratorDeclarationNode decl = enumeratorIter.next();
+			ExpressionNode constantNode = decl.getValue();
+			Enumerator enumerator;
+
+			if (constantNode == null) {
+				if (value == null)
+					value = valueFactory.integerValue(enumeratorType, 0);
+				else
+					value = valueFactory.plusOne(value);
+			} else {
+				Value tmpValue;
+
+				entityAnalyzer.expressionAnalyzer
+						.processExpression(constantNode);
+				if (!constantNode.isConstantExpression())
+					throw error(
+							"Non-constant expression used in enumerator definition",
+							constantNode);
+				tmpValue = nodeFactory.getConstantValue(constantNode);
+				if (!(tmpValue instanceof IntegerValue))
+					throw error(
+							"Constant expression of concrete integer type expected, not "
+									+ tmpValue, constantNode);
+				value = (IntegerValue) tmpValue;
+			}
+			enumerator = entityFactory.newEnumerator(decl, enumerationType,
+					value);
+			enumerator.addDeclaration(decl);
+			enumerator.setDefinition(decl);
+			decl.setEntity(enumerator);
+			decl.getIdentifier().setEntity(enumerator);
+			enumeratorList.add(enumerator);
+			try {
+				scope.add(enumerator);
+			} catch (UnsourcedException e) {
+				throw error(e, decl);
+			}
+		}
+		enumerationType.complete(enumeratorList);
+		return enumeration;
+	}
+
+	/**
+	 * Creates a new structure or union entity and type based on given node.
+	 * Adds it to the scope. This method should only be called if it is known no
+	 * such entity exists.
+	 * 
+	 * @param node
+	 *            a structure or union node
+	 * @return the resulting structure or union entity
+	 * @throws SyntaxException
+	 *             if already exists in scope
+	 */
+	private StructureOrUnion createStructureOrUnion(
+			StructureOrUnionTypeNode node) throws SyntaxException {
+		Scope scope = node.getScope();
+		IdentifierNode identifier = node.getIdentifier();
+		String tag = node.getName(); // could be null
+		SequenceNode<FieldDeclarationNode> fieldDecls = node
+				.getStructDeclList(); // could be null
+		StructureOrUnion structureOrUnion;
+		StructureOrUnionType structureOrUnionType;
+
+		structureOrUnionType = typeFactory.structureOrUnionType(node,
+				node.isStruct(), tag);
+		// in case this was used in previous analysis pass, clear it:
+		structureOrUnionType.clear();
+		structureOrUnion = entityFactory
+				.newStructureOrUnion(structureOrUnionType);
+		structureOrUnion.addDeclaration(node);
+		scope.add(structureOrUnion);
+		if (identifier != null)
+			identifier.setEntity(structureOrUnion);
+		structureOrUnion.addDeclaration(node);
+		if (fieldDecls != null) {
+			Iterator<FieldDeclarationNode> fieldIter = fieldDecls
+					.childIterator();
+			List<Field> fieldList = new LinkedList<Field>();
+
+			structureOrUnion.setDefinition(node);
+			while (fieldIter.hasNext()) {
+				FieldDeclarationNode decl = fieldIter.next();
+				TypeNode fieldTypeNode = decl.getTypeNode();
+				ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
+				Value bitWidth;
+				ObjectType fieldType;
+				Field field;
+
+				if (fieldTypeNode == null)
+					fieldType = null;
+				else {
+					Type tempType = processTypeNode(fieldTypeNode);
+
+					if (!(tempType instanceof ObjectType))
+						throw error(
+								"Non-object type for structure or union member",
+								fieldTypeNode);
+					fieldType = (ObjectType) tempType;
+				}
+				if (bitWidthExpression == null) {
+					bitWidth = null;
+				} else {
+					if (!bitWidthExpression.isConstantExpression())
+						throw error(
+								"Non-constant expression used for bit width in field declaration",
+								bitWidthExpression);
+					bitWidth = nodeFactory.getConstantValue(bitWidthExpression);
+				}
+				field = entityFactory.newField(decl, fieldType, bitWidth,
+						structureOrUnion);
+				decl.setEntity(field);
+				if (decl.getIdentifier() != null)
+					decl.getIdentifier().setEntity(field);
+				fieldList.add(field);
+			}
+			structureOrUnionType.complete(fieldList);
+		}
+		return structureOrUnion;
+	}
+
+	// ************************* Exported Methods **************************
+
+	Type processTypeNode(TypeNode typeNode) throws SyntaxException {
+		return processTypeNode(typeNode, false);
+	}
+
+	/**
+	 * Process a TypeNode. The Type defined by that type node is computed and
+	 * associated to the TypeNode.
+	 * 
+	 * This method may also entail the creation and/or modification of entities.
+	 * For example, if the type node defines a strucuture or union type, or
+	 * enumeration type, then the corresponding entities may be created or
+	 * completed.
+	 * 
+	 * @param typeNode
+	 * @return
+	 * @throws SyntaxException
+	 */
+	Type processTypeNode(TypeNode typeNode, boolean isParameter)
+			throws SyntaxException {
+		TypeNodeKind kind = typeNode.kind();
+		Type type;
+
+		switch (kind) {
+		case VOID:
+			type = typeFactory.voidType();
+			break;
+		case BASIC:
+			type = processBasicType((BasicTypeNode) typeNode);
+			break;
+		case ENUMERATION:
+			type = processEnumerationType((EnumerationTypeNode) typeNode);
+			break;
+		case ARRAY:
+			type = processArrayType((ArrayTypeNode) typeNode, isParameter);
+			break;
+		case STRUCTURE_OR_UNION:
+			type = processStructureOrUnionType((StructureOrUnionTypeNode) typeNode);
+			break;
+		case FUNCTION:
+			type = processFunctionType((FunctionTypeNode) typeNode, isParameter);
+			break;
+		case POINTER:
+			type = processPointerType((PointerTypeNode) typeNode);
+			break;
+		case ATOMIC:
+			type = processAtomicType((AtomicTypeNode) typeNode);
+			break;
+		case TYPEDEF_NAME:
+			type = processTypedefName((TypedefNameNode) typeNode);
+			break;
+		case SCOPE:
+			type = typeFactory.scopeType();
+			break;
+		default:
+			throw new RuntimeException("Unreachable");
+		}
+		assert type != null;
+		typeNode.setType(type);
+		return type;
+	}
+
+	/**
+	 * See C11 6.7.2.2 and 6.7.2.3. The procedure is as follows:
+	 * 
+	 * If there is no tag: there has to be an enumerator list, and this defines
+	 * a new unnamed entity and enumeration type in the current scope.
+	 * 
+	 * If there is a tag, proceed as follows:
+	 * 
+	 * If there is an enumerator list: check that there is no tagged entity with
+	 * the same tag in the current scope. If this check fails, syntax error.
+	 * Create a new enumeration entity and type, add it to the current scope.
+	 * 
+	 * If there is not an enumerator list: check (1) there is a visible tagged
+	 * entity with the same tag; (2) that tagged entity is an enum; and (3) that
+	 * previous enum is complete. If any of these fails: syntax error. Else, use
+	 * the old entity and type.
+	 * 
+	 * @param node
+	 * @return
+	 * @throws SyntaxException
+	 */
+	Type processEnumerationType(EnumerationTypeNode node)
+			throws SyntaxException {
+		Scope scope = node.getScope();
+		IdentifierNode identifier = node.getIdentifier(); // could be null
+		String tag = node.getName(); // could be null
+		SequenceNode<EnumeratorDeclarationNode> enumerators = node
+				.enumerators(); // could be null
+		Enumeration enumeration;
+		Type result;
+
+		if (node.isRestrictQualified())
+			throw error("Use of restrict qualifier with non-pointer type", node);
+		if (tag != null) {
+			if (enumerators != null) {
+				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
+
+				if (oldEntity != null)
+					throw error("Re-use of tag " + tag
+							+ " for enumeration.  Previous use was at "
+							+ oldEntity.getFirstDeclaration().getSource(), node);
+				enumeration = createEnumeration(node);
+			} else {
+				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
+
+				if (oldEntity == null)
+					throw error(
+							"See C11 6.7.2.3(3):\n\"A type specifier of the form\n"
+									+ "    enum identifier\n"
+									+ "without an enumerator list shall only appear after the type\n"
+									+ "it specifies is complete.\"", node);
+				if (!(oldEntity instanceof Enumeration))
+					throw error(
+							"Re-use of tag "
+									+ tag
+									+ " for enumeration when tag is visible with different kind.  Previous use was at "
+									+ oldEntity.getFirstDeclaration()
+											.getSource(), node);
+				enumeration = (Enumeration) oldEntity;
+				assert enumeration.getType().isComplete();
+				// if not, you would have caught the earlier incomplete use
+				enumeration.addDeclaration(node);
+			}
+		} else {
+			// no tag: create new anonymous enumeration
+			if (enumerators == null)
+				throw error("Anonymous enumeration with no enumerator list",
+						node);
+			enumeration = createEnumeration(node);
+		}
+		node.setEntity(enumeration);
+		if (identifier != null)
+			identifier.setEntity(enumeration);
+		{
+			boolean constQ = node.isConstQualified();
+			boolean volatileQ = node.isVolatileQualified();
+			UnqualifiedObjectType unqualifiedType = enumeration.getType();
+
+			if (node.isAtomicQualified())
+				unqualifiedType = typeFactory.atomicType(unqualifiedType);
+			if (constQ || volatileQ)
+				result = typeFactory.qualifiedType(unqualifiedType, constQ,
+						volatileQ, false, false, false);
+			else
+				result = unqualifiedType;
+		}
+		node.setType(result);
+		return result;
+	}
+
+	/**
+	 * See C11 6.7.2.1 and 6.7.2.3. The procedure is as follows:
+	 * 
+	 * If there is no tag, there has to be a declarator list, and this defines a
+	 * new unnamed struct or union entity and type in the current scope.
+	 * 
+	 * If there is a tag, proceed as follows:
+	 * 
+	 * If there is a declarator list: check that there is no tagged entity with
+	 * same tag in the current scope. If this check fails, syntax error. Else,
+	 * create a new struct/union entity and type and add it to the current
+	 * scope.
+	 * 
+	 * If there is no declarator list: see if there exists a visible tagged
+	 * entity with same tag. If there does exist such an entity, check it has
+	 * same kind as this one (struct or union), and use it. If there does not
+	 * exist such an entity, create a new incomplete struct or union entity and
+	 * type and add it to the current scope.
+	 * 
+	 * @param node
+	 * @return
+	 * @throws SyntaxException
+	 */
+	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
+			throws SyntaxException {
+		Scope scope = node.getScope();
+		IdentifierNode identifier = node.getIdentifier(); // could be null
+		String tag = node.getName(); // could be null
+		SequenceNode<FieldDeclarationNode> fieldDecls = node
+				.getStructDeclList(); // could be null
+		StructureOrUnion structureOrUnion;
+		Type result;
+
+		if (node.isRestrictQualified())
+			throw error("Use of restrict qualifier with non-pointer type", node);
+		if (tag == null) {
+			if (fieldDecls == null)
+				throw error(
+						"Anonymous structure or union with no declarator list",
+						node);
+			structureOrUnion = createStructureOrUnion(node);
+		} else {
+			if (fieldDecls != null) {
+				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
+
+				if (oldEntity != null)
+					throw error(
+							"Previously declared entity with same tag and scope: "
+									+ oldEntity.getFirstDeclaration()
+											.getSource(), node);
+				structureOrUnion = createStructureOrUnion(node);
+			} else {
+				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
+
+				if (oldEntity != null) {
+					if (oldEntity.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
+						throw error(
+								"Re-use of tag "
+										+ tag
+										+ " for structure or union.  Previous use was at "
+										+ oldEntity.getFirstDeclaration()
+												.getSource(), node);
+					structureOrUnion = (StructureOrUnion) oldEntity;
+				} else {
+					structureOrUnion = createStructureOrUnion(node);
+				}
+			}
+		}
+		node.setEntity(structureOrUnion);
+		if (identifier != null)
+			identifier.setEntity(structureOrUnion);
+		{
+			boolean constQ = node.isConstQualified();
+			boolean volatileQ = node.isVolatileQualified();
+			UnqualifiedObjectType unqualifiedType = structureOrUnion.getType();
+
+			if (node.isAtomicQualified())
+				unqualifiedType = typeFactory.atomicType(unqualifiedType);
+			if (constQ || volatileQ)
+				result = typeFactory.qualifiedType(unqualifiedType, constQ,
+						volatileQ, false, false, false);
+			else
+				result = unqualifiedType;
+		}
+		node.setType(result);
+		return result;
+	}
 }
