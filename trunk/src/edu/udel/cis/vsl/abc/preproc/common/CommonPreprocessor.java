@@ -23,7 +23,7 @@ import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 
 /**
  * The class provides easy access to all services exported by the preproc module
- * (a la Fa�ade Pattern). It includes a main method which preprocesses the file
+ * (a la Facade Pattern). It includes a main method which preprocesses the file
  * and sends result to stdout.
  * 
  * TODO: support -D, i.e., object macros defined at command line
