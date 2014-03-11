@@ -1,5 +1,27 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ALIGNOF;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.AMPERSAND;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.AND;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ARROW;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ASSIGN;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ATOMIC;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BIG_O;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITANDEQ;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITOR;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITOREQ;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITXOR;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITXOREQ;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BREAK;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.CHARACTER_CONSTANT;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.COMMA;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.CONST;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.CONTINUE;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DIV;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DIVEQ;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DO;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DOT;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,36 +107,36 @@ public class ASTBuilder {
 
 	// Convenient constants...
 
-	static final int ALIGNAS = CivlCParser.ALIGNAS;
-	static final int ALIGNOF = CivlCParser.ALIGNOF;
-	static final int AMPERSAND = CivlCParser.AMPERSAND;
-	static final int AND = CivlCParser.AND;
-	static final int ARROW = CivlCParser.ARROW;
-	static final int ASSIGN = CivlCParser.ASSIGN;
-	static final int ATOMIC = CivlCParser.ATOMIC;
-	static final int AUTO = CivlCParser.AUTO;
-	static final int BIG_O = CivlCParser.BIG_O;
-	static final int BITANDEQ = CivlCParser.BITANDEQ;
-	static final int BITOR = CivlCParser.BITOR;
-	static final int BITOREQ = CivlCParser.BITOREQ;
-	static final int BITXOR = CivlCParser.BITXOR;
-	static final int BITXOREQ = CivlCParser.BITXOREQ;
-	static final int BOOL = CivlCParser.BOOL;
-	static final int BREAK = CivlCParser.BREAK;
-	static final int CASE = CivlCParser.CASE;
-	static final int CHAR = CivlCParser.CHAR;
-	static final int CHARACTER_CONSTANT = CivlCParser.CHARACTER_CONSTANT;
-	static final int COLON = CivlCParser.COLON;
-	static final int COMMA = CivlCParser.COMMA;
-	static final int COMMENT = CivlCParser.COMMENT;
-	static final int COMPLEX = CivlCParser.COMPLEX;
-	static final int CONST = CivlCParser.CONST;
-	static final int CONTINUE = CivlCParser.CONTINUE;
-	static final int DEFAULT = CivlCParser.DEFAULT;
-	static final int DIV = CivlCParser.DIV;
-	static final int DIVEQ = CivlCParser.DIVEQ;
-	static final int DO = CivlCParser.DO;
-	static final int DOT = CivlCParser.DOT;
+	// static final int ALIGNAS = CivlCParser.ALIGNAS;
+	// static final int ALIGNOF = CivlCParser.ALIGNOF;
+	// static final int AMPERSAND = CivlCParser.AMPERSAND;
+	// static final int AND = CivlCParser.AND;
+	// static final int ARROW = CivlCParser.ARROW;
+	// static final int ASSIGN = CivlCParser.ASSIGN;
+	// static final int ATOMIC = CivlCParser.ATOMIC;
+	// static final int AUTO = CivlCParser.AUTO;
+	// static final int BIG_O = CivlCParser.BIG_O;
+	// static final int BITANDEQ = CivlCParser.BITANDEQ;
+	// static final int BITOR = CivlCParser.BITOR;
+	// static final int BITOREQ = CivlCParser.BITOREQ;
+	// static final int BITXOR = CivlCParser.BITXOR;
+	// static final int BITXOREQ = CivlCParser.BITXOREQ;
+	// static final int BOOL = CivlCParser.BOOL;
+	// static final int BREAK = CivlCParser.BREAK;
+	// static final int CASE = CivlCParser.CASE;
+	// static final int CHAR = CivlCParser.CHAR;
+	// static final int CHARACTER_CONSTANT = CivlCParser.CHARACTER_CONSTANT;
+	// static final int COLON = CivlCParser.COLON;
+	// static final int COMMA = CivlCParser.COMMA;
+	// static final int COMMENT = CivlCParser.COMMENT;
+	// static final int COMPLEX = CivlCParser.COMPLEX;
+	// static final int CONST = CivlCParser.CONST;
+	// static final int CONTINUE = CivlCParser.CONTINUE;
+	// static final int DEFAULT = CivlCParser.DEFAULT;
+	// static final int DIV = CivlCParser.DIV;
+	// static final int DIVEQ = CivlCParser.DIVEQ;
+//	static final int DO = CivlCParser.DO;
+//	static final int DOT = CivlCParser.DOT;
 	static final int DOUBLE = CivlCParser.DOUBLE;
 	static final int ELLIPSIS = CivlCParser.ELLIPSIS;
 	static final int ELSE = CivlCParser.ELSE;
@@ -2208,6 +2230,7 @@ public class ASTBuilder {
 		}
 	}
 
+	// TODO implement OMP parser
 	private PragmaNode translatePragma(Source source, CommonTree pragmaTree,
 			SimpleScope scope) {
 		CommonTree identifierTree = (CommonTree) pragmaTree.getChild(0);
