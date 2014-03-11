@@ -124,6 +124,7 @@
 	<path id="src.compile.classpath">
 		<pathelement location="${src.dir}" />
 		<pathelement location="${antlr.jar}" />
+		<pathelement location="${sarl.jar}" />
 	</path>
 
 	<target name="compile" description="Compile all java source files." depends="parsers">
@@ -137,6 +138,7 @@
 			<fileset dir="${bin.dir}" />
 			<!--<fileset dir="${antlr.runtime.bin}" />-->
 			<zipfileset includes="**/*.class" src="${antlr.runtime.jar}" />
+			<zipfileset includes="**/*.class" src="${sarl.jar}" />
 			<fileset dir="${basedir}/text/include" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
@@ -153,6 +155,7 @@
 		<pathelement location="${antlr.jar}" />
 		<pathelement location="${junit.jar}" />
 		<pathelement location="${hamcrest.jar}" />
+		<pathelement location="${sarl.jar}" />
 	</path>
 
 	<path id="test.execute.classpath">
@@ -162,6 +165,7 @@
 		<pathelement location="${junit.jar}" />
 		<pathelement location="${basedir}/text/include" />
 		<pathelement location="${hamcrest.jar}" />
+		<pathelement location="${sarl.jar}" />
 	</path>
 
 	<target name="test-init">
