@@ -238,4 +238,7 @@ $comm $comm_create($scope scope, $gcomm gcomm, int place);
 /* Returns the parent scope of the given scope */
 $scope $scope_parent($scope s);
 
+/* Returns $true iff the procecess value of p1 equals to p2 */
+_Bool equalsTo($proc p1, $proc p2);
+
 #endif
