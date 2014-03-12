@@ -238,7 +238,16 @@ $comm $comm_create($scope scope, $gcomm gcomm, int place);
 /* Returns the parent scope of the given scope */
 $scope $scope_parent($scope s);
 
-/* Returns $true iff the procecess value of p1 equals to p2 */
-_Bool equalsTo($proc p1, $proc p2);
+/* Returns $true iff p is a defined procecess value (i.e., 
+the value of the process id is greater than 0) */
+_Bool $proc_defined($proc p);
+
+/* Returns $true iff s is a defined scope value (i.e., 
+the scope s is still valid) */
+_Bool $scope_defined($scope s);
+
+_Bool $gcomm_defined($gcomm gcomm);
+
+_Bool $comm_defined($comm comm);
 
 #endif

@@ -1536,7 +1536,9 @@ public class ExpressionAnalyzer {
 		Type type0 = addStandardConversions(arg0);
 		Type type1 = addStandardConversions(arg1);
 
-		if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
+		if (type0.kind() == TypeKind.PROCESS && type1.kind() == TypeKind.PROCESS) {
+			// no conversions necessary
+		} else if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
 			// no conversions necessary
 		} else if (type0 instanceof ArithmeticType
 				&& type1 instanceof ArithmeticType) {
