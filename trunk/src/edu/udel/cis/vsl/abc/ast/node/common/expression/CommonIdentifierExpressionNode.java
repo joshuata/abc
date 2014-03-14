@@ -29,7 +29,7 @@ public class CommonIdentifierExpressionNode extends CommonExpressionNode
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("IdentifierExpression");
+		out.print("IdentifierExpressionNode");
 	}
 
 	@Override

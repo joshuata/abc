@@ -37,7 +37,7 @@ public class CommonFloatingConstantNode extends CommonConstantNode implements
 
 	@Override
 	public String toString() {
-		return "FloatingConstant[radix=" + getConstantValue().getRadix()
+		return "FloatingConstantNode[radix=" + getConstantValue().getRadix()
 				+ ", significand=" + wholePart + "." + fractionPart
 				+ ", exponent=" + exponent + ", doubleValue="
 				+ getConstantValue().getDoubleValue() + "]";

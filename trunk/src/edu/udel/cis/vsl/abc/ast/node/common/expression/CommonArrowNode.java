@@ -36,7 +36,7 @@ public class CommonArrowNode extends CommonExpressionNode implements ArrowNode {
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("ArrowExpression");
+		out.print("ArrowNode");
 	}
 
 	@Override

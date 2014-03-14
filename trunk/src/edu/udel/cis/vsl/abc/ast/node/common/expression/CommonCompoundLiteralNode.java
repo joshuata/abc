@@ -22,7 +22,7 @@ public class CommonCompoundLiteralNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("CompoundLiteral");
+		out.print("CompoundLiteralNode");
 	}
 
 	@Override

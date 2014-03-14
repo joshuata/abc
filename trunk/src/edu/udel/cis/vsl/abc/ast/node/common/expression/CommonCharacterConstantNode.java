@@ -17,7 +17,7 @@ public class CommonCharacterConstantNode extends CommonConstantNode implements
 
 	@Override
 	public String toString() {
-		return "CharacterConstant[" + getConstantValue() + "]";
+		return "CharacterConstantNode[" + getConstantValue() + "]";
 	}
 
 	@Override

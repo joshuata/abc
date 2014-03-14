@@ -37,7 +37,7 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("CollectiveExpression");
+		out.print("CollectiveExpressionNode");
 	}
 
 	@Override

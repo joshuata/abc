@@ -26,7 +26,7 @@ public class CommonEnumerationConstantNode extends CommonConstantNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("EnumerationConstant");
+		out.print("EnumerationConstantNode");
 	}
 
 	@Override

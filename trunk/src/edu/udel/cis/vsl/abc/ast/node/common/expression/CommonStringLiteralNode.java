@@ -17,7 +17,7 @@ public class CommonStringLiteralNode extends CommonConstantNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("StringLiteral[" + getConstantValue() + "]");
+		out.print("StringLiteralNode[" + getConstantValue() + "]");
 	}
 
 	@Override

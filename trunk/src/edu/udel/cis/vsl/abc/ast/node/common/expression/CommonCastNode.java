@@ -36,7 +36,7 @@ public class CommonCastNode extends CommonExpressionNode implements CastNode {
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("CastExpression");
+		out.print("CastNode");
 	}
 
 	@Override

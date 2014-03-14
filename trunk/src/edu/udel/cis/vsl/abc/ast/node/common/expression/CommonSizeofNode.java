@@ -26,7 +26,7 @@ public class CommonSizeofNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("SizeOf");
+		out.print("SizeOfNode");
 	}
 
 	@Override
