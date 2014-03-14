@@ -16,7 +16,7 @@ public class CommonScopeOfNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("ScopeOf");
+		out.print("ScopeOfNode");
 	}
 
 	@Override

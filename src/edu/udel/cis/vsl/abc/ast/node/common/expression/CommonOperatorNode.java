@@ -46,7 +46,7 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("OperatorExpression[operator=" + operator + "]");
+		out.print("OperatorNode[operator=" + operator + "]");
 	}
 
 	private boolean hasConstantOperator() {

@@ -27,7 +27,7 @@ public class CommonAlignOfNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("AlignOf");
+		out.print("AlignOfNode");
 	}
 
 	@Override

@@ -24,7 +24,7 @@ public class CommonSpawnNode extends CommonExpressionNode implements SpawnNode {
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("spawn");
+		out.print("SpawnNode");
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class CommonSpawnNode extends CommonExpressionNode implements SpawnNode {
 	public ExpressionKind expressionKind() {
 		return ExpressionKind.SPAWN;
 	}
-	
+
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		return false;

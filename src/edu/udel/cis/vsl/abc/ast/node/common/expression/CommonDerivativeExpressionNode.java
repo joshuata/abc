@@ -75,7 +75,7 @@ public class CommonDerivativeExpressionNode extends CommonExpressionNode
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("DerivativeExpression");
+		out.print("DerivativeExpressionNode");
 	}
 
 	@Override

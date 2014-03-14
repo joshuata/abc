@@ -48,7 +48,7 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("FunctionCall");
+		out.print("FunctionCallNode");
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class CommonIntegerConstantNode extends CommonConstantNode implements
 
 	@Override
 	public String toString() {
-		return "IntegerConstant[value=" + getConstantValue().getIntegerValue()
+		return "IntegerConstantNode[value=" + getConstantValue().getIntegerValue()
 				+ "]";
 	}
 

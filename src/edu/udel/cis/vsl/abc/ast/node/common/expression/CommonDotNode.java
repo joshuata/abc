@@ -36,7 +36,7 @@ public class CommonDotNode extends CommonExpressionNode implements DotNode {
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("DotExpression");
+		out.print("DotNode");
 	}
 
 	@Override

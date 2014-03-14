@@ -34,7 +34,7 @@ public class CommonRemoteExpressionNode extends CommonExpressionNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		out.print("RemoteExpression");
+		out.print("RemoteExpressionNode");
 	}
 
 	@Override
