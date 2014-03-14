@@ -94,7 +94,7 @@ public class ABC {
 		System.exit(1);
 	}
 
-	private static Config parseCommandLind(String[] args)
+	private static Config parseCommandLine(String[] args)
 			throws FileNotFoundException {
 		String infileName = null;
 		String outfileName = null;
@@ -219,7 +219,7 @@ public class ABC {
 		System.out.println("ABC v" + version + " of " + date
 				+ " -- http://vsl.cis.udel.edu\n");
 		System.out.flush();
-		config = parseCommandLind(args);
+		config = parseCommandLine(args);
 		if (config.preprocOnly)
 			config.activator.preprocess(config.out);
 		else if (config.verbose)
