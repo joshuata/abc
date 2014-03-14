@@ -37,7 +37,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -192,6 +194,83 @@ public class StatementAnalyzer {
 		}
 	}
 
+	private void processJump(JumpNode statement) throws SyntaxException {
+		switch (statement.getKind()) {
+		case RETURN: {
+			ExpressionNode expression = ((ReturnNode) statement)
+					.getExpression();
+			Function function = entityAnalyzer.enclosingFunction(statement);
+			ObjectType returnType = function.getType().getReturnType();
+			boolean returnTypeIsVoid = returnType.kind() == TypeKind.VOID;
+
+			if (expression == null) {
+				if (!returnTypeIsVoid)
+					throw error("Missing expression in return statement",
+							statement);
+			} else {
+				if (returnTypeIsVoid)
+					throw error(
+							"Argument for return in function returning void",
+							statement);
+				if (expression != null)
+					processExpression(expression);
+				try {
+					expressionAnalyzer
+							.processAssignment(returnType, expression);
+				} catch (UnsourcedException e) {
+					throw error(e, expression);
+				}
+			}
+		}
+		case GOTO: // taken care of later in processGotos
+		case BREAK: // nothing to do
+		case CONTINUE: // nothing to do
+			break;
+		default:
+			throw new RuntimeException("Unreachable");
+		}
+	}
+
+	private void processLoop(LoopNode loopNode) throws SyntaxException {
+		switch (loopNode.getKind()) {
+		case WHILE:
+			processExpression(loopNode.getCondition());
+			processStatement(loopNode.getBody());
+			processExpression(loopNode.getInvariant());
+			break;
+		case DO_WHILE:
+			processStatement(loopNode.getBody());
+			processExpression(loopNode.getCondition());
+			processExpression(loopNode.getInvariant());
+			break;
+		case FOR: {
+			ForLoopNode forNode = (ForLoopNode) loopNode;
+			ForLoopInitializerNode initializer = forNode.getInitializer();
+
+			if (initializer == null) {
+			} else if (initializer instanceof ExpressionNode) {
+				processExpression((ExpressionNode) initializer);
+			} else if (initializer instanceof DeclarationListNode) {
+				Iterator<VariableDeclarationNode> declIter = ((DeclarationListNode) initializer)
+						.childIterator();
+
+				while (declIter.hasNext())
+					entityAnalyzer.declarationAnalyzer
+							.processVariableDeclaration(declIter.next());
+			} else
+				throw error("Unknown kind of initializer clause in for loop",
+						initializer);
+			processExpression(loopNode.getCondition());
+			processExpression(forNode.getIncrementer());
+			processStatement(loopNode.getBody());
+			processExpression(loopNode.getInvariant());
+			break;
+		}
+		default:
+			throw new RuntimeException("Unreachable");
+		}
+	}
+
 	// ************************* Exported Methods **************************
 
 	void processStatement(StatementNode statement) throws SyntaxException {
@@ -203,64 +282,11 @@ public class StatementAnalyzer {
 		else if (statement instanceof IfNode) {
 			processIf((IfNode) statement);
 		} else if (statement instanceof JumpNode) {
-			switch (((JumpNode) statement).getKind()) {
-			case RETURN: {
-				ExpressionNode expression = ((ReturnNode) statement)
-						.getExpression();
-
-				if (expression != null)
-					processExpression(expression);
-			}
-			case GOTO: // taken care of later in processGotos
-			case BREAK: // nothing to do
-			case CONTINUE: // nothing to do
-				break;
-			default:
-				throw new RuntimeException("Unreachable");
-			}
+			processJump((JumpNode) statement);
 		} else if (statement instanceof LabeledStatementNode) {
 			processLabeledStatement((LabeledStatementNode) statement);
 		} else if (statement instanceof LoopNode) {
-			LoopNode loopNode = (LoopNode) statement;
-
-			switch (((LoopNode) statement).getKind()) {
-			case WHILE:
-				processExpression(loopNode.getCondition());
-				processStatement(loopNode.getBody());
-				processExpression(loopNode.getInvariant());
-				break;
-			case DO_WHILE:
-				processStatement(loopNode.getBody());
-				processExpression(loopNode.getCondition());
-				processExpression(loopNode.getInvariant());
-				break;
-			case FOR: {
-				ForLoopNode forNode = (ForLoopNode) loopNode;
-				ForLoopInitializerNode initializer = forNode.getInitializer();
-
-				if (initializer == null) {
-				} else if (initializer instanceof ExpressionNode) {
-					processExpression((ExpressionNode) initializer);
-				} else if (initializer instanceof DeclarationListNode) {
-					Iterator<VariableDeclarationNode> declIter = ((DeclarationListNode) initializer)
-							.childIterator();
-
-					while (declIter.hasNext())
-						entityAnalyzer.declarationAnalyzer
-								.processVariableDeclaration(declIter.next());
-				} else
-					throw error(
-							"Unknown kind of initializer clause in for loop",
-							initializer);
-				processExpression(loopNode.getCondition());
-				processExpression(forNode.getIncrementer());
-				processStatement(loopNode.getBody());
-				processExpression(loopNode.getInvariant());
-				break;
-			}
-			default:
-				throw new RuntimeException("Unreachable");
-			}
+			processLoop((LoopNode) statement);
 		} else if (statement instanceof SwitchNode) {
 			processExpression(((SwitchNode) statement).getCondition());
 			processStatement(((SwitchNode) statement).getBody());
