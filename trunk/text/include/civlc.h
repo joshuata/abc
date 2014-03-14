@@ -78,7 +78,7 @@ void memcpy(void *p, void *q, size_t size) {
   }
 }
 
-/* The CIVL-C de-allocation function, which takes a reference to a heap */
+/* The CIVL-C de-allocation function, which takes a reference to a pointer */
 void $free(void *p);
 
 // Message passing:
@@ -187,9 +187,15 @@ $gcomm $gcomm_create($scope scope, int size) {
   return result;
 }
 
+/* De-allocation a __gcomm__ object */
+void $gcomm_free($gcomm gcomm);
+
 /* Returns the size (number of places) in the global communicator associated
  * to the given comm. */
 int $comm_size($comm comm);
+
+/* De-allocation a __comm__ object */
+void $comm_free($comm comm);
 
 /* Returns the place of the local communicator.  This is the same as the
  * place argument used to create the local communicator. */
