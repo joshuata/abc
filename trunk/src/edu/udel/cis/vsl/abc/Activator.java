@@ -35,8 +35,6 @@ import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.program.Programs;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
-import edu.udel.cis.vsl.abc.reason.IF.Reasoner;
-import edu.udel.cis.vsl.abc.reason.common.CommonReasoner;
 import edu.udel.cis.vsl.abc.token.Tokens;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
@@ -106,8 +104,6 @@ public class Activator {
 
 	private SymbolicUniverse universe = SARL.newStandardUniverse();
 
-	private Reasoner reasoner;
-
 	/**
 	 * Creates a new Activator instance with the given file and include paths.
 	 * No action is taken: the file is not opened.
@@ -123,7 +119,6 @@ public class Activator {
 		String filename = file.getName();
 
 		this.file = file;
-		this.reasoner = new CommonReasoner(this.universe);
 		ABC.setLanguageFromName(filename);
 		preprocessor = preprocessorFactory.newPreprocessor(systemIncludes,
 				userIncludes);
@@ -441,5 +436,14 @@ public class Activator {
 		out.flush();
 
 		return program;
+	}
+
+	/**
+	 * Return the symbolic universe.
+	 * 
+	 * @return
+	 */
+	public SymbolicUniverse universe() {
+		return this.universe;
 	}
 }
