@@ -176,6 +176,7 @@ public class StatementAnalyzer {
 			Iterator<LabeledStatementNode> cases = switchNode.getCases();
 			Value constant;
 
+			expressionAnalyzer.processExpression(caseExpression);
 			if (!caseExpression.isConstantExpression())
 				error("Case expression not constant", caseExpression);
 			constant = nodeFactory.getConstantValue(caseExpression);
