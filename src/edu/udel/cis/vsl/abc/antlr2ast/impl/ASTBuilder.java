@@ -2240,11 +2240,19 @@ public class ASTBuilder {
 		int numTokens = bodyTree.getChildCount();
 		List<CToken> body = new LinkedList<CToken>();
 		CToken newlineToken = (CToken) newlineTree.getToken();
+		String bodyText = "";
 
 		for (int i = 0; i < numTokens; i++) {
 			CToken token = (CToken) ((CommonTree) bodyTree.getChild(i))
 					.getToken();
+			bodyText += token.getText() + " ";
 			body.add(token);
+		}
+		if(identifier.name().equals("omp")){
+			OmpBuilder ompBuilder = new OmpBuilder(bodyText);
+			
+			ompBuilder.getOmpNode();
+			//TODO create OpenMP nodes
 		}
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
