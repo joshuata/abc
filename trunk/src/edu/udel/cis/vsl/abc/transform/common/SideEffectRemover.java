@@ -769,20 +769,18 @@ public class SideEffectRemover implements Transformer {
 
 	private StatementNode loopStatement(LoopNode statement)
 			throws SyntaxException {
-		ExpressionNode condition = statement.getCondition().copy();
+		ExpressionNode condition = statement.getCondition();
 		StatementNode newBody = processStatement(statement.getBody());
 		ExpressionNode invariant = statement.getInvariant();
 		StatementNode result;
 
-		// condition.parent().removeChild(condition.childIndex());
 		if (invariant != null) {
 			invariant.parent().removeChild(invariant.childIndex());
 		}
 		if (!condition.isSideEffectFree(false)) {
 			// If a side effect exists in a condition, convert from
 			// while (e) {S;} to while (true) {int tmp_X = e; if (!e) break; S;}
-			SideEffectFreeTriple sefCondition = processExpression(condition
-					.copy());
+			SideEffectFreeTriple sefCondition = processExpression(condition);
 			List<BlockItemNode> bodyItems = new ArrayList<BlockItemNode>();
 			List<ExpressionNode> ifArgument = new ArrayList<ExpressionNode>();
 			IdentifierNode tempVariableID = factory.newIdentifierNode(
@@ -845,7 +843,7 @@ public class SideEffectRemover implements Transformer {
 				bodyItems.add(newBody);
 				bodyItems.add(modifiedIncrementer);
 				loop = factory.newWhileLoopNode(statement.getSource(),
-						condition, factory.newCompoundStatementNode(
+						condition.copy(), factory.newCompoundStatementNode(
 								newBody.getSource(), bodyItems), invariant
 								.copy());
 				if (initializer instanceof ExpressionNode) {
@@ -868,12 +866,12 @@ public class SideEffectRemover implements Transformer {
 			}
 			break;
 		case DO_WHILE:
-			result = factory.newDoLoopNode(statement.getSource(), condition,
-					newBody, invariant);
+			result = factory.newDoLoopNode(statement.getSource(),
+					condition.copy(), newBody, invariant);
 			break;
 		default:
-			result = factory.newWhileLoopNode(statement.getSource(), condition,
-					newBody, invariant);
+			result = factory.newWhileLoopNode(statement.getSource(),
+					condition.copy(), newBody, invariant);
 		}
 		return result;
 	}
@@ -984,6 +982,9 @@ public class SideEffectRemover implements Transformer {
 			assert functionExpression instanceof IdentifierExpressionNode;
 			functionEntity = ((IdentifierExpressionNode) functionExpression)
 					.getIdentifier().getEntity();
+			// functionEntity =
+			// expression.getScope().getLexicalOrdinaryEntity(((IdentifierExpressionNode)
+			// functionExpression).getIdentifier().name());
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
 
 			// siegel: another possible way is to clone, but
