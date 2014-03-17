@@ -44,8 +44,65 @@
 		<pathelement location="${antlr.jar}" />
 	</path>
 
-	<target name="parsers" depends="CivlCParser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
+	<target name="parsers" depends="OmpParser, CivlCParser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
 	</target>
+
+	<!-- Building OpenMP parser -->
+
+	<target name="checkOmpParserChanges">
+		<uptodate property="noOmpParserChanges">
+			<srcfiles file="${grammar.dir}/OmpParser.g" />
+			<srcfiles file="${grammar.dir}/CivlCParser.g" />
+			<srcfiles file="${grammar.dir}/CivlCParser.tokens" />
+			<srcfiles file="${grammar.dir}/OmpLexer.g" />
+			<srcfiles file="${grammar.dir}/OmpLexer.tokens" />
+			<mapper type="merge" to="${real.src.dir}/parse/common/OmpParser.java" />
+		</uptodate>
+	</target>
+
+	<target name="OmpParser" depends="CivlCParser, OmpLexer, checkOmpParserChanges" unless="noOmpParserChanges">
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="OmpParser.g" />
+		</java>
+		<move file="${grammar.dir}/OmpParser.java" tofile="${grammar.dir}/OmpParser2.java" />
+		<echo message="package edu.udel.cis.vsl.abc.parse.common;${line.separator}import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;${line.separator}import edu.udel.cis.vsl.abc.preproc.common.*;${line.separator}${line.separator}" file="${grammar.dir}/OmpParser.java" />
+		<concat destfile="${grammar.dir}/OmpParser.java" append="true">
+			<filelist dir="${grammar.dir}" files="OmpParser2.java" />
+		</concat>
+		<delete file="${grammar.dir}/OmpParser2.java" />
+		<move file="${grammar.dir}/OmpParser.java" todir="${real.src.dir}/parse/common" />
+		<move file="${grammar.dir}/OmpParser_CivlCParser.java" todir="${real.src.dir}/parse/common" />
+	</target>
+
+	<target name="checkOmpLexerChanges">
+		<uptodate property="noOmpLexerChanges">
+			<srcfiles file="${grammar.dir}/OmpLexer.g" />
+			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
+			<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" />
+			<compositemapper>
+				<mapper type="merge" to="${grammar.dir}/OmpLexer.tokens" />
+				<mapper type="merge" to="${real.src.dir}/preproc/common/OmpLexer.java" />
+			</compositemapper>
+		</uptodate>
+	</target>
+
+	<target name="OmpLexer" depends="PreprocessorLexer,checkOmpLexerChanges" unless="noOmpLexerChanges">
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="OmpLexer.g" />
+		</java>
+		<move file="${grammar.dir}/OmpLexer.java" tofile="${grammar.dir}/OmpLexer2.java" />
+		<echo message="package edu.udel.cis.vsl.abc.preproc.common;${line.separator}${line.separator}" file="${grammar.dir}/OmpLexer.java" />
+		<concat destfile="${grammar.dir}/OmpLexer.java" append="true">
+			<filelist dir="${grammar.dir}" files="OmpLexer2.java" />
+		</concat>
+		<delete file="${grammar.dir}/OmpLexer2.java" />
+		<move file="${grammar.dir}/OmpLexer.java" todir="${real.src.dir}/preproc/common" />
+		<move file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />
+	</target>
+
+	<!-- Building CivlC parser -->
 
 	<target name="checkCivlCParserChanges">
 		<uptodate property="noCivlCParserChanges">
@@ -117,7 +174,6 @@
 		</java>
 		<move file="${grammar.dir}/PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />
 	</target>
-
 
 	<!-- Source compilation and JAR construction -->
 
@@ -243,11 +299,19 @@
 		<delete file="${basedir}/jacoco.exec" />
 		<delete file="${manifest-file}" />
 		<delete file="${grammar.dir}/PreprocessorLexer.tokens" />
-		<delete file="${real.src.dir}/preproc/PreprocessorLexer.java" />
+		<delete file="${real.src.dir}/preproc/common/PreprocessorLexer.java" />
 		<delete file="${grammar.dir}/PreprocessorParser.tokens" />
-		<delete file="${real.src.dir}/preproc/PreprocessorParser.java" />
+		<delete file="${real.src.dir}/preproc/common/PreprocessorParser.java" />
 		<delete file="${grammar.dir}/PreprocessorExpressionParser.tokens" />
-		<delete file="${real.src.dir}/preproc/expr/PreprocessorExpressionParser.java" />
+		<delete file="${real.src.dir}/preproc/common/PreprocessorExpressionParser.java" />
+		<delete file="${grammar.dir}/CivlCParser.tokens" />
+		<delete file="${real.src.dir}/parse/common/CivlCParser.java" />
+		<delete file="${grammar.dir}/OmpLexer.tokens" />
+		<delete file="${real.src.dir}/preproc/common/OmpLexer.java" />
+		<delete file="${real.src.dir}/preproc/common/OmpLexer_PreprocessorLexer.java" />
+		<delete file="${grammar.dir}/OmpParser.tokens" />
+		<delete file="${real.src.dir}/parse/common/OmpParser.java" />
+		<delete file="${real.src.dir}/parse/common/OmpParser_CivlCParser.java" />
 	</target>
 
 	<!-- Do everything -->
