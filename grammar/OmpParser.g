@@ -14,9 +14,12 @@ tokens
 	IDENTIFIER_LIST;	
 	PARALLEL_FOR;
 	PARALLEL_SECTIONS;
+	UNIQUE_FOR;
+	UNIQUIE_PARLLEL;
+	DATA_CLAUSE;
 }
 
-/* ANTLR 3.4 doesn't allow redefinition of headers in compositive grammars.
+/* ANTLR 3.4 doesn't allow redefinition of headers in composite grammars.
 Our solution for this is: add the header (package, imported package)
 to the generated java file in ant.
 @header
@@ -168,14 +171,23 @@ for_clause
   ;
 
 unique_for_clause
-  : ORDERED ->^(ORDERED)
-  | SCHEDULE LPAREN s=schedule_kind RPAREN
-    -> ^(SCHEDULE $s)
-  | SCHEDULE LPAREN s1=schedule_kind COMMA e=expression RPAREN
-    -> ^(SCHEDULE $s1 $e)
-  | COLLAPSE LPAREN i=INTEGER_CONSTANT RPAREN
-    -> ^(COLLAPSE $i)
+  : ORDERED ->^(UNIQUE_FOR ORDERED)
+  | s1=schedule_clause -> ^(UNIQUE_FOR $s1)
+  | c=collapse_clause -> ^(UNIQUE_FOR $c)
   ;
+  
+schedule_clause
+	: SCHEDULE LPAREN s=schedule_kind RPAREN
+	  -> ^(SCHEDULE $s)
+    | SCHEDULE LPAREN s1=schedule_kind COMMA e=expression RPAREN
+      -> ^(SCHEDULE $s1 $e)
+	;
+	
+collapse_clause
+	:
+	COLLAPSE LPAREN i=INTEGER_CONSTANT RPAREN
+    -> ^(COLLAPSE $i)
+	;
 
 schedule_kind
   : STATIC -> ^(STATIC)
@@ -185,30 +197,80 @@ schedule_kind
   ;
 
 unique_parallel_clause
+  : i=if_clause 
+    -> ^(UNIQUIE_PARLLEL $i)
+  | n=num_threads_clause 
+    -> ^(UNIQUIE_PARLLEL $n)
+  ;
+  
+if_clause
   : IF LPAREN e1=expression RPAREN
     -> ^(IF $e1)
-  | NUM_THREADS LPAREN e2=expression RPAREN
+  ;
+  
+num_threads_clause
+  : NUM_THREADS LPAREN e2=expression RPAREN
     -> ^(NUM_THREADS $e2)
   ;
 
 data_clause
+  : d1=private_clause
+    -> ^(DATA_CLAUSE $d1)
+  | d2=firstprivate_clause
+    -> ^(DATA_CLAUSE $d2)
+  | d3=lastprivate_clause
+    -> ^(DATA_CLAUSE $d3)
+  | d4=shared_clause
+    -> ^(DATA_CLAUSE $d4)
+  | d5=default_clause
+    -> ^(DATA_CLAUSE $d5)
+  | d6=reduction_clause
+    -> ^(DATA_CLAUSE $d6)
+  | d7=copyin_clause
+    -> ^(DATA_CLAUSE $d7)
+  | d8=copyprivate_clause
+    -> ^(DATA_CLAUSE $d8)
+  ;
+  
+private_clause
   : PRIVATE WS* LPAREN WS* i1=identifier_list WS* RPAREN 
     -> ^(PRIVATE $i1)
-  | FST_PRIVATE WS* LPAREN WS* i2=identifier_list WS* RPAREN
+  ;
+  
+firstprivate_clause
+  : FST_PRIVATE WS* LPAREN WS* i2=identifier_list WS* RPAREN
     -> ^(FST_PRIVATE $i2)
-  | LST_PRIVATE WS* LPAREN WS* i3=identifier_list WS* RPAREN
+  ;
+  
+lastprivate_clause
+  : LST_PRIVATE WS* LPAREN WS* i3=identifier_list WS* RPAREN
     -> ^(LST_PRIVATE $i3)
-  | SHARED WS* LPAREN WS* i4=identifier_list WS* RPAREN
+  ;
+  
+shared_clause
+  : SHARED WS* LPAREN WS* i4=identifier_list WS* RPAREN
     -> ^(SHARED $i4)
-  | DEFAULT WS* LPAREN WS* SHARED WS* RPAREN
+  ;
+  
+default_clause
+  : DEFAULT WS* LPAREN WS* SHARED WS* RPAREN
     -> ^(DEFAULT SHARED)
   | DEFAULT WS* LPAREN WS* NONE WS* RPAREN
     -> ^(DEFAULT NONE)
-  | REDUCTION WS* LPAREN WS* r=reduction_operator WS* COLON WS* i5=identifier_list WS* RPAREN
+  ;
+  
+reduction_clause
+  : REDUCTION WS* LPAREN WS* r=reduction_operator WS* COLON WS* i5=identifier_list WS* RPAREN
     -> ^(REDUCTION $r $i5)
-  | COPYIN WS* LPAREN WS* i6=identifier_list WS* RPAREN
+  ;
+  
+copyin_clause
+  : COPYIN WS* LPAREN WS* i6=identifier_list WS* RPAREN
     -> ^(COPYIN $i6)
-  | COPYPRIVATE WS* LPAREN WS* i7=identifier_list WS* RPAREN
+  ;
+  
+copyprivate_clause
+  : COPYPRIVATE WS* LPAREN WS* i7=identifier_list WS* RPAREN
     -> ^(COPYPRIVATE $i7)
   ;
 
