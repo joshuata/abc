@@ -70,4 +70,9 @@ public class CIVLTranslationTest {
 	public void atomicBlock() throws ABCException, IOException {
 		check("atomicStatement");
 	}
+	
+	@Test
+	public void potentialBug() throws ABCException, IOException {
+		check("potentialBug");
+	}
 }
