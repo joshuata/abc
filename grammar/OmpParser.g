@@ -84,7 +84,7 @@ critical_directive
   ;
   
 sections_directive
-  : SECTIONS  s+=sections_clause*
+  : SECTIONS  (s+=sections_clause)*
   -> ^(SECTIONS $s*)
   ;
 

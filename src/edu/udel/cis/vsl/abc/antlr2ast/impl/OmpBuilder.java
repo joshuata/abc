@@ -392,17 +392,6 @@ public class OmpBuilder {
 		}
 	}
 
-	// private void getCTokenList(CommonTree rootTree) {
-	// int number = rootTree.getChildCount();
-	// CToken token = (CToken)rootTree.getToken();
-	// // CToken ctoken = sourceFactory.newCToken(token, formation);
-	//
-	// this.ctokens.add(ctoken);
-	// for (int i = 0; i < number; i++) {
-	// getCTokenList((CommonTree) rootTree.getChild(i));
-	// }
-	// }
-
 	private OmpNode translateParallel(CommonTree paralle)
 			throws SyntaxException {
 		int numChildren = paralle.getChildCount();
@@ -470,18 +459,6 @@ public class OmpBuilder {
 			throw new ABCRuntimeException("Unreachable");
 		}
 	}
-
-	// private void processTokens(List<Token> tokens, int line, int colOffset) {
-	// int number = tokens.size();
-	//
-	// for (int i = 0; i < number; i++) {
-	// Token token = tokens.get(i);
-	//
-	// token.setLine(line);
-	// token.setCharPositionInLine(token.getCharPositionInLine()
-	// + colOffset);
-	// }
-	// }
 
 	private OmpParallelNode translateParallelFor(CommonTree parallelFor)
 			throws SyntaxException {

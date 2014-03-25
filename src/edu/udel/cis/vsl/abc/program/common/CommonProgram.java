@@ -67,4 +67,10 @@ public class CommonProgram implements Program {
 		return ast.getASTFactory().getTokenFactory();
 	}
 
+	@Override
+	public void transform(TransformMode mode) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
