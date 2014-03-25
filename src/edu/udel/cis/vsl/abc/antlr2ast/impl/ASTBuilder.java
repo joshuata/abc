@@ -2274,9 +2274,9 @@ public class ASTBuilder {
 		if (identifier.name().equals("omp")) {
 			int line = identifier.getSource().getLastToken().getLine();
 
+			newlineToken.setType(CivlCParser.EOF);
 			return ompBuilder.getOmpNode(bodyText, formation, line, col + 1,
 					source, identifier, newlineToken, scope);
-			// TODO create OpenMP nodes
 		}
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
