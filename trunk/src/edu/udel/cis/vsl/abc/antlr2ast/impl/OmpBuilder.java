@@ -17,6 +17,7 @@ import static edu.udel.cis.vsl.abc.parse.common.OmpParser.FLUSH;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.FOR;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.FST_PRIVATE;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.GUIDED;
+import static edu.udel.cis.vsl.abc.parse.common.OmpParser.IDENTIFIER;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.IF;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.LST_PRIVATE;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.MASTER;
@@ -44,15 +45,13 @@ import static edu.udel.cis.vsl.abc.parse.common.OmpParser.THD_PRIVATE;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.UNIQUE_FOR;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.UNIQUE_PARALLEL;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenSource;
+import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
@@ -74,9 +73,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKin
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpNodeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.parse.common.OmpParser;
-import edu.udel.cis.vsl.abc.preproc.common.OmpLexer;
+import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
@@ -87,7 +85,7 @@ public class OmpBuilder {
 	private OmpNodeFactory ompNodeFactory;
 	private NodeFactory nodeFactory;
 	private TokenFactory sourceFactory;
-	private Formation formation;
+	// private Formation formation;
 	private List<CToken> ctokens;
 	private Source source;
 	private IdentifierNode ompIdentifierNode;
@@ -114,29 +112,126 @@ public class OmpBuilder {
 		this.astBuilder = astBuilder;
 	}
 
-	@SuppressWarnings("unchecked")
-	public OmpNode getOmpNode(String text, Formation formation, int line,
-			int offset, Source source, IdentifierNode identifier,
-			CToken eofToken, SimpleScope scope) throws SyntaxException {
-		this.formation = formation;
+	private TokenStream ompTokenStream(List<CToken> ctokens) {
+		int number = ctokens.size();
+		TokenSource source;
+
+		for (int i = 0; i < number; i++) {
+			CToken token = ctokens.get(i);
+			int type = token.getType();
+
+			if (type == IDENTIFIER) {
+				switch (token.getText()) {
+				case "barrier":
+					token.setType(BARRIER);
+					break;
+				case "collapse":
+					token.setType(COLLAPSE);
+					break;
+				case "copyin":
+					token.setType(COPYIN);
+					break;
+				case "copyprivate":
+					token.setType(COPYPRIVATE);
+					break;
+				case "critical":
+					token.setType(CRITICAL);
+					break;
+				case "default":
+					token.setType(DEFAULT);
+					break;
+				case "dynamic":
+					token.setType(DYNAMIC);
+					break;
+				case "firstprivate":
+					token.setType(FST_PRIVATE);
+					break;
+				case "flush":
+					token.setType(FLUSH);
+					break;
+				case "guided":
+					token.setType(GUIDED);
+					break;
+				case "lastprivate":
+					token.setType(LST_PRIVATE);
+					break;
+				case "master":
+					token.setType(MASTER);
+					break;
+				case "none":
+					token.setType(NONE);
+					break;
+				case "nowait":
+					token.setType(NOWAIT);
+					break;
+				case "num_threads":
+					token.setType(NUM_THREADS);
+					break;
+				case "ordered":
+					token.setType(ORDERED);
+					break;
+				case "parallel":
+					token.setType(PARALLEL);
+					break;
+				case "private":
+					token.setType(PRIVATE);
+					break;
+				case "reduction":
+					token.setType(REDUCTION);
+					break;
+				case "runtime":
+					token.setType(RUNTIME);
+					break;
+				case "schedule":
+					token.setType(SCHEDULE);
+					break;
+				case "sections":
+					token.setType(SECTIONS);
+					break;
+				case "section":
+					token.setType(SECTION);
+					break;
+				case "shared":
+					token.setType(SHARED);
+					break;
+				case "static":
+					token.setType(STATIC);
+					break;
+				case "threadprivate":
+					token.setType(THD_PRIVATE);
+					break;
+				default:
+				}
+			}
+			if (i == number - 1) {
+				token.setNext(null);
+			}
+		}
+		this.ctokens = ctokens;
+		source = PreprocessorUtils.makeTokenSourceFromList(ctokens.get(0));
+		return new CommonTokenStream(source);
+	}
+
+	public OmpNode getOmpNode(Source source, IdentifierNode identifier,
+			SimpleScope scope, List<CToken> ctokens, CToken eofToken)
+			throws SyntaxException {
 		try {
-			ANTLRInputStream input = new ANTLRInputStream(
-					new ByteArrayInputStream(text.getBytes()));
-			OmpLexer lexer = new OmpLexer(input);
-			CommonTokenStream tokens = new CommonTokenStream(lexer);
+			// ANTLRInputStream input = new ANTLRInputStream(
+			// new ByteArrayInputStream(text.getBytes()));
+			// OmpLexer lexer = new OmpLexer(input);
+			TokenStream tokens = this.ompTokenStream(ctokens);
 			OmpParser parser;
 			CommonTree rootTree;
 			int type;
-			
+
 			this.scope = scope;
-			this.ctokens = new ArrayList<>();
 			this.source = source;
 			this.ompIdentifierNode = identifier;
 			this.eofToken = eofToken;
 			parser = new OmpParser(tokens);
-			processTokens(tokens.getTokens(), line, offset);
+			// processTokens(tokens.getTokens(), line, offset);
 			rootTree = (CommonTree) parser.openmp_construct().getTree();
-			getCTokenList(rootTree);
+			// getCTokenList(rootTree);
 			type = rootTree.getType();
 			switch (type) {
 			case PARALLEL_FOR:
@@ -161,7 +256,7 @@ public class OmpBuilder {
 
 				if (rootTree.getChildCount() > 0) {
 					criticalNode
-							.setCriticalName(getIdentifierNode(((CommonTree) rootTree
+							.setCriticalName(getIdentifierNode((CToken) ((CommonTree) rootTree
 									.getChild(0)).getToken()));
 				}
 				return criticalNode;
@@ -179,9 +274,6 @@ public class OmpBuilder {
 			case THD_PRIVATE:
 			default:
 			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		} catch (RecognitionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -285,16 +377,16 @@ public class OmpBuilder {
 		}
 	}
 
-	private void getCTokenList(CommonTree rootTree) {
-		int number = rootTree.getChildCount();
-		Token token = rootTree.getToken();
-		CToken ctoken = sourceFactory.newCToken(token, formation);
-
-		this.ctokens.add(ctoken);
-		for (int i = 0; i < number; i++) {
-			getCTokenList((CommonTree) rootTree.getChild(i));
-		}
-	}
+	// private void getCTokenList(CommonTree rootTree) {
+	// int number = rootTree.getChildCount();
+	// CToken token = (CToken)rootTree.getToken();
+	// // CToken ctoken = sourceFactory.newCToken(token, formation);
+	//
+	// this.ctokens.add(ctoken);
+	// for (int i = 0; i < number; i++) {
+	// getCTokenList((CommonTree) rootTree.getChild(i));
+	// }
+	// }
 
 	private OmpNode translateParallel(CommonTree paralle)
 			throws SyntaxException {
@@ -343,17 +435,17 @@ public class OmpBuilder {
 
 	}
 
-	private void processTokens(List<Token> tokens, int line, int colOffset) {
-		int number = tokens.size();
-
-		for (int i = 0; i < number; i++) {
-			Token token = tokens.get(i);
-
-			token.setLine(line);
-			token.setCharPositionInLine(token.getCharPositionInLine()
-					+ colOffset);
-		}
-	}
+	// private void processTokens(List<Token> tokens, int line, int colOffset) {
+	// int number = tokens.size();
+	//
+	// for (int i = 0; i < number; i++) {
+	// Token token = tokens.get(i);
+	//
+	// token.setLine(line);
+	// token.setCharPositionInLine(token.getCharPositionInLine()
+	// + colOffset);
+	// }
+	// }
 
 	private OmpParallelNode translateParallelFor(CommonTree parallelFor) {
 		int numChildren = parallelFor.getChildCount();
@@ -475,17 +567,17 @@ public class OmpBuilder {
 		ArrayList<IdentifierNode> list = new ArrayList<>(numChildren);
 
 		for (int i = 0; i < numChildren; i++) {
-			list.add(getIdentifierNode(((CommonTree) identifierList.getChild(i))
-					.getToken()));
+			list.add(getIdentifierNode((CToken) ((CommonTree) identifierList
+					.getChild(i)).getToken()));
 		}
 		return list;
 	}
 
-	private IdentifierNode getIdentifierNode(Token token) {
-		CToken ctoken = sourceFactory.newCToken(token, formation);
-		Source source = sourceFactory.newSource(ctoken);
+	private IdentifierNode getIdentifierNode(CToken token) {
+		// CToken ctoken = sourceFactory.newCToken(token, formation);
+		Source source = sourceFactory.newSource(token);
 
-		return nodeFactory.newIdentifierNode(source, ctoken.getText());
+		return nodeFactory.newIdentifierNode(source, token.getText());
 	}
 
 	public OmpNodeFactory ompNodeFactory() {

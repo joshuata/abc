@@ -93,7 +93,6 @@ import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
-import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -2246,7 +2245,6 @@ public class ASTBuilder {
 		}
 	}
 
-	// TODO implement OMP parser
 	private PragmaNode translatePragma(Source source, CommonTree pragmaTree,
 			SimpleScope scope) throws SyntaxException {
 		CommonTree identifierTree = (CommonTree) pragmaTree.getChild(0);
@@ -2254,29 +2252,27 @@ public class ASTBuilder {
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
 		CommonTree newlineTree = (CommonTree) pragmaTree.getChild(2);
 		int numTokens = bodyTree.getChildCount();
-		List<CToken> body = new LinkedList<CToken>();
+		List<CToken> body = new LinkedList<>();
 		CToken newlineToken = (CToken) newlineTree.getToken();
-		String bodyText = "";
-		Formation formation = ((CToken) identifierTree.getToken())
-				.getFormation();
-		int col = 0;
+		// String bodyText = "";
+		// Formation formation = ((CToken) identifierTree.getToken())
+		// .getFormation();
+		// int col = 0;
 
 		for (int i = 0; i < numTokens; i++) {
 			CToken token = (CToken) ((CommonTree) bodyTree.getChild(i))
 					.getToken();
 
-			if (i == 0) {
-				col = token.getCharPositionInLine();
-			}
-			bodyText += token.getText() + " ";
+			// if (i == 0) {
+			// col = token.getCharPositionInLine();
+			// }
+			// bodyText += token.getText() + " ";
 			body.add(token);
 		}
 		if (identifier.name().equals("omp")) {
-			int line = identifier.getSource().getLastToken().getLine();
-
 			newlineToken.setType(CivlCParser.EOF);
-			return ompBuilder.getOmpNode(bodyText, formation, line, col + 1,
-					source, identifier, newlineToken, scope);
+			return ompBuilder.getOmpNode(source, identifier, scope, body,
+					newlineToken);
 		}
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
