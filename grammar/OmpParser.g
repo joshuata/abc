@@ -65,7 +65,7 @@ openmp_construct
   ;
 
 parallel_directive
-  : PARALLEL WS+ (p+=parallel_clause WS?)*
+  : PARALLEL  (p+=parallel_clause)*
   -> ^(PARALLEL $p*)
   ;
 
@@ -79,12 +79,12 @@ master_directive
   ;
 
 critical_directive
-  : CRITICAL WS* (LPAREN WS* id=IDENTIFIER WS* RPAREN)?
+  : CRITICAL  (LPAREN  id=IDENTIFIER  RPAREN)?
   -> ^(CRITICAL $id?)
   ;
   
 sections_directive
-  : SECTIONS WS* s+=sections_clause*
+  : SECTIONS  s+=sections_clause*
   -> ^(SECTIONS $s*)
   ;
 
@@ -98,7 +98,7 @@ section_directive
   ;
   
 parallel_for_directive
-  : PARALLEL WS+ FOR WS+ p+=parallel_for_clause*
+  : PARALLEL FOR p+=parallel_for_clause*
     -> ^(PARALLEL_FOR $p*)
   ;
 
@@ -109,7 +109,7 @@ parallel_for_clause
   ;
 
 parallel_sections_directive
-  : PARALLEL WS+ SECTIONS WS+ p+=parallel_sections_clause*
+  : PARALLEL  SECTIONS  p+=parallel_sections_clause*
     -> ^(PARALLEL_SECTIONS $p*)
   ;
 
@@ -119,7 +119,7 @@ parallel_sections_clause
   ;
 
 single_directive
-  : SINGLE WS* s+=single_clause*
+  : SINGLE  s+=single_clause*
     -> ^(SINGLE $s*)
   ;
 
@@ -137,12 +137,12 @@ atomic_directive
   ;
 
 flush_directive
-  : FLUSH WS* f=flush_vars?
+  : FLUSH  f=flush_vars?
     -> ^(FLUSH $f?)
   ;
 
 flush_vars
-  : LPAREN WS*  i=identifier_list WS* RPAREN
+  : LPAREN   i=identifier_list  RPAREN
     -> ^(IDENTIFIER_LIST $i)
   ;
 
@@ -155,12 +155,12 @@ nowait_directive
   ;
 
 threadprivate_directive
-  : THD_PRIVATE WS* LPAREN WS* i=identifier_list WS* RPAREN
+  : THD_PRIVATE  LPAREN  i=identifier_list  RPAREN
     -> ^(THD_PRIVATE $i)
   ;
 
 for_directive
-  : FOR WS+ (f+=for_clause)*
+  : FOR  (f+=for_clause)*
     -> ^(FOR $f*)
   ;
 
@@ -177,15 +177,15 @@ unique_for_clause
   ;
   
 schedule_clause
-	: SCHEDULE WS* LPAREN WS* s1=schedule_kind WS* COMMA WS* e=expression WS* RPAREN
+	: SCHEDULE  LPAREN  s1=schedule_kind  COMMA  e=expression  RPAREN
       -> ^(SCHEDULE $s1 $e)
-    |  SCHEDULE WS* LPAREN WS* s=schedule_kind WS* RPAREN
+    |  SCHEDULE  LPAREN  s=schedule_kind  RPAREN
 	  -> ^(SCHEDULE $s)
 	;
 	
 collapse_clause
 	:
-	COLLAPSE WS* LPAREN WS* i=INTEGER_CONSTANT WS* RPAREN
+	COLLAPSE  LPAREN  i=INTEGER_CONSTANT  RPAREN
     -> ^(COLLAPSE $i)
 	;
 
@@ -204,12 +204,12 @@ unique_parallel_clause
   ;
   
 if_clause
-  : IF WS* LPAREN WS* e1=expression WS* RPAREN
+  : IF  LPAREN  e1=expression  RPAREN
     -> ^(IF $e1)
   ;
   
 num_threads_clause
-  : NUM_THREADS WS* LPAREN WS* e2=expression WS* RPAREN
+  : NUM_THREADS  LPAREN  e2=expression  RPAREN
     -> ^(NUM_THREADS $e2)
   ;
 
@@ -233,44 +233,44 @@ data_clause
   ;
   
 private_clause
-  : PRIVATE WS* LPAREN WS* i1=identifier_list WS* RPAREN 
+  : PRIVATE  LPAREN  i1=identifier_list  RPAREN 
     -> ^(PRIVATE $i1)
   ;
   
 firstprivate_clause
-  : FST_PRIVATE WS* LPAREN WS* i2=identifier_list WS* RPAREN
+  : FST_PRIVATE  LPAREN  i2=identifier_list  RPAREN
     -> ^(FST_PRIVATE $i2)
   ;
   
 lastprivate_clause
-  : LST_PRIVATE WS* LPAREN WS* i3=identifier_list WS* RPAREN
+  : LST_PRIVATE  LPAREN  i3=identifier_list  RPAREN
     -> ^(LST_PRIVATE $i3)
   ;
   
 shared_clause
-  : SHARED WS* LPAREN WS* i4=identifier_list WS* RPAREN
+  : SHARED  LPAREN  i4=identifier_list  RPAREN
     -> ^(SHARED $i4)
   ;
   
 default_clause
-  : DEFAULT WS* LPAREN WS* SHARED WS* RPAREN
+  : DEFAULT  LPAREN  SHARED  RPAREN
     -> ^(DEFAULT SHARED)
-  | DEFAULT WS* LPAREN WS* NONE WS* RPAREN
+  | DEFAULT  LPAREN  NONE  RPAREN
     -> ^(DEFAULT NONE)
   ;
   
 reduction_clause
-  : REDUCTION WS* LPAREN WS* r=reduction_operator WS* COLON WS* i5=identifier_list WS* RPAREN
+  : REDUCTION LPAREN r=reduction_operator COLON i5=identifier_list RPAREN
     -> ^(REDUCTION $r $i5)
   ;
   
 copyin_clause
-  : COPYIN WS* LPAREN WS* i6=identifier_list WS* RPAREN
+  : COPYIN  LPAREN  i6=identifier_list  RPAREN
     -> ^(COPYIN $i6)
   ;
   
 copyprivate_clause
-  : COPYPRIVATE WS* LPAREN WS* i7=identifier_list WS* RPAREN
+  : COPYPRIVATE  LPAREN  i7=identifier_list  RPAREN
     -> ^(COPYPRIVATE $i7)
   ;
 
@@ -288,7 +288,7 @@ reduction_operator
 
 identifier_list
   :
-  i1=IDENTIFIER (WS* COMMA WS* i2+=IDENTIFIER)* 
+  i1=IDENTIFIER ( COMMA  i2+=IDENTIFIER)* 
   -> ^(IDENTIFIER_LIST $i1 $i2*)
   ;
   

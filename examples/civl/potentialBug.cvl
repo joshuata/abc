@@ -1,9 +1,9 @@
 //command: civl parse potentialBug.cvl
 
 #include<civlc.h>
-$input int L;
-$assume 0<L && L<=3;
-//int L =3;
+//$input int L;
+//$assume 0<L && L<=3;
+int L =3;
 int foo(int a[L]){
   return L;
 }

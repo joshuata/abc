@@ -92,14 +92,14 @@
 			<arg value="-verbose" />
 			<arg value="OmpLexer.g" />
 		</java>
-		<move file="${grammar.dir}/OmpLexer.java" tofile="${grammar.dir}/OmpLexer2.java" />
+		<!--<move file="${grammar.dir}/OmpLexer.java" tofile="${grammar.dir}/OmpLexer2.java" />
 		<echo message="package edu.udel.cis.vsl.abc.preproc.common;${line.separator}${line.separator}" file="${grammar.dir}/OmpLexer.java" />
 		<concat destfile="${grammar.dir}/OmpLexer.java" append="true">
 			<filelist dir="${grammar.dir}" files="OmpLexer2.java" />
-		</concat>
-		<delete file="${grammar.dir}/OmpLexer2.java" />
-		<move file="${grammar.dir}/OmpLexer.java" todir="${real.src.dir}/preproc/common" />
-		<move file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />
+		</concat>-->
+		<delete file="${grammar.dir}/OmpLexer.java" />
+		<!--<move file="${grammar.dir}/OmpLexer.java" todir="${real.src.dir}/preproc/common" />
+		<move file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />-->
 	</target>
 
 	<!-- Building CivlC parser -->
