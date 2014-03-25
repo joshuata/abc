@@ -17,9 +17,9 @@ import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 
-	private ArrayList<CToken> body;
+	protected ArrayList<CToken> body;
 
-	private CToken eofToken;
+	protected CToken eofToken;
 
 	public CommonPragmaNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken) {

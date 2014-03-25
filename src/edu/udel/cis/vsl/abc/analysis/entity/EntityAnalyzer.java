@@ -231,15 +231,20 @@ public class EntityAnalyzer implements Analyzer {
 
 	void processPragma(PragmaNode node) throws SyntaxException {
 		IdentifierNode identifier = node.getPragmaIdentifier();
-		String name = identifier.name();
-		PragmaHandler handler = pragmaHandlerMap.get(name);
 
-		if (handler == null) {
-			handler = entityFactory.newPragmaHandler(name);
+		if (identifier == null) {
+			return;
+		} else {
+			String name = identifier.name();
+			PragmaHandler handler = pragmaHandlerMap.get(name);
 
-			pragmaHandlerMap.put(name, handler);
+			if (handler == null) {
+				handler = entityFactory.newPragmaHandler(name);
+
+				pragmaHandlerMap.put(name, handler);
+			}
+			identifier.setEntity(handler);
 		}
-		identifier.setEntity(handler);
 	}
 
 	/**
