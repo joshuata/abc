@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.Iterator;
+import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
@@ -12,9 +13,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode.OmpStatementNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -293,6 +300,9 @@ public class StatementAnalyzer {
 			processStatement(((SwitchNode) statement).getBody());
 		} else if (statement instanceof PragmaNode) {
 			entityAnalyzer.processPragma((PragmaNode) statement);
+			if (statement instanceof OmpStatementNode) {
+				processOmpStatement((OmpStatementNode) statement);
+			}
 		} else if (statement instanceof NullStatementNode) {
 			// nothing to do
 		} else if (statement instanceof AssumeNode) {
@@ -319,6 +329,45 @@ public class StatementAnalyzer {
 			processStatement(((AtomicNode) statement).getBody());
 		} else
 			throw error("Unknown kind of statement", statement);
+	}
+
+	private void processOmpStatement(OmpStatementNode statement)
+			throws SyntaxException {
+		OmpStatementNodeKind kind = statement.ompStatementNodeKind();
+
+		switch (kind) {
+		case PARALLEL:
+			OmpParallelNode parallel = (OmpParallelNode) statement;
+
+			if (parallel.ifClause() != null)
+				processExpression(parallel.ifClause());
+			if (parallel.numThreads() != null)
+				processExpression(parallel.numThreads());
+			break;
+		case WORKSHARE:
+			OmpWorkshareNode workshare = (OmpWorkshareNode) statement;
+
+			switch (workshare.ompWorkshareNodeKind()) {
+			case FOR:
+				OmpForNode forNode = (OmpForNode) statement;
+				List<FunctionCallNode> assertions = forNode.assertions();
+				FunctionCallNode invariant = forNode.invariant();
+
+				if (assertions != null) {
+					for (FunctionCallNode node : assertions)
+						processExpression(node);
+				}
+				if (invariant != null)
+					processExpression(invariant);
+				break;
+			default:
+			}
+			break;
+		default:
+
+		}
+		if (statement.statementNode() != null)
+			processStatement(statement.statementNode());
 	}
 
 	/**

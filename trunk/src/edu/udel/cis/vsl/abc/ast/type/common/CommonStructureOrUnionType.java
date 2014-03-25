@@ -67,6 +67,8 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 	@Override
 	public int getNumFields() {
+		if (fields == null)
+			return 0;
 		return fields.size();
 	}
 

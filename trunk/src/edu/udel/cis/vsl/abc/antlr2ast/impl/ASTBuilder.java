@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
@@ -70,12 +71,14 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode.StatementKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
@@ -90,6 +93,7 @@ import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
+import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -135,8 +139,8 @@ public class ASTBuilder {
 	// static final int DEFAULT = CivlCParser.DEFAULT;
 	// static final int DIV = CivlCParser.DIV;
 	// static final int DIVEQ = CivlCParser.DIVEQ;
-//	static final int DO = CivlCParser.DO;
-//	static final int DOT = CivlCParser.DOT;
+	// static final int DO = CivlCParser.DO;
+	// static final int DOT = CivlCParser.DOT;
 	static final int DOUBLE = CivlCParser.DOUBLE;
 	static final int ELLIPSIS = CivlCParser.ELLIPSIS;
 	static final int ELSE = CivlCParser.ELSE;
@@ -312,6 +316,8 @@ public class ASTBuilder {
 
 	private CommonTree rootTree;
 
+	private OmpBuilder ompBuilder;
+
 	// Constructors...
 
 	/**
@@ -332,6 +338,8 @@ public class ASTBuilder {
 		this.nodeFactory = unitFactory.getNodeFactory();
 		this.sourceFactory = unitFactory.getTokenFactory();
 		this.rootTree = rootTree;
+		this.ompBuilder = new OmpBuilder(nodeFactory.getValueFactory(),
+				this.nodeFactory, this.sourceFactory, this);
 	}
 
 	// The "main" instance method...
@@ -404,8 +412,16 @@ public class ASTBuilder {
 	}
 
 	private IdentifierNode translateIdentifier(CommonTree identifier) {
-		CToken token = (CToken) identifier.getToken();
-		Source source = sourceFactory.newSource(token);
+		Token idToken = identifier.getToken();
+		CToken token;
+		Source source;
+
+		if (idToken instanceof CToken)
+			token = (CToken) idToken;
+		else {
+			token = sourceFactory.newCToken(idToken, null);
+		}
+		source = sourceFactory.newSource(token);
 
 		return nodeFactory.newIdentifierNode(source, token.getText());
 	}
@@ -524,7 +540,7 @@ public class ASTBuilder {
 				stringLiteral.getText(), token.getStringLiteral());
 	}
 
-	private ExpressionNode translateExpression(CommonTree expressionTree,
+	public ExpressionNode translateExpression(CommonTree expressionTree,
 			SimpleScope scope) throws SyntaxException {
 		int kind = expressionTree.getType();
 
@@ -2232,7 +2248,7 @@ public class ASTBuilder {
 
 	// TODO implement OMP parser
 	private PragmaNode translatePragma(Source source, CommonTree pragmaTree,
-			SimpleScope scope) {
+			SimpleScope scope) throws SyntaxException {
 		CommonTree identifierTree = (CommonTree) pragmaTree.getChild(0);
 		IdentifierNode identifier = translateIdentifier(identifierTree);
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
@@ -2241,18 +2257,26 @@ public class ASTBuilder {
 		List<CToken> body = new LinkedList<CToken>();
 		CToken newlineToken = (CToken) newlineTree.getToken();
 		String bodyText = "";
+		Formation formation = ((CToken) identifierTree.getToken())
+				.getFormation();
+		int col = 0;
 
 		for (int i = 0; i < numTokens; i++) {
 			CToken token = (CToken) ((CommonTree) bodyTree.getChild(i))
 					.getToken();
+
+			if (i == 0) {
+				col = token.getCharPositionInLine();
+			}
 			bodyText += token.getText() + " ";
 			body.add(token);
 		}
-		if(identifier.name().equals("omp")){
-			OmpBuilder ompBuilder = new OmpBuilder(bodyText);
-			
-			ompBuilder.getOmpNode();
-			//TODO create OpenMP nodes
+		if (identifier.name().equals("omp")) {
+			int line = identifier.getSource().getLastToken().getLine();
+
+			return ompBuilder.getOmpNode(bodyText, formation, line, col + 1,
+					source, identifier, newlineToken, scope);
+			// TODO create OpenMP nodes
 		}
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
@@ -2272,6 +2296,7 @@ public class ASTBuilder {
 		CommonTree blockItems = (CommonTree) compoundStatementTree.getChild(1);
 		int numChildren = blockItems.getChildCount();
 		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
+		OmpStatementNode ompStatementNode = null;
 
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree childTree = (CommonTree) blockItems.getChild(i);
@@ -2289,7 +2314,20 @@ public class ASTBuilder {
 				items.add((BlockItemNode) translateFunctionDefinition(
 						childTree, newScope));
 			} else {
-				items.add(translateStatement(childTree, newScope));
+				StatementNode statementNode = translateStatement(childTree,
+						newScope);
+
+				if (ompStatementNode != null) {
+					ompStatementNode.setStatementNode(statementNode);
+					ompStatementNode = null;
+				} else {
+					items.add(statementNode);
+					if (statementNode.statementKind() == StatementKind.OMP_STATEMENT) {
+						ompStatementNode = (OmpStatementNode) statementNode;
+						if (ompStatementNode.completed())
+							ompStatementNode = null;
+					}
+				}
 			}
 		}
 		return nodeFactory.newCompoundStatementNode(source, items);

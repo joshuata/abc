@@ -1,12 +1,12 @@
 package edu.udel.cis.vsl.abc.util;
 
-public class Pair<T> {
+public class Pair<S, T> {
 
-	public T left;
+	public S left;
 
 	public T right;
 
-	public Pair(T left, T right) {
+	public Pair(S left, T right) {
 		this.left = left;
 		this.right = right;
 	}

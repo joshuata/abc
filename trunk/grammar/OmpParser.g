@@ -15,8 +15,9 @@ tokens
 	PARALLEL_FOR;
 	PARALLEL_SECTIONS;
 	UNIQUE_FOR;
-	UNIQUIE_PARLLEL;
+	UNIQUE_PARALLEL;
 	DATA_CLAUSE;
+	FOR_CLAUSE;
 }
 
 /* ANTLR 3.4 doesn't allow redefinition of headers in composite grammars.
@@ -64,7 +65,7 @@ openmp_construct
   ;
 
 parallel_directive
-  : PARALLEL WS* p+=parallel_clause*
+  : PARALLEL WS+ (p+=parallel_clause WS?)*
   -> ^(PARALLEL $p*)
   ;
 
@@ -78,8 +79,8 @@ master_directive
   ;
 
 critical_directive
-  : CRITICAL WS* r=region_phrase?
-  -> ^(CRITICAL $r?)
+  : CRITICAL WS* (LPAREN WS* id=IDENTIFIER WS* RPAREN)?
+  -> ^(CRITICAL $id?)
   ;
   
 sections_directive
@@ -89,7 +90,7 @@ sections_directive
 
 sections_clause
   : data_clause
-  | NOWAIT -> ^(NOWAIT)
+  | nowait_directive
   ;
 
 section_directive
@@ -97,7 +98,7 @@ section_directive
   ;
   
 parallel_for_directive
-  : PARALLEL WS+ FOR WS* p+=parallel_for_clause*
+  : PARALLEL WS+ FOR WS+ p+=parallel_for_clause*
     -> ^(PARALLEL_FOR $p*)
   ;
 
@@ -108,7 +109,7 @@ parallel_for_clause
   ;
 
 parallel_sections_directive
-  : PARALLEL WS+ SECTIONS WS* p+=parallel_sections_clause*
+  : PARALLEL WS+ SECTIONS WS+ p+=parallel_sections_clause*
     -> ^(PARALLEL_SECTIONS $p*)
   ;
 
@@ -124,12 +125,7 @@ single_directive
 
 single_clause
   : data_clause
-  | NOWAIT
-  ;
-
-region_phrase
-  : LPAREN WS* IDENTIFIER WS* RPAREN
-    -> ^(IDENTIFIER)
+  | nowait_directive
   ;
 
 barrier_directive
@@ -153,6 +149,10 @@ flush_vars
 ordered_directive
   : ORDERED -> ^(ORDERED)
   ;
+  
+nowait_directive
+  : NOWAIT -> ^(NOWAIT)
+  ;
 
 threadprivate_directive
   : THD_PRIVATE WS* LPAREN WS* i=identifier_list WS* RPAREN
@@ -160,14 +160,14 @@ threadprivate_directive
   ;
 
 for_directive
-  : FOR f+=for_clause*
+  : FOR WS+ (f+=for_clause)*
     -> ^(FOR $f*)
   ;
 
 for_clause
-  : unique_for_clause
-  | data_clause
-  | NOWAIT ->^(NOWAIT)
+  : u=unique_for_clause -> ^(FOR_CLAUSE $u)
+  | d=data_clause -> ^(FOR_CLAUSE $d)
+  | n=nowait_directive -> ^(FOR_CLAUSE $n)
   ;
 
 unique_for_clause
@@ -177,15 +177,15 @@ unique_for_clause
   ;
   
 schedule_clause
-	: SCHEDULE LPAREN s=schedule_kind RPAREN
-	  -> ^(SCHEDULE $s)
-    | SCHEDULE LPAREN s1=schedule_kind COMMA e=expression RPAREN
+	: SCHEDULE WS* LPAREN WS* s1=schedule_kind WS* COMMA WS* e=expression WS* RPAREN
       -> ^(SCHEDULE $s1 $e)
+    |  SCHEDULE WS* LPAREN WS* s=schedule_kind WS* RPAREN
+	  -> ^(SCHEDULE $s)
 	;
 	
 collapse_clause
 	:
-	COLLAPSE LPAREN i=INTEGER_CONSTANT RPAREN
+	COLLAPSE WS* LPAREN WS* i=INTEGER_CONSTANT WS* RPAREN
     -> ^(COLLAPSE $i)
 	;
 
@@ -198,18 +198,18 @@ schedule_kind
 
 unique_parallel_clause
   : i=if_clause 
-    -> ^(UNIQUIE_PARLLEL $i)
+    -> ^(UNIQUE_PARALLEL $i)
   | n=num_threads_clause 
-    -> ^(UNIQUIE_PARLLEL $n)
+    -> ^(UNIQUE_PARALLEL $n)
   ;
   
 if_clause
-  : IF LPAREN e1=expression RPAREN
+  : IF WS* LPAREN WS* e1=expression WS* RPAREN
     -> ^(IF $e1)
   ;
   
 num_threads_clause
-  : NUM_THREADS LPAREN e2=expression RPAREN
+  : NUM_THREADS WS* LPAREN WS* e2=expression WS* RPAREN
     -> ^(NUM_THREADS $e2)
   ;
 

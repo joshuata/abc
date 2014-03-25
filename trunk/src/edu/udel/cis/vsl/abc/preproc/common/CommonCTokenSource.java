@@ -443,7 +443,7 @@ public class CommonCTokenSource implements CTokenSource {
 			throws PreprocessorException {
 		Token token = ((CommonTree) invocationNode).getToken();
 		CToken cToken = tokenFactory.newCToken(token, getIncludeHistory());
-		Pair<CToken> result;
+		Pair<CToken, CToken> result;
 
 		if (macro instanceof ObjectMacro) {
 			result = processInvocation((ObjectMacro) macro, cToken);
@@ -482,8 +482,8 @@ public class CommonCTokenSource implements CTokenSource {
 	 *             if something goes wrong while expanding the list of
 	 *             replacement tokens (i.e., the second expansion)
 	 */
-	private Pair<CToken> processInvocation(ObjectMacro macro, CToken origin)
-			throws PreprocessorException {
+	private Pair<CToken, CToken> processInvocation(ObjectMacro macro,
+			CToken origin) throws PreprocessorException {
 		return performSecondExpansion(instantiate(macro, origin), macro);
 	}
 
@@ -512,8 +512,8 @@ public class CommonCTokenSource implements CTokenSource {
 	 * @param arguments
 	 * @throws PreprocessorException
 	 */
-	private Pair<CToken> processInvocation(FunctionMacro macro, CToken origin,
-			CToken[] arguments) throws PreprocessorException {
+	private Pair<CToken, CToken> processInvocation(FunctionMacro macro,
+			CToken origin, CToken[] arguments) throws PreprocessorException {
 		for (int i = 0; i < arguments.length; i++)
 			arguments[i] = expandList(arguments[i]).left;
 		return performSecondExpansion(instantiate(macro, origin, arguments),
@@ -535,8 +535,9 @@ public class CommonCTokenSource implements CTokenSource {
 	 * @throws PreprocessorException
 	 *             any improper macro invocations occur in the token list
 	 */
-	private Pair<CToken> performSecondExpansion(Pair<CToken> tokenList,
-			Macro macro) throws PreprocessorException {
+	private Pair<CToken, CToken> performSecondExpansion(
+			Pair<CToken, CToken> tokenList, Macro macro)
+			throws PreprocessorException {
 		String name = macro.getName();
 
 		// mark all occurrences of identifier M as "do not expand"...
@@ -586,8 +587,8 @@ public class CommonCTokenSource implements CTokenSource {
 	 *         performing substitution of actual arguments for formal parameters
 	 *         in the macro body
 	 */
-	private Pair<CToken> instantiate(FunctionMacro macro, CToken origin,
-			CToken[] arguments) {
+	private Pair<CToken, CToken> instantiate(FunctionMacro macro,
+			CToken origin, CToken[] arguments) {
 		int numTokens = macro.getNumReplacementTokens();
 		CToken first = null, previous = null, current = null;
 
@@ -618,7 +619,7 @@ public class CommonCTokenSource implements CTokenSource {
 				}
 			}
 		}
-		return new Pair<CToken>(first, current);
+		return new Pair<>(first, current);
 	}
 
 	/**
@@ -638,7 +639,7 @@ public class CommonCTokenSource implements CTokenSource {
 	 * @return first and last element in a null-terminated linked list of fresh
 	 *         CTokens obtained from the macro's body
 	 */
-	private Pair<CToken> instantiate(ObjectMacro macro, CToken origin) {
+	private Pair<CToken, CToken> instantiate(ObjectMacro macro, CToken origin) {
 		int numTokens = macro.getNumReplacementTokens();
 		CToken first = null, previous = null, current = null;
 
@@ -653,7 +654,7 @@ public class CommonCTokenSource implements CTokenSource {
 				first = current;
 			previous = current;
 		}
-		return new Pair<CToken>(first, current);
+		return new Pair<>(first, current);
 	}
 
 	/**
@@ -684,7 +685,8 @@ public class CommonCTokenSource implements CTokenSource {
 	 * @return first element in expanded list; may be null for empty list
 	 * @throws PreprocessorException
 	 */
-	private Pair<CToken> expandList(CToken first) throws PreprocessorException {
+	private Pair<CToken, CToken> expandList(CToken first)
+			throws PreprocessorException {
 		CToken current = first, previous = null;
 
 		while (current != null) {
@@ -725,7 +727,7 @@ public class CommonCTokenSource implements CTokenSource {
 				continue;
 			}
 
-			Pair<CToken> replacements;
+			Pair<CToken, CToken> replacements;
 
 			if (macro instanceof ObjectMacro) {
 				replacements = processInvocation((ObjectMacro) macro, current);
@@ -758,7 +760,7 @@ public class CommonCTokenSource implements CTokenSource {
 				previous.setNext(current);
 			}
 		}
-		return new Pair<CToken>(first, previous);
+		return new Pair<>(first, previous);
 	}
 
 	/**
@@ -1631,7 +1633,8 @@ public class CommonCTokenSource implements CTokenSource {
 		}
 	}
 
-	private void addOutputList(Pair<CToken> list) throws PreprocessorException {
+	private void addOutputList(Pair<CToken, CToken> list)
+			throws PreprocessorException {
 		CToken previous = null, current = list.left;
 
 		while (current != null) {
