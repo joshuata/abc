@@ -18,7 +18,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
  */
 public interface OmpSyncNode extends OmpStatementNode {
 	public enum OmpSyncNodeKind {
-		MASTER, CRITICAL, BARRIER, FLUSH
+		MASTER, CRITICAL, BARRIER, FLUSH, ORDERED
 	}
 
 	OmpSyncNodeKind ompSyncNodeKind();
@@ -39,4 +39,6 @@ public interface OmpSyncNode extends OmpStatementNode {
 	 * @return
 	 */
 	ArrayList<IdentifierNode> flushedList();
+	
+	void setFlushedList(ArrayList<IdentifierNode> list);
 }

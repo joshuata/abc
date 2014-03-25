@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -20,4 +21,8 @@ public interface OmpNodeFactory {
 
 	OmpWorkshareNode newWorkshareNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken, OmpWorkshareNodeKind kind);
+
+	OmpDeclarativeNode newDeclarativeNode(Source source,
+			IdentifierNode identifier, List<CToken> body, CToken eofToken,
+			ArrayList<IdentifierNode> variables);
 }

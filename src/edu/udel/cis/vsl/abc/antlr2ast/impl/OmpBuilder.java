@@ -85,7 +85,6 @@ public class OmpBuilder {
 	private OmpNodeFactory ompNodeFactory;
 	private NodeFactory nodeFactory;
 	private TokenFactory sourceFactory;
-	// private Formation formation;
 	private List<CToken> ctokens;
 	private Source source;
 	private IdentifierNode ompIdentifierNode;
@@ -216,9 +215,6 @@ public class OmpBuilder {
 			SimpleScope scope, List<CToken> ctokens, CToken eofToken)
 			throws SyntaxException {
 		try {
-			// ANTLRInputStream input = new ANTLRInputStream(
-			// new ByteArrayInputStream(text.getBytes()));
-			// OmpLexer lexer = new OmpLexer(input);
 			TokenStream tokens = this.ompTokenStream(ctokens);
 			OmpParser parser;
 			CommonTree rootTree;
@@ -229,23 +225,22 @@ public class OmpBuilder {
 			this.ompIdentifierNode = identifier;
 			this.eofToken = eofToken;
 			parser = new OmpParser(tokens);
-			// processTokens(tokens.getTokens(), line, offset);
 			rootTree = (CommonTree) parser.openmp_construct().getTree();
-			// getCTokenList(rootTree);
 			type = rootTree.getType();
 			switch (type) {
 			case PARALLEL_FOR:
 				return translateParallelFor(rootTree);
 			case PARALLEL_SECTIONS:
-				break;
+				return translateParallelSections(rootTree);
 			case PARALLEL:
 				return translateParallel(rootTree);
 			case FOR:
 				return translateFor(rootTree);
 			case SECTIONS:
-				return translateSections(rootTree);
+				return translateWorkshare(rootTree,
+						OmpWorkshareNodeKind.SECTIONS);
 			case SINGLE:
-				break;
+				return translateWorkshare(rootTree, OmpWorkshareNodeKind.SINGLE);
 			case MASTER:
 				return ompNodeFactory.newSyncNode(source, identifier, ctokens,
 						eofToken, OmpSyncNodeKind.MASTER);
@@ -260,10 +255,9 @@ public class OmpBuilder {
 									.getChild(0)).getToken()));
 				}
 				return criticalNode;
-			case ATOMIC:
-				break;
 			case ORDERED:
-				break;
+				return ompNodeFactory.newSyncNode(source, identifier, ctokens,
+						eofToken, OmpSyncNodeKind.ORDERED);
 			case SECTION:
 				return ompNodeFactory.newWorkshareNode(source, identifier,
 						ctokens, eofToken, OmpWorkshareNodeKind.SECTION);
@@ -271,39 +265,60 @@ public class OmpBuilder {
 				return ompNodeFactory.newSyncNode(source, identifier, ctokens,
 						eofToken, OmpSyncNodeKind.BARRIER);
 			case FLUSH:
+				OmpSyncNode flushNode = ompNodeFactory.newSyncNode(source,
+						identifier, ctokens, eofToken, OmpSyncNodeKind.FLUSH);
+
+				flushNode
+						.setFlushedList(translateIdentifierList((CommonTree) rootTree
+								.getChild(0)));
+				return flushNode;
 			case THD_PRIVATE:
+				return ompNodeFactory.newDeclarativeNode(source, identifier,
+						this.ctokens, eofToken,
+						translateIdentifierList((CommonTree) rootTree
+								.getChild(0)));
+			case ATOMIC:
+				throw new ABCUnsupportedException("atomic construct of OpenMP");
 			default:
+				throw new ABCRuntimeException("Unreachable");
 			}
 		} catch (RecognitionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 
-	private OmpWorkshareNode translateSections(CommonTree sectionsTree) {
-		int numChildren = sectionsTree.getChildCount();
-		OmpWorkshareNode sectionsNode = ompNodeFactory.newWorkshareNode(source,
-				this.ompIdentifierNode, this.ctokens, eofToken,
-				OmpWorkshareNodeKind.SECTIONS);
+	private OmpWorkshareNode translateWorkshare(CommonTree workshareTree,
+			OmpWorkshareNodeKind kind) {
+		int numChildren = workshareTree.getChildCount();
+		OmpWorkshareNode workshareNode = ompNodeFactory.newWorkshareNode(
+				source, this.ompIdentifierNode, this.ctokens, eofToken, kind);
+		boolean hasNowait = false;
 
 		for (int i = 0; i < numChildren; i++) {
-			CommonTree sectionsClause = (CommonTree) sectionsTree.getChild(i);
+			CommonTree sectionsClause = (CommonTree) workshareTree.getChild(i);
 			int type = sectionsClause.getType();
 
 			switch (type) {
 			case DATA_CLAUSE:
-				this.translateDataClause(sectionsClause, sectionsNode);
+				this.translateDataClause(sectionsClause, workshareNode);
 				break;
 			case NOWAIT:
-				sectionsNode.setNowait(true);
+				if (!hasNowait) {
+					hasNowait = true;
+				} else {
+					throw new ABCRuntimeException(
+							"At most one nowait directive is allowed in an OpenMP construct.",
+							(sourceFactory.newSource((CToken) sectionsClause
+									.getToken()).getSummary(false)));
+				}
+				workshareNode.setNowait(true);
 				break;
 			default:
 				throw new ABCRuntimeException("Unreachable");
 			}
 		}
-
-		return sectionsNode;
+		return workshareNode;
 	}
 
 	private OmpForNode translateFor(CommonTree forTree) throws SyntaxException {
@@ -394,6 +409,8 @@ public class OmpBuilder {
 		OmpParallelNode parallelNode = ompNodeFactory.newParallelNode(
 				this.source, this.ompIdentifierNode, this.ctokens,
 				this.eofToken);
+		boolean hasIf = false;
+		boolean hasNumThreads = false;
 
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree parallelClause = (CommonTree) paralle.getChild(i);
@@ -401,7 +418,27 @@ public class OmpBuilder {
 
 			switch (type) {
 			case UNIQUE_PARALLEL:
-				this.translateUniqueParallel(parallelClause, parallelNode);
+				int result = this.translateUniqueParallel(parallelClause, parallelNode);
+				
+				if(result == IF){
+					if(!hasIf){
+						hasIf = true;
+					}else{
+						throw new ABCRuntimeException(
+								"At most one if clause is allowed in an OpenMP parallel construct.",
+								(sourceFactory.newSource((CToken) parallelClause
+										.getToken()).getSummary(false)));
+					}
+				}else if(result == NUM_THREADS){
+					if(!hasNumThreads){
+						hasNumThreads = true;
+					}else{
+						throw new ABCRuntimeException(
+								"At most one num_threads() clause is allowed in an OpenMP parallel construct.",
+								(sourceFactory.newSource((CToken) parallelClause
+										.getToken()).getSummary(false)));
+					}
+				}
 				break;
 			case DATA_CLAUSE:
 				this.translateDataClause(parallelClause, parallelNode);
@@ -413,7 +450,7 @@ public class OmpBuilder {
 		return parallelNode;
 	}
 
-	private void translateUniqueParallel(CommonTree parallelClause,
+	private int translateUniqueParallel(CommonTree parallelClause,
 			OmpParallelNode parallelNode) throws SyntaxException {
 		CommonTree child = (CommonTree) parallelClause.getChild(0);
 		ExpressionNode expression;
@@ -423,16 +460,15 @@ public class OmpBuilder {
 			expression = astBuilder.translateExpression(
 					(CommonTree) child.getChild(0), scope);
 			parallelNode.setIfClause(expression);
-			break;
+			return IF;
 		case NUM_THREADS:
 			expression = astBuilder.translateExpression(
 					(CommonTree) child.getChild(0), scope);
 			parallelNode.setNumThreads(expression);
-			break;
+			return NUM_THREADS;
 		default:
 			throw new ABCRuntimeException("Unreachable");
 		}
-
 	}
 
 	// private void processTokens(List<Token> tokens, int line, int colOffset) {
@@ -447,7 +483,8 @@ public class OmpBuilder {
 	// }
 	// }
 
-	private OmpParallelNode translateParallelFor(CommonTree parallelFor) {
+	private OmpParallelNode translateParallelFor(CommonTree parallelFor)
+			throws SyntaxException {
 		int numChildren = parallelFor.getChildCount();
 		OmpParallelNode parallelNode = ompNodeFactory.newParallelNode(
 				this.source, this.ompIdentifierNode, this.ctokens,
@@ -461,17 +498,49 @@ public class OmpBuilder {
 
 			switch (type) {
 			case UNIQUE_PARALLEL:
+				this.translateUniqueParallel(parallelForClause, parallelNode);
 				break;
 			case UNIQUE_FOR:
+				this.translateUniqueForClause(parallelForClause, forNode);
 				break;
 			case DATA_CLAUSE:
-				this.translateDataClause(parallelForClause, forNode);
+				this.translateDataClause(parallelForClause, parallelNode);
 				break;
 			default:
 				throw new ABCRuntimeException("Unreachable");
 			}
 		}
 		parallelNode.setStatementNode(forNode);
+		return parallelNode;
+	}
+
+	private OmpParallelNode translateParallelSections(
+			CommonTree parallelSections) throws SyntaxException {
+		int numChildren = parallelSections.getChildCount();
+		OmpParallelNode parallelNode = ompNodeFactory.newParallelNode(
+				this.source, this.ompIdentifierNode, this.ctokens,
+				this.eofToken);
+		OmpWorkshareNode sectionsNode = ompNodeFactory.newWorkshareNode(source,
+				null, this.ctokens, eofToken, OmpWorkshareNodeKind.SECTIONS);
+
+		for (int i = 0; i < numChildren; i++) {
+			CommonTree parallelSectionsClause = (CommonTree) parallelSections
+					.getChild(i);
+			int type = parallelSectionsClause.getType();
+
+			switch (type) {
+			case UNIQUE_PARALLEL:
+				this.translateUniqueParallel(parallelSectionsClause,
+						parallelNode);
+				break;
+			case DATA_CLAUSE:
+				this.translateDataClause(parallelSectionsClause, parallelNode);
+				break;
+			default:
+				throw new ABCRuntimeException("Unreachable");
+			}
+		}
+		parallelNode.setStatementNode(sectionsNode);
 		return parallelNode;
 	}
 
@@ -516,7 +585,7 @@ public class OmpBuilder {
 							.getChild(0)));
 			break;
 		case DEFAULT:
-			if (dataClause.getChild(0).getType() == NONE)
+			if (dataClause.getChild(0).getChild(0).getType() == NONE)
 				((OmpParallelNode) ompStatementNode).setDefault(false);
 			break;
 		case REDUCTION:
