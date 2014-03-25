@@ -78,4 +78,15 @@ public class OmpTranslationTest {
 	public void vecAdd_fix() throws ABCException, IOException {
 		check("vecAdd_fix");
 	}
+	
+	@Test
+	public void fig310_mxv_omp() throws ABCException, IOException {
+		check("fig3.10-mxv-omp");
+	}
+	
+	@Test
+	public void fig498_threadprivate() throws ABCException, IOException {
+		check("fig4.98-threadprivate");
+	}
+	
 }

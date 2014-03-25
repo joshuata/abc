@@ -65,6 +65,9 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		case FLUSH:
 			out.print("OmpFlush");
 			break;
+		case ORDERED:
+			out.print("OmpOrdered");
+			break;
 		default:
 			throw new ABCRuntimeException("Unreachable");
 		}
@@ -75,5 +78,30 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		assert this.ompSyncNodeKind == OmpSyncNodeKind.CRITICAL;
 		this.criticalName = name;
 
+	}
+
+	@Override
+	public void setFlushedList(ArrayList<IdentifierNode> list) {
+		assert this.ompSyncNodeKind == OmpSyncNodeKind.FLUSH;
+		this.flushedList = list;
+	}
+
+	@Override
+	protected void printExtras(String prefix, PrintStream out) {
+		int count;
+
+		if (this.flushedList != null) {
+			count = flushedList.size();
+			if (count > 0) {
+				out.println();
+				out.print(prefix + "flush(");
+				for (int i = 0; i < count; i++) {
+					out.print(flushedList.get(i).name());
+					if (i < count - 1)
+						out.print(",");
+				}
+				out.print(")");
+			}
+		}
 	}
 }

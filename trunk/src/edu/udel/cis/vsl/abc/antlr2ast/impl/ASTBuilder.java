@@ -2254,19 +2254,11 @@ public class ASTBuilder {
 		int numTokens = bodyTree.getChildCount();
 		List<CToken> body = new LinkedList<>();
 		CToken newlineToken = (CToken) newlineTree.getToken();
-		// String bodyText = "";
-		// Formation formation = ((CToken) identifierTree.getToken())
-		// .getFormation();
-		// int col = 0;
 
 		for (int i = 0; i < numTokens; i++) {
 			CToken token = (CToken) ((CommonTree) bodyTree.getChild(i))
 					.getToken();
 
-			// if (i == 0) {
-			// col = token.getCharPositionInLine();
-			// }
-			// bodyText += token.getText() + " ";
 			body.add(token);
 		}
 		if (identifier.name().equals("omp")) {

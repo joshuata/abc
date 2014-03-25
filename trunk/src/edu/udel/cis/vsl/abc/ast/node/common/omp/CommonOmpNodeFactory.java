@@ -1,8 +1,10 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
@@ -52,5 +54,11 @@ public class CommonOmpNodeFactory implements OmpNodeFactory {
 			OmpWorkshareNodeKind kind) {
 		return new CommonOmpWorkshareNode(source, identifier, body, eofToken,
 				kind);
+	}
+
+	@Override
+	public OmpDeclarativeNode newDeclarativeNode(Source source,
+			IdentifierNode identifier, List<CToken> body, CToken eofToken, ArrayList<IdentifierNode> variables) {
+		return new CommonOmpDeclarativeNode(source, identifier, body, eofToken, variables);
 	}
 }
