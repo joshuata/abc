@@ -14,6 +14,10 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
  * 
  */
 public interface Program {
+	
+	public enum TransformMode{
+		MPI, OMP, PTHREAD
+	}
 
 	/**
 	 * Returns the abstract syntax tree of this program. Note that this can
@@ -59,5 +63,7 @@ public interface Program {
 	void print(PrintStream out);
 
 	void printSymbolTable(PrintStream out);
+	
+	void transform(TransformMode mode);
 
 }

@@ -98,6 +98,7 @@
 			<filelist dir="${grammar.dir}" files="OmpLexer2.java" />
 		</concat>-->
 		<delete file="${grammar.dir}/OmpLexer.java" />
+		<delete file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" />
 		<!--<move file="${grammar.dir}/OmpLexer.java" todir="${real.src.dir}/preproc/common" />
 		<move file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />-->
 	</target>
