@@ -757,6 +757,14 @@ public class SideEffectRemover implements Transformer {
 							+ statement, statement.getSource()
 							.getSummary(false));
 				}
+			} else if (expression instanceof CastNode) {
+				// It's not clear why this would be used, since the result of
+				// the cast is discarded, but we've seen it in examples.
+				// Solution: formulate a new expression statement without the
+				// cast and do a recursive call.
+				result = expressionStatement(factory
+						.newExpressionStatementNode(((CastNode) expression)
+								.getArgument().copy()));
 			} else {
 				throw new ABCUnsupportedException(
 						"removing side effects from this expression statement: "
@@ -932,8 +940,8 @@ public class SideEffectRemover implements Transformer {
 				right = ((OperatorNode) expression).getArgument(1);
 				leftTriple = processExpression(left);
 				rightTriple = processExpression(right);
-				operands.add(leftTriple.getExpression());
-				operands.add(rightTriple.getExpression());
+				operands.add(leftTriple.getExpression().copy());
+				operands.add(rightTriple.getExpression().copy());
 				sideEffectFreeExpression = factory.newOperatorNode(
 						expression.getSource(),
 						((OperatorNode) expression).getOperator(), operands);
@@ -1125,8 +1133,7 @@ public class SideEffectRemover implements Transformer {
 			// assign.parent().removeChild(assign.childIndex());
 			before.add(factory.newExpressionStatementNode(assign.copy()));
 		} else {
-			SideEffectFreeTriple rhs = processExpression(assign.getArgument(1)
-					.copy());
+			SideEffectFreeTriple rhs = processExpression(assign.getArgument(1));
 			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
 			ExpressionNode newRhs = rhs.getExpression().copy();
 
