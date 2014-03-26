@@ -1,8 +1,8 @@
 /* ABC model of math.h */
 
-$abstract double sqrt(double x);
+double sqrt(double x);
 
-$abstract double ceil(double x);
+double ceil(double x);
 
-$abstract double exp(double x);
+double exp(double x);
 
