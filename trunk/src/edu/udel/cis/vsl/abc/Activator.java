@@ -34,11 +34,14 @@ import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.program.Programs;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.program.IF.Program.TransformMode;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.token.Tokens;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.transform.IF.MPITransformer;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
+import edu.udel.cis.vsl.abc.transform.common.CommonMPITransformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 import edu.udel.cis.vsl.abc.util.ANTLRUtils;
@@ -95,8 +98,12 @@ public class Activator {
 
 	private Transformer pruner = new Pruner(astFactory);
 
+	private MPITransformer mpiTransformer = new CommonMPITransformer(
+			this.astFactory, this.nodeFactory);
+
 	private ProgramFactory programFactory = Programs.newProgramFactory(
-			astFactory, standardAnalyzer, pruner, sideEffectRemover);
+			astFactory, standardAnalyzer, pruner, sideEffectRemover,
+			this.mpiTransformer);
 
 	private Preprocessor preprocessor;
 
@@ -435,6 +442,94 @@ public class Activator {
 		out.println();
 		out.flush();
 
+		return program;
+	}
+
+	/**
+	 * Show every stage of translation. This is a lot of output and is only
+	 * recommended for small examples. Applies pruner and side-effect-remover.
+	 * 
+	 * @param out
+	 * @return the AST
+	 * @throws PreprocessorException
+	 *             if preprocessing fails
+	 * @throws ParseException
+	 *             if parsing the preprocessed file fails
+	 * @throws SyntaxException
+	 *             if analysis of syntax fails
+	 * @throws IOException
+	 *             if file cannot be read
+	 */
+	public Program showMpiTransformation(PrintStream out) throws ABCException,
+			IOException {
+		AST ast;
+		CParser parser;
+		CommonTree tree;
+		ASTBuilder builder;
+		Program program;
+
+		// print the original source file...
+		ANTLRUtils.source(out, file);
+		out.println();
+		// print the result of preprocessing...
+		out.println(bar + " Preprocessor output " + bar);
+		preprocessor.printOutputDebug(out, file);
+		out.println();
+		// print the ANTLR Tree...
+		out.println(bar + " ANTLR Parse Tree " + bar);
+		parser = Parse.newCParser(preprocessor, file);
+		tree = parser.getTree();
+		ANTLRUtils.printTree(out, tree);
+		out.println();
+		out.flush();
+		ast = null;
+		try {
+			builder = new ASTBuilder(parser, astFactory, tree);
+			ast = builder.getTranslationUnit(); // creates ast
+			program = programFactory.newProgram(ast); // analyzes ast
+			ast = program.getAST();
+		} catch (Exception e) {
+			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
+			if (ast == null)
+				out.println("null");
+			else
+				ast.print(out);
+			out.println();
+			out.flush();
+			throw e;
+		}
+		out.println("\n\n" + bar + " Program " + bar + "\n");
+		program.print(out);
+		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
+		program.printSymbolTable(out);
+		out.println("\n\n" + bar + " Types " + bar + "\n");
+		typeFactory.printTypes(out);
+		out.println();
+		out.flush();
+		// print the results of MPI transformation
+
+		out.println("\n\n" + bar + " MPI transformed Program " + bar);
+		program.transform(TransformMode.MPI);
+		program.print(out);
+		out.println();
+		out.flush();
+
+//		// print the result of pruning unreachable decls...
+//		out.println("\n\n" + bar + " Pruned Program " + bar);
+//		program.prune();
+//		program.print(out);
+//		out.println();
+//		out.flush();
+//		// print the results of removing side-effects...
+//		out.println("\n\n" + bar + " Side-effect-free Pruned Program " + bar);
+//		program.removeSideEffects();
+//		program.print(out);
+//		out.println();
+//		out.flush();
+		out.println("\n\n" + bar + " Types " + bar + "\n");
+		typeFactory.printTypes(out);
+		out.println();
+		out.flush();
 		return program;
 	}
 

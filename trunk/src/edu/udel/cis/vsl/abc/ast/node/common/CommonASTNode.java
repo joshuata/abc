@@ -182,7 +182,7 @@ public abstract class CommonASTNode implements ASTNode {
 		} else {
 			out.print(" (scope UNKNOWN)");
 		}
-		if (includeSource) {
+		if (includeSource && source != null) {
 			out.println();
 			out.print(prefix + "| source: " + source.getSummary(false));
 		}

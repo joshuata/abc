@@ -64,6 +64,6 @@ public interface Program {
 
 	void printSymbolTable(PrintStream out);
 	
-	void transform(TransformMode mode);
+	void transform(TransformMode mode) throws SyntaxException;
 
 }
