@@ -20,7 +20,7 @@ typedef struct {
 
 #define MPI_STATUSES_IGNORE NULL
 
-$comm MPI_COMM_WORLD = $comm_create($here, __rank);
+$comm MPI_COMM_WORLD = $comm_create($here, GCOMM_WORLD, __rank);
 
 int sizeofDatatype(MPI_Datatype datatype) {
   switch (datatype) {
