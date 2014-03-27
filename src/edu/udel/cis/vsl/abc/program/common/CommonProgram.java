@@ -7,6 +7,7 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.transform.IF.MPITransformer;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 public class CommonProgram implements Program {
@@ -17,15 +18,19 @@ public class CommonProgram implements Program {
 
 	private Transformer sideEffectRemover;
 
+	private MPITransformer mpiTransformer;
+
 	private AST ast;
 
 	public CommonProgram(Analyzer standardAnalyzer, Transformer pruner,
-			Transformer sideEffectRemover, AST ast)
-			throws SyntaxException {
+			Transformer sideEffectRemover, MPITransformer mpiTransformer,
+			AST ast) throws SyntaxException {
 		this.standardAnalyzer = standardAnalyzer;
 		this.pruner = pruner;
 		this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
+		this.mpiTransformer = mpiTransformer;
+
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
 	}
@@ -68,9 +73,9 @@ public class CommonProgram implements Program {
 	}
 
 	@Override
-	public void transform(TransformMode mode) {
-		// TODO Auto-generated method stub
-		
+	public void transform(TransformMode mode) throws SyntaxException {
+		ast = this.mpiTransformer.transform(ast);
+		standardAnalyzer.clear(ast);
+//		standardAnalyzer.analyze(ast);
 	}
-
 }
