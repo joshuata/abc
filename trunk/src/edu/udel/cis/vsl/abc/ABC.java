@@ -48,6 +48,13 @@ public class ABC {
 		TokenUtils.initialization();
 		return new Activator(file, systemIncludes, userIncludes);
 	}
+	
+	public static Activator activator(File file, File[] systemIncludes,
+			File[] userIncludes, Language kind) {
+		TokenUtils.initialization();
+		language = kind;
+		return new Activator(file, systemIncludes, userIncludes);
+	}
 
 	public static Activator activator(File file) {
 		return new Activator(file);

@@ -15,15 +15,12 @@ void main() {
     left = (myrank+nprocs-1)%nprocs;
     right = (myrank+nprocs+1)%nprocs;
     i=0;
-    while (i<N) {
-        if (myrank%2==0) {
-            MPI_Send(NULL, 0, MPI_INT, right, 0, MPI_COMM_WORLD);
-            MPI_Recv(NULL, 0, MPI_INT, left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        } else {
-            MPI_Recv(NULL, 0, MPI_INT, left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Send(NULL, 0, MPI_INT, right, 0, MPI_COMM_WORLD);
-        }
-        i++;
+    if (myrank%2==0) {
+        MPI_Send(NULL, 0, MPI_INT, right, 0, MPI_COMM_WORLD);
+        MPI_Recv(NULL, 0, MPI_INT, left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    } else {
+        MPI_Recv(NULL, 0, MPI_INT, left, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Send(NULL, 0, MPI_INT, right, 0, MPI_COMM_WORLD);
     }
     MPI_Finalize();
 }
