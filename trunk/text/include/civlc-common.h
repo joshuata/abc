@@ -219,4 +219,6 @@ _Bool $gcomm_defined($gcomm gcomm);
 
 _Bool $comm_defined($comm comm);
 
+void $proc_null($proc *p);
+
 #endif
