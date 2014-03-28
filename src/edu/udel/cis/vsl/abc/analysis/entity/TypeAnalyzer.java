@@ -178,6 +178,11 @@ public class TypeAnalyzer {
 			UnqualifiedObjectType unqualifiedType = (node.hasAtomicInBrackets() ? typeFactory
 					.atomicType(pointerType) : pointerType);
 
+			// need to process size expression, but ignore it...
+			sizeExpression = node.getExtent();
+			if (sizeExpression != null)
+				entityAnalyzer.expressionAnalyzer
+						.processExpression(sizeExpression);
 			return typeFactory.qualify(unqualifiedType,
 					node.hasConstInBrackets(), node.hasVolatileInBrackets(),
 					node.hasRestrictInBrackets(), false, false);
