@@ -221,7 +221,7 @@ _Bool $gcomm_defined($gcomm gcomm);
 /* Returns $true iff comm points to a valid object. */
 _Bool $comm_defined($comm comm);
 
-/* Sets (*p) with the constant value presenting NULL of $proc type. */
+/* Sets (*p) with the constant value representing NULL of $proc type. */
 void $proc_null($proc *p);
 
 #endif
