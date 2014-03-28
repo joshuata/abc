@@ -26,15 +26,14 @@ public class MPITranslationTest {
 	public void tearDown() throws Exception {
 	}
 
-	private void translate(String filenameRoot) throws ABCException,
-			IOException {
-		Activator a;
-
-		this.systemIncludes = new File[1];
-		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
-				userIncludes, Language.CIVL_C);
-		a.showMpiTransformation(out);
-	}
+	/*
+	 * private void translate(String filenameRoot) throws ABCException,
+	 * IOException { Activator a;
+	 * 
+	 * this.systemIncludes = new File[1]; a = ABC.activator(new File(root,
+	 * filenameRoot + ".c"), systemIncludes, userIncludes, Language.CIVL_C);
+	 * a.showMpiTransformation(out); }
+	 */
 
 	private void check(String filenameRoot) throws ABCException, IOException {
 		Activator a;
@@ -48,7 +47,7 @@ public class MPITranslationTest {
 
 	@Test
 	public void test() throws ABCException, IOException {
-		translate("test");
+		check("test");
 	}
 
 	@Test
