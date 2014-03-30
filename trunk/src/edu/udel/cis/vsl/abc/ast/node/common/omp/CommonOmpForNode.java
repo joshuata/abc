@@ -129,4 +129,14 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		}
 		super.printExtras(prefix, out);
 	}
+
+	@Override
+	public void setAssertions(List<FunctionCallNode> assertions) {
+		this.assertions = assertions;
+	}
+
+	@Override
+	public void setInvariant(FunctionCallNode invariant) {
+		this.invariant = invariant;
+	}
 }
