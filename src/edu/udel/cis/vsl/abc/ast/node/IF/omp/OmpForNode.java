@@ -36,15 +36,39 @@ public interface OmpForNode extends OmpWorkshareNode {
 
 	void setCollapse(int value);
 
+	/**
+	 * Returns true iff <code>ordered</code> clause is present.
+	 * 
+	 * @return
+	 */
 	boolean ordered();
 
 	void setOrdered(boolean value);
 
+	/**
+	 * Returns the chunk size.
+	 * 
+	 * @return
+	 */
 	ExpressionNode chunkSize();
 
 	void setChunsize(ExpressionNode chunkSize);
 
-	List<FunctionCallNode> assertions();// assertions to be checked before entry
+	/**
+	 * Returns the assertions to be checked before the entry of the loop.
+	 * 
+	 * @return
+	 */
+	List<FunctionCallNode> assertions();
 
-	FunctionCallNode invariant();// loop invariant
+	void setAssertions(List<FunctionCallNode> assertions);
+
+	/**
+	 * Returns the loop invariant.
+	 * 
+	 * @return
+	 */
+	FunctionCallNode invariant();
+
+	void setInvariant(FunctionCallNode invariant);
 }
