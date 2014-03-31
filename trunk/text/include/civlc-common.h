@@ -21,11 +21,8 @@ typedef unsigned long int size_t;
 /* The CIVL-C process reference type */ 
 typedef struct __proc__ $proc;
 
-/* The CIVL-C heap type, used to represent a heap */
-//typedef struct __heap__ $heap;
-
-// /* The CIVL-C scope type, used to represent a scope */
- typedef struct __scope__ $scope;
+/* The CIVL-C scope type, used to represent a scope */
+typedef struct __scope__ $scope;
 
 /* The CIVL-C dynamic type, used to represent a symbolic type */
 typedef struct __dynamic__ $dynamic;
@@ -44,11 +41,6 @@ int $choose_int(int n);
 /* assertion */
 void $assert(_Bool expr, ...);
 
-/* Printf, just as in standard C */
-//void printf(const char * restrict format, ...);
-//moved to stdio.h
-//void printf(char * format, ...);
-
 // Special types and operations:
 
 /* A system type for bundling any slice of memory into
@@ -61,8 +53,7 @@ int $bundle_size($bundle b);
  * ptr and size, copying the data into the new bundle */
 $bundle $bundle_pack(void *ptr, int size);
 
-/* Copies the data out of the bundle into the region
- * specified */
+/* Copies the data out of the bundle into the region specified */
 void $bundle_unpack($bundle bundle, void *ptr);
 
 // Memory functions:
@@ -70,7 +61,8 @@ void $bundle_unpack($bundle bundle, void *ptr);
 /* The CIVL-C malloc function, which takes a reference to a scope */
 void* $malloc($scope s, int size);
 
-/* The CIVL-C de-allocation function, which takes a reference to a pointer */
+/* The CIVL-C de-allocation function, which takes a pointer, just like 
+ * the standard "free" */
 void $free(void *p);
 
 // Message passing:
@@ -94,8 +86,7 @@ typedef struct __message__ {
 } $message;
 
 /* creates a new message, copying data from the specified buffer */ 
-$message $message_pack(int source, int dest, int tag,
-    void *data, int size);
+$message $message_pack(int source, int dest, int tag, void *data, int size);
   
 /* returns the message source */ 
 int $message_source($message message);
@@ -111,7 +102,7 @@ int $message_size($message message);
 
 /* transfers message data to buf, throwing exception if message
  * size exceeds specified size */ 
-void $message_unpack($message message, void *buf, int size) ;
+void $message_unpack($message message, void *buf, int size);
 
 /* A datatype representing a queue of messages.  All message
  * data is encapsulated inside this value; no external allocation
@@ -135,14 +126,13 @@ typedef struct __gcomm__ {
  * operating globle communicators. The local communicator type has 
  * a handle of a globle communicator. This type represents for 
  * a set of processes which have ranks in common.
- * */
+ */
  typedef struct __comm__ {
   int place;
   $gcomm gcomm;
  } * $comm;
 
-/* This version of gcomm_create should only be called if
- * size is concrete. */ 
+/* This version of gcomm_create should only be called if size is concrete. */ 
 $gcomm $gcomm_create2($scope scope, int size);
 
 /* Creates a new global communicator object and returns a handle to it.
@@ -184,13 +174,6 @@ $message $comm_seek($comm comm, int source, int tag);
 /* Finds the first matching message, removes it from the communicator,
  * and returns the message */
 $message $comm_dequeue($comm comm, int source, int tag);
-
-/* returns the number of messages from source to dest stored
- * in comm */ 
-//int $comm_chan_size($comm comm, int source, int dest);
-
-/* returns the total number of messages in the comm */ 
-//int $comm_total_size($comm comm);
 
 /* Creates a new local communicator object and returns a handle to it.
  * The new communicator will be affiliated with the specified global

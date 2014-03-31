@@ -1,35 +1,37 @@
 package edu.udel.cis.vsl.abc.program.common;
 
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.transform.IF.MPITransformer;
+import edu.udel.cis.vsl.abc.transform.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 public class CommonProgram implements Program {
 
 	private Analyzer standardAnalyzer;
 
-	private Transformer pruner;
+	// private Transformer pruner;
 
-	private Transformer sideEffectRemover;
+	// private Transformer sideEffectRemover;
 
-	private MPITransformer mpiTransformer;
+	// private MPITransformer mpiTransformer;
 
 	private AST ast;
 
-	public CommonProgram(Analyzer standardAnalyzer, Transformer pruner,
-			Transformer sideEffectRemover, MPITransformer mpiTransformer,
-			AST ast) throws SyntaxException {
+	public CommonProgram(Analyzer standardAnalyzer, AST ast)
+			throws SyntaxException {
 		this.standardAnalyzer = standardAnalyzer;
-		this.pruner = pruner;
-		this.sideEffectRemover = sideEffectRemover;
+		// this.pruner = pruner;
+		// this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
-		this.mpiTransformer = mpiTransformer;
+		// this.mpiTransformer = mpiTransformer;
 
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
@@ -40,22 +42,22 @@ public class CommonProgram implements Program {
 		return ast;
 	}
 
-	@Override
-	public void removeSideEffects() throws SyntaxException {
-		ast = sideEffectRemover.transform(ast);
-		standardAnalyzer.clear(ast);
-		// debugging code...
-		// System.out.println("\n\nRemoved side effects...\n\n");
-		// ast.print(System.out);
-		standardAnalyzer.analyze(ast);
-	}
+	// @Override
+	// public void removeSideEffects() throws SyntaxException {
+	// ast = sideEffectRemover.transform(ast);
+	// standardAnalyzer.clear(ast);
+	// // debugging code...
+	// // System.out.println("\n\nRemoved side effects...\n\n");
+	// // ast.print(System.out);
+	// standardAnalyzer.analyze(ast);
+	// }
 
-	@Override
-	public void prune() throws SyntaxException {
-		ast = pruner.transform(ast);
-		standardAnalyzer.clear(ast);
-		standardAnalyzer.analyze(ast);
-	}
+	// @Override
+	// public void prune() throws SyntaxException {
+	// ast = pruner.transform(ast);
+	// standardAnalyzer.clear(ast);
+	// standardAnalyzer.analyze(ast);
+	// }
 
 	@Override
 	public void print(PrintStream out) {
@@ -73,9 +75,38 @@ public class CommonProgram implements Program {
 	}
 
 	@Override
-	public void transform(TransformMode mode) throws SyntaxException {
-		ast = this.mpiTransformer.transform(ast);
+	public void apply(Transformer transformer) throws SyntaxException {
+		ast = transformer.transform(ast);
 		standardAnalyzer.clear(ast);
-//		standardAnalyzer.analyze(ast);
+		standardAnalyzer.analyze(ast);
+	}
+
+	@Override
+	public void applyTransformer(String code) throws SyntaxException {
+		Transformer transformer = Transform.newTransformer(code,
+				ast.getASTFactory());
+
+		apply(transformer);
+	}
+
+	@Override
+	public void apply(Iterable<Transformer> transformers)
+			throws SyntaxException {
+		for (Transformer transformer : transformers) {
+			ast = transformer.transform(ast);
+			standardAnalyzer.clear(ast);
+			standardAnalyzer.analyze(ast);
+		}
+	}
+
+	@Override
+	public void applyTransformers(Iterable<String> codes)
+			throws SyntaxException {
+		List<Transformer> transformers = new LinkedList<>();
+		ASTFactory astFactory = ast.getASTFactory();
+
+		for (String code : codes)
+			transformers.add(Transform.newTransformer(code, astFactory));
+		apply(transformers);
 	}
 }
