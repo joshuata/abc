@@ -1,9 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.util.Pair;
@@ -50,71 +48,108 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>shared</code>
-	 * clause.
+	 * clause. There are several possibilities:
+	 * <ul>
+	 * <li><code>shared(x, y, z, ...)</code>: a non-empty sequence node;</li>
+	 * <li><code>shared()</code>: an empty sequence node;</li>
+	 * <li>no <code>shared</code> clause: null.</li>
+	 * </ul>
 	 * 
 	 * @return
 	 */
-	List<IdentifierNode> sharedList();
+	SequenceNode<IdentifierNode> sharedList();
 
-	void setSharedList(ArrayList<IdentifierNode> list);
+	void setSharedList(SequenceNode<IdentifierNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>private</code>
-	 * clause.
+	 * clause. There are several possibilities:
+	 * <ul>
+	 * <li><code>private(x, y, z, ...)</code>: a non-empty sequence node;</li>
+	 * <li><code>private()</code>: an empty sequence node;</li>
+	 * <li>no <code>private</code> clause: null.</li>
+	 * </ul>
 	 * 
 	 * @return
 	 */
-	List<IdentifierNode> privateList();
+	SequenceNode<IdentifierNode> privateList();
 
-	void setPrivateList(ArrayList<IdentifierNode> list);
+	void setPrivateList(SequenceNode<IdentifierNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by
-	 * <code>firstprivate</code> clause.
+	 * <code>firstprivate</code> clause. There are several possibilities:
+	 * <ul>
+	 * <li><code>firstprivate(x, y, z, ...)</code>: a non-empty sequence node;</li>
+	 * <li><code>firstprivate()</code>: an empty sequence node;</li>
+	 * <li>no <code>firstprivate</code> clause: null.</li>
+	 * </ul>
 	 * 
 	 * @return
 	 */
-	List<IdentifierNode> firstprivateList();
+	SequenceNode<IdentifierNode> firstprivateList();
 
-	void setFirstprivateList(ArrayList<IdentifierNode> list);
+	void setFirstprivateList(SequenceNode<IdentifierNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>lastprivate</code>
-	 * clause.
+	 * clause. There are several possibilities:
+	 * <ul>
+	 * <li><code>lastprivate(x, y, z, ...)</code>: a non-empty sequence node;</li>
+	 * <li><code>lastprivate()</code>: an empty sequence node;</li>
+	 * <li>no <code>lastprivate</code> clause: null.</li>
+	 * </ul>
 	 * 
 	 * @return
 	 */
-	List<IdentifierNode> lastprivateList();
+	SequenceNode<IdentifierNode> lastprivateList();
 
-	void setLastprivateList(ArrayList<IdentifierNode> list);
+	void setLastprivateList(SequenceNode<IdentifierNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>copyin</code>
-	 * clause.
+	 * clause. There are several possibilities:
+	 * <ul>
+	 * <li><code>copyin(x, y, z, ...)</code>: a non-empty sequence node;</li>
+	 * <li><code>copyin()</code>: an empty sequence node;</li>
+	 * <li>no <code>copyin</code> clause: null.</li>
+	 * </ul>
 	 * 
 	 * @return
 	 */
-	List<IdentifierNode> copyinList();
+	SequenceNode<IdentifierNode> copyinList();
 
-	void setCopyinList(ArrayList<IdentifierNode> list);
+	void setCopyinList(SequenceNode<IdentifierNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>copyprivate</code>
-	 * clause.
+	 * clause. There are several possibilities:
+	 * <ul>
+	 * <li><code>copyprivate(x, y, z, ...)</code>: a non-empty sequence node;</li>
+	 * <li><code>copyprivate()</code>: an empty sequence node;</li>
+	 * <li>no <code>copyprivate</code> clause: null.</li>
+	 * </ul>
 	 * 
 	 * @return
 	 */
-	List<IdentifierNode> copyprivateList();
+	SequenceNode<IdentifierNode> copyprivateList();
 
-	void setCopyprivateList(ArrayList<IdentifierNode> list);
+	void setCopyprivateList(SequenceNode<IdentifierNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>reduction</code>
 	 * clause.
 	 * 
+	 * There are several possibilities:
+	 * <ul>
+	 * <li><code>reduction(operator: x, y, z, ...)</code>: the operator and a
+	 * non-empty sequence node;</li>
+	 * <li>no <code>reduction</code> clause: null.</li>
+	 * </ul>
+	 * 
 	 * @return
 	 */
-	Pair<Operator, ArrayList<IdentifierNode>> reductionList();
+	Pair<Operator, SequenceNode<IdentifierNode>> reductionList();
 
-	void setReductionList(Pair<Operator, ArrayList<IdentifierNode>> list);
+	void setReductionList(Pair<Operator, SequenceNode<IdentifierNode>> list);
 }

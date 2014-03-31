@@ -1,11 +1,11 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -14,7 +14,7 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		OmpSyncNode {
 	private OmpSyncNodeKind ompSyncNodeKind;
 	private IdentifierNode criticalName;
-	private ArrayList<IdentifierNode> flushedList;
+	private SequenceNode<IdentifierNode> flushedList;
 
 	public CommonOmpSyncNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken, OmpSyncNodeKind kind) {
@@ -45,7 +45,7 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	}
 
 	@Override
-	public ArrayList<IdentifierNode> flushedList() {
+	public SequenceNode<IdentifierNode> flushedList() {
 		return this.flushedList;
 	}
 
@@ -81,7 +81,7 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	}
 
 	@Override
-	public void setFlushedList(ArrayList<IdentifierNode> list) {
+	public void setFlushedList(SequenceNode<IdentifierNode> list) {
 		assert this.ompSyncNodeKind == OmpSyncNodeKind.FLUSH;
 		this.flushedList = list;
 	}
@@ -91,12 +91,12 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		int count;
 
 		if (this.flushedList != null) {
-			count = flushedList.size();
+			count = flushedList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "flush(");
 				for (int i = 0; i < count; i++) {
-					out.print(flushedList.get(i).name());
+					out.print(flushedList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}

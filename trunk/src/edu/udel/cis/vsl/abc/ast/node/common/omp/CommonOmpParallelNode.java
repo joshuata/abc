@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
@@ -71,32 +72,29 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 				this.getSource(), identifierCopy, bodyCopy, this.eofToken,
 				duplicate(this.numThreads), duplicate(ifClause),
 				duplicate(statementNode), isDefaultShared);
-		ArrayList<IdentifierNode> listCopy = this.sharedList == null ? null
-				: (ArrayList<IdentifierNode>) this.sharedList.clone();
-		Pair<Operator, ArrayList<IdentifierNode>> reductionCopy;
+		SequenceNode<IdentifierNode> listCopy = this.sharedList == null ? null
+				: this.sharedList.copy();
+		Pair<Operator, SequenceNode<IdentifierNode>> reductionCopy;
 
 		newNode.setSharedList(listCopy);
-		listCopy = this.privateList == null ? null
-				: (ArrayList<IdentifierNode>) this.privateList.clone();
+		listCopy = this.privateList == null ? null : this.privateList.copy();
 		newNode.setPrivateList(listCopy);
-		listCopy = this.firstprivateList == null ? null
-				: (ArrayList<IdentifierNode>) this.firstprivateList.clone();
+		listCopy = this.firstprivateList == null ? null : this.firstprivateList
+				.copy();
 		newNode.setFirstprivateList(listCopy);
-		listCopy = this.lastprivateList == null ? null
-				: (ArrayList<IdentifierNode>) this.lastprivateList.clone();
+		listCopy = this.lastprivateList == null ? null : this.lastprivateList
+				.copy();
 		newNode.setLastprivateList(listCopy);
-		listCopy = this.copyinList == null ? null
-				: (ArrayList<IdentifierNode>) this.copyinList.clone();
+		listCopy = this.copyinList == null ? null : this.copyinList.copy();
 		newNode.setCopyinList(listCopy);
-		listCopy = this.copyprivateList == null ? null
-				: (ArrayList<IdentifierNode>) this.copyprivateList.clone();
+		listCopy = this.copyprivateList == null ? null : this.copyprivateList
+				.copy();
 		newNode.setCopyprivateList(listCopy);
 		if (this.reductionList == null)
 			reductionCopy = null;
 		else {
 			listCopy = this.reductionList.right == null ? null
-					: (ArrayList<IdentifierNode>) this.reductionList.right
-							.clone();
+					: this.reductionList.right.copy();
 			reductionCopy = new Pair<>(this.reductionList.left, listCopy);
 		}
 		newNode.setReductionList(reductionCopy);

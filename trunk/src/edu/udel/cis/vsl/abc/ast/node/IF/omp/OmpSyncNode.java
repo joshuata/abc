@@ -1,8 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
-import java.util.ArrayList;
-
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 
 /**
  * This interface stands for synchronization constructs of OpenMP, including:
@@ -22,7 +21,7 @@ public interface OmpSyncNode extends OmpStatementNode {
 	}
 
 	OmpSyncNodeKind ompSyncNodeKind();
-	
+
 	void setCriticalName(IdentifierNode name);
 
 	/**
@@ -38,7 +37,7 @@ public interface OmpSyncNode extends OmpStatementNode {
 	 * 
 	 * @return
 	 */
-	ArrayList<IdentifierNode> flushedList();
-	
-	void setFlushedList(ArrayList<IdentifierNode> list);
+	SequenceNode<IdentifierNode> flushedList();
+
+	void setFlushedList(SequenceNode<IdentifierNode> list);
 }

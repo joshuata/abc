@@ -1,10 +1,10 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -21,19 +21,19 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 
 	protected StatementNode statementNode = null;
 
-	protected ArrayList<IdentifierNode> sharedList = null;
+	protected SequenceNode<IdentifierNode> sharedList = null;
 
-	protected ArrayList<IdentifierNode> privateList = null;
+	protected SequenceNode<IdentifierNode> privateList = null;
 
-	protected ArrayList<IdentifierNode> firstprivateList = null;
+	protected SequenceNode<IdentifierNode> firstprivateList = null;
 
-	protected ArrayList<IdentifierNode> lastprivateList = null;
+	protected SequenceNode<IdentifierNode> lastprivateList = null;
 
-	protected ArrayList<IdentifierNode> copyinList = null;
+	protected SequenceNode<IdentifierNode> copyinList = null;
 
-	protected ArrayList<IdentifierNode> copyprivateList = null;
+	protected SequenceNode<IdentifierNode> copyprivateList = null;
 
-	protected Pair<Operator, ArrayList<IdentifierNode>> reductionList = null;
+	protected Pair<Operator, SequenceNode<IdentifierNode>> reductionList = null;
 
 	public CommonOmpStatementNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken) {
@@ -88,72 +88,73 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 	}
 
 	@Override
-	public List<IdentifierNode> sharedList() {
+	public SequenceNode<IdentifierNode> sharedList() {
 		return this.sharedList;
 	}
 
 	@Override
-	public List<IdentifierNode> privateList() {
+	public SequenceNode<IdentifierNode> privateList() {
 		return this.privateList;
 	}
 
 	@Override
-	public List<IdentifierNode> firstprivateList() {
+	public SequenceNode<IdentifierNode> firstprivateList() {
 		return this.firstprivateList;
 	}
 
 	@Override
-	public List<IdentifierNode> lastprivateList() {
+	public SequenceNode<IdentifierNode> lastprivateList() {
 		return this.lastprivateList;
 	}
 
 	@Override
-	public List<IdentifierNode> copyinList() {
+	public SequenceNode<IdentifierNode> copyinList() {
 		return this.copyinList;
 	}
 
 	@Override
-	public List<IdentifierNode> copyprivateList() {
+	public SequenceNode<IdentifierNode> copyprivateList() {
 		return this.copyprivateList;
 	}
 
 	@Override
-	public Pair<Operator, ArrayList<IdentifierNode>> reductionList() {
+	public Pair<Operator, SequenceNode<IdentifierNode>> reductionList() {
 		return this.reductionList;
 	}
 
 	@Override
-	public void setSharedList(ArrayList<IdentifierNode> list) {
+	public void setSharedList(SequenceNode<IdentifierNode> list) {
 		this.sharedList = list;
 	}
 
 	@Override
-	public void setPrivateList(ArrayList<IdentifierNode> list) {
+	public void setPrivateList(SequenceNode<IdentifierNode> list) {
 		this.privateList = list;
 	}
 
 	@Override
-	public void setFirstprivateList(ArrayList<IdentifierNode> list) {
+	public void setFirstprivateList(SequenceNode<IdentifierNode> list) {
 		this.firstprivateList = list;
 	}
 
 	@Override
-	public void setLastprivateList(ArrayList<IdentifierNode> list) {
+	public void setLastprivateList(SequenceNode<IdentifierNode> list) {
 		this.lastprivateList = list;
 	}
 
 	@Override
-	public void setCopyinList(ArrayList<IdentifierNode> list) {
+	public void setCopyinList(SequenceNode<IdentifierNode> list) {
 		this.copyinList = list;
 	}
 
 	@Override
-	public void setCopyprivateList(ArrayList<IdentifierNode> list) {
+	public void setCopyprivateList(SequenceNode<IdentifierNode> list) {
 		this.copyprivateList = list;
 	}
 
 	@Override
-	public void setReductionList(Pair<Operator, ArrayList<IdentifierNode>> list) {
+	public void setReductionList(
+			Pair<Operator, SequenceNode<IdentifierNode>> list) {
 		this.reductionList = list;
 	}
 
@@ -166,12 +167,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 			out.print(prefix + "nowait");
 		}
 		if (sharedList != null) {
-			count = sharedList.size();
+			count = sharedList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "shared(");
 				for (int i = 0; i < count; i++) {
-					out.print(sharedList.get(i).name());
+					out.print(sharedList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
@@ -179,12 +180,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 			}
 		}
 		if (privateList != null) {
-			count = privateList.size();
+			count = privateList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "private(");
 				for (int i = 0; i < count; i++) {
-					out.print(privateList.get(i).name());
+					out.print(privateList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
@@ -192,12 +193,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 			}
 		}
 		if (firstprivateList != null) {
-			count = firstprivateList.size();
+			count = firstprivateList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "firstprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(firstprivateList.get(i).name());
+					out.print(firstprivateList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
@@ -205,12 +206,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 			}
 		}
 		if (lastprivateList != null) {
-			count = lastprivateList.size();
+			count = lastprivateList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "lastprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(lastprivateList.get(i).name());
+					out.print(lastprivateList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
@@ -218,12 +219,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 			}
 		}
 		if (copyinList != null) {
-			count = copyinList.size();
+			count = copyinList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "copyin(");
 				for (int i = 0; i < count; i++) {
-					out.print(copyinList.get(i).name());
+					out.print(copyinList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
@@ -231,12 +232,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 			}
 		}
 		if (copyprivateList != null) {
-			count = copyprivateList.size();
+			count = copyprivateList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "copyprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(copyprivateList.get(i).name());
+					out.print(copyprivateList.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
@@ -273,10 +274,10 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 				break;
 			}
 			out.print(":");
-			count = reductionList.right.size();
+			count = reductionList.right.numChildren();
 			if (count > 0) {
 				for (int i = 0; i < count; i++) {
-					out.print(reductionList.right.get(i).name());
+					out.print(reductionList.right.getSequenceChild(i).name());
 					if (i < count - 1)
 						out.print(",");
 				}
