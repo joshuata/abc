@@ -1,10 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
-import edu.udel.cis.vsl.abc.util.Pair;
 
 public interface OmpStatementNode extends OmpNode, StatementNode {
 	public enum OmpStatementNodeKind {
@@ -57,9 +56,9 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> sharedList();
+	SequenceNode<IdentifierExpressionNode> sharedList();
 
-	void setSharedList(SequenceNode<IdentifierNode> list);
+	void setSharedList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>private</code>
@@ -72,9 +71,9 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> privateList();
+	SequenceNode<IdentifierExpressionNode> privateList();
 
-	void setPrivateList(SequenceNode<IdentifierNode> list);
+	void setPrivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by
@@ -87,9 +86,9 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> firstprivateList();
+	SequenceNode<IdentifierExpressionNode> firstprivateList();
 
-	void setFirstprivateList(SequenceNode<IdentifierNode> list);
+	void setFirstprivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>lastprivate</code>
@@ -102,9 +101,9 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> lastprivateList();
+	SequenceNode<IdentifierExpressionNode> lastprivateList();
 
-	void setLastprivateList(SequenceNode<IdentifierNode> list);
+	void setLastprivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>copyin</code>
@@ -117,9 +116,9 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> copyinList();
+	SequenceNode<IdentifierExpressionNode> copyinList();
 
-	void setCopyinList(SequenceNode<IdentifierNode> list);
+	void setCopyinList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>copyprivate</code>
@@ -132,9 +131,9 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> copyprivateList();
+	SequenceNode<IdentifierExpressionNode> copyprivateList();
 
-	void setCopyprivateList(SequenceNode<IdentifierNode> list);
+	void setCopyprivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
 	 * Returns the list of identifier nodes declared by <code>reduction</code>
@@ -149,7 +148,7 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	Pair<Operator, SequenceNode<IdentifierNode>> reductionList();
+	SequenceNode<OperatorNode> reductionList();
 
-	void setReductionList(Pair<Operator, SequenceNode<IdentifierNode>> list);
+	void setReductionList(SequenceNode<OperatorNode> list);
 }

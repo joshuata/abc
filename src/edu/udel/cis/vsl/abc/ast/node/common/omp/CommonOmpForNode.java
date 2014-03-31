@@ -15,19 +15,33 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		OmpForNode {
 
 	private OmpScheduleKind schedule;
-	private ExpressionNode chunkSize;
+	// private ExpressionNode chunkSize;
 	private int collapse;
 	private boolean ordered;
 	private List<FunctionCallNode> assertions;
 	private FunctionCallNode invariant;
 
+	/**
+	 * Children
+	 * <ul>
+	 * <li>Children 0-8: same as {@link CommonOmpStatementNode};</li>
+	 * <li>Child 9: ExpressionNode, the expression of chunk_size in
+	 * <code>schedule()</code> ;</li>
+	 * </ul>
+	 * 
+	 * @param source
+	 * @param identifier
+	 * @param body
+	 * @param eofToken
+	 */
 	public CommonOmpForNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken) {
 		super(source, identifier, body, eofToken, OmpWorkshareNodeKind.FOR);
 		collapse = 1;
 		schedule = OmpScheduleKind.STATIC;
 		ordered = false;
-		chunkSize = null;
+		this.addChild(null);// child 9
+		// chunkSize = null;
 	}
 
 	@Override
@@ -62,7 +76,7 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 
 	@Override
 	public ExpressionNode chunkSize() {
-		return this.chunkSize;
+		return (ExpressionNode) this.child(9);
 	}
 
 	@Override
@@ -82,12 +96,13 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 
 	@Override
 	public void setChunsize(ExpressionNode chunkSize) {
-		this.chunkSize = chunkSize;
+		this.setChild(9, chunkSize);
 	}
 
 	@Override
 	protected void printExtras(String prefix, PrintStream out) {
 		String scheduleText;
+		ExpressionNode chunkSize = (ExpressionNode) this.child(9);
 
 		// STATIC, DYNAMIC, GUIDED, AUTO, RUNTIME
 		switch (schedule) {
@@ -109,12 +124,12 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		default:
 			throw new ABCRuntimeException("Unreachable");
 		}
-		if (this.chunkSize != null) {
+		if (chunkSize != null) {
 			out.println();
 			out.print(prefix + "schedule(");
 			out.print(scheduleText);
 			out.print(",");
-			out.print(this.chunkSize.toString());
+			out.print(chunkSize.toString());
 			out.print(")");
 		}
 		if (collapse > 1) {

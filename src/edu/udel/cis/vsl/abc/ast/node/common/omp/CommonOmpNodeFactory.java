@@ -4,6 +4,7 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNodeFactory;
@@ -59,7 +60,7 @@ public class CommonOmpNodeFactory implements OmpNodeFactory {
 	@Override
 	public OmpDeclarativeNode newDeclarativeNode(Source source,
 			IdentifierNode identifier, List<CToken> body, CToken eofToken,
-			SequenceNode<IdentifierNode> variables) {
+			SequenceNode<IdentifierExpressionNode> variables) {
 		return new CommonOmpDeclarativeNode(source, identifier, body, eofToken,
 				variables);
 	}

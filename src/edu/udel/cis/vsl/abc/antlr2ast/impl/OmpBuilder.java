@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.AMPERSAND;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.AND;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.ATOMIC;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.BARRIER;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.BITOR;
@@ -24,7 +23,6 @@ import static edu.udel.cis.vsl.abc.parse.common.OmpParser.MASTER;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.NONE;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.NOWAIT;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.NUM_THREADS;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.OR;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.ORDERED;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PARALLEL;
 import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PARALLEL_FOR;
@@ -60,6 +58,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode.OmpScheduleKind;
@@ -79,7 +79,6 @@ import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.util.Pair;
 
 public class OmpBuilder {
 
@@ -253,7 +252,7 @@ public class OmpBuilder {
 				if (rootTree.getChildCount() > 0) {
 					criticalNode
 							.setCriticalName(getIdentifierNode((CToken) ((CommonTree) rootTree
-									.getChild(0)).getToken()));
+									.getChild(0)).getToken()).getIdentifier());
 				}
 				return criticalNode;
 			case ORDERED:
@@ -576,56 +575,78 @@ public class OmpBuilder {
 		}
 	}
 
-	private Pair<Operator, SequenceNode<IdentifierNode>> translateReductionClause(
+	private SequenceNode<OperatorNode> translateReductionClause(
 			CommonTree reduction) {
 		Operator operator = translateOperator(reduction.getChild(0).getType());
-		SequenceNode<IdentifierNode> list = translateIdentifierList(
-				"reductionList", (CommonTree) reduction.getChild(1));
+		List<IdentifierExpressionNode> list = translateIdentifierList((CommonTree) reduction
+				.getChild(1));
+		int count = list.size();
+		List<OperatorNode> operators = new ArrayList<>(count);
+		Source rootSource = sourceFactory.newSource((CToken) reduction
+				.getToken());
 
-		return new Pair<>(operator, list);
+		for (int i = 0; i < count; i++) {
+			IdentifierExpressionNode node = list.get(i);
+			Source source = node.getSource();
+			List<ExpressionNode> arguments = new ArrayList<>(1);
+
+			arguments.add(node);
+			arguments.add(node.copy());
+			operators.add(nodeFactory.newOperatorNode(source, operator,
+					arguments));
+		}
+		return nodeFactory.newSequenceNode(rootSource, "reductionList",
+				operators);
 	}
 
 	private Operator translateOperator(int type) {
 		switch (type) {
 		case PLUS:
-			return Operator.PLUS;
+			return Operator.PLUSEQ;
 		case STAR:
-			return Operator.TIMES;
+			return Operator.TIMESEQ;
 		case SUB:
-			return Operator.MINUS;
+			return Operator.MINUSEQ;
 		case AMPERSAND:
-			return Operator.BITAND;
+			return Operator.BITANDEQ;
 		case BITXOR:
-			return Operator.BITXOR;
+			return Operator.BITXOREQ;
 		case BITOR:
-			return Operator.BITOR;
-		case AND:
-			return Operator.LAND;
-		case OR:
-			return Operator.LOR;
+			return Operator.BITOREQ;
+			// case AND:
+			// return Operator.LANDEQ;
+			// case OR:
+			// return Operator.LOREQ;
 		default:
 			throw new ABCUnsupportedException("reduction operator of type "
 					+ type);
 		}
 	}
 
-	private SequenceNode<IdentifierNode> translateIdentifierList(String name,
+	private SequenceNode<IdentifierExpressionNode> translateIdentifierList(
+			String name, CommonTree identifierList) {
+		List<IdentifierExpressionNode> list = translateIdentifierList(identifierList);
+
+		return nodeFactory.newSequenceNode(source, name, list);
+	}
+
+	private List<IdentifierExpressionNode> translateIdentifierList(
 			CommonTree identifierList) {
 		int numChildren = identifierList.getChildCount();
-		ArrayList<IdentifierNode> list = new ArrayList<>(numChildren);
+		List<IdentifierExpressionNode> list = new ArrayList<>(numChildren);
 
 		for (int i = 0; i < numChildren; i++) {
 			list.add(getIdentifierNode((CToken) ((CommonTree) identifierList
 					.getChild(i)).getToken()));
 		}
-		return nodeFactory.newSequenceNode(source, name, list);
+		return list;
 	}
 
-	private IdentifierNode getIdentifierNode(CToken token) {
-		// CToken ctoken = sourceFactory.newCToken(token, formation);
+	private IdentifierExpressionNode getIdentifierNode(CToken token) {
 		Source source = sourceFactory.newSource(token);
 
-		return nodeFactory.newIdentifierNode(source, token.getText());
+		return nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, token.getText()));
 	}
 
 	public OmpNodeFactory ompNodeFactory() {

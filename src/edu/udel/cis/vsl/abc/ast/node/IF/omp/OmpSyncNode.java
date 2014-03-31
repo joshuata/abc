@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 
 /**
  * This interface stands for synchronization constructs of OpenMP, including:
@@ -37,7 +38,7 @@ public interface OmpSyncNode extends OmpStatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<IdentifierNode> flushedList();
+	SequenceNode<IdentifierExpressionNode> flushedList();
 
-	void setFlushedList(SequenceNode<IdentifierNode> list);
+	void setFlushedList(SequenceNode<IdentifierExpressionNode> list);
 }

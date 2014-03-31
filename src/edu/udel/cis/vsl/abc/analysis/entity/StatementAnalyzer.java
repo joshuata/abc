@@ -8,6 +8,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
@@ -331,10 +332,24 @@ public class StatementAnalyzer {
 			throw error("Unknown kind of statement", statement);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void processOmpStatement(OmpStatementNode statement)
 			throws SyntaxException {
 		OmpStatementNodeKind kind = statement.ompStatementNodeKind();
 
+		for (int i = 1; i <= 7; i++) {
+			SequenceNode<ExpressionNode> list = (SequenceNode<ExpressionNode>) statement
+					.child(i);
+
+			if (list != null) {
+				int count = list.numChildren();
+
+				for (int j = 0; j < count; j++) {
+					this.expressionAnalyzer.processExpression(list
+							.getSequenceChild(j));
+				}
+			}
+		}
 		switch (kind) {
 		case PARALLEL:
 			OmpParallelNode parallel = (OmpParallelNode) statement;
@@ -352,6 +367,7 @@ public class StatementAnalyzer {
 				OmpForNode forNode = (OmpForNode) statement;
 				List<FunctionCallNode> assertions = forNode.assertions();
 				FunctionCallNode invariant = forNode.invariant();
+				ExpressionNode chunkSize = forNode.chunkSize();
 
 				if (assertions != null) {
 					for (FunctionCallNode node : assertions)
@@ -359,6 +375,8 @@ public class StatementAnalyzer {
 				}
 				if (invariant != null)
 					processExpression(invariant);
+				if (chunkSize != null)
+					processExpression(chunkSize);
 				break;
 			default:
 			}

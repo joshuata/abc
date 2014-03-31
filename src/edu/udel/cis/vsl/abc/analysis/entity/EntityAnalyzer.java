@@ -19,6 +19,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
@@ -28,8 +29,10 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.EnumerationConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
@@ -210,6 +213,9 @@ public class EntityAnalyzer implements Analyzer {
 					.processTypedefDeclaration((TypedefDeclarationNode) node);
 		} else if (node instanceof PragmaNode) {
 			processPragma((PragmaNode) node);
+			if (node instanceof OmpDeclarativeNode) {
+				processOmpDeclarativeNode((OmpDeclarativeNode) node);
+			}
 		} else if (node instanceof StaticAssertionNode) {
 			processStaticAssertion((StaticAssertionNode) node);
 		} else if (node instanceof StructureOrUnionTypeNode) {
@@ -226,6 +232,16 @@ public class EntityAnalyzer implements Analyzer {
 					.processScopeParameterizedDeclaration((ScopeParameterizedDeclarationNode) node);
 		} else {
 			throw new RuntimeException("Unreachable");
+		}
+	}
+
+	private void processOmpDeclarativeNode(OmpDeclarativeNode node) throws SyntaxException {
+		SequenceNode<IdentifierExpressionNode> variables = node.variables();
+		int count = variables.numChildren();
+
+		for (int i = 0; i < count; i++) {
+			this.expressionAnalyzer.processExpression(variables
+					.getSequenceChild(i));
 		}
 	}
 
