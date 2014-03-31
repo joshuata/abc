@@ -29,6 +29,7 @@ public interface OmpForNode extends OmpWorkshareNode {
 
 	/**
 	 * Returns the number of loops associated with the loop construct.
+	 * 1 by default if there is no collapse clause.
 	 * 
 	 * @return
 	 */
@@ -46,7 +47,7 @@ public interface OmpForNode extends OmpWorkshareNode {
 	void setOrdered(boolean value);
 
 	/**
-	 * Returns the chunk size.
+	 * Returns the chunk size. NULL if there is no schedule clause.
 	 * 
 	 * @return
 	 */

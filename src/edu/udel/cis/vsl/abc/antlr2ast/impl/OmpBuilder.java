@@ -58,6 +58,7 @@ import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
@@ -268,15 +269,17 @@ public class OmpBuilder {
 				OmpSyncNode flushNode = ompNodeFactory.newSyncNode(source,
 						identifier, ctokens, eofToken, OmpSyncNodeKind.FLUSH);
 
-				flushNode
-						.setFlushedList(translateIdentifierList((CommonTree) rootTree
-								.getChild(0)));
+				flushNode.setFlushedList(translateIdentifierList("flushList",
+						(CommonTree) rootTree.getChild(0)));
 				return flushNode;
 			case THD_PRIVATE:
-				return ompNodeFactory.newDeclarativeNode(source, identifier,
-						this.ctokens, eofToken,
-						translateIdentifierList((CommonTree) rootTree
-								.getChild(0)));
+				return ompNodeFactory.newDeclarativeNode(
+						source,
+						identifier,
+						this.ctokens,
+						eofToken,
+						translateIdentifierList("threadprivateList",
+								(CommonTree) rootTree.getChild(0)));
 			case ATOMIC:
 				throw new ABCUnsupportedException("atomic construct of OpenMP");
 			default:
@@ -407,25 +410,28 @@ public class OmpBuilder {
 
 			switch (type) {
 			case UNIQUE_PARALLEL:
-				int result = this.translateUniqueParallel(parallelClause, parallelNode);
-				
-				if(result == IF){
-					if(!hasIf){
+				int result = this.translateUniqueParallel(parallelClause,
+						parallelNode);
+
+				if (result == IF) {
+					if (!hasIf) {
 						hasIf = true;
-					}else{
+					} else {
 						throw new ABCRuntimeException(
 								"At most one if clause is allowed in an OpenMP parallel construct.",
-								(sourceFactory.newSource((CToken) parallelClause
-										.getToken()).getSummary(false)));
+								(sourceFactory
+										.newSource((CToken) parallelClause
+												.getToken()).getSummary(false)));
 					}
-				}else if(result == NUM_THREADS){
-					if(!hasNumThreads){
+				} else if (result == NUM_THREADS) {
+					if (!hasNumThreads) {
 						hasNumThreads = true;
-					}else{
+					} else {
 						throw new ABCRuntimeException(
 								"At most one num_threads() clause is allowed in an OpenMP parallel construct.",
-								(sourceFactory.newSource((CToken) parallelClause
-										.getToken()).getSummary(false)));
+								(sourceFactory
+										.newSource((CToken) parallelClause
+												.getToken()).getSummary(false)));
 					}
 				}
 				break;
@@ -532,34 +538,30 @@ public class OmpBuilder {
 		type = dataClauseEle.getType();
 		switch (type) {
 		case PRIVATE:
-			ompStatementNode
-					.setPrivateList(translateIdentifierList((CommonTree) dataClauseEle
-							.getChild(0)));
+			ompStatementNode.setPrivateList(translateIdentifierList(
+					"privateList", (CommonTree) dataClauseEle.getChild(0)));
 			break;
 		case FST_PRIVATE:
 			ompStatementNode
-					.setFirstprivateList(translateIdentifierList((CommonTree) dataClauseEle
-							.getChild(0)));
+					.setFirstprivateList(translateIdentifierList(
+							"firstprivateList",
+							(CommonTree) dataClauseEle.getChild(0)));
 			break;
 		case LST_PRIVATE:
-			ompStatementNode
-					.setLastprivateList(translateIdentifierList((CommonTree) dataClauseEle
-							.getChild(0)));
+			ompStatementNode.setLastprivateList(translateIdentifierList(
+					"lastprivateList", (CommonTree) dataClauseEle.getChild(0)));
 			break;
 		case SHARED:
-			ompStatementNode
-					.setSharedList(translateIdentifierList((CommonTree) dataClauseEle
-							.getChild(0)));
+			ompStatementNode.setSharedList(translateIdentifierList(
+					"sharedList", (CommonTree) dataClauseEle.getChild(0)));
 			break;
 		case COPYIN:
-			ompStatementNode
-					.setCopyinList(translateIdentifierList((CommonTree) dataClauseEle
-							.getChild(0)));
+			ompStatementNode.setCopyinList(translateIdentifierList(
+					"copyinList", (CommonTree) dataClauseEle.getChild(0)));
 			break;
 		case COPYPRIVATE:
-			ompStatementNode
-					.setCopyprivateList(translateIdentifierList((CommonTree) dataClauseEle
-							.getChild(0)));
+			ompStatementNode.setCopyprivateList(translateIdentifierList(
+					"copyprivateList", (CommonTree) dataClauseEle.getChild(0)));
 			break;
 		case DEFAULT:
 			if (dataClause.getChild(0).getChild(0).getType() == NONE)
@@ -574,11 +576,11 @@ public class OmpBuilder {
 		}
 	}
 
-	private Pair<Operator, ArrayList<IdentifierNode>> translateReductionClause(
+	private Pair<Operator, SequenceNode<IdentifierNode>> translateReductionClause(
 			CommonTree reduction) {
 		Operator operator = translateOperator(reduction.getChild(0).getType());
-		ArrayList<IdentifierNode> list = translateIdentifierList((CommonTree) reduction
-				.getChild(1));
+		SequenceNode<IdentifierNode> list = translateIdentifierList(
+				"reductionList", (CommonTree) reduction.getChild(1));
 
 		return new Pair<>(operator, list);
 	}
@@ -607,7 +609,7 @@ public class OmpBuilder {
 		}
 	}
 
-	private ArrayList<IdentifierNode> translateIdentifierList(
+	private SequenceNode<IdentifierNode> translateIdentifierList(String name,
 			CommonTree identifierList) {
 		int numChildren = identifierList.getChildCount();
 		ArrayList<IdentifierNode> list = new ArrayList<>(numChildren);
@@ -616,7 +618,7 @@ public class OmpBuilder {
 			list.add(getIdentifierNode((CToken) ((CommonTree) identifierList
 					.getChild(i)).getToken()));
 		}
-		return list;
+		return nodeFactory.newSequenceNode(source, name, list);
 	}
 
 	private IdentifierNode getIdentifierNode(CToken token) {
