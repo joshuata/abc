@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
@@ -11,16 +12,22 @@ import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 /**
- * This class provides a static method to create a new transformer based on the
- * transformer code. It also provides a method that lists of all the known
- * codes.
+ * This class manages the set of transformations provided by an execution of
+ * ABC.
  * 
- * If you create a new Transformer, you may edit this file so it knows about
- * your transformer, following the pattern of the others. It is not required for
- * you to do so---your transformer can be used to transform a program whether or
- * not it appears here. The advantage of appearing here is that a switch will be
- * automatically added to the command line interface for all transformers
- * appearing here.
+ * It provides a static method {@link #newTransformer(String, ASTFactory)} to
+ * create a new transformer instance based on the transformer code. It also
+ * provides a method that lists all the known codes.
+ * 
+ * If you create a new {@link Transformer}, you may edit this file so it knows
+ * about your transformer, following the pattern of the others: simply add an
+ * entry to array {@link #records}. It is not required for you to do so---your
+ * transformer can be used to transform a program whether or not it appears
+ * here. The advantage of appearing here is that a switch will be automatically
+ * added to the command line interface for all transformers appearing here.
+ * 
+ * Alternatively, you can add your transformer at runtime using method
+ * {@link #addTransform(TransformRecord)}.
  * 
  * @author siegel
  * 
@@ -59,14 +66,44 @@ public class Transform {
 				}
 			}
 
+	// add more here.
+
 	};
 
+	/**
+	 * Map from transform codes to corresponding records.
+	 */
 	private static Map<String, TransformRecord> codeToRecord = new LinkedHashMap<>();
 
+	/*
+	 * Initializes codeToRecord using the list of hard-wired transforms in array
+	 * records.
+	 */
 	static {
 		for (TransformRecord record : records) {
-			codeToRecord.put(record.code, record);
+			if (codeToRecord.put(record.code, record) != null)
+				throw new ABCRuntimeException("Two transformations named "
+						+ record.code);
 		}
+	}
+
+	/**
+	 * Adds a new transform to the collection of known ones. Use this method if
+	 * you don't want to hardwire your transform in to the ABC code base. You
+	 * will need to create an instance of TransformRecord, for example, in the
+	 * anonymous way done above with the build-in transforms. It can be added at
+	 * any time but usually it is done in some initialization phase.
+	 * 
+	 * @param record
+	 *            a transform record
+	 * @throws ABCRuntimeException
+	 *             if there is already a transform with the given code in this
+	 *             current collection
+	 */
+	public static void addTransform(TransformRecord record) {
+		if (codeToRecord.put(record.code, record) != null)
+			throw new ABCRuntimeException("Two transformations named "
+					+ record.code);
 	}
 
 	/**
@@ -78,19 +115,37 @@ public class Transform {
 		return codeToRecord.keySet();
 	}
 
+	/**
+	 * Returns the short description associated to the given transformer code.
+	 * 
+	 * @param code
+	 *            a transformer code currently in the collection
+	 * @return the short description of the transformation
+	 * @throws ABCRuntimeException
+	 *             if there is no such code in the current collection
+	 */
 	public static String getShortDescription(String code) {
 		TransformRecord record = codeToRecord.get(code);
 
 		if (record == null)
-			return null;
+			throw new ABCRuntimeException("No transformation with code " + code);
 		return record.shortDescription;
 	}
 
+	/**
+	 * Returns the long name associated to the given transformer code.
+	 * 
+	 * @param code
+	 *            a transformer code currently in the collection
+	 * @return the long name of that transformer, e.g., "MPITransformer"
+	 * @throws ABCRuntimeException
+	 *             if there is no such code in the current collection
+	 */
 	public static String getLongName(String code) {
 		TransformRecord record = codeToRecord.get(code);
 
 		if (record == null)
-			return null;
+			throw new ABCRuntimeException("No transformation with code " + code);
 		return record.name;
 	}
 
@@ -105,12 +160,7 @@ public class Transform {
 	 * transformer. That transformer can only operate on ASTs that were produced
 	 * with the same AST Factory.
 	 * 
-	 * Current transformers are (code followed by class name):
-	 * <ul>
-	 * <li>sef: SideEffectRemover</li>
-	 * <li>mpi: MPITransformer</li>
-	 * <li>prune: Pruner</li>
-	 * </ul>
+	 * 
 	 * 
 	 * @param code
 	 *            a short string indicating the kind of transformer to produce
@@ -118,13 +168,14 @@ public class Transform {
 	 *            the AST factory that will is used to produce all the ASTs upon
 	 *            which the new transformer will operate
 	 * @return a new transformer instance of the specified kind
+	 * @throws ABCRuntimeException
+	 *             if there is no such code in the current collection
 	 */
 	public static Transformer newTransformer(String code, ASTFactory astFactory) {
 		TransformRecord record = codeToRecord.get(code);
 
 		if (record == null)
-			return null;
+			throw new ABCRuntimeException("No transformation with code " + code);
 		return record.create(astFactory);
 	}
-
 }

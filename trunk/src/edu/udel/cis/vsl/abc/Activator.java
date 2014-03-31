@@ -362,7 +362,7 @@ public class Activator {
 		program.print(out);
 		out.println("\n\nSymbol Table:\n");
 		program.printSymbolTable(out);
-		out.println("\n\nTypes " + bar + "\n");
+		out.println("\n\nTypes:\n");
 		typeFactory.printTypes(out);
 		out.println();
 		out.flush();
