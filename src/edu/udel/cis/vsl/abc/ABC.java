@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 import edu.udel.cis.vsl.abc.transform.Transform;
 
 /**
@@ -31,9 +30,9 @@ import edu.udel.cis.vsl.abc.transform.Transform;
  */
 public class ABC {
 
-	public final static String version = "0.1";
+	public final static String version = "0.2";
 
-	public final static String date = "01-mar-2013";
+	public final static String date = "31-mar-2014";
 
 	public static enum Language {
 		C, CIVL_C
@@ -46,15 +45,29 @@ public class ABC {
 	 */
 	public static Language language = Language.C;
 
+	/**
+	 * Produces a new Activator for operating on the given file, using the given
+	 * include paths for preprocessing. Uses the default language.
+	 * 
+	 * @param file
+	 *            the file to be parsed
+	 * @param systemIncludes
+	 *            a list of directories into which to search for system header
+	 *            files
+	 * @param userIncludes
+	 *            a list of directories in which to search for user header files
+	 * @return an Activator, which can be used to preprocess, parse, and
+	 *         transform the file
+	 */
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes) {
-		TokenUtils.initialization();
+		// TokenUtils.initialization();
 		return new Activator(file, systemIncludes, userIncludes);
 	}
 
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes, Language kind) {
-		TokenUtils.initialization();
+		// TokenUtils.initialization();
 		language = kind;
 		return new Activator(file, systemIncludes, userIncludes);
 	}
@@ -89,13 +102,13 @@ public class ABC {
 		out.println("  verbose mode, show all processing steps");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
-		out.println("");
 		for (String code : Transform.getCodes()) {
 			String description = Transform.getShortDescription(code);
 
 			out.println("-" + code);
 			out.println("  " + description);
 		}
+		out.println();
 		out.flush();
 	}
 

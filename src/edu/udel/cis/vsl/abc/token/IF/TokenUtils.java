@@ -23,16 +23,16 @@ public class TokenUtils {
 	 */
 	public final static int summaryBound = 10;
 
-	private static HashMap<String, Integer> fileNameMap;
+	private static HashMap<String, Integer> fileNameMap= new LinkedHashMap<String, Integer>();
 
 	public final static String SHORT_FILE_NAME_PREFIX = "f";
 
-	/**
-	 * Initialize the file name map.
-	 */
-	public static void initialization(){
-		fileNameMap = new LinkedHashMap<String, Integer>();
-	}
+	// /**
+	// * Initialize the file name map.
+	// */
+	// public static void initialization(){
+	// fileNameMap = new LinkedHashMap<String, Integer>();
+	// }
 	
 	/**
 	 * A utility function to extract the filename, line number, and character
