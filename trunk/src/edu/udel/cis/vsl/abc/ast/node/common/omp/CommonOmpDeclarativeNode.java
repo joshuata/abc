@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -12,13 +13,22 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 public class CommonOmpDeclarativeNode extends CommonOmpNode implements
 		OmpDeclarativeNode {
 
-	private SequenceNode<IdentifierNode> variables;
+	// private SequenceNode<IdentifierNode> variables;
 
+	/**
+	 * Child 1: varabile list
+	 * 
+	 * @param source
+	 * @param identifier
+	 * @param body
+	 * @param eofToken
+	 * @param varList
+	 */
 	public CommonOmpDeclarativeNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken,
-			SequenceNode<IdentifierNode> varList) {
+			SequenceNode<IdentifierExpressionNode> varList) {
 		super(source, identifier, body, eofToken);
-		this.variables = varList;
+		this.addChild(varList);// child 1
 	}
 
 	@Override
@@ -32,13 +42,14 @@ public class CommonOmpDeclarativeNode extends CommonOmpNode implements
 	}
 
 	@Override
-	public void setList(SequenceNode<IdentifierNode> list) {
-		this.variables = list;
+	public void setList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(1, list);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public SequenceNode<IdentifierNode> variables() {
-		return this.variables;
+	public SequenceNode<IdentifierExpressionNode> variables() {
+		return (SequenceNode<IdentifierExpressionNode>) this.child(1);
 	}
 
 	@Override
@@ -46,17 +57,20 @@ public class CommonOmpDeclarativeNode extends CommonOmpNode implements
 		out.print("OmpThreadprivate");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void printExtras(String prefix, PrintStream out) {
 		int count;
+		SequenceNode<IdentifierExpressionNode> variables = (SequenceNode<IdentifierExpressionNode>) this
+				.child(1);
 
-		if (this.variables != null) {
+		if (variables != null) {
 			count = variables.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "threadprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(variables.getSequenceChild(i).name());
+					out.print(variables.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}

@@ -6,6 +6,7 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -14,13 +15,29 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		OmpSyncNode {
 	private OmpSyncNodeKind ompSyncNodeKind;
 	private IdentifierNode criticalName;
-	private SequenceNode<IdentifierNode> flushedList;
 
+	// private SequenceNode<IdentifierNode> flushedList;
+
+	/**
+	 * Children
+	 * <ul>
+	 * <li>Children 0-8: same as {@link CommonOmpStatementNode};</li>
+	 * <li>Child 9: SequenceNode&lt;IdentifierNode&gt; "flushedList", the list
+	 * of identifiers declared by <code>flushed()</code> ;</li>
+	 * </ul>
+	 * 
+	 * @param source
+	 * @param identifier
+	 * @param body
+	 * @param eofToken
+	 * @param kind
+	 */
 	public CommonOmpSyncNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken, OmpSyncNodeKind kind) {
 		super(source, identifier, body, eofToken);
 		this.ompSyncNodeKind = kind;
 		this.ompStatementKind = OmpStatementNodeKind.SYNCHRONIZATION;
+		this.addChild(null);// child 9
 	}
 
 	@Override
@@ -44,9 +61,10 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		return this.criticalName;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public SequenceNode<IdentifierNode> flushedList() {
-		return this.flushedList;
+	public SequenceNode<IdentifierExpressionNode> flushedList() {
+		return (SequenceNode<IdentifierExpressionNode>) this.child(9);
 	}
 
 	// MASTER, CRITICAL, BARRIER, FLUSH
@@ -81,22 +99,26 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	}
 
 	@Override
-	public void setFlushedList(SequenceNode<IdentifierNode> list) {
+	public void setFlushedList(SequenceNode<IdentifierExpressionNode> list) {
 		assert this.ompSyncNodeKind == OmpSyncNodeKind.FLUSH;
-		this.flushedList = list;
+		this.setChild(9, list);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void printExtras(String prefix, PrintStream out) {
 		int count;
+		SequenceNode<IdentifierExpressionNode> flushedList = (SequenceNode<IdentifierExpressionNode>) this
+				.child(9);
 
-		if (this.flushedList != null) {
+		if (flushedList != null) {
 			count = flushedList.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "flush(");
 				for (int i = 0; i < count; i++) {
-					out.print(flushedList.getSequenceChild(i).name());
+					out.print(flushedList.getSequenceChild(i).getIdentifier()
+							.name());
 					if (i < count - 1)
 						out.print(",");
 				}

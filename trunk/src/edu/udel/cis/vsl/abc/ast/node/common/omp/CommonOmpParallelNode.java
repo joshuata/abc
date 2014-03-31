@@ -1,19 +1,15 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
-import edu.udel.cis.vsl.abc.util.Pair;
 
 public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 		OmpParallelNode {
@@ -21,10 +17,26 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 	private ExpressionNode ifClause = null;
 	private boolean isDefaultShared = true;
 
+	/**
+	 * Children
+	 * <ul>
+	 * <li>Children 0-8: same as {@link CommonOmpStatementNode};</li>
+	 * <li>Child 9: ExpressionNode, the expression of <code>num_threads()</code>
+	 * ;</li>
+	 * <li>Child 10: ExpressionNode, the expression of <code>if()</code>.</li>
+	 * </ul>
+	 * 
+	 * @param source
+	 * @param identifier
+	 * @param body
+	 * @param eofToken
+	 */
 	public CommonOmpParallelNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken) {
 		super(source, identifier, body, eofToken);
 		this.ompStatementKind = OmpStatementNodeKind.PARALLEL;
+		this.addChild(null);// child 9
+		this.addChild(null);// child 10
 	}
 
 	public CommonOmpParallelNode(Source source, IdentifierNode identifier,
@@ -33,15 +45,10 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 			boolean isDefaultShared) {
 		super(source, identifier, body, eofToken);
 		this.ompStatementKind = OmpStatementNodeKind.PARALLEL;
-		this.numThreads = numThreads;
-		this.ifClause = ifClause;
+		this.setChild(8, statementNode);
+		this.setChild(9, numThreads);
+		this.setChild(10, ifClause);
 		this.isDefaultShared = isDefaultShared;
-		this.statementNode = statementNode;
-		if (ifClause != null)
-			this.addChild(ifClause);
-		if (numThreads != null)
-			this.addChild(numThreads);
-		this.addChild(statementNode);
 	}
 
 	/*
@@ -60,51 +67,53 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 	 * protected Pair<Operator, List<IdentifierNode>> reductionList = null;
 	 */
 
-	@Override
-	@SuppressWarnings({ "unchecked" })
-	public CommonOmpParallelNode copy() {
-		ArrayList<CToken> bodyCopy = this.body == null ? null
-				: (ArrayList<CToken>) this.body.clone();
-		IdentifierNode identifier = getPragmaIdentifier();
-		IdentifierNode identifierCopy = identifier == null ? null : identifier
-				.copy();
-		CommonOmpParallelNode newNode = new CommonOmpParallelNode(
-				this.getSource(), identifierCopy, bodyCopy, this.eofToken,
-				duplicate(this.numThreads), duplicate(ifClause),
-				duplicate(statementNode), isDefaultShared);
-		SequenceNode<IdentifierNode> listCopy = this.sharedList == null ? null
-				: this.sharedList.copy();
-		Pair<Operator, SequenceNode<IdentifierNode>> reductionCopy;
-
-		newNode.setSharedList(listCopy);
-		listCopy = this.privateList == null ? null : this.privateList.copy();
-		newNode.setPrivateList(listCopy);
-		listCopy = this.firstprivateList == null ? null : this.firstprivateList
-				.copy();
-		newNode.setFirstprivateList(listCopy);
-		listCopy = this.lastprivateList == null ? null : this.lastprivateList
-				.copy();
-		newNode.setLastprivateList(listCopy);
-		listCopy = this.copyinList == null ? null : this.copyinList.copy();
-		newNode.setCopyinList(listCopy);
-		listCopy = this.copyprivateList == null ? null : this.copyprivateList
-				.copy();
-		newNode.setCopyprivateList(listCopy);
-		if (this.reductionList == null)
-			reductionCopy = null;
-		else {
-			listCopy = this.reductionList.right == null ? null
-					: this.reductionList.right.copy();
-			reductionCopy = new Pair<>(this.reductionList.left, listCopy);
-		}
-		newNode.setReductionList(reductionCopy);
-		return newNode;
-	}
+	// @Override
+	// @SuppressWarnings({ "unchecked" })
+	// public CommonOmpParallelNode copy() {
+	// ArrayList<CToken> bodyCopy = this.body == null ? null
+	// : (ArrayList<CToken>) this.body.clone();
+	// IdentifierNode identifier = getPragmaIdentifier();
+	// IdentifierNode identifierCopy = identifier == null ? null : identifier
+	// .copy();
+	// CommonOmpParallelNode newNode = new CommonOmpParallelNode(
+	// this.getSource(), identifierCopy, bodyCopy, this.eofToken,
+	// duplicate(this.numThreads), duplicate(ifClause),
+	// duplicate(statementNode), isDefaultShared);
+	// SequenceNode<IdentifierNode> listCopy = this.sharedList == null ? null
+	// : this.sharedList.copy();
+	// Pair<Operator, SequenceNode<IdentifierNode>> reductionCopy;
+	//
+	// newNode.setSharedList(listCopy);
+	// listCopy = this.privateList == null ? null : this.privateList.copy();
+	// newNode.setPrivateList(listCopy);
+	// listCopy = this.firstprivateList == null ? null : this.firstprivateList
+	// .copy();
+	// newNode.setFirstprivateList(listCopy);
+	// listCopy = this.lastprivateList == null ? null : this.lastprivateList
+	// .copy();
+	// newNode.setLastprivateList(listCopy);
+	// listCopy = this.copyinList == null ? null : this.copyinList.copy();
+	// newNode.setCopyinList(listCopy);
+	// listCopy = this.copyprivateList == null ? null : this.copyprivateList
+	// .copy();
+	// newNode.setCopyprivateList(listCopy);
+	// if (this.reductionList == null)
+	// reductionCopy = null;
+	// else {
+	// listCopy = this.reductionList.right == null ? null
+	// : this.reductionList.right.copy();
+	// reductionCopy = new Pair<>(this.reductionList.left, listCopy);
+	// }
+	// newNode.setReductionList(reductionCopy);
+	// return newNode;
+	// }
 
 	@Override
 	public void setStatementNode(StatementNode statement) {
-		if (this.statementNode != null) {
-			((OmpStatementNode) this.statementNode).setStatementNode(statement);
+		StatementNode statementNode = (StatementNode) this.child(8);
+
+		if (statementNode != null) {
+			((OmpStatementNode) statementNode).setStatementNode(statement);
 		} else {
 			super.setStatementNode(statement);
 		}

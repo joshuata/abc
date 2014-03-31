@@ -5,13 +5,15 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
-import edu.udel.cis.vsl.abc.util.Pair;
 
+@SuppressWarnings("unchecked")
 public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 		OmpStatementNode {
 
@@ -19,33 +21,58 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 
 	protected boolean nowait;
 
-	protected StatementNode statementNode = null;
-
-	protected SequenceNode<IdentifierNode> sharedList = null;
-
-	protected SequenceNode<IdentifierNode> privateList = null;
-
-	protected SequenceNode<IdentifierNode> firstprivateList = null;
-
-	protected SequenceNode<IdentifierNode> lastprivateList = null;
-
-	protected SequenceNode<IdentifierNode> copyinList = null;
-
-	protected SequenceNode<IdentifierNode> copyprivateList = null;
-
-	protected Pair<Operator, SequenceNode<IdentifierNode>> reductionList = null;
-
+	/**
+	 * 
+	 * Children:
+	 * <ul>
+	 * <li>
+	 * Child 0: IdentifierNode "omp", name of the pragma</li>
+	 * <li>Child 1: SequenceNode&lt;IdentifierExpressionNode&gt; "sharedList",
+	 * the list of identifiers declared by <code>shared</code></li>
+	 * <li>Child 2: SequenceNode&lt;IdentifierExpressionNode&gt; "privateList",
+	 * the list of identifiers declared by <code>private</code></li>
+	 * <li>Child 3: SequenceNode&lt;IdentifierExpressionNode&gt;
+	 * "firstprivateList", the list of identifiers declared by
+	 * <code>firstprivate</code></li>
+	 * <li>Child 4: SequenceNode&lt;IdentifierExpressionNode&gt;
+	 * "lastprivateList", the list of identifiers declared by
+	 * <code>lastprivate</code></li>
+	 * <li>Child 5: SequenceNode&lt;IdentifierExpressionNode&gt; "copyinList",
+	 * the list of identifiers declared by <code>copyin</code></li>
+	 * <li>Child 6: SequenceNode&lt;IdentifierExpressionNode&gt;
+	 * "copyprivateList", the list of identifiers declared by
+	 * <code>copyprivate</code></li>
+	 * <li>Child 7: SequenceNode&lt;OperatorNode&gt; "reductionList", the list
+	 * of operators and identifiers declared by <code>reduction</code></li>
+	 * <li>Child 8: StatementNode, the statement node affected by this pragma</li>
+	 * </ul>
+	 * 
+	 * @param source
+	 * @param identifier
+	 * @param body
+	 * @param eofToken
+	 */
 	public CommonOmpStatementNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken eofToken) {
 		super(source, identifier, body, eofToken);
 		nowait = false;
+		this.addChild(null);// child 1
+		this.addChild(null);// child 2
+		this.addChild(null);// child 3
+		this.addChild(null);// child 4
+		this.addChild(null);// child 5
+		this.addChild(null);// child 6
+		this.addChild(null);// child 7
+		this.addChild(null);// child 8
 	}
 
 	@Override
 	public boolean completed() {
-		if (this.statementNode != null) {
-			if (this.statementNode instanceof OmpStatementNode)
-				return ((OmpStatementNode) this.statementNode).completed();
+		StatementNode statementNode = (StatementNode) this.child(8);
+
+		if (statementNode != null) {
+			if (statementNode instanceof OmpStatementNode)
+				return ((OmpStatementNode) statementNode).completed();
 			return true;
 		} else
 			return false;
@@ -78,208 +105,227 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 
 	@Override
 	public StatementNode statementNode() {
-		return this.statementNode;
+		return (StatementNode) this.child(8);
 	}
 
 	@Override
 	public void setStatementNode(StatementNode stmtNode) {
-		this.statementNode = stmtNode;
-		this.addChild(stmtNode);
+		this.setChild(8, stmtNode);
 	}
 
 	@Override
-	public SequenceNode<IdentifierNode> sharedList() {
-		return this.sharedList;
+	public SequenceNode<IdentifierExpressionNode> sharedList() {
+		return (SequenceNode<IdentifierExpressionNode>) this.child(1);
 	}
 
 	@Override
-	public SequenceNode<IdentifierNode> privateList() {
-		return this.privateList;
+	public SequenceNode<IdentifierExpressionNode> privateList() {
+		return (SequenceNode<IdentifierExpressionNode>) child(2);
 	}
 
 	@Override
-	public SequenceNode<IdentifierNode> firstprivateList() {
-		return this.firstprivateList;
+	public SequenceNode<IdentifierExpressionNode> firstprivateList() {
+		return (SequenceNode<IdentifierExpressionNode>) child(3);
 	}
 
 	@Override
-	public SequenceNode<IdentifierNode> lastprivateList() {
-		return this.lastprivateList;
+	public SequenceNode<IdentifierExpressionNode> lastprivateList() {
+		return (SequenceNode<IdentifierExpressionNode>) this.child(4);
 	}
 
 	@Override
-	public SequenceNode<IdentifierNode> copyinList() {
-		return this.copyinList;
+	public SequenceNode<IdentifierExpressionNode> copyinList() {
+		return (SequenceNode<IdentifierExpressionNode>) child(5);
 	}
 
 	@Override
-	public SequenceNode<IdentifierNode> copyprivateList() {
-		return this.copyprivateList;
+	public SequenceNode<IdentifierExpressionNode> copyprivateList() {
+		return (SequenceNode<IdentifierExpressionNode>) this.child(6);
 	}
 
 	@Override
-	public Pair<Operator, SequenceNode<IdentifierNode>> reductionList() {
-		return this.reductionList;
+	public SequenceNode<OperatorNode> reductionList() {
+		return (SequenceNode<OperatorNode>) this.child(7);
 	}
 
 	@Override
-	public void setSharedList(SequenceNode<IdentifierNode> list) {
-		this.sharedList = list;
+	public void setSharedList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(1, list);
 	}
 
 	@Override
-	public void setPrivateList(SequenceNode<IdentifierNode> list) {
-		this.privateList = list;
+	public void setPrivateList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(2, list);
 	}
 
 	@Override
-	public void setFirstprivateList(SequenceNode<IdentifierNode> list) {
-		this.firstprivateList = list;
+	public void setFirstprivateList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(3, list);
 	}
 
 	@Override
-	public void setLastprivateList(SequenceNode<IdentifierNode> list) {
-		this.lastprivateList = list;
+	public void setLastprivateList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(4, list);
 	}
 
 	@Override
-	public void setCopyinList(SequenceNode<IdentifierNode> list) {
-		this.copyinList = list;
+	public void setCopyinList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(5, list);
 	}
 
 	@Override
-	public void setCopyprivateList(SequenceNode<IdentifierNode> list) {
-		this.copyprivateList = list;
+	public void setCopyprivateList(SequenceNode<IdentifierExpressionNode> list) {
+		this.setChild(6, list);
 	}
 
 	@Override
-	public void setReductionList(
-			Pair<Operator, SequenceNode<IdentifierNode>> list) {
-		this.reductionList = list;
+	public void setReductionList(SequenceNode<OperatorNode> list) {
+		this.setChild(7, list);
 	}
 
 	@Override
 	protected void printExtras(String prefix, PrintStream out) {
 		int count;
+		SequenceNode<IdentifierExpressionNode> list;
+		SequenceNode<OperatorNode> reductionList;
 
 		if (this.nowait) {
 			out.println();
 			out.print(prefix + "nowait");
 		}
-		if (sharedList != null) {
-			count = sharedList.numChildren();
+		// sharedList
+		list = (SequenceNode<IdentifierExpressionNode>) this.child(1);
+		if (list != null) {
+			count = list.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "shared(");
 				for (int i = 0; i < count; i++) {
-					out.print(sharedList.getSequenceChild(i).name());
+					out.print(list.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}
 				out.print(")");
 			}
 		}
-		if (privateList != null) {
-			count = privateList.numChildren();
+		// privateList
+		list = (SequenceNode<IdentifierExpressionNode>) this.child(2);
+		if (list != null) {
+			count = list.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "private(");
 				for (int i = 0; i < count; i++) {
-					out.print(privateList.getSequenceChild(i).name());
+					out.print(list.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}
 				out.print(")");
 			}
 		}
-		if (firstprivateList != null) {
-			count = firstprivateList.numChildren();
+		// firstprivateList
+		list = (SequenceNode<IdentifierExpressionNode>) this.child(3);
+		if (list != null) {
+			count = list.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "firstprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(firstprivateList.getSequenceChild(i).name());
+					out.print(list.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}
 				out.print(")");
 			}
 		}
-		if (lastprivateList != null) {
-			count = lastprivateList.numChildren();
+		// lastprivateList
+		list = (SequenceNode<IdentifierExpressionNode>) this.child(4);
+		if (list != null) {
+			count = list.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "lastprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(lastprivateList.getSequenceChild(i).name());
+					out.print(list.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}
 				out.print(")");
 			}
 		}
-		if (copyinList != null) {
-			count = copyinList.numChildren();
+		// copyin
+		list = (SequenceNode<IdentifierExpressionNode>) this.child(5);
+		if (list != null) {
+			count = list.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "copyin(");
 				for (int i = 0; i < count; i++) {
-					out.print(copyinList.getSequenceChild(i).name());
+					out.print(list.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}
 				out.print(")");
 			}
 		}
-		if (copyprivateList != null) {
-			count = copyprivateList.numChildren();
+		// copyprivate
+		list = (SequenceNode<IdentifierExpressionNode>) this.child(6);
+		if (list != null) {
+			count = list.numChildren();
 			if (count > 0) {
 				out.println();
 				out.print(prefix + "copyprivate(");
 				for (int i = 0; i < count; i++) {
-					out.print(copyprivateList.getSequenceChild(i).name());
+					out.print(list.getSequenceChild(i).getIdentifier().name());
 					if (i < count - 1)
 						out.print(",");
 				}
 				out.print(")");
 			}
 		}
+		reductionList = (SequenceNode<OperatorNode>) this.child(7);
 		if (reductionList != null) {
 			out.println();
 			out.print(prefix + "reduction(");
-			switch (reductionList.left) {
-			case PLUS:
-				out.print("+");
-				break;
-			case TIMES:
-				out.print("*");
-				break;
-			case MINUS:
-				out.print("-");
-				break;
-			case BITAND:
-				out.print("&");
-				break;
-			case BITXOR:
-				out.print("^");
-				break;
-			case BITOR:
-				out.print("|");
-				break;
-			case LAND:
-				out.print("&&");
-				break;
-			default:
-				out.print("||");
-				break;
-			}
-			out.print(":");
-			count = reductionList.right.numChildren();
-			if (count > 0) {
+
+			if (reductionList != null) {
+				count = reductionList.numChildren();
+
 				for (int i = 0; i < count; i++) {
-					out.print(reductionList.right.getSequenceChild(i).name());
-					if (i < count - 1)
-						out.print(",");
+					OperatorNode current = reductionList.getSequenceChild(i);
+					Operator operator = current.getOperator();
+					IdentifierExpressionNode arg = (IdentifierExpressionNode) current
+							.getArgument(0);
+
+					switch (operator) {
+					case PLUS:
+						out.print("+");
+						break;
+					case TIMES:
+						out.print("*");
+						break;
+					case MINUS:
+						out.print("-");
+						break;
+					case BITAND:
+						out.print("&");
+						break;
+					case BITXOR:
+						out.print("^");
+						break;
+					case BITOR:
+						out.print("|");
+						break;
+					case LAND:
+						out.print("&&");
+						break;
+					default:
+						out.print("||");
+						break;
+					}
+					out.print(":");
+					out.print(arg.getIdentifier().name());
+					out.print(",");
 				}
 			}
 			out.print(")");
