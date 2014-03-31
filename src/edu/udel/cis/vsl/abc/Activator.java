@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.LinkedList;
 
 import org.antlr.runtime.tree.CommonTree;
 
@@ -34,16 +35,12 @@ import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.program.Programs;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.program.IF.Program.TransformMode;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.token.Tokens;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.transform.IF.MPITransformer;
+import edu.udel.cis.vsl.abc.transform.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.abc.transform.common.CommonMPITransformer;
-import edu.udel.cis.vsl.abc.transform.common.Pruner;
-import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 import edu.udel.cis.vsl.abc.util.ANTLRUtils;
 import edu.udel.cis.vsl.sarl.SARL;
 import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
@@ -94,16 +91,13 @@ public class Activator {
 			astFactory, entityFactory, nodeFactory, sourceFactory,
 			conversionFactory);
 
-	private Transformer sideEffectRemover = new SideEffectRemover();
+	private Transformer sideEffectRemover = Transform.newTransformer("sef",
+			astFactory);
 
-	private Transformer pruner = new Pruner(astFactory);
-
-	private MPITransformer mpiTransformer = new CommonMPITransformer(
-			this.astFactory, this.nodeFactory);
+	private Transformer pruner = Transform.newTransformer("prune", astFactory);
 
 	private ProgramFactory programFactory = Programs.newProgramFactory(
-			astFactory, standardAnalyzer, pruner, sideEffectRemover,
-			this.mpiTransformer);
+			astFactory, standardAnalyzer);
 
 	private Preprocessor preprocessor;
 
@@ -364,90 +358,20 @@ public class Activator {
 		return ast;
 	}
 
-	/**
-	 * Show every stage of translation. This is a lot of output and is only
-	 * recommended for small examples. Applies pruner and side-effect-remover.
-	 * 
-	 * @param out
-	 * @return the AST
-	 * @throws PreprocessorException
-	 *             if preprocessing fails
-	 * @throws ParseException
-	 *             if parsing the preprocessed file fails
-	 * @throws SyntaxException
-	 *             if analysis of syntax fails
-	 * @throws IOException
-	 *             if file cannot be read
-	 */
-	public Program showTranslation(PrintStream out) throws ABCException,
-			IOException {
-		AST ast;
-		CParser parser;
-		CommonTree tree;
-		ASTBuilder builder;
-		Program program;
-
-		// print the original source file...
-		ANTLRUtils.source(out, file);
-		out.println();
-		// print the result of preprocessing...
-		out.println(bar + " Preprocessor output " + bar);
-		preprocessor.printOutputDebug(out, file);
-		out.println();
-		// print the ANTLR Tree...
-		out.println(bar + " ANTLR Parse Tree " + bar);
-		parser = Parse.newCParser(preprocessor, file);
-		tree = parser.getTree();
-		ANTLRUtils.printTree(out, tree);
-		out.println();
-		out.flush();
-		ast = null;
-		try {
-			builder = new ASTBuilder(parser, astFactory, tree);
-			ast = builder.getTranslationUnit(); // creates ast
-			program = programFactory.newProgram(ast); // analyzes ast
-			ast = program.getAST();
-		} catch (Exception e) {
-			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
-			if (ast == null)
-				out.println("null");
-			else
-				ast.print(out);
-			out.println();
-			out.flush();
-			throw e;
-		}
-		out.println("\n\n" + bar + " Program " + bar + "\n");
+	private void printProgram(PrintStream out, Program program) {
 		program.print(out);
-		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
+		out.println("\n\nSymbol Table:\n");
 		program.printSymbolTable(out);
-		out.println("\n\n" + bar + " Types " + bar + "\n");
+		out.println("\n\nTypes " + bar + "\n");
 		typeFactory.printTypes(out);
 		out.println();
 		out.flush();
-		// print the result of pruning unreachable decls...
-		out.println("\n\n" + bar + " Pruned Program " + bar);
-		program.prune();
-		program.print(out);
-		out.println();
-		out.flush();
-		// print the results of removing side-effects...
-		out.println("\n\n" + bar + " Side-effect-free Pruned Program " + bar);
-		program.removeSideEffects();
-		program.print(out);
-		out.println();
-		out.flush();
-		out.println("\n\n" + bar + " Types " + bar + "\n");
-		typeFactory.printTypes(out);
-		out.println();
-		out.flush();
-
-		return program;
 	}
 
 	/**
-	 * Show every stage of translation. This is a lot of output and is only
-	 * recommended for small examples. Applies pruner and side-effect-remover.
+	 * Show every stage of translation, including the state of the AST after
+	 * each transform is applied. This is a lot of output and is only
+	 * recommended for small examples.
 	 * 
 	 * @param out
 	 * @return the AST
@@ -460,7 +384,8 @@ public class Activator {
 	 * @throws IOException
 	 *             if file cannot be read
 	 */
-	public Program showMpiTransformation(PrintStream out) throws ABCException,
+	private Program showTranslationWorker(PrintStream out,
+			Iterable<Transformer> transformers) throws ABCException,
 			IOException {
 		AST ast;
 		CParser parser;
@@ -498,39 +423,34 @@ public class Activator {
 			out.flush();
 			throw e;
 		}
-		out.println("\n\n" + bar + " Program " + bar + "\n");
-		program.print(out);
-		out.println("\n\n" + bar + " Symbol Table " + bar + "\n");
-		program.printSymbolTable(out);
-		out.println("\n\n" + bar + " Types " + bar + "\n");
-		typeFactory.printTypes(out);
-		out.println();
-		out.flush();
-		// print the results of MPI transformation
-
-		out.println("\n\n" + bar + " MPI transformed Program " + bar);
-		program.transform(TransformMode.MPI);
-		program.print(out);
-		out.println();
-		out.flush();
-
-//		// print the result of pruning unreachable decls...
-//		out.println("\n\n" + bar + " Pruned Program " + bar);
-//		program.prune();
-//		program.print(out);
-//		out.println();
-//		out.flush();
-//		// print the results of removing side-effects...
-//		out.println("\n\n" + bar + " Side-effect-free Pruned Program " + bar);
-//		program.removeSideEffects();
-//		program.print(out);
-//		out.println();
-//		out.flush();
-		out.println("\n\n" + bar + " Types " + bar + "\n");
-		typeFactory.printTypes(out);
-		out.println();
-		out.flush();
+		for (Transformer transformer : transformers) {
+			out.println("\n\n" + bar + " After " + transformer + " " + bar);
+			program.apply(transformer);
+			printProgram(out, program);
+		}
 		return program;
+	}
+
+	public Program showTranslation(PrintStream out,
+			Iterable<String> transformCodes) throws ABCException, IOException {
+		LinkedList<Transformer> transformers = new LinkedList<>();
+
+		for (String code : transformCodes)
+			transformers.add(Transform.newTransformer(code, astFactory));
+		return showTranslationWorker(out, transformers);
+	}
+
+	/**
+	 * Shows translation with no transformers.
+	 * 
+	 * @param out
+	 * @return
+	 * @throws ABCException
+	 * @throws IOException
+	 */
+	public Program showTranslation(PrintStream out) throws ABCException,
+			IOException {
+		return showTranslation(out, new LinkedList<String>());
 	}
 
 	/**

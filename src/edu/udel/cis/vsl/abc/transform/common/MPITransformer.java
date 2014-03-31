@@ -9,7 +9,6 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
@@ -28,17 +27,16 @@ import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonVoidTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.abc.transform.IF.MPITransformer;
+import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
-public class CommonMPITransformer implements MPITransformer {
+public class MPITransformer extends BaseTransformer {
 
-	private ASTFactory astFactory;
+	public static String CODE = "mpi";
+	public static String LONG_NAME = "MPITransformer";
+	public static String SHORT_DESCRIPTION = "transforms C/MPI program to CIVL-C";
 
-	private NodeFactory nodeFactory;
-
-	public CommonMPITransformer(ASTFactory astFactory, NodeFactory nodeFactory) {
-		this.astFactory = astFactory;
-		this.nodeFactory = nodeFactory;
+	public MPITransformer(ASTFactory astFactory) {
+		super(CODE, LONG_NAME, SHORT_DESCRIPTION, astFactory);
 	}
 
 	private FunctionDefinitionNode mpiProcess(SequenceNode<ASTNode> root) {
@@ -93,6 +91,8 @@ public class CommonMPITransformer implements MPITransformer {
 		ASTNode root = ast.getRootNode();
 		Function main = (Function) root.getScope().getOrdinaryEntity("main");
 
+		assert this.astFactory == ast.getASTFactory();
+		assert this.nodeFactory == astFactory.getNodeFactory();
 		if (main == null)
 			return ast;
 		if (main.getDefinition() == null)
@@ -103,11 +103,11 @@ public class CommonMPITransformer implements MPITransformer {
 			VariableDeclarationNode gcommWorld;
 			List<ASTNode> externalList;
 			VariableDeclarationNode nprocsVar;
-			SequenceNode<ASTNode> newRootNode ;
+			SequenceNode<ASTNode> newRootNode;
 
 			ast.release();
 			// $input int NPROCS;
-			nprocsVar =this.nprocsDeclaration();
+			nprocsVar = this.nprocsDeclaration();
 			// $gcomm GCOMM_WORLD = $gcomm_create($here, NPROCS);
 			gcommWorld = this.gcommDeclaration();
 			// MPI_Process(__rank){}
@@ -125,21 +125,20 @@ public class CommonMPITransformer implements MPITransformer {
 			externalList.add(gcommWorld);
 			externalList.add(mpiProcess);
 			externalList.add(mainFunction);
-			newRootNode = nodeFactory.newSequenceNode(
-					null, "TranslationUnit", externalList);
+			newRootNode = nodeFactory.newSequenceNode(null, "TranslationUnit",
+					externalList);
 			newAst = astFactory.newTranslationUnit(newRootNode);
 			return newAst;
 		}
 	}
+
 	private VariableDeclarationNode nprocsDeclaration() {
 		// $input int NPROCS;
 		TypeNode nprocsType = new CommonBasicTypeNode(null, BasicTypeKind.INT);
-		
-					nprocsType.setInputQualified(true);
-					return nodeFactory
-							.newVariableDeclarationNode(null,
-									nodeFactory.newIdentifierNode(null, "NPROCS"),
-									nprocsType);
+
+		nprocsType.setInputQualified(true);
+		return nodeFactory.newVariableDeclarationNode(null,
+				nodeFactory.newIdentifierNode(null, "NPROCS"), nprocsType);
 	}
 
 	private VariableDeclarationNode gcommDeclaration() {
@@ -262,10 +261,4 @@ public class CommonMPITransformer implements MPITransformer {
 
 		return mainFunction;
 	}
-
-	// private ASTNode mpiMainNode(ASTNode root) {
-	// return root;
-	//
-	// }
-
 }

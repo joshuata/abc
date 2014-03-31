@@ -9,10 +9,9 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
-import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodePredicate;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.abc.transform.IF.Transformer;
+import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
 /**
  * Prunes unreachable objects from an AST. Starting from the "main" function,
@@ -39,7 +38,11 @@ import edu.udel.cis.vsl.abc.transform.IF.Transformer;
  * @author siegel
  * 
  */
-public class Pruner implements Transformer {
+public class Pruner extends BaseTransformer {
+
+	public final static String CODE = "prune";
+	public final static String LONG_NAME = "Pruner";
+	public final static String SHORT_DESCRIPTION = "removes unreachable objects from the AST";
 
 	public enum Reachability {
 		/**
@@ -60,17 +63,12 @@ public class Pruner implements Transformer {
 		KEEP
 	};
 
-	private ASTFactory astFactory;
-
-	private NodeFactory nodeFactory;
-
 	private AttributeKey reachedKey;
 
 	private NodePredicate reachable;
 
 	public Pruner(ASTFactory astFactory) {
-		this.astFactory = astFactory;
-		this.nodeFactory = astFactory.getNodeFactory();
+		super(CODE, LONG_NAME, SHORT_DESCRIPTION, astFactory);
 		reachedKey = nodeFactory.newAttribute("reached", Reachability.class);
 		reachable = new NodePredicate() {
 
@@ -110,55 +108,14 @@ public class Pruner implements Transformer {
 			}
 		}
 	}
-	
-	// /**
-	// * If any variable decl nodes have reachable initializer but unreachable
-	// * identifier and type nodes, replace those nodes with a simple
-	// * expression statement node wrapping the initializer.
-	// *
-	// * @param root
-	// */
-	// private void changeDecls(ASTNode node) {
-	// int numChildren = node.numChildren();
-	//
-	// for (int i=0; i<numChildren; i++) {
-	// ASTNode child = node.child(i);
-	//
-	// if (child instanceof VariableDeclarationNode) {
-	// VariableDeclarationNode decl = (VariableDeclarationNode)child;
-	// InitializerNode init = decl.getInitializer();
-	//
-	// if (init != null && init.getAttribute(reachedKey) == Reachability.KEEP) {
-	// // if all other children of decl will not be kept, do transform...
-	// boolean modify = true;
-	// Iterator<ASTNode> iter = decl.children();
-	//
-	// while (iter.hasNext()) {
-	// ASTNode grandchild = iter.next();
-	//
-	// if (grandchild != null && grandchild != init &&
-	// grandchild.getAttribute(reachedKey)==Reachability.KEEP) {
-	// modify = false;
-	// break;
-	// }
-	// }
-	// if (modify) {
-	// // replace child with new ExpressionStatement
-	//
-	// }
-	// }
-	//
-	// } else {
-	// changeDecls(child);
-	// }
-	// }
-	// }
 
 	@Override
 	public AST transform(AST ast) throws SyntaxException {
 		ASTNode root = ast.getRootNode();
 		Function main = (Function) root.getScope().getOrdinaryEntity("main");
 
+		assert this.astFactory == ast.getASTFactory();
+		assert this.nodeFactory == astFactory.getNodeFactory();
 		if (main == null)
 			return ast;
 		if (main.getDefinition() == null)
@@ -181,5 +138,4 @@ public class Pruner implements Transformer {
 			return newAst;
 		}
 	}
-
 }

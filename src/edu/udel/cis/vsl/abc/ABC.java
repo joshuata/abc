@@ -5,9 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
+import edu.udel.cis.vsl.abc.transform.Transform;
 
 /**
  * The main class for the ABC C front end. Provides a simple command line
@@ -48,7 +51,7 @@ public class ABC {
 		TokenUtils.initialization();
 		return new Activator(file, systemIncludes, userIncludes);
 	}
-	
+
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes, Language kind) {
 		TokenUtils.initialization();
@@ -84,13 +87,16 @@ public class ABC {
 		out.println("  preprocess only");
 		out.println("-v");
 		out.println("  verbose mode, show all processing steps");
-		out.println("-prune");
-		out.println("  prune nodes unreachable from main from AST");
-		out.println("-sef");
-		out.println("  transform expressions with side-effects");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
 		out.println("");
+		for (String code : Transform.getCodes()) {
+			String description = Transform.getShortDescription(code);
+
+			out.println("-" + code);
+			out.println("  " + description);
+		}
+		out.flush();
 	}
 
 	private static void err(String msg) {
@@ -113,8 +119,7 @@ public class ABC {
 		File[] systemIncludes, userIncludes;
 		boolean preprocOnly = false;
 		boolean verbose = false;
-		boolean prune = false; // prune nodes unreachable from main
-		boolean sef = false; // make side-effect-free
+		List<String> transformCodes = new LinkedList<>();
 		Language languageChoice = null;
 		Config result = new Config();
 
@@ -164,20 +169,6 @@ public class ABC {
 				preprocOnly = true;
 			} else if (arg.equals("-v")) {
 				verbose = true;
-			} else if (arg.startsWith("-prune")) {
-				if (arg.equals("-prune") || arg.equals("-prune=true"))
-					prune = true;
-				else if (arg.equals("-prune=false"))
-					prune = false;
-				else
-					err("Unknown command line option: " + arg);
-			} else if (arg.startsWith("-sef")) {
-				if (arg.equals("-sef") || arg.equals("-sef=true"))
-					sef = true;
-				else if (arg.equals("-sef=false"))
-					sef = false;
-				else
-					err("Unknown command line option: " + arg);
 			} else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
 					languageChoice = Language.C;
@@ -186,7 +177,13 @@ public class ABC {
 				else
 					err("Unknown command line option: " + arg);
 			} else if (arg.startsWith("-")) {
-				err("Unknown command line option: " + arg);
+				// try transform code...
+				String code = arg.substring(1);
+
+				if (Transform.getCodes().contains(code))
+					transformCodes.add(code);
+				else
+					err("Unknown command line option: " + arg);
 			} else {
 				if (infileName == null)
 					infileName = arg;
@@ -211,8 +208,7 @@ public class ABC {
 		result.activator = new Activator(infile, systemIncludes, userIncludes);
 		result.verbose = verbose;
 		result.preprocOnly = preprocOnly;
-		result.prune = prune;
-		result.sef = sef;
+		result.transformCodes = transformCodes;
 		return result;
 	}
 
@@ -230,36 +226,42 @@ public class ABC {
 		if (config.preprocOnly)
 			config.activator.preprocess(config.out);
 		else if (config.verbose)
-			config.activator.showTranslation(config.out);
+			config.activator.showTranslation(config.out, config.transformCodes);
 		else {
 			Program program = config.activator.getProgram();
-			int numNodes1 = program.getAST().getNumberOfNodes();
-			int numNodes2;
 
-			System.out.println("AST has " + numNodes1 + " nodes.");
-			if (config.prune) {
-				System.out.print("Pruning... ");
-				System.out.flush();
-				program.prune();
-				numNodes2 = program.getAST().getNumberOfNodes();
-				System.out.println("pruned " + (numNodes1 - numNodes2)
-						+ " nodes yielding AST with " + numNodes2 + " nodes.");
-				System.out.flush();
-			}
-			if (config.sef) {
-				System.out.print("Removing side-effects... ");
-				System.out.flush();
-				program.removeSideEffects();
-				System.out.println("resulting AST has "
-						+ program.getAST().getNumberOfNodes() + " nodes.");
-				System.out.flush();
-			}
-			System.out.println();
-			System.out.flush();
+			program.applyTransformers(config.transformCodes);
 			program.print(config.out);
-			config.out.flush();
 		}
 		config.out.close();
+		// else {
+		// Program program = config.activator.getProgram();
+		// int numNodes1 = program.getAST().getNumberOfNodes();
+		// int numNodes2;
+		//
+		// System.out.println("AST has " + numNodes1 + " nodes.");
+		// if (config.prune) {
+		// System.out.print("Pruning... ");
+		// System.out.flush();
+		// program.prune();
+		// numNodes2 = program.getAST().getNumberOfNodes();
+		// System.out.println("pruned " + (numNodes1 - numNodes2)
+		// + " nodes yielding AST with " + numNodes2 + " nodes.");
+		// System.out.flush();
+		// }
+		// if (config.sef) {
+		// System.out.print("Removing side-effects... ");
+		// System.out.flush();
+		// program.removeSideEffects();
+		// System.out.println("resulting AST has "
+		// + program.getAST().getNumberOfNodes() + " nodes.");
+		// System.out.flush();
+		// }
+		// System.out.println();
+		// System.out.flush();
+		// program.print(config.out);
+		// config.out.flush();
+		// }
 	}
 }
 
@@ -268,6 +270,5 @@ class Config {
 	boolean preprocOnly;
 	PrintStream out;
 	boolean verbose;
-	boolean prune; // prune nodes unreachable from main?
-	boolean sef; // make side-effect-free?
+	List<String> transformCodes;
 }
