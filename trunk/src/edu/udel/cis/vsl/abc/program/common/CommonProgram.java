@@ -33,8 +33,8 @@ public class CommonProgram implements Program {
 		// this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
 		// this.mpiTransformer = mpiTransformer;
-		// standardAnalyzer.clear(ast);
-		// standardAnalyzer.analyze(ast);
+		 standardAnalyzer.clear(ast);
+		 standardAnalyzer.analyze(ast);
 	}
 
 	@Override
