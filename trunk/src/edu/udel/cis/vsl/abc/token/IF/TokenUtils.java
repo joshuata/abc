@@ -95,14 +95,6 @@ public class TokenUtils {
 		return filename;
 	}
 
-	public static void addFileName(String fileName) {
-		if (!fileNameMap.containsKey(fileName)) {
-			int index = fileNameMap.size();
-
-			fileNameMap.put(fileName, index);
-		}
-	}
-
 	/**
 	 * Print the list of shorter file names and the corresponding original file
 	 * names
