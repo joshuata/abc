@@ -1,13 +1,11 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
-import java.io.PrintStream;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
@@ -144,8 +142,8 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 	}
 
 	@Override
-	public SequenceNode<OperatorNode> reductionList() {
-		return (SequenceNode<OperatorNode>) this.child(7);
+	public SequenceNode<OmpReductionNode> reductionList() {
+		return (SequenceNode<OmpReductionNode>) this.child(7);
 	}
 
 	@Override
@@ -179,158 +177,158 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 	}
 
 	@Override
-	public void setReductionList(SequenceNode<OperatorNode> list) {
+	public void setReductionList(SequenceNode<OmpReductionNode> list) {
 		this.setChild(7, list);
 	}
 
-	@Override
-	protected void printExtras(String prefix, PrintStream out) {
-		int count;
-		SequenceNode<IdentifierExpressionNode> list;
-		SequenceNode<OperatorNode> reductionList;
-
-		if (this.nowait) {
-			out.println();
-			out.print(prefix + "nowait");
-		}
-		// sharedList
-		list = (SequenceNode<IdentifierExpressionNode>) this.child(1);
-		if (list != null) {
-			count = list.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "shared(");
-				for (int i = 0; i < count; i++) {
-					out.print(list.getSequenceChild(i).getIdentifier().name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
-			}
-		}
-		// privateList
-		list = (SequenceNode<IdentifierExpressionNode>) this.child(2);
-		if (list != null) {
-			count = list.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "private(");
-				for (int i = 0; i < count; i++) {
-					out.print(list.getSequenceChild(i).getIdentifier().name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
-			}
-		}
-		// firstprivateList
-		list = (SequenceNode<IdentifierExpressionNode>) this.child(3);
-		if (list != null) {
-			count = list.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "firstprivate(");
-				for (int i = 0; i < count; i++) {
-					out.print(list.getSequenceChild(i).getIdentifier().name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
-			}
-		}
-		// lastprivateList
-		list = (SequenceNode<IdentifierExpressionNode>) this.child(4);
-		if (list != null) {
-			count = list.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "lastprivate(");
-				for (int i = 0; i < count; i++) {
-					out.print(list.getSequenceChild(i).getIdentifier().name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
-			}
-		}
-		// copyin
-		list = (SequenceNode<IdentifierExpressionNode>) this.child(5);
-		if (list != null) {
-			count = list.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "copyin(");
-				for (int i = 0; i < count; i++) {
-					out.print(list.getSequenceChild(i).getIdentifier().name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
-			}
-		}
-		// copyprivate
-		list = (SequenceNode<IdentifierExpressionNode>) this.child(6);
-		if (list != null) {
-			count = list.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "copyprivate(");
-				for (int i = 0; i < count; i++) {
-					out.print(list.getSequenceChild(i).getIdentifier().name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
-			}
-		}
-		reductionList = (SequenceNode<OperatorNode>) this.child(7);
-		if (reductionList != null) {
-			out.println();
-			out.print(prefix + "reduction(");
-
-			if (reductionList != null) {
-				count = reductionList.numChildren();
-
-				for (int i = 0; i < count; i++) {
-					OperatorNode current = reductionList.getSequenceChild(i);
-					Operator operator = current.getOperator();
-					IdentifierExpressionNode arg = (IdentifierExpressionNode) current
-							.getArgument(0);
-
-					switch (operator) {
-					case PLUS:
-						out.print("+");
-						break;
-					case TIMES:
-						out.print("*");
-						break;
-					case MINUS:
-						out.print("-");
-						break;
-					case BITAND:
-						out.print("&");
-						break;
-					case BITXOR:
-						out.print("^");
-						break;
-					case BITOR:
-						out.print("|");
-						break;
-					case LAND:
-						out.print("&&");
-						break;
-					default:
-						out.print("||");
-						break;
-					}
-					out.print(":");
-					out.print(arg.getIdentifier().name());
-					out.print(",");
-				}
-			}
-			out.print(")");
-		}
-
-	}
+	// @Override
+	// protected void printExtras(String prefix, PrintStream out) {
+	// int count;
+	// SequenceNode<IdentifierExpressionNode> list;
+	// SequenceNode<OmpReductionNode> reductionList;
+	//
+	// if (this.nowait) {
+	// out.println();
+	// out.print(prefix + "nowait");
+	// }
+	// // sharedList
+	// list = (SequenceNode<IdentifierExpressionNode>) this.child(1);
+	// if (list != null) {
+	// count = list.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "shared(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(list.getSequenceChild(i).getIdentifier().name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// // privateList
+	// list = (SequenceNode<IdentifierExpressionNode>) this.child(2);
+	// if (list != null) {
+	// count = list.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "private(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(list.getSequenceChild(i).getIdentifier().name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// // firstprivateList
+	// list = (SequenceNode<IdentifierExpressionNode>) this.child(3);
+	// if (list != null) {
+	// count = list.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "firstprivate(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(list.getSequenceChild(i).getIdentifier().name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// // lastprivateList
+	// list = (SequenceNode<IdentifierExpressionNode>) this.child(4);
+	// if (list != null) {
+	// count = list.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "lastprivate(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(list.getSequenceChild(i).getIdentifier().name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// // copyin
+	// list = (SequenceNode<IdentifierExpressionNode>) this.child(5);
+	// if (list != null) {
+	// count = list.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "copyin(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(list.getSequenceChild(i).getIdentifier().name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// // copyprivate
+	// list = (SequenceNode<IdentifierExpressionNode>) this.child(6);
+	// if (list != null) {
+	// count = list.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "copyprivate(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(list.getSequenceChild(i).getIdentifier().name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// reductionList = (SequenceNode<OmpReductionNode>) this.child(7);
+	// if (reductionList != null) {
+	// out.println();
+	// out.print(prefix + "reduction(");
+	//
+	// if (reductionList != null) {
+	// count = reductionList.numChildren();
+	//
+	// for (int i = 0; i < count; i++) {
+	// OperatorNode current = reductionList.getSequenceChild(i);
+	// Operator operator = current.getOperator();
+	// IdentifierExpressionNode arg = (IdentifierExpressionNode) current
+	// .getArgument(0);
+	//
+	// switch (operator) {
+	// case PLUS:
+	// out.print("+");
+	// break;
+	// case TIMES:
+	// out.print("*");
+	// break;
+	// case MINUS:
+	// out.print("-");
+	// break;
+	// case BITAND:
+	// out.print("&");
+	// break;
+	// case BITXOR:
+	// out.print("^");
+	// break;
+	// case BITOR:
+	// out.print("|");
+	// break;
+	// case LAND:
+	// out.print("&&");
+	// break;
+	// default:
+	// out.print("||");
+	// break;
+	// }
+	// out.print(":");
+	// out.print(arg.getIdentifier().name());
+	// out.print(",");
+	// }
+	// }
+	// out.print(")");
+	// }
+	//
+	// }
 
 }

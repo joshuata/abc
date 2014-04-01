@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 
 public interface OmpStatementNode extends OmpNode, StatementNode {
@@ -148,7 +147,7 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return
 	 */
-	SequenceNode<OperatorNode> reductionList();
+	SequenceNode<OmpReductionNode> reductionList();
 
-	void setReductionList(SequenceNode<OperatorNode> list);
+	void setReductionList(SequenceNode<OmpReductionNode> list);
 }

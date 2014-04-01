@@ -13,6 +13,8 @@ public class CommonInclusion implements Inclusion {
 	 */
 	private File file;
 
+	private String shortName;
+
 	/**
 	 * The token containing the file name in the include directive that named
 	 * the file. Will be null for the original file (which wasn't included from
@@ -26,10 +28,11 @@ public class CommonInclusion implements Inclusion {
 		this.includeToken = null;
 	}
 
-	public CommonInclusion(File file, Token includeToken) {
+	public CommonInclusion(File file, Token includeToken, String shortName) {
 		assert file != null;
 		this.file = file;
 		this.includeToken = includeToken;
+		this.shortName = shortName;
 	}
 
 	@Override
@@ -53,6 +56,11 @@ public class CommonInclusion implements Inclusion {
 	@Override
 	public Token getIncludeToken() {
 		return includeToken;
+	}
+
+	@Override
+	public String fileShortName() {
+		return this.shortName;
 	}
 
 }

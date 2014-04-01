@@ -24,7 +24,7 @@ public interface TokenFactory {
 	 */
 	Inclusion newInclusion(File file);
 
-	Inclusion newInclusion(File file, Token includeToken);
+	Inclusion newInclusion(File file, Token includeToken, String shortName);
 
 	// Basic token creation...
 
