@@ -19,8 +19,6 @@ public class CommonProgram implements Program {
 
 	private Analyzer standardAnalyzer;
 
-	private SymbolicUniverse universe;
-
 	// private Transformer pruner;
 
 	// private Transformer sideEffectRemover;
@@ -36,10 +34,8 @@ public class CommonProgram implements Program {
 		// this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
 		// this.mpiTransformer = mpiTransformer;
-
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
-		this.universe = universe;
 	}
 
 	@Override
@@ -92,7 +88,7 @@ public class CommonProgram implements Program {
 	@Override
 	public void applyTransformer(String code) throws SyntaxException {
 		Transformer transformer = Transform.newTransformer(code,
-				ast.getASTFactory(), this.universe);
+				ast.getASTFactory());
 
 		apply(transformer);
 	}
@@ -114,7 +110,7 @@ public class CommonProgram implements Program {
 		ASTFactory astFactory = ast.getASTFactory();
 
 		for (String code : codes)
-			transformers.add(Transform.newTransformer(code, astFactory, this.universe));
+			transformers.add(Transform.newTransformer(code, astFactory));
 		apply(transformers);
 	}
 }

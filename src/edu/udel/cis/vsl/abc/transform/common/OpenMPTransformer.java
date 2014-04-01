@@ -61,9 +61,8 @@ public class OpenMPTransformer extends BaseTransformer {
 
 	private SymbolicUniverse universe;
 
-	public OpenMPTransformer(ASTFactory astFactory, SymbolicUniverse universe) {
+	public OpenMPTransformer(ASTFactory astFactory) {
 		super(CODE, LONG_NAME, SHORT_DESCRIPTION, astFactory);
-		this.universe = universe;
 	}
 
 	public AST transform(AST unit) throws SyntaxException {

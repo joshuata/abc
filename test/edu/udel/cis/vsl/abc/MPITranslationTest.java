@@ -3,6 +3,8 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,12 +39,14 @@ public class MPITranslationTest {
 
 	private void check(String filenameRoot) throws ABCException, IOException {
 		Activator a;
+		List<String> codes = new LinkedList<>();
 
+		// codes.add(MPITransformer.CODE);
 		this.systemIncludes = new File[0];
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
 				userIncludes, Language.CIVL_C);
-		a.showTranslation(out);
+		a.showTranslation(out, codes);
 	}
 
 	@Test

@@ -33,7 +33,7 @@ public class CIVLTranslationTest {
 
 	private void check(String filenameRoot) throws ABCException, IOException {
 		Activator a;
-		List<String> codes = new LinkedList<String>();
+		List<String> codes = new LinkedList<>();
 
 		codes.add(Pruner.CODE);
 		codes.add(SideEffectRemover.CODE);

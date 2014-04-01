@@ -11,7 +11,6 @@ import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
 import edu.udel.cis.vsl.abc.transform.common.OpenMPTransformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
-import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 /**
  * This class manages the set of transformations provided by an execution of
@@ -47,8 +46,7 @@ public class Transform {
 					SideEffectRemover.LONG_NAME,
 					SideEffectRemover.SHORT_DESCRIPTION) {
 				@Override
-				public Transformer create(ASTFactory astFactory,
-						SymbolicUniverse universe) {
+				public Transformer create(ASTFactory astFactory) {
 					return new SideEffectRemover(astFactory);
 				}
 			},
@@ -56,8 +54,7 @@ public class Transform {
 			new TransformRecord(MPITransformer.CODE, MPITransformer.LONG_NAME,
 					MPITransformer.SHORT_DESCRIPTION) {
 				@Override
-				public Transformer create(ASTFactory astFactory,
-						SymbolicUniverse universe) {
+				public Transformer create(ASTFactory astFactory) {
 					return new MPITransformer(astFactory);
 				}
 			},
@@ -66,17 +63,15 @@ public class Transform {
 					OpenMPTransformer.LONG_NAME,
 					OpenMPTransformer.SHORT_DESCRIPTION) {
 				@Override
-				public Transformer create(ASTFactory astFactory,
-						SymbolicUniverse universe) {
-					return new OpenMPTransformer(astFactory, universe);
+				public Transformer create(ASTFactory astFactory) {
+					return new OpenMPTransformer(astFactory);
 				}
 			},
 
 			new TransformRecord(Pruner.CODE, Pruner.LONG_NAME,
 					Pruner.SHORT_DESCRIPTION) {
 				@Override
-				public Transformer create(ASTFactory astFactory,
-						SymbolicUniverse universe) {
+				public Transformer create(ASTFactory astFactory) {
 					return new Pruner(astFactory);
 				}
 			}
@@ -187,11 +182,11 @@ public class Transform {
 	 *             if there is no such code in the current collection
 	 */
 	public static Transformer newTransformer(String code,
-			ASTFactory astFactory, SymbolicUniverse universe) {
+			ASTFactory astFactory) {
 		TransformRecord record = codeToRecord.get(code);
 
 		if (record == null)
 			throw new ABCRuntimeException("No transformation with code " + code);
-		return record.create(astFactory, universe);
+		return record.create(astFactory);
 	}
 }
