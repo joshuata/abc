@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.antlr.runtime.ANTLRFileStream;
@@ -33,6 +34,8 @@ import edu.udel.cis.vsl.abc.util.ANTLRUtils;
  */
 public class CommonPreprocessor implements Preprocessor {
 
+	public final static String SHORT_FILE_NAME_PREFIX = "f";
+
 	public final static boolean debug = true;
 
 	/**
@@ -57,6 +60,8 @@ public class CommonPreprocessor implements Preprocessor {
 	private Map<String, Macro> implicitMacros;
 
 	private TokenFactory tokenFactory = Tokens.newTokenFactory();
+
+	private HashMap<String, Integer> fileNameMap = new LinkedHashMap<String, Integer>();
 
 	public CommonPreprocessor(File[] systemIncludePaths, File[] userIncludePaths) {
 		this.systemIncludePaths = systemIncludePaths;
@@ -164,8 +169,17 @@ public class CommonPreprocessor implements Preprocessor {
 	public PreprocessorParser parser(File file) throws PreprocessorException {
 		PreprocessorLexer lexer = lexer(file);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+		this.addFileName(file.getName());
 
 		return new PreprocessorParser(tokenStream);
+	}
+
+	private void addFileName(String fileName) {
+		if (!fileNameMap.containsKey(fileName)) {
+			int index = fileNameMap.size();
+
+			fileNameMap.put(fileName, index);
+		}
 	}
 
 	/**
@@ -341,4 +355,5 @@ public class CommonPreprocessor implements Preprocessor {
 		else
 			p.printOutput(System.out, file);
 	}
+
 }

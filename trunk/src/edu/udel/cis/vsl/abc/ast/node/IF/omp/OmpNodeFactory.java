@@ -5,6 +5,7 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKind;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
@@ -26,4 +27,11 @@ public interface OmpNodeFactory {
 	OmpDeclarativeNode newDeclarativeNode(Source source,
 			IdentifierNode identifier, List<CToken> body, CToken eofToken,
 			SequenceNode<IdentifierExpressionNode> variables);
+
+	OmpSymbolReductionNode newSymbolReductionNode(Source source,
+			Operator operator, SequenceNode<IdentifierExpressionNode> nodes);
+
+	OmpFunctionReductionNode newFunctionReductionNode(Source source,
+			IdentifierNode function,
+			SequenceNode<IdentifierExpressionNode> nodes);
 }

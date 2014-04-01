@@ -65,7 +65,7 @@ public interface ASTNode {
 		// REMOTE_REFERENCE,
 		SCOPE_PARAMETERIZED_DECLARATION,
 		// CONSTANT,
-		TYPE, EXPRESSION, STATEMENT, OMP_NODE
+		TYPE, EXPRESSION, STATEMENT, OMP_NODE, OMP_REDUCTION_OPERATOR
 	};
 
 	/** ID number unique within the AST to which this node belongs. */

@@ -15,11 +15,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode.OmpReductionNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode.OmpStatementNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
@@ -336,8 +340,10 @@ public class StatementAnalyzer {
 	private void processOmpStatement(OmpStatementNode statement)
 			throws SyntaxException {
 		OmpStatementNodeKind kind = statement.ompStatementNodeKind();
+		SequenceNode<OmpReductionNode> reductionList = (SequenceNode<OmpReductionNode>) statement
+				.child(7);
 
-		for (int i = 1; i <= 7; i++) {
+		for (int i = 1; i <= 6; i++) {
 			SequenceNode<ExpressionNode> list = (SequenceNode<ExpressionNode>) statement
 					.child(i);
 
@@ -348,6 +354,13 @@ public class StatementAnalyzer {
 					this.expressionAnalyzer.processExpression(list
 							.getSequenceChild(j));
 				}
+			}
+		}
+		if (reductionList != null) {
+			int count = reductionList.numChildren();
+
+			for (int j = 0; j < count; j++) {
+				this.processOmpReductionNode(reductionList.getSequenceChild(j));
 			}
 		}
 		switch (kind) {
@@ -386,6 +399,22 @@ public class StatementAnalyzer {
 		}
 		if (statement.statementNode() != null)
 			processStatement(statement.statementNode());
+	}
+
+	private void processOmpReductionNode(OmpReductionNode reduction)
+			throws SyntaxException {
+		OmpReductionNodeKind kind = reduction.ompReductionOperatorNodeKind();
+		SequenceNode<IdentifierExpressionNode> list = reduction.variables();
+		int count = list.numChildren();
+
+		if (kind == OmpReductionNodeKind.FUNCTION) {
+			this.expressionAnalyzer
+					.processExpression(((OmpFunctionReductionNode) reduction)
+							.function());
+		}
+		for (int i = 0; i < count; i++) {
+			this.expressionAnalyzer.processExpression(list.getSequenceChild(i));
+		}
 	}
 
 	/**

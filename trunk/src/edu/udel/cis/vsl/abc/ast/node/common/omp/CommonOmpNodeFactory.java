@@ -5,10 +5,13 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
@@ -63,5 +66,18 @@ public class CommonOmpNodeFactory implements OmpNodeFactory {
 			SequenceNode<IdentifierExpressionNode> variables) {
 		return new CommonOmpDeclarativeNode(source, identifier, body, eofToken,
 				variables);
+	}
+
+	@Override
+	public OmpSymbolReductionNode newSymbolReductionNode(Source source,
+			Operator operator, SequenceNode<IdentifierExpressionNode> nodes) {
+		return new CommonOmpSymbolReductionNode(source, operator, nodes);
+	}
+
+	@Override
+	public OmpFunctionReductionNode newFunctionReductionNode(Source source,
+			IdentifierNode function,
+			SequenceNode<IdentifierExpressionNode> nodes) {
+		return new CommonOmpFunctionReductionNode(source, function, nodes);
 	}
 }

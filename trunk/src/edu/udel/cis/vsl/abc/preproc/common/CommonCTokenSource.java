@@ -1288,12 +1288,12 @@ public class CommonCTokenSource implements CTokenSource {
 					+ file);
 		tree = (Tree) fileReturn.getTree();
 		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(file,
-				filenameToken), parser, tree, tree.getChild(0));
+				filenameToken, ""), parser, tree, tree.getChild(0));
 	}
 
 	/**
 	 * Find the file with the given name by looking through the directories in
-	 * the given list. Go throughs list from first to last. Returns first
+	 * the given list. Go through list from first to last. Returns first
 	 * instance found.
 	 * 
 	 * Note: the filename may itself containing directory structure, e.g.,
