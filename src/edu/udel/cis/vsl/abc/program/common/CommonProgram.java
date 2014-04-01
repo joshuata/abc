@@ -12,10 +12,14 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
+import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
+import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 public class CommonProgram implements Program {
 
 	private Analyzer standardAnalyzer;
+
+	private SymbolicUniverse universe;
 
 	// private Transformer pruner;
 
@@ -25,8 +29,8 @@ public class CommonProgram implements Program {
 
 	private AST ast;
 
-	public CommonProgram(Analyzer standardAnalyzer, AST ast)
-			throws SyntaxException {
+	public CommonProgram(Analyzer standardAnalyzer, AST ast,
+			SymbolicUniverse universe) throws SyntaxException {
 		this.standardAnalyzer = standardAnalyzer;
 		// this.pruner = pruner;
 		// this.sideEffectRemover = sideEffectRemover;
@@ -35,6 +39,7 @@ public class CommonProgram implements Program {
 
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
+		this.universe = universe;
 	}
 
 	@Override
@@ -77,14 +82,17 @@ public class CommonProgram implements Program {
 	@Override
 	public void apply(Transformer transformer) throws SyntaxException {
 		ast = transformer.transform(ast);
-		standardAnalyzer.clear(ast);
-		standardAnalyzer.analyze(ast);
+		// MPI transformer ignores the standard analysis for this moment.
+		if (!transformer.getCode().equals(MPITransformer.CODE)) {
+			standardAnalyzer.clear(ast);
+			standardAnalyzer.analyze(ast);
+		}
 	}
 
 	@Override
 	public void applyTransformer(String code) throws SyntaxException {
 		Transformer transformer = Transform.newTransformer(code,
-				ast.getASTFactory());
+				ast.getASTFactory(), this.universe);
 
 		apply(transformer);
 	}
@@ -106,7 +114,7 @@ public class CommonProgram implements Program {
 		ASTFactory astFactory = ast.getASTFactory();
 
 		for (String code : codes)
-			transformers.add(Transform.newTransformer(code, astFactory));
+			transformers.add(Transform.newTransformer(code, astFactory, this.universe));
 		apply(transformers);
 	}
 }

@@ -66,6 +66,8 @@ import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 public class Activator {
 
 	private static String bar = "===================";
+	
+	private SymbolicUniverse universe = SARL.newStandardUniverse();
 
 	private TokenFactory sourceFactory = Tokens.newTokenFactory();
 
@@ -92,9 +94,9 @@ public class Activator {
 			conversionFactory);
 
 	private Transformer sideEffectRemover = Transform.newTransformer("sef",
-			astFactory);
+			astFactory, universe);
 
-	private Transformer pruner = Transform.newTransformer("prune", astFactory);
+	private Transformer pruner = Transform.newTransformer("prune", astFactory, universe);
 
 	private ProgramFactory programFactory = Programs.newProgramFactory(
 			astFactory, standardAnalyzer);
@@ -102,8 +104,6 @@ public class Activator {
 	private Preprocessor preprocessor;
 
 	private File file;
-
-	private SymbolicUniverse universe = SARL.newStandardUniverse();
 
 	/**
 	 * Creates a new Activator instance with the given file and include paths.
@@ -306,7 +306,7 @@ public class Activator {
 	public Program getProgram() throws ParseException, SyntaxException,
 			PreprocessorException {
 		AST ast = getRawTranslationUnit();
-		Program program = programFactory.newProgram(ast);
+		Program program = programFactory.newProgram(ast, this.universe);
 
 		return program;
 	}
@@ -411,7 +411,7 @@ public class Activator {
 		try {
 			builder = new ASTBuilder(parser, astFactory, tree);
 			ast = builder.getTranslationUnit(); // creates ast
-			program = programFactory.newProgram(ast); // analyzes ast
+			program = programFactory.newProgram(ast, this.universe); // analyzes ast
 			ast = program.getAST();
 		} catch (Exception e) {
 			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
@@ -436,7 +436,7 @@ public class Activator {
 		LinkedList<Transformer> transformers = new LinkedList<>();
 
 		for (String code : transformCodes)
-			transformers.add(Transform.newTransformer(code, astFactory));
+			transformers.add(Transform.newTransformer(code, astFactory, universe));
 		return showTranslationWorker(out, transformers);
 	}
 
