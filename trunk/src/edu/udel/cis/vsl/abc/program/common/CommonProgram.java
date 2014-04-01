@@ -12,7 +12,6 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
 import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 public class CommonProgram implements Program {
@@ -34,8 +33,8 @@ public class CommonProgram implements Program {
 		// this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
 		// this.mpiTransformer = mpiTransformer;
-		standardAnalyzer.clear(ast);
-		standardAnalyzer.analyze(ast);
+		// standardAnalyzer.clear(ast);
+		// standardAnalyzer.analyze(ast);
 	}
 
 	@Override
@@ -79,10 +78,10 @@ public class CommonProgram implements Program {
 	public void apply(Transformer transformer) throws SyntaxException {
 		ast = transformer.transform(ast);
 		// MPI transformer ignores the standard analysis for this moment.
-		if (!transformer.getCode().equals(MPITransformer.CODE)) {
-			standardAnalyzer.clear(ast);
-			standardAnalyzer.analyze(ast);
-		}
+		// if (!transformer.getCode().equals(MPITransformer.CODE)) {
+		standardAnalyzer.clear(ast);
+		standardAnalyzer.analyze(ast);
+		// }
 	}
 
 	@Override

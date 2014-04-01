@@ -1,4 +1,4 @@
-#include<mpi0.h>
+#include<mpi.h>
 int myrank;
 int nprocs;
 int left;

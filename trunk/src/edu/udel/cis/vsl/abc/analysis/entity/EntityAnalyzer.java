@@ -143,7 +143,9 @@ public class EntityAnalyzer implements Analyzer {
 			throw error(e, root);
 		}
 		while (children.hasNext()) {
-			processExternalDefinitions((ExternalDefinitionNode) children.next());
+			ASTNode current = children.next();
+			
+			processExternalDefinitions((ExternalDefinitionNode) current);
 		}
 		findTentativeDefinitions(rootScope);
 	}
