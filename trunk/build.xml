@@ -44,7 +44,7 @@
 		<pathelement location="${antlr.jar}" />
 	</path>
 
-	<target name="parsers" depends="OmpParser, CivlCParser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
+	<target name="parsers" depends="OmpParser, OmpLexer, CivlCParser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
 	</target>
 
 	<!-- Building OpenMP parser -->
@@ -56,7 +56,10 @@
 			<srcfiles file="${grammar.dir}/CivlCParser.tokens" />
 			<srcfiles file="${grammar.dir}/OmpLexer.g" />
 			<srcfiles file="${grammar.dir}/OmpLexer.tokens" />
-			<mapper type="merge" to="${real.src.dir}/parse/common/OmpParser.java" />
+			<compositemapper>
+				<mapper type="merge" to="${real.src.dir}/parse/common/OmpParser.java" />
+				<mapper type="merge" to="${real.src.dir}/parse/common/OmpParser_CivlCParser.java" />
+			</compositemapper>
 		</uptodate>
 	</target>
 
@@ -79,11 +82,8 @@
 		<uptodate property="noOmpLexerChanges">
 			<srcfiles file="${grammar.dir}/OmpLexer.g" />
 			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" />
-			<compositemapper>
-				<mapper type="merge" to="${grammar.dir}/OmpLexer.tokens" />
-				<mapper type="merge" to="${real.src.dir}/preproc/common/OmpLexer.java" />
-			</compositemapper>
+			<!--<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" /> not neccessary because it is already checked by PrerocessorParser-->
+			<mapper type="merge" to="${grammar.dir}/OmpLexer.tokens" />
 		</uptodate>
 	</target>
 
@@ -92,15 +92,8 @@
 			<arg value="-verbose" />
 			<arg value="OmpLexer.g" />
 		</java>
-		<!--<move file="${grammar.dir}/OmpLexer.java" tofile="${grammar.dir}/OmpLexer2.java" />
-		<echo message="package edu.udel.cis.vsl.abc.preproc.common;${line.separator}${line.separator}" file="${grammar.dir}/OmpLexer.java" />
-		<concat destfile="${grammar.dir}/OmpLexer.java" append="true">
-			<filelist dir="${grammar.dir}" files="OmpLexer2.java" />
-		</concat>-->
 		<delete file="${grammar.dir}/OmpLexer.java" />
 		<delete file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" />
-		<!--<move file="${grammar.dir}/OmpLexer.java" todir="${real.src.dir}/preproc/common" />
-		<move file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />-->
 	</target>
 
 	<!-- Building CivlC parser -->
@@ -193,7 +186,6 @@
 	<target name="jar" depends="compile" description="Jar up all class files.">
 		<jar destfile="${jar-path}">
 			<fileset dir="${bin.dir}" />
-			<!--<fileset dir="${antlr.runtime.bin}" />-->
 			<zipfileset includes="**/*.class" src="${antlr.runtime.jar}" />
 			<zipfileset includes="**/*.class" src="${sarl.jar}" />
 			<fileset dir="${basedir}/text/include" />
