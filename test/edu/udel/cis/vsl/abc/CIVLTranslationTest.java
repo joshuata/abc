@@ -3,10 +3,15 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import edu.udel.cis.vsl.abc.transform.common.Pruner;
+import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 public class CIVLTranslationTest {
 
@@ -28,12 +33,15 @@ public class CIVLTranslationTest {
 
 	private void check(String filenameRoot) throws ABCException, IOException {
 		Activator a;
+		List<String> codes = new LinkedList<String>();
 
+		codes.add(Pruner.CODE);
+		codes.add(SideEffectRemover.CODE);
 		this.systemIncludes = new File[0];
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".cvl"),
 				systemIncludes, userIncludes);
-		a.showTranslation(out);
+		a.showTranslation(out, codes);
 	}
 
 	@Test
@@ -65,12 +73,12 @@ public class CIVLTranslationTest {
 	public void pointerScopes() throws ABCException, IOException {
 		check("pointerScopes");
 	}
-	
+
 	@Test
 	public void atomicBlock() throws ABCException, IOException {
 		check("atomicStatement");
 	}
-	
+
 	@Test
 	public void potentialBug() throws ABCException, IOException {
 		check("potentialBug");
