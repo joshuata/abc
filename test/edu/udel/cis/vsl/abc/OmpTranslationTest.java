@@ -10,6 +10,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.udel.cis.vsl.abc.transform.common.OpenMPTransformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
@@ -35,6 +36,7 @@ public class OmpTranslationTest {
 
 		codes.add(Pruner.CODE);
 		codes.add(SideEffectRemover.CODE);
+		codes.add(OpenMPTransformer.CODE);
 		this.systemIncludes = new File[0];
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
@@ -97,4 +99,8 @@ public class OmpTranslationTest {
 		check("fig4.98-threadprivate");
 	}
 
+	@Test
+	public void parallelfor() throws ABCException, IOException {
+		check("parallelfor");
+	}
 }
