@@ -94,9 +94,9 @@ public class Activator {
 			conversionFactory);
 
 	private Transformer sideEffectRemover = Transform.newTransformer("sef",
-			astFactory, universe);
+			astFactory);
 
-	private Transformer pruner = Transform.newTransformer("prune", astFactory, universe);
+	private Transformer pruner = Transform.newTransformer("prune", astFactory);
 
 	private ProgramFactory programFactory = Programs.newProgramFactory(
 			astFactory, standardAnalyzer);
@@ -436,7 +436,7 @@ public class Activator {
 		LinkedList<Transformer> transformers = new LinkedList<>();
 
 		for (String code : transformCodes)
-			transformers.add(Transform.newTransformer(code, astFactory, universe));
+			transformers.add(Transform.newTransformer(code, astFactory));
 		return showTranslationWorker(out, transformers);
 	}
 

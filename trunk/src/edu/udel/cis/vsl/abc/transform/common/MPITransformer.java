@@ -1,9 +1,13 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.antlr.runtime.tree.CommonTree;
+
+import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
 import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -23,10 +27,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
-import edu.udel.cis.vsl.abc.ast.node.common.type.CommonBasicTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.common.type.CommonVoidTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.parse.Parse;
+import edu.udel.cis.vsl.abc.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.preproc.Preprocess;
+import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
+import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
+import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
@@ -44,6 +53,8 @@ public class MPITransformer extends BaseTransformer {
 	private static String COMM_CREATE = "$comm_create";
 	private static String GCOMM_DESTROY = "$gcomm_destroy";
 	private static String COMM_DESTROY = "$comm_destroy";
+
+	private Source source;
 
 	public MPITransformer(ASTFactory astFactory) {
 		super(CODE, LONG_NAME, SHORT_DESCRIPTION, astFactory);
@@ -63,9 +74,9 @@ public class MPITransformer extends BaseTransformer {
 				COMM_WORLD);
 
 		callMain = nodeFactory.newExpressionStatementNode(nodeFactory
-				.newFunctionCallNode(null, nodeFactory
-						.newIdentifierExpressionNode(null,
-								nodeFactory.newIdentifierNode(null, "main")),
+				.newFunctionCallNode(source, nodeFactory
+						.newIdentifierExpressionNode(source,
+								nodeFactory.newIdentifierNode(source, "main")),
 						new ArrayList<ExpressionNode>(), null));
 		// add call main: main();
 		root.addSequenceChild(callMain);
@@ -90,15 +101,14 @@ public class MPITransformer extends BaseTransformer {
 		mpiProcessBody = nodeFactory.newCompoundStatementNode(root.getSource(),
 				items);
 		newFormalList = new LinkedList<>();
-		newFormalList.add(nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "_rank"),
-				new CommonBasicTypeNode(null, BasicTypeKind.INT)));
-		formals = nodeFactory.newSequenceNode(null,
+		newFormalList.add(nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "_rank"),
+				nodeFactory.newBasicTypeNode(source, BasicTypeKind.INT)));
+		formals = nodeFactory.newSequenceNode(source,
 				"FormalParameterDeclarations", newFormalList);
-		mpiProcessType = new CommonFunctionTypeNode(null,
-				new CommonVoidTypeNode(null), formals, true);
-		mpiProcess = nodeFactory.newFunctionDefinitionNode(null,
-				nodeFactory.newIdentifierNode(null, "MPI_Process"),
+		mpiProcessType = nodeFactory.newFunctionTypeNode(source, nodeFactory.newVoidTypeNode(source), formals, true);
+		mpiProcess = nodeFactory.newFunctionDefinitionNode(source,
+				nodeFactory.newIdentifierNode(source, "MPI_Process"),
 				mpiProcessType, null, mpiProcessBody);
 		return mpiProcess;
 	}
@@ -106,14 +116,14 @@ public class MPITransformer extends BaseTransformer {
 	private ExpressionStatementNode commDestroy(String destroy, String commName) {
 		// $comm_destroy
 		IdentifierExpressionNode function = nodeFactory
-				.newIdentifierExpressionNode(null,
-						nodeFactory.newIdentifierNode(null, destroy));
+				.newIdentifierExpressionNode(source,
+						nodeFactory.newIdentifierNode(source, destroy));
 		List<ExpressionNode> arguments = new ArrayList<>(1);
 
-		arguments.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, commName)));
+		arguments.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, commName)));
 		return nodeFactory.newExpressionStatementNode(nodeFactory
-				.newFunctionCallNode(null, function, arguments, null));
+				.newFunctionCallNode(source, function, arguments, null));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -121,6 +131,7 @@ public class MPITransformer extends BaseTransformer {
 	public AST transform(AST ast) throws SyntaxException {
 		ASTNode root = ast.getRootNode();
 		Function main = (Function) root.getScope().getOrdinaryEntity("main");
+		this.source = root.getSource();
 
 		assert this.astFactory == ast.getASTFactory();
 		assert this.nodeFactory == astFactory.getNodeFactory();
@@ -135,7 +146,20 @@ public class MPITransformer extends BaseTransformer {
 			List<ASTNode> externalList;
 			VariableDeclarationNode nprocsVar;
 			SequenceNode<ASTNode> newRootNode;
+//			List<ASTNode> civlcAstNodes = new ArrayList<>();
+			List<ASTNode> mpiAstNodes = new ArrayList<>();
+			int count;
 
+			try {
+//				civlcAstNodes = this.astNodesOfFile("civlc.h");
+				mpiAstNodes = this.astNodesOfFile("mpi0.h");
+			} catch (PreprocessorException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			ast.release();
 			// $input int NPROCS;
 			nprocsVar = this.nprocsDeclaration();
@@ -151,6 +175,14 @@ public class MPITransformer extends BaseTransformer {
 			// MPI_Process() definition;
 			// main function.
 			externalList = new LinkedList<>();
+//			count = civlcAstNodes.size();
+//			for (int i = 0; i < count; i++) {
+//				externalList.add(civlcAstNodes.get(i));
+//			}
+			count = mpiAstNodes.size();
+			for (int i = 0; i < count; i++) {
+				externalList.add(mpiAstNodes.get(i));
+			}
 			externalList.add(nprocsVar);
 			externalList.add(gcommWorld);
 			externalList.add(mpiProcess);
@@ -162,17 +194,53 @@ public class MPITransformer extends BaseTransformer {
 		}
 	}
 
-	// private void parseCivlCFile(){
-	// // File civlc =
-	// }
+	private List<ASTNode> astNodesOfFile(String fileName)
+			throws PreprocessorException, ParseException, SyntaxException {
+		AST ast = this.parseFile(fileName);
+		ASTNode root = ast.getRootNode();
+		int number = root.numChildren();
+		List<ASTNode> list = new ArrayList<>(number);
+
+		for (int i = 0; i < number; i++) {
+			list.add(root.child(i));
+		}
+		ast.release();
+		for (int i = 0; i < number; i++) {
+			root.removeChild(i);
+		}
+		return list;
+	}
+
+	private AST parseFile(String fileName) throws PreprocessorException,
+			ParseException, SyntaxException {
+		AST ast;
+		CParser parser;
+		CommonTree tree;
+		ASTBuilder builder;
+		PreprocessorFactory preprocessorFactory = Preprocess
+				.newPreprocessorFactory();
+		Preprocessor preprocessor = preprocessorFactory.newPreprocessor(
+				new File[0], new File[0]);
+		String root = new File(".").getAbsolutePath();
+		String suffix = "text/include/" + fileName;
+		File file = new File(new File(root), suffix);
+
+		parser = Parse.newCParser(preprocessor, file);
+		tree = parser.getTree();
+		ast = null;
+		builder = new ASTBuilder(parser, astFactory, tree);
+		ast = builder.getTranslationUnit(); // creates ast
+		return ast;
+	}
 
 	private VariableDeclarationNode nprocsDeclaration() {
 		// $input int NPROCS;
-		TypeNode nprocsType = new CommonBasicTypeNode(null, BasicTypeKind.INT);
+		TypeNode nprocsType = nodeFactory.newBasicTypeNode(source,
+				BasicTypeKind.INT);
 
 		nprocsType.setInputQualified(true);
-		return nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "NPROCS"), nprocsType);
+		return nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "NPROCS"), nprocsType);
 	}
 
 	private VariableDeclarationNode commDeclaration() {
@@ -181,20 +249,20 @@ public class MPITransformer extends BaseTransformer {
 		ExpressionNode commCreate;
 
 		commType = nodeFactory.newTypedefNameNode(
-				nodeFactory.newIdentifierNode(null, COMM_TYPE), null);
+				nodeFactory.newIdentifierNode(source, COMM_TYPE), null);
 		commCreateArgs = new ArrayList<>(3);
-		commCreateArgs.add(nodeFactory.newHereNode(null));
-		commCreateArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, GCOMM_WORLD)));
-		commCreateArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "_rank")));
+		commCreateArgs.add(nodeFactory.newHereNode(source));
+		commCreateArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, GCOMM_WORLD)));
+		commCreateArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "_rank")));
 		commCreate = nodeFactory.newFunctionCallNode(
-				null,
-				nodeFactory.newIdentifierExpressionNode(null,
-						nodeFactory.newIdentifierNode(null, COMM_CREATE)),
+				source,
+				nodeFactory.newIdentifierExpressionNode(source,
+						nodeFactory.newIdentifierNode(source, COMM_CREATE)),
 				commCreateArgs, null);
-		return nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "MPI_COMM_WORLD"),
+		return nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "MPI_COMM_WORLD"),
 				commType, commCreate);
 	}
 
@@ -204,19 +272,19 @@ public class MPITransformer extends BaseTransformer {
 		ExpressionNode gcommCreate;
 
 		gcommType = nodeFactory.newTypedefNameNode(
-				nodeFactory.newIdentifierNode(null, GCOMM_TYPE), null);
+				nodeFactory.newIdentifierNode(source, GCOMM_TYPE), null);
 		gcommCreateArgs = new ArrayList<>(2);
-		gcommCreateArgs.add(nodeFactory.newHereNode(null));
-		gcommCreateArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "NPROCS")));
+		gcommCreateArgs.add(nodeFactory.newHereNode(source));
+		gcommCreateArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "NPROCS")));
 		gcommCreate = nodeFactory.newFunctionCallNode(
-				null,
-				nodeFactory.newIdentifierExpressionNode(null,
-						nodeFactory.newIdentifierNode(null, GCOMM_CREATE)),
+				source,
+				nodeFactory.newIdentifierExpressionNode(source,
+						nodeFactory.newIdentifierNode(source, GCOMM_CREATE)),
 				gcommCreateArgs, null);
-		return nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "GCOMM_WORLD"), gcommType,
-				gcommCreate);
+		return nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "GCOMM_WORLD"),
+				gcommType, gcommCreate);
 	}
 
 	private FunctionDefinitionNode mainFunction() {
@@ -247,76 +315,75 @@ public class MPITransformer extends BaseTransformer {
 		 * $gcomm_destroy(GCOMM_WORLD); }
 		 */
 		procsType = nodeFactory.newArrayTypeNode(
-				null,
+				source,
 				nodeFactory.newTypedefNameNode(
-						nodeFactory.newIdentifierNode(null, "$proc"), null),
-				nodeFactory.newIdentifierExpressionNode(null,
-						nodeFactory.newIdentifierNode(null, "NPROCS")));
-		procsVar = nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "procs"), procsType);
+						nodeFactory.newIdentifierNode(source, "$proc"), null),
+				nodeFactory.newIdentifierExpressionNode(source,
+						nodeFactory.newIdentifierNode(source, "NPROCS")));
+		procsVar = nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "procs"), procsType);
 		items.add(procsVar);
 
 		// first for loop:
 		// nodeFactory.newForLoopInitializerNode(
 		// statementSource, declarations)
 		initialList = new LinkedList<>();
-		initialList.add(nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "i"),
-				new CommonBasicTypeNode(null, BasicTypeKind.INT)));
-		initializerNode = nodeFactory.newForLoopInitializerNode(null,
+		initialList.add(nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "i"),
+				nodeFactory.newBasicTypeNode(source, BasicTypeKind.INT)));
+		initializerNode = nodeFactory.newForLoopInitializerNode(source,
 				initialList);
 		operatorArgs = new LinkedList<>();
-		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "i")));
-		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "NPROCS")));
+		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "i")));
+		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "NPROCS")));
 
-		loopCondition = nodeFactory.newOperatorNode(null, Operator.LT,
+		loopCondition = nodeFactory.newOperatorNode(source, Operator.LT,
 				operatorArgs);
 		operatorArgs = new LinkedList<>();
-		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "i")));
+		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "i")));
 
-		incrementer = nodeFactory.newOperatorNode(null, Operator.POSTINCREMENT,
-				operatorArgs);
+		incrementer = nodeFactory.newOperatorNode(source,
+				Operator.POSTINCREMENT, operatorArgs);
 		callArgs = new ArrayList<>(1);
-		callArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "i")));
-		spawnProc = nodeFactory.newSpawnNode(null, nodeFactory
-				.newFunctionCallNode(null, nodeFactory
-						.newIdentifierExpressionNode(null, nodeFactory
-								.newIdentifierNode(null, "MPI_Process")),
+		callArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "i")));
+		spawnProc = nodeFactory.newSpawnNode(source, nodeFactory
+				.newFunctionCallNode(source, nodeFactory
+						.newIdentifierExpressionNode(source, nodeFactory
+								.newIdentifierNode(source, "MPI_Process")),
 						callArgs, null));
 		operatorArgs = new LinkedList<>();
-		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "procs")));
-		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(null,
-				nodeFactory.newIdentifierNode(null, "i")));
-		leftHandSide = nodeFactory.newOperatorNode(null, Operator.SUBSCRIPT,
+		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "procs")));
+		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
+				nodeFactory.newIdentifierNode(source, "i")));
+		leftHandSide = nodeFactory.newOperatorNode(source, Operator.SUBSCRIPT,
 				operatorArgs);
 		operatorArgs = new LinkedList<>();
 		operatorArgs.add(leftHandSide);
 		operatorArgs.add(spawnProc);
 		assign = nodeFactory.newExpressionStatementNode(nodeFactory
-				.newOperatorNode(null, Operator.ASSIGN, operatorArgs));
-		forLoop = nodeFactory.newForLoopNode(null, initializerNode,
+				.newOperatorNode(source, Operator.ASSIGN, operatorArgs));
+		forLoop = nodeFactory.newForLoopNode(source, initializerNode,
 				loopCondition, incrementer, assign, null);
 		items.add(forLoop);
 
 		items.add(gcommDestroy);
 
-		mainBody = nodeFactory.newCompoundStatementNode(null, items);
+		mainBody = nodeFactory.newCompoundStatementNode(source, items);
 
 		newFormalList = new LinkedList<>();
-		newFormalList.add(nodeFactory.newVariableDeclarationNode(null,
-				nodeFactory.newIdentifierNode(null, "_rank"),
-				new CommonBasicTypeNode(null, BasicTypeKind.INT)));
-		formals = nodeFactory.newSequenceNode(null,
+		newFormalList.add(nodeFactory.newVariableDeclarationNode(source,
+				nodeFactory.newIdentifierNode(source, "_rank"),
+				nodeFactory.newBasicTypeNode(source, BasicTypeKind.INT)));
+		formals = nodeFactory.newSequenceNode(source,
 				"FormalParameterDeclarations", newFormalList);
-		mainType = new CommonFunctionTypeNode(null,
-				new CommonVoidTypeNode(null), formals, true);
-		mainFunction = nodeFactory.newFunctionDefinitionNode(null,
-				nodeFactory.newIdentifierNode(null, "MPI_Process"), mainType,
+		mainType = nodeFactory.newFunctionTypeNode(source, nodeFactory.newVoidTypeNode(source), formals, true);
+		mainFunction = nodeFactory.newFunctionDefinitionNode(source,
+				nodeFactory.newIdentifierNode(source, "MPI_Process"), mainType,
 				null, mainBody);
 
 		return mainFunction;

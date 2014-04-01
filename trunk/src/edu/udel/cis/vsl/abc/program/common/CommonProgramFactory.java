@@ -40,8 +40,7 @@ public class CommonProgramFactory implements ProgramFactory {
 	// }
 
 	@Override
-	public Program newProgram(AST ast, SymbolicUniverse universe)
-			throws SyntaxException {
+	public Program newProgram(AST ast, SymbolicUniverse universe) throws SyntaxException {
 		return new CommonProgram(standardAnalyzer, ast, universe);
 	}
 

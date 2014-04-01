@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.transform;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 public abstract class TransformRecord {
 
@@ -18,6 +17,5 @@ public abstract class TransformRecord {
 		this.shortDescription = shortDescription;
 	}
 
-	public abstract Transformer create(ASTFactory astFactory,
-			SymbolicUniverse universe);
+	public abstract Transformer create(ASTFactory astFactory);
 }
