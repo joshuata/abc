@@ -52,4 +52,9 @@ public class CommonFunctionDefinitionNode extends CommonFunctionDeclarationNode
 	public NodeKind nodeKind() {
 		return NodeKind.FUNCTION_DEFINITION;
 	}
+
+	@Override
+	public OrdinaryDeclarationKind ordinaryDeclarationKind() {
+		return OrdinaryDeclarationKind.FUNCTION_DEFINITION;
+	}
 }

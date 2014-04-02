@@ -17,6 +17,14 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
  */
 public interface OrdinaryDeclarationNode extends BlockItemNode,
 		DeclarationNode, ExternalDefinitionNode {
+	
+	public enum OrdinaryDeclarationKind{
+		VARIABLE_DECLARATION,
+		FUNCTION_DECLARATION, FUNCTION_DEFINITION, 
+		ABSTRACT_FUNCTION_DEFINITION
+	}
+	
+	OrdinaryDeclarationKind ordinaryDeclarationKind();
 
 	/**
 	 * The type of the thing being declared. This may be null: e.g., in a

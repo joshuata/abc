@@ -56,6 +56,11 @@ public abstract class CommonOrdinaryDeclarationNode extends
 		staticStorage = value;
 	}
 
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.ORDINARY_DECLARATION;
+	}
+
 	void copyStorage(OrdinaryDeclarationNode node) {
 		node.setExternStorage(hasExternStorage());
 		node.setStaticStorage(hasStaticStorage());

@@ -23,7 +23,17 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * 
  */
 public interface BlockItemNode extends ASTNode {
+	
+	public enum BlockItemKind{
+		STATEMENT, STRUCT_OR_UNION, ENUMERATOR, 
+		STATIC_ASSERTION, 
+		ORDINARY_DECLARATION,TYPEDEF, PRAGMA, 
+		SCOPED_DECLARATION
+	}
 
 	@Override
 	BlockItemNode copy();
+	
+	BlockItemKind blockItemKind();
+	
 }

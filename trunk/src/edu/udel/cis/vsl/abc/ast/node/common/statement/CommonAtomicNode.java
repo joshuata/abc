@@ -4,7 +4,6 @@ import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 /**
@@ -15,13 +14,13 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
  * 
  */
 
-public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
+public class CommonAtomicNode extends CommonStatementNode implements AtomicNode {
 
 	/**
 	 * True iff the atomic node is declared by <code>$atom</code>; otherwise, it
 	 * is general atomic node starting with <code>$atomic</code>.
 	 */
-	private boolean isAtom  = false;
+	private boolean isAtom = false;
 
 	/**
 	 * Constructor
@@ -29,8 +28,7 @@ public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 	 * @param source
 	 * @param body
 	 */
-	public CommonAtomicNode(Source source, boolean isAtom,
-			StatementNode body) {
+	public CommonAtomicNode(Source source, boolean isAtom, StatementNode body) {
 		super(source, body);
 		this.isAtom = isAtom;
 	}
@@ -38,11 +36,6 @@ public class CommonAtomicNode extends CommonASTNode implements AtomicNode {
 	@Override
 	public StatementKind statementKind() {
 		return StatementKind.ATOMIC;
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override

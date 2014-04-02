@@ -9,10 +9,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LabeledStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonSwitchNode extends CommonASTNode implements SwitchNode {
+public class CommonSwitchNode extends CommonStatementNode implements SwitchNode {
 
 	private List<LabeledStatementNode> cases = new LinkedList<LabeledStatementNode>();
 
@@ -81,11 +80,6 @@ public class CommonSwitchNode extends CommonASTNode implements SwitchNode {
 	public void clear() {
 		cases = new LinkedList<LabeledStatementNode>();
 		defaultCase = null;
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override

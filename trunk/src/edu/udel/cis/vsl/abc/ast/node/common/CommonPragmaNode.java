@@ -95,6 +95,11 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 	public StatementKind statementKind() {
 		return StatementKind.PRAGMA;
 	}
+
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.PRAGMA;
+	}
 }
 
 class GenericTokenSource implements TokenSource {

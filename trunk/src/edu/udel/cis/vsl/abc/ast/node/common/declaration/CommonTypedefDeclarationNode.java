@@ -47,6 +47,11 @@ public class CommonTypedefDeclarationNode extends CommonDeclarationNode
 		return NodeKind.TYPEDEF;
 	}
 
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.TYPEDEF;
+	}
+
 	// @SuppressWarnings("unchecked")
 	// @Override
 	// public SequenceNode<VariableDeclarationNode> getScopeList() {

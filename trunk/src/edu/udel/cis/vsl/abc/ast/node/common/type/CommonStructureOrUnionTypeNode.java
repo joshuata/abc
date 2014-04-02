@@ -116,5 +116,10 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 	public void makeIncomplete() {
 		removeChild(1);
 	}
-	
+
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.STRUCT_OR_UNION;
+	}
+
 }

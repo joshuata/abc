@@ -5,10 +5,9 @@ import java.io.PrintStream;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonLoopNode extends CommonASTNode implements LoopNode {
+public class CommonLoopNode extends CommonStatementNode implements LoopNode {
 
 	private LoopKind loopKind;
 
@@ -60,11 +59,6 @@ public class CommonLoopNode extends CommonASTNode implements LoopNode {
 		return new CommonLoopNode(getSource(), getKind(),
 				duplicate(getCondition()), duplicate(getBody()),
 				duplicate(getInvariant()));
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override

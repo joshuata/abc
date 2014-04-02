@@ -5,10 +5,9 @@ import java.io.PrintStream;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonIfNode extends CommonASTNode implements IfNode {
+public class CommonIfNode extends CommonStatementNode implements IfNode {
 
 	public CommonIfNode(Source source, ExpressionNode condition,
 			StatementNode trueBranch) {
@@ -53,11 +52,6 @@ public class CommonIfNode extends CommonASTNode implements IfNode {
 		else
 			return new CommonIfNode(getSource(), duplicate(getCondition()),
 					duplicate(getTrueBranch()), duplicate(falseBranch));
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override
