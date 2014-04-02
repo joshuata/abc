@@ -1,7 +1,6 @@
-package edu.udel.cis.vsl.abc.transform;
+package edu.udel.cis.vsl.abc.transform.IF;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 public abstract class TransformRecord {
 
