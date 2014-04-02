@@ -144,7 +144,7 @@ public class EntityAnalyzer implements Analyzer {
 		}
 		while (children.hasNext()) {
 			ASTNode current = children.next();
-			
+
 			processExternalDefinitions((ExternalDefinitionNode) current);
 		}
 		findTentativeDefinitions(rootScope);
@@ -237,7 +237,8 @@ public class EntityAnalyzer implements Analyzer {
 		}
 	}
 
-	private void processOmpDeclarativeNode(OmpDeclarativeNode node) throws SyntaxException {
+	private void processOmpDeclarativeNode(OmpDeclarativeNode node)
+			throws SyntaxException {
 		SequenceNode<IdentifierExpressionNode> variables = node.variables();
 		int count = variables.numChildren();
 
@@ -331,7 +332,6 @@ public class EntityAnalyzer implements Analyzer {
 				((TypeNode) node).setType(null);
 			}
 			if (node instanceof IdentifierNode) {
-				((IdentifierNode) node).setDefinition(null);
 				((IdentifierNode) node).setEntity(null);
 			}
 			if (node instanceof ExpressionNode) {

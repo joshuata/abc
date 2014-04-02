@@ -1,12 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.node.common;
 
 import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonIdentifierNode extends CommonASTNode implements
@@ -16,9 +13,9 @@ public class CommonIdentifierNode extends CommonASTNode implements
 
 	private Entity entity;
 
-	private List<DeclarationNode> declarations;
+	// private List<DeclarationNode> declarations;
 
-	private DeclarationNode definition;
+	// private DeclarationNode definition;
 
 	public CommonIdentifierNode(Source source, String name) {
 		super(source);
@@ -50,25 +47,25 @@ public class CommonIdentifierNode extends CommonASTNode implements
 		this.entity = entity;
 	}
 
-	@Override
-	public Iterator<DeclarationNode> getDeclarations() {
-		return declarations.iterator();
-	}
-
-	@Override
-	public void addDeclaration(DeclarationNode declaration) {
-		declarations.add(declaration);
-	}
-
-	@Override
-	public DeclarationNode getDefinition() {
-		return definition;
-	}
-
-	@Override
-	public void setDefinition(DeclarationNode declaration) {
-		this.definition = declaration;
-	}
+	// @Override
+	// public Iterator<DeclarationNode> getDeclarations() {
+	// return declarations.iterator();
+	// }
+	//
+	// @Override
+	// public void addDeclaration(DeclarationNode declaration) {
+	// declarations.add(declaration);
+	// }
+	//
+	// @Override
+	// public DeclarationNode getDefinition() {
+	// return definition;
+	// }
+	//
+	// @Override
+	// public void setDefinition(DeclarationNode declaration) {
+	// this.definition = declaration;
+	// }
 
 	@Override
 	public IdentifierNode copy() {

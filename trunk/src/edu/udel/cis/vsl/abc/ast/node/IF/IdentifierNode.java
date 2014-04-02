@@ -1,9 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF;
 
-import java.util.Iterator;
-
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 
 /**
  * An identifier can denote: (1) an object, (2) a function, (3) a tag of a
@@ -19,24 +16,45 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
  */
 public interface IdentifierNode extends ASTNode {
 
-	/** The name of the identifier */
+	/**
+	 * Returns the name of this identifier node. This is a non-null string. This
+	 * is typically the string that actually appears in the source code.
+	 */
 	String name();
 
+	/**
+	 * Sets the name of this identifier.
+	 * 
+	 * @param name
+	 *            new value for identifier name
+	 */
 	void setName(String name);
 
+	/**
+	 * Returns the entity to which this identifier refers. Every identifier
+	 * refers to some entity: a variable, function, structure or union, typedef,
+	 * enumeration, etc. All of those things are examples if entities.
+	 * 
+	 * Typically, the entity starts off as null, and is set during the standard
+	 * analysis phase.
+	 * 
+	 * The information provided by the getEntity methods in the AST is what is
+	 * typically referred to as the "symbol table".
+	 * 
+	 * @return the entity to which this identifier refers, or null if that
+	 *         information has not yet been computed
+	 */
 	Entity getEntity();
 
+	/**
+	 * Sets the entity to which this identifier refers. This method is typically
+	 * called by the standard analysis routine, which computes this
+	 * "symbol table" information.
+	 * 
+	 * @param entity
+	 *            the entity to which this identifier refers; must be non-null
+	 */
 	void setEntity(Entity entity);
-
-	Iterator<DeclarationNode> getDeclarations();
-
-	// is this necessary?
-	void addDeclaration(DeclarationNode declaration);
-
-	/** Returns the declaration that defines this identifier. */
-	DeclarationNode getDefinition();
-
-	void setDefinition(DeclarationNode declaration);
 
 	@Override
 	IdentifierNode copy();
