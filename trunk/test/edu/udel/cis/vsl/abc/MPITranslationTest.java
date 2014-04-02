@@ -57,12 +57,12 @@ public class MPITranslationTest {
 	public void ring() throws ABCException, IOException {
 		check("ring");
 	}
-	
+
 	@Test
 	public void sumArray() throws ABCException, IOException {
 		check("sum_array");
 	}
-	
+
 	@Test
 	public void mpithreads_mpi() throws ABCException, IOException {
 		check("mpithreads_mpi");

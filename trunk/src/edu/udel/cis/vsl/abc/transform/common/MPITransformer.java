@@ -13,6 +13,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode.ExpressionKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -21,6 +23,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode.StatementKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -91,7 +94,15 @@ public class MPITransformer extends BaseTransformer {
 
 			root.removeChild(i);
 			if (sourceFile.endsWith(".h")) {
-				includedNodes.add(child);
+				if (child.nodeKind() == NodeKind.VARIABLE_DECLARATION) {
+					VariableDeclarationNode variableDeclaration = (VariableDeclarationNode) child;
+
+					if (!variableDeclaration.getName().equals(COMM_WORLD)) {
+						includedNodes.add(child);
+					}
+				} else {
+					includedNodes.add(child);
+				}
 			} else {
 				if (child.nodeKind() == NodeKind.FUNCTION_DEFINITION) {
 					FunctionDefinitionNode functionNode = (FunctionDefinitionNode) child;
@@ -104,6 +115,8 @@ public class MPITransformer extends BaseTransformer {
 						SequenceNode<VariableDeclarationNode> parameters = functionType
 								.getParameters();
 						int count = parameters.numChildren();
+						CompoundStatementNode functionBody = functionNode
+								.getBody();
 
 						functionName.setName("__main");
 						if (count > 0) {
@@ -122,6 +135,51 @@ public class MPITransformer extends BaseTransformer {
 									.newSequenceNode(source,
 											"FormalParameterDeclarations",
 											newParameters));
+						}
+						count = functionBody.numChildren();
+						for (int j = 0; j < count; j++) {
+							BlockItemNode block = functionBody
+									.getSequenceChild(j);
+
+							if (block.nodeKind() == NodeKind.STATEMENT) {
+								StatementNode statementNode = (StatementNode) block;
+
+								if (statementNode.statementKind() == StatementKind.EXPRESSION) {
+									ExpressionStatementNode expressionStatement = (ExpressionStatementNode) statementNode;
+									ExpressionNode expression = expressionStatement
+											.getExpression();
+
+									if (expression.expressionKind() == ExpressionKind.FUNCTION_CALL) {
+										FunctionCallNode functionCall = (FunctionCallNode) expression;
+
+										if (functionCall.getFunction()
+												.expressionKind() == ExpressionKind.IDENTIFIER_EXPRESSION) {
+											IdentifierExpressionNode functionExpression = (IdentifierExpressionNode) functionCall
+													.getFunction();
+
+											if (functionExpression
+													.getIdentifier().name()
+													.equals("MPI_Init")) {
+												List<ExpressionNode> arguments = new ArrayList<>(
+														0);
+
+												functionExpression
+														.getIdentifier()
+														.setName("_MPI_Init");
+												functionCall
+														.setChild(
+																1,
+																nodeFactory
+																		.newSequenceNode(
+																				source,
+																				"ActualParameterList",
+																				arguments));
+											}
+										}
+									}
+
+								}
+							}
 						}
 					}
 				}
