@@ -180,10 +180,9 @@ public class CompoundLiteralAnalyzer {
 	 */
 	private Designation processDesignation(DesignationNode desNode,
 			LiteralTypeNode ltNode) throws SyntaxException {
-		Iterable<DesignatorNode> iter = desNode.childIterable();
 		Designation result = new Designation(ltNode);
 
-		for (DesignatorNode designatorNode : iter) {
+		for (DesignatorNode designatorNode : desNode) {
 			int index;
 
 			if (designatorNode instanceof FieldDesignatorNode) {
@@ -223,10 +222,8 @@ public class CompoundLiteralAnalyzer {
 		CommonCompoundLiteralObject result = new CommonCompoundLiteralObject(
 				ltNode, compoundInitNode);
 		Designation position = new Designation(ltNode);
-		Iterable<PairNode<DesignationNode, InitializerNode>> iter = compoundInitNode
-				.childIterable();
 
-		for (PairNode<DesignationNode, InitializerNode> pair : iter) {
+		for (PairNode<DesignationNode, InitializerNode> pair : compoundInitNode) {
 			DesignationNode desNode = pair.getLeft();
 			InitializerNode initNode = pair.getRight();
 			LiteralObject subLiteral;

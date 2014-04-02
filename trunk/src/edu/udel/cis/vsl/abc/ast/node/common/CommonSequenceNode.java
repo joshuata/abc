@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common;
 
 import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -42,8 +43,8 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Iterable<T> childIterable() {
-		return (Iterable<T>) children();
+	public Iterator<T> iterator() {
+		return (Iterator<T>) children().iterator();
 	}
 
 	@Override
@@ -53,9 +54,8 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 
 	protected List<T> childListCopy() {
 		List<T> childListCopy = new LinkedList<T>();
-		Iterable<T> iter = childIterable();
 
-		for (T child : iter) {
+		for (T child : this) {
 			if (child == null)
 				childListCopy.add(null);
 			else {
@@ -78,10 +78,9 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 	 */
 	protected List<T> childListCopy(boolean[] keep) {
 		List<T> childListCopy = new LinkedList<T>();
-		Iterable<T> iter = childIterable();
 		int count = 0;
 
-		for (T child : iter) {
+		for (T child : this) {
 			if (keep[count]) {
 				if (child == null)
 					childListCopy.add(null);

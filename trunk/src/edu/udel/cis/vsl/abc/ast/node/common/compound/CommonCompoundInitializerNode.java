@@ -64,9 +64,8 @@ public class CommonCompoundInitializerNode extends
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		boolean result = true;
-		Iterable<PairNode<DesignationNode, InitializerNode>> iter = childIterable();
 
-		for (PairNode<DesignationNode, InitializerNode> pair : iter) {
+		for (PairNode<DesignationNode, InitializerNode> pair : this) {
 			InitializerNode init = pair.getRight();
 
 			result = result && init.isSideEffectFree(errorsAreSideEffects);

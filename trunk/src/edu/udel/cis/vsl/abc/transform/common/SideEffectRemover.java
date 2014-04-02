@@ -246,9 +246,8 @@ public class SideEffectRemover extends BaseTransformer {
 		ChooseStatementNode result;
 		StatementNode defaultCase = statement.getDefaultCase();
 		Vector<StatementNode> statements = new Vector<StatementNode>();
-		Iterable<StatementNode> iterable = statement.childIterable();
 
-		for (StatementNode child : iterable) {
+		for (StatementNode child : statement) {
 			statements.add(processStatement(child));
 		}
 		result = nodeFactory.newChooseStatementNode(statement.getSource(),
@@ -873,10 +872,9 @@ public class SideEffectRemover extends BaseTransformer {
 					allItems.add(nodeFactory
 							.newExpressionStatementNode((ExpressionNode) initializer));
 				} else if (initializer instanceof DeclarationListNode) {
-					Iterable<VariableDeclarationNode> iter = ((DeclarationListNode) initializer)
-							.childIterable();
+					DeclarationListNode declarationList = (DeclarationListNode) initializer;
 
-					for (VariableDeclarationNode child : iter) {
+					for (VariableDeclarationNode child : declarationList) {
 						allItems.add(child);
 					}
 				} else {

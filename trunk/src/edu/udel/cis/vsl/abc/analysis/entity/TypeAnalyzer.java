@@ -393,10 +393,7 @@ public class TypeAnalyzer {
 			List<ObjectType> parameterTypes = new LinkedList<ObjectType>();
 
 			if (hasVariableArgs || !onlyVoid(parameters)) {
-				Iterable<VariableDeclarationNode> parameterIter = parameters
-						.childIterable();
-
-				for (VariableDeclarationNode decl : parameterIter) {
+				for (VariableDeclarationNode decl : parameters) {
 					TypeNode parameterTypeNode;
 
 					// C11 6.7.5(2): "An alignment attribute shall not be
@@ -445,9 +442,7 @@ public class TypeAnalyzer {
 				.enumerators();
 		Scope scope = node.getScope();
 		String tag = node.getName(); // could be null
-		Iterable<EnumeratorDeclarationNode> enumeratorIter = enumerators
-				.childIterable();
-		List<Enumerator> enumeratorList = new LinkedList<Enumerator>();
+		List<Enumerator> enumeratorList = new LinkedList<>();
 		EnumerationType enumerationType = typeFactory
 				.enumerationType(node, tag);
 		Enumeration enumeration;
@@ -459,7 +454,7 @@ public class TypeAnalyzer {
 		scope.add(enumeration);
 		enumeration.setDefinition(node);
 		enumeration.addDeclaration(node);
-		for (EnumeratorDeclarationNode decl : enumeratorIter) {
+		for (EnumeratorDeclarationNode decl : enumerators) {
 			ExpressionNode constantNode = decl.getValue();
 			Enumerator enumerator;
 
@@ -534,12 +529,10 @@ public class TypeAnalyzer {
 			identifier.setEntity(structureOrUnion);
 		structureOrUnion.addDeclaration(node);
 		if (fieldDecls != null) {
-			Iterable<FieldDeclarationNode> fieldIter = fieldDecls
-					.childIterable();
-			List<Field> fieldList = new LinkedList<Field>();
+			List<Field> fieldList = new LinkedList<>();
 
 			structureOrUnion.setDefinition(node);
-			for (FieldDeclarationNode decl : fieldIter) {
+			for (FieldDeclarationNode decl : fieldDecls) {
 				TypeNode fieldTypeNode = decl.getTypeNode();
 				ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
 				Value bitWidth;
