@@ -13,6 +13,7 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.ABC.Language;
 import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
+import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 public class MPITranslationTest {
 
@@ -45,7 +46,7 @@ public class MPITranslationTest {
 
 		codes.add(MPITransformer.CODE);
 		codes.add(Pruner.CODE);
-		// codes.add(SideEffectRemover.CODE);
+		codes.add(SideEffectRemover.CODE);
 		this.systemIncludes = new File[0];
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
@@ -58,13 +59,18 @@ public class MPITranslationTest {
 		check("ring");
 	}
 
-	@Test
-	public void sumArray() throws ABCException, IOException {
-		check("sum_array");
-	}
+//	@Test
+//	public void sumArray() throws ABCException, IOException {
+//		check("sum_array");
+//	}
 
 	@Test
 	public void mpithreads_mpi() throws ABCException, IOException {
 		check("mpithreads_mpi");
+	}
+
+	@Test
+	public void adder_par() throws ABCException, IOException {
+		check("adder_par");
 	}
 }
