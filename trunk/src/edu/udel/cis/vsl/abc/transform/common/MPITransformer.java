@@ -31,8 +31,17 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
+/**
+ * MPITransformer transforms an AST of an MPI program into an AST of an
+ * equivalent CIVL-C program. The translation scheme is described <a
+ * href=https://vsl.cis.udel.edu/trac/civl/wiki/MPITransformation>here</a>.
+ * 
+ * @author Manchun Zheng (zmanchun)
+ * 
+ */
 public class MPITransformer extends BaseTransformer {
 
+	/* **************************** Static Fields ************************** */
 	public static String CODE = "mpi";
 	public static String LONG_NAME = "MPITransformer";
 	public static String SHORT_DESCRIPTION = "transforms C/MPI program to CIVL-C";
@@ -40,18 +49,76 @@ public class MPITransformer extends BaseTransformer {
 	private static String COMM_WORLD = "MPI_COMM_WORLD";
 	private static String GCOMM_WORLD = "GCOMM_WORLD";
 	private static String GCOMM_TYPE = "$gcomm";
-	private static String COMM_TYPE = "$comm";
+	private static String COMM_TYPE = "MPI_Comm";
 	private static String GCOMM_CREATE = "$gcomm_create";
 	private static String COMM_CREATE = "$comm_create";
 	private static String GCOMM_DESTROY = "$gcomm_destroy";
 	private static String COMM_DESTROY = "$comm_destroy";
+	private static String MPI_MAIN = "__main";
+	private static String MPI_RANK = "_rank";
+	private static String MPI_INIT = "MPI_Init";
+	private static String MPI_INIT_NEW = "_MPI_Init";
+	private static String MPI_PROCESS = "MPI_Process";
+	private static String NPROCS = "NPROCS";
+	private static String PROCS = "procs";
+	private static String WAIT = "$wait";
+	private static String PROC_TYPE = "$proc";
 
+	/* **************************** Instant Fields ************************* */
+
+	/**
+	 * There are new nodes created by the transformer, other than parsing from
+	 * some source file. All new nodes share the same source. TODO create an
+	 * appropriate source
+	 */
 	private Source source;
 
+	/* ****************************** Constructor ************************** */
+	/**
+	 * Creates a new instance of MPITransformer.
+	 * 
+	 * @param astFactory
+	 *            The ASTFactory that will be used to create new nodes.
+	 */
 	public MPITransformer(ASTFactory astFactory) {
 		super(CODE, LONG_NAME, SHORT_DESCRIPTION, astFactory);
 	}
 
+	/* *************************** Private Methods ************************* */
+
+	/**
+	 * Constructs the function MPI_Process() from the original MPI program. It
+	 * is a wrapper of the original MPI program with some additional features: <br>
+	 * <code>void MPI_Process(){</code><br>
+	 * <code>&nbsp;&nbsp;$comm MPI_COMM_WORLD = $comm_create(...);</code><br>
+	 * <code>&nbsp;&nbsp;//SLIGHTLY-MODIFIED ORIGINAL PROGRAM;</code><br>
+	 * <code>&nbsp;&nbsp;int a, b, ...;</code><br>
+	 * <code>&nbsp;&nbsp;... function(){...}</code><br>
+	 * <code>&nbsp;&nbsp;...</code><br>
+	 * <code>&nbsp;&nbsp;... __main(){...} // renamed main() to __main()</code><br>
+	 * <code>&nbsp;&nbsp;....</code><br>
+	 * <code>&nbsp;&nbsp;//ORIGINAL PROGRAM ENDS HERE;</code><br>
+	 * <code>&nbsp;&nbsp;__main();</code><br>
+	 * <code>&nbsp;&nbsp;$comm_destroy(MPI_COMM_WORLD);</code><br>
+	 * <code>}</code>
+	 * 
+	 * @param root
+	 *            The root node of the AST of the original MPI program.
+	 * @param includedNodes
+	 *            The set of AST nodes that are parsed from header files. These
+	 *            nodes will be moved up to the higher scope (i.e., the file
+	 *            scope of the final AST). When invoking this function, this
+	 *            parameter should be an empty list and this function will
+	 *            update this list.
+	 * @param vars
+	 *            The list of variable declaration nodes that are the arguments
+	 *            of the original main function. These variables will be moved
+	 *            up to the higher scope (i.e., the file scope of the final AST)
+	 *            and become $input variables of the final AST. When invoking
+	 *            this function, this parameter should be an empty list and this
+	 *            function will update this list.
+	 * @return The function definition node of MPI_Process.
+	 */
 	private FunctionDefinitionNode mpiProcess(SequenceNode<ASTNode> root,
 			List<ASTNode> includedNodes, List<VariableDeclarationNode> vars) {
 		List<BlockItemNode> items;
@@ -71,19 +138,10 @@ public class MPITransformer extends BaseTransformer {
 						nodeFactory
 								.newIdentifierExpressionNode(source,
 										nodeFactory.newIdentifierNode(source,
-												"__main")),
+												MPI_MAIN)),
 						new ArrayList<ExpressionNode>(), null));
-		// add call main: main();
-		// root.addSequenceChild(callMain);
+
 		// build MPI_Process() function:
-		// void MPI_Process(int _rank)
-		// {
-		// initialize MPI_COMM_WORLD: $comm MPI_COMM_WORLD=$comm_create($here,
-		// GCOMM_WORLD, _rank);
-		// original program; (function/variable declaration/definition)
-		// function call: main();
-		// $comm_destroy(MPI_COMM_WORLD);
-		// }
 		items = new LinkedList<>();
 		number = root.numChildren();
 		items.add(commVar);
@@ -97,6 +155,7 @@ public class MPITransformer extends BaseTransformer {
 				if (child.nodeKind() == NodeKind.VARIABLE_DECLARATION) {
 					VariableDeclarationNode variableDeclaration = (VariableDeclarationNode) child;
 
+					// ignore the MPI_COMM_WORLD declaration in mpi.h.
 					if (!variableDeclaration.getName().equals(COMM_WORLD)) {
 						includedNodes.add(child);
 					}
@@ -110,77 +169,8 @@ public class MPITransformer extends BaseTransformer {
 							.child(0);
 
 					if (functionName.name().equals("main")) {
-						FunctionTypeNode functionType = functionNode
-								.getTypeNode();
-						SequenceNode<VariableDeclarationNode> parameters = functionType
-								.getParameters();
-						int count = parameters.numChildren();
-						CompoundStatementNode functionBody = functionNode
-								.getBody();
-
-						functionName.setName("__main");
-						if (count > 0) {
-							List<VariableDeclarationNode> newParameters = new ArrayList<>(
-									0);
-
-							for (int k = 0; k < count; k++) {
-								VariableDeclarationNode parameter = parameters
-										.getSequenceChild(k);
-
-								parameters.removeChild(k);
-								parameter.getTypeNode().setInputQualified(true);
-								vars.add(parameter);
-							}
-							functionType.setParameters(nodeFactory
-									.newSequenceNode(source,
-											"FormalParameterDeclarations",
-											newParameters));
-						}
-						count = functionBody.numChildren();
-						for (int j = 0; j < count; j++) {
-							BlockItemNode block = functionBody
-									.getSequenceChild(j);
-
-							if (block.nodeKind() == NodeKind.STATEMENT) {
-								StatementNode statementNode = (StatementNode) block;
-
-								if (statementNode.statementKind() == StatementKind.EXPRESSION) {
-									ExpressionStatementNode expressionStatement = (ExpressionStatementNode) statementNode;
-									ExpressionNode expression = expressionStatement
-											.getExpression();
-
-									if (expression.expressionKind() == ExpressionKind.FUNCTION_CALL) {
-										FunctionCallNode functionCall = (FunctionCallNode) expression;
-
-										if (functionCall.getFunction()
-												.expressionKind() == ExpressionKind.IDENTIFIER_EXPRESSION) {
-											IdentifierExpressionNode functionExpression = (IdentifierExpressionNode) functionCall
-													.getFunction();
-
-											if (functionExpression
-													.getIdentifier().name()
-													.equals("MPI_Init")) {
-												List<ExpressionNode> arguments = new ArrayList<>(
-														0);
-
-												functionExpression
-														.getIdentifier()
-														.setName("_MPI_Init");
-												functionCall
-														.setChild(
-																1,
-																nodeFactory
-																		.newSequenceNode(
-																				source,
-																				"ActualParameterList",
-																				arguments));
-											}
-										}
-									}
-
-								}
-							}
-						}
+						functionName.setName(MPI_MAIN);
+						processOriginalMainFunction(functionNode, vars);
 					}
 				}
 				items.add((BlockItemNode) child);
@@ -192,20 +182,115 @@ public class MPITransformer extends BaseTransformer {
 				items);
 		newFormalList = new LinkedList<>();
 		newFormalList.add(nodeFactory.newVariableDeclarationNode(source,
-				nodeFactory.newIdentifierNode(source, "_rank"),
+				nodeFactory.newIdentifierNode(source, MPI_RANK),
 				nodeFactory.newBasicTypeNode(source, BasicTypeKind.INT)));
 		formals = nodeFactory.newSequenceNode(source,
 				"FormalParameterDeclarations", newFormalList);
 		mpiProcessType = nodeFactory.newFunctionTypeNode(source,
 				nodeFactory.newVoidTypeNode(source), formals, true);
 		mpiProcess = nodeFactory.newFunctionDefinitionNode(source,
-				nodeFactory.newIdentifierNode(source, "MPI_Process"),
+				nodeFactory.newIdentifierNode(source, MPI_PROCESS),
 				mpiProcessType, null, mpiProcessBody);
 		return mpiProcess;
 	}
 
+	/**
+	 * Processes the original main function, including:
+	 * <ul>
+	 * <li>Removes all arguments of the function;</li>
+	 * <li>Renames the function as "__main";</li>
+	 * <li>Changes the function call <code>MPI_Init(...)</code> to
+	 * <code>_MPI_Init()</code>.</li>
+	 * </ul>
+	 * 
+	 * @param mainFunction
+	 *            The function definition node representing the original main
+	 *            function.
+	 * @param vars
+	 *            The list of variable declaration nodes that are the arguments
+	 *            of the original main function. These variables will be moved
+	 *            up to the higher scope (i.e., the file scope of the final AST)
+	 *            and become $input variables of the final AST. When invoking
+	 *            this function, this parameter should be an empty list and this
+	 *            function will update this list.
+	 */
+	private void processOriginalMainFunction(
+			FunctionDefinitionNode mainFunction,
+			List<VariableDeclarationNode> vars) {
+		FunctionTypeNode functionType = mainFunction.getTypeNode();
+		SequenceNode<VariableDeclarationNode> parameters = functionType
+				.getParameters();
+		int count = parameters.numChildren();
+		CompoundStatementNode functionBody = mainFunction.getBody();
+
+		if (count > 0) {
+			List<VariableDeclarationNode> newParameters = new ArrayList<>(0);
+
+			for (int k = 0; k < count; k++) {
+				VariableDeclarationNode parameter = parameters
+						.getSequenceChild(k);
+
+				parameters.removeChild(k);
+				parameter.getTypeNode().setInputQualified(true);
+				vars.add(parameter);
+			}
+			functionType.setParameters(nodeFactory.newSequenceNode(source,
+					"FormalParameterDeclarations", newParameters));
+		}
+		count = functionBody.numChildren();
+		for (int j = 0; j < count; j++) {
+			BlockItemNode block = functionBody.getSequenceChild(j);
+
+			if (block.nodeKind() == NodeKind.STATEMENT) {
+				StatementNode statementNode = (StatementNode) block;
+
+				if (statementNode.statementKind() == StatementKind.EXPRESSION) {
+					ExpressionStatementNode expressionStatement = (ExpressionStatementNode) statementNode;
+					ExpressionNode expression = expressionStatement
+							.getExpression();
+
+					if (expression.expressionKind() == ExpressionKind.FUNCTION_CALL) {
+						FunctionCallNode functionCall = (FunctionCallNode) expression;
+
+						if (functionCall.getFunction().expressionKind() == ExpressionKind.IDENTIFIER_EXPRESSION) {
+							IdentifierExpressionNode functionExpression = (IdentifierExpressionNode) functionCall
+									.getFunction();
+
+							if (functionExpression.getIdentifier().name()
+									.equals(MPI_INIT)) {
+								List<ExpressionNode> arguments = new ArrayList<>(
+										0);
+
+								functionExpression.getIdentifier().setName(
+										MPI_INIT_NEW);
+								functionCall.setChild(1, nodeFactory
+										.newSequenceNode(source,
+												"ActualParameterList",
+												arguments));
+							}
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	/**
+	 * Creates an expression statement node of a function call node for
+	 * destroying a communicator, either global or local.
+	 * 
+	 * @param destroy
+	 *            The name of the function call, either
+	 *            <code>$gcomm_destroy</code> or <code>$comm_destroy</code>.
+	 * @param commName
+	 *            The name of the variable of the communicator to be destroy,
+	 *            either <code>GCOMM_WORLD</code> or <code>MPI_COMM_WORLD</code>
+	 *            .
+	 * @return The expression statement node of the function call for destroying
+	 *         the specified communicator.
+	 */
 	private ExpressionStatementNode commDestroy(String destroy, String commName) {
-		// $comm_destroy
 		IdentifierExpressionNode function = nodeFactory
 				.newIdentifierExpressionNode(source,
 						nodeFactory.newIdentifierNode(source, destroy));
@@ -217,112 +302,29 @@ public class MPITransformer extends BaseTransformer {
 				.newFunctionCallNode(source, function, arguments, null));
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public AST transform(AST ast) throws SyntaxException {
-		ASTNode root = ast.getRootNode();
-		AST newAst;
-		FunctionDefinitionNode mpiProcess, mainFunction;
-		VariableDeclarationNode gcommWorld;
-		List<ASTNode> externalList;
-		VariableDeclarationNode nprocsVar;
-		SequenceNode<ASTNode> newRootNode;
-		// List<ASTNode> civlcAstNodes = new ArrayList<>();
-		// List<ASTNode> mpiAstNodes = new ArrayList<>();
-		List<ASTNode> includedNodes = new ArrayList<ASTNode>();
-		List<VariableDeclarationNode> mainParameters = new ArrayList<>();
-		int count;
-
-		this.source = root.getSource();
-		assert this.astFactory == ast.getASTFactory();
-		assert this.nodeFactory == astFactory.getNodeFactory();
-		ast.release();
-		// $input int NPROCS;
-		nprocsVar = this.nprocsDeclaration();
-		// $gcomm GCOMM_WORLD = $gcomm_create($here, NPROCS);
-		gcommWorld = this.gcommDeclaration();
-		// MPI_Process(__rank){}
-		mpiProcess = this.mpiProcess((SequenceNode<ASTNode>) root,
-				includedNodes, mainParameters);
-		// main function
-		mainFunction = mainFunction();
-		// the translated program is:
-		// input variables;
-		// gcomm
-		// MPI_Process() definition;
-		// main function.
-		externalList = new LinkedList<>();
-		// count = civlcAstNodes.size();
-		// for (int i = 0; i < count; i++) {
-		// externalList.add(civlcAstNodes.get(i));
-		// }
-		count = includedNodes.size();
-		for (int i = 0; i < count; i++) {
-			externalList.add(includedNodes.get(i));
-		}
-		count = mainParameters.size();
-		for (int i = 0; i < count; i++) {
-			externalList.add(mainParameters.get(i));
-		}
-		externalList.add(nprocsVar);
-		externalList.add(gcommWorld);
-		externalList.add(mpiProcess);
-		externalList.add(mainFunction);
-		newRootNode = nodeFactory.newSequenceNode(null, "TranslationUnit",
-				externalList);
-		newAst = astFactory.newTranslationUnit(newRootNode);
-		return newAst;
-	}
-
-	// private List<ASTNode> astNodesOfFile(String fileName)
-	// throws PreprocessorException, ParseException, SyntaxException {
-	// AST ast = this.parseFile(fileName);
-	// ASTNode root = ast.getRootNode();
-	// int number = root.numChildren();
-	// List<ASTNode> list = new ArrayList<>(number);
-	//
-	// for (int i = 0; i < number; i++) {
-	// list.add(root.child(i));
-	// }
-	// ast.release();
-	// for (int i = 0; i < number; i++) {
-	// root.removeChild(i);
-	// }
-	// return list;
-	// }
-	//
-	// private AST parseFile(String fileName) throws PreprocessorException,
-	// ParseException, SyntaxException {
-	// AST ast;
-	// CParser parser;
-	// CommonTree tree;
-	// ASTBuilder builder;
-	// PreprocessorFactory preprocessorFactory = Preprocess
-	// .newPreprocessorFactory();
-	// Preprocessor preprocessor = preprocessorFactory.newPreprocessor(
-	// new File[0], new File[0]);
-	// String root = new File(".").getAbsolutePath();
-	// String suffix = "text/include/" + fileName;
-	// File file = new File(new File(root), suffix);
-	//
-	// parser = Parse.newCParser(preprocessor, file);
-	// tree = parser.getTree();
-	// ast = null;
-	// builder = new ASTBuilder(parser, astFactory, tree);
-	// ast = builder.getTranslationUnit(); // creates ast
-	// return ast;
-	// }
-
+	/**
+	 * Creates the declaration node for the input variable <code>NPROCS</code>.
+	 * 
+	 * @return The declaration node of the input variable <code>NPROCS</code>.
+	 */
 	private VariableDeclarationNode nprocsDeclaration() {
-		// $input int NPROCS;
 		TypeNode nprocsType = nodeFactory.newBasicTypeNode(source,
 				BasicTypeKind.INT);
 
 		nprocsType.setInputQualified(true);
 		return nodeFactory.newVariableDeclarationNode(source,
-				nodeFactory.newIdentifierNode(source, "NPROCS"), nprocsType);
+				nodeFactory.newIdentifierNode(source, NPROCS), nprocsType);
 	}
 
+	/**
+	 * Creates the declaration node for the variable <code>MPI_COMM_WORLD</code>
+	 * , which is of <code>MPI_Comm</code> type and has an initializer to call
+	 * <code>$comm_create()</code>. That is:
+	 * <code>MPI_Comm MPI_COMM_WORLD = $comm_create($here, GCOMM_WORLD, _rank)</code>
+	 * .
+	 * 
+	 * @return The declaration node of the variable <code>MPI_COMM_WORLD</code>.
+	 */
 	private VariableDeclarationNode commDeclaration() {
 		TypeNode commType;
 		List<ExpressionNode> commCreateArgs;
@@ -335,17 +337,25 @@ public class MPITransformer extends BaseTransformer {
 		commCreateArgs.add(nodeFactory.newIdentifierExpressionNode(source,
 				nodeFactory.newIdentifierNode(source, GCOMM_WORLD)));
 		commCreateArgs.add(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, "_rank")));
+				nodeFactory.newIdentifierNode(source, MPI_RANK)));
 		commCreate = nodeFactory.newFunctionCallNode(
 				source,
 				nodeFactory.newIdentifierExpressionNode(source,
 						nodeFactory.newIdentifierNode(source, COMM_CREATE)),
 				commCreateArgs, null);
 		return nodeFactory.newVariableDeclarationNode(source,
-				nodeFactory.newIdentifierNode(source, "MPI_COMM_WORLD"),
-				commType, commCreate);
+				nodeFactory.newIdentifierNode(source, COMM_WORLD), commType,
+				commCreate);
 	}
 
+	/**
+	 * Creates the declaration node for the variable <code>GCOMM_WORLD</code> ,
+	 * which is of <code>$gcomm</code> type and has an initializer to call
+	 * <code>$gcomm_create()</code>. That is:
+	 * <code>$gcomm MPI_COMM_WORLD = $gcomm_create($here, NPROCS)</code> .
+	 * 
+	 * @return The declaration node of the variable <code>GCOMM_WORLD</code>.
+	 */
 	private VariableDeclarationNode gcommDeclaration() {
 		TypeNode gcommType;
 		List<ExpressionNode> gcommCreateArgs;
@@ -356,17 +366,34 @@ public class MPITransformer extends BaseTransformer {
 		gcommCreateArgs = new ArrayList<>(2);
 		gcommCreateArgs.add(nodeFactory.newHereNode(source));
 		gcommCreateArgs.add(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, "NPROCS")));
+				nodeFactory.newIdentifierNode(source, NPROCS)));
 		gcommCreate = nodeFactory.newFunctionCallNode(
 				source,
 				nodeFactory.newIdentifierExpressionNode(source,
 						nodeFactory.newIdentifierNode(source, GCOMM_CREATE)),
 				gcommCreateArgs, null);
 		return nodeFactory.newVariableDeclarationNode(source,
-				nodeFactory.newIdentifierNode(source, "GCOMM_WORLD"),
-				gcommType, gcommCreate);
+				nodeFactory.newIdentifierNode(source, GCOMM_WORLD), gcommType,
+				gcommCreate);
 	}
 
+	/**
+	 * Creates the main function for the final program, which is: <br>
+	 * <code>void main(){</code><br>
+	 * <code>&nbsp;&nbsp;$proc procs[NPROCS];</code><br>
+	 * <code>&nbsp;&nbsp;for(int i = 0; i < NPROCS; i++){</code><br>
+	 * <code>&nbsp;&nbsp;&nbsp;&nbsp;procs[i] = $spawn MPI_Process(i);</code><br>
+	 * <code>&nbsp;&nbsp;}</code><br>
+	 * <code>&nbsp;&nbsp;for(int i = 0; i < NPROCS; i++){</code><br>
+	 * <code>&nbsp;&nbsp;&nbsp;&nbsp;$wait(procs[i]);</code><br>
+	 * <code>&nbsp;&nbsp;}</code><br>
+	 * <code>&nbsp;&nbsp;$gcomm_destroy(GCOMM_WORLD);</code><br>
+	 * <code>}</code><br>
+	 * 
+	 * @return The function definition node representing the main function of
+	 *         the final program.
+	 * @throws SyntaxException
+	 */
 	private FunctionDefinitionNode mainFunction() throws SyntaxException {
 		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
 		TypeNode procsType;
@@ -386,27 +413,18 @@ public class MPITransformer extends BaseTransformer {
 		ExpressionStatementNode gcommDestroy = this.commDestroy(GCOMM_DESTROY,
 				GCOMM_WORLD);
 
-		// main
-		/*
-		 * void main() { $proc procs[NPROCS];
-		 * 
-		 * for (int i=0; i<NPROCS; i++) procs[i] = $spawn MPI_Process(i); for
-		 * (int i=0; i<NPROCS; i++) $wait(procs[i]);
-		 * $gcomm_destroy(GCOMM_WORLD); }
-		 */
-		procsType = nodeFactory.newArrayTypeNode(
-				source,
-				nodeFactory.newTypedefNameNode(
-						nodeFactory.newIdentifierNode(source, "$proc"), null),
-				nodeFactory.newIdentifierExpressionNode(source,
-						nodeFactory.newIdentifierNode(source, "NPROCS")));
+		// declaring $proc procs[NPROCS];
+		procsType = nodeFactory
+				.newArrayTypeNode(source,
+						nodeFactory.newTypedefNameNode(nodeFactory
+								.newIdentifierNode(source, PROC_TYPE), null),
+						nodeFactory.newIdentifierExpressionNode(source,
+								nodeFactory.newIdentifierNode(source, NPROCS)));
 		procsVar = nodeFactory.newVariableDeclarationNode(source,
-				nodeFactory.newIdentifierNode(source, "procs"), procsType);
+				nodeFactory.newIdentifierNode(source, PROCS), procsType);
 		items.add(procsVar);
 
-		// first for loop:
-		// nodeFactory.newForLoopInitializerNode(
-		// statementSource, declarations)
+		// first for loop;
 		initialList = new LinkedList<>();
 		initialList.add(nodeFactory.newVariableDeclarationNode(source,
 				nodeFactory.newIdentifierNode(source, "i"),
@@ -418,7 +436,7 @@ public class MPITransformer extends BaseTransformer {
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
 				nodeFactory.newIdentifierNode(source, "i")));
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, "NPROCS")));
+				nodeFactory.newIdentifierNode(source, NPROCS)));
 
 		loopCondition = nodeFactory.newOperatorNode(source, Operator.LT,
 				operatorArgs);
@@ -434,11 +452,11 @@ public class MPITransformer extends BaseTransformer {
 		spawnProc = nodeFactory.newSpawnNode(source, nodeFactory
 				.newFunctionCallNode(source, nodeFactory
 						.newIdentifierExpressionNode(source, nodeFactory
-								.newIdentifierNode(source, "MPI_Process")),
+								.newIdentifierNode(source, MPI_PROCESS)),
 						callArgs, null));
 		operatorArgs = new LinkedList<>();
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, "procs")));
+				nodeFactory.newIdentifierNode(source, PROCS)));
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
 				nodeFactory.newIdentifierNode(source, "i")));
 		leftHandSide = nodeFactory.newOperatorNode(source, Operator.SUBSCRIPT,
@@ -452,7 +470,7 @@ public class MPITransformer extends BaseTransformer {
 				loopCondition, incrementer, assign, null);
 		items.add(forLoop);
 
-		// second for loop:
+		// second for loop;
 		initialList = new LinkedList<>();
 		initialList.add(nodeFactory.newVariableDeclarationNode(source,
 				nodeFactory.newIdentifierNode(source, "i"),
@@ -464,7 +482,7 @@ public class MPITransformer extends BaseTransformer {
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
 				nodeFactory.newIdentifierNode(source, "i")));
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, "NPROCS")));
+				nodeFactory.newIdentifierNode(source, NPROCS)));
 
 		loopCondition = nodeFactory.newOperatorNode(source, Operator.LT,
 				operatorArgs);
@@ -478,7 +496,7 @@ public class MPITransformer extends BaseTransformer {
 
 		operatorArgs = new LinkedList<>();
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, "procs")));
+				nodeFactory.newIdentifierNode(source, PROCS)));
 		operatorArgs.add(nodeFactory.newIdentifierExpressionNode(source,
 				nodeFactory.newIdentifierNode(source, "i")));
 		callArgs.add(nodeFactory.newOperatorNode(source, Operator.SUBSCRIPT,
@@ -486,20 +504,21 @@ public class MPITransformer extends BaseTransformer {
 		waitProc = nodeFactory.newFunctionCallNode(
 				source,
 				nodeFactory.newIdentifierExpressionNode(source,
-						nodeFactory.newIdentifierNode(source, "$wait")),
-				callArgs, null);
+						nodeFactory.newIdentifierNode(source, WAIT)), callArgs,
+				null);
 		forLoop = nodeFactory.newForLoopNode(source, initializerNode,
 				loopCondition, incrementer,
 				nodeFactory.newExpressionStatementNode(waitProc), null);
 		items.add(forLoop);
 
+		// destroying GCOMM_WROLD;
 		items.add(gcommDestroy);
 
+		// constructing the function definition node.
 		mainBody = nodeFactory.newCompoundStatementNode(source, items);
-
 		newFormalList = new LinkedList<>();
 		newFormalList.add(nodeFactory.newVariableDeclarationNode(source,
-				nodeFactory.newIdentifierNode(source, "_rank"),
+				nodeFactory.newIdentifierNode(source, MPI_RANK),
 				nodeFactory.newBasicTypeNode(source, BasicTypeKind.INT)));
 		formals = nodeFactory.newSequenceNode(source,
 				"FormalParameterDeclarations", newFormalList);
@@ -508,7 +527,62 @@ public class MPITransformer extends BaseTransformer {
 		mainFunction = nodeFactory.newFunctionDefinitionNode(source,
 				nodeFactory.newIdentifierNode(source, "main"), mainType, null,
 				mainBody);
-
 		return mainFunction;
+	}
+
+	/* ********************* Methods From BaseTransformer ****************** */
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public AST transform(AST ast) throws SyntaxException {
+		ASTNode root = ast.getRootNode();
+		AST newAst;
+		FunctionDefinitionNode mpiProcess, mainFunction;
+		VariableDeclarationNode gcommWorld;
+		List<ASTNode> externalList;
+		VariableDeclarationNode nprocsVar;
+		SequenceNode<ASTNode> newRootNode;
+		List<ASTNode> includedNodes = new ArrayList<ASTNode>();
+		List<VariableDeclarationNode> mainParameters = new ArrayList<>();
+		int count;
+
+		this.source = root.getSource();
+		assert this.astFactory == ast.getASTFactory();
+		assert this.nodeFactory == astFactory.getNodeFactory();
+		ast.release();
+		// declaring $input int NPROCS;
+		nprocsVar = this.nprocsDeclaration();
+		// declaring $gcomm GCOMM_WORLD = $gcomm_create($here, NPROCS);
+		gcommWorld = this.gcommDeclaration();
+		// defining MPI_Process(_rank){...};
+		mpiProcess = this.mpiProcess((SequenceNode<ASTNode>) root,
+				includedNodes, mainParameters);
+		// defining the main function;
+		mainFunction = mainFunction();
+
+		// the translated program is:
+		// input variables;
+		// gcomm
+		// MPI_Process() definition;
+		// main function.
+		externalList = new LinkedList<>();
+		count = includedNodes.size();
+		// adding nodes from header files.
+		for (int i = 0; i < count; i++) {
+			externalList.add(includedNodes.get(i));
+		}
+		count = mainParameters.size();
+		// adding nodes from the arguments of the original main function.
+		for (int i = 0; i < count; i++) {
+			externalList.add(mainParameters.get(i));
+		}
+		externalList.add(nprocsVar);
+		externalList.add(gcommWorld);
+		externalList.add(mpiProcess);
+		externalList.add(mainFunction);
+		newRootNode = nodeFactory.newSequenceNode(null, "TranslationUnit",
+				externalList);
+		newAst = astFactory.newTranslationUnit(newRootNode);
+		return newAst;
 	}
 }
