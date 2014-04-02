@@ -264,12 +264,12 @@ public class StatementAnalyzer {
 			} else if (initializer instanceof ExpressionNode) {
 				processExpression((ExpressionNode) initializer);
 			} else if (initializer instanceof DeclarationListNode) {
-				Iterator<VariableDeclarationNode> declIter = ((DeclarationListNode) initializer)
-						.childIterator();
+				Iterable<VariableDeclarationNode> declIter = ((DeclarationListNode) initializer)
+						.childIterable();
 
-				while (declIter.hasNext())
+				for (VariableDeclarationNode child : declIter)
 					entityAnalyzer.declarationAnalyzer
-							.processVariableDeclaration(declIter.next());
+							.processVariableDeclaration(child);
 			} else
 				throw error("Unknown kind of initializer clause in for loop",
 						initializer);
@@ -323,11 +323,11 @@ public class StatementAnalyzer {
 				throw error("Guard has non-scalar type " + guardType, guard);
 			processStatement(((WhenNode) statement).getBody());
 		} else if (statement instanceof ChooseStatementNode) {
-			Iterator<StatementNode> children = ((ChooseStatementNode) statement)
-					.childIterator();
+			Iterable<StatementNode> children = ((ChooseStatementNode) statement)
+					.childIterable();
 
-			while (children.hasNext())
-				processStatement(children.next());
+			for (StatementNode child : children)
+				processStatement(child);
 		} else if (statement instanceof WaitNode) {
 			processExpression(((WaitNode) statement).getExpression());
 		} else if (statement instanceof AtomicNode) {
@@ -433,11 +433,9 @@ public class StatementAnalyzer {
 	 */
 	void processCompoundStatement(CompoundStatementNode node)
 			throws SyntaxException {
-		Iterator<BlockItemNode> items = node.childIterator();
+		Iterable<BlockItemNode> items = node.childIterable();
 
-		while (items.hasNext()) {
-			BlockItemNode item = items.next();
-
+		for (BlockItemNode item : items) {
 			if (item instanceof StatementNode)
 				processStatement((StatementNode) item);
 			else if (item instanceof StructureOrUnionTypeNode)

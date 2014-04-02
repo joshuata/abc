@@ -25,7 +25,6 @@ import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DOT;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -2403,8 +2402,8 @@ public class ASTBuilder {
 			} else {
 				SequenceNode<VariableDeclarationNode> newFormalSequenceNode;
 				List<VariableDeclarationNode> newFormalList = new LinkedList<VariableDeclarationNode>();
-				Iterator<VariableDeclarationNode> formals = formalSequenceNode
-						.childIterator();
+				Iterable<VariableDeclarationNode> formals = formalSequenceNode
+						.childIterable();
 				Map<String, VariableDeclarationNode> declMap = new HashMap<String, VariableDeclarationNode>();
 
 				for (int i = 0; i < numDeclarations; i++) {
@@ -2434,8 +2433,7 @@ public class ASTBuilder {
 								(VariableDeclarationNode) definition);
 					}
 				}
-				while (formals.hasNext()) {
-					VariableDeclarationNode formal = formals.next();
+				for (VariableDeclarationNode formal : formals) {
 					String parameterName = formal.getIdentifier().name();
 					VariableDeclarationNode newDeclaration;
 

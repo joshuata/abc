@@ -14,7 +14,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
@@ -99,9 +98,11 @@ public class OpenMPTransformer extends BaseTransformer {
 					.privateList();
 			if (privateList != null) {
 				privateIDs = new ArrayList<Entity>();
-				Iterator<IdentifierExpressionNode> it = privateList.childIterator();
-				while (it.hasNext()) {
-					Entity idEnt = it.next().getIdentifier().getEntity();
+				Iterable<IdentifierExpressionNode> it = privateList
+						.childIterable();
+				for (IdentifierExpressionNode idExpression : it) {
+					Entity idEnt = idExpression.getIdentifier().getEntity();
+
 					privateIDs.add(idEnt);
 				}
 			} else {
@@ -111,9 +112,8 @@ public class OpenMPTransformer extends BaseTransformer {
 					+ privateIDs);
 
 			// Visit the rest of this node
-			Iterator<ASTNode> iter = node.children();
-			while (iter.hasNext()) {
-				ASTNode child = iter.next();
+			Iterable<ASTNode> children = node.children();
+			for (ASTNode child : children) {
 				annotate(child);
 			}
 
@@ -192,7 +192,7 @@ public class OpenMPTransformer extends BaseTransformer {
 				if (initializer instanceof SequenceNode<?>) {
 					SequenceNode<VariableDeclarationNode> decls = (SequenceNode<VariableDeclarationNode>) initializer;
 					Iterator<VariableDeclarationNode> it = (Iterator<VariableDeclarationNode>) decls
-							.childIterator();
+							.childIterable();
 					VariableDeclarationNode vdn = it.next();
 					if (it.hasNext()) {
 						assert false : "OpenMP Canonical Loop Form violated (single initializer only) :"
@@ -258,9 +258,9 @@ public class OpenMPTransformer extends BaseTransformer {
 			/*
 			 * Check for array-based dependences
 			 */
-			boolean hasDeps = hasArrayRefDependences(writeArrayRefs, readArrayRefs);
-			System.out.println("OMP For has array "
-					+ (hasDeps ? "" : "in")
+			boolean hasDeps = hasArrayRefDependences(writeArrayRefs,
+					readArrayRefs);
+			System.out.println("OMP For has array " + (hasDeps ? "" : "in")
 					+ "dependent loop iterations");
 
 		} else if (node != null) {
@@ -270,9 +270,8 @@ public class OpenMPTransformer extends BaseTransformer {
 			 * Could match other types here that have no ForLoopNode below them
 			 * and skip their traversal to speed things up.
 			 */
-			Iterator<ASTNode> iter = node.children();
-			while (iter.hasNext()) {
-				ASTNode child = iter.next();
+			Iterable<ASTNode> children = node.children();
+			for (ASTNode child : children) {
 				annotate(child);
 			}
 		}
@@ -291,7 +290,8 @@ public class OpenMPTransformer extends BaseTransformer {
 
 			ExpressionNode lhs = assign.getArgument(0);
 			if (lhs instanceof IdentifierExpressionNode) {
-				Entity idEnt = ((IdentifierExpressionNode) lhs).getIdentifier().getEntity();
+				Entity idEnt = ((IdentifierExpressionNode) lhs).getIdentifier()
+						.getEntity();
 				if (privateIDs == null || !privateIDs.contains(idEnt)) {
 					writeVars.add(idEnt);
 				}
@@ -313,9 +313,8 @@ public class OpenMPTransformer extends BaseTransformer {
 			 * Could match other types here that have no ForLoopNode below them
 			 * and skip their traversal to speed things up.
 			 */
-			Iterator<ASTNode> iter = node.children();
-			while (iter.hasNext()) {
-				ASTNode child = iter.next();
+			Iterable<ASTNode> children = node.children();
+			for (ASTNode child : children) {
 				collectAssignRefExprs(child);
 			}
 		}
@@ -326,8 +325,8 @@ public class OpenMPTransformer extends BaseTransformer {
 	 */
 	private void collectRHSRefExprs(ASTNode node) {
 		if (node instanceof IdentifierExpressionNode) {
-			Entity idEnt = ((IdentifierExpressionNode) node)
-					.getIdentifier().getEntity();
+			Entity idEnt = ((IdentifierExpressionNode) node).getIdentifier()
+					.getEntity();
 			if (privateIDs == null || !privateIDs.contains(idEnt)) {
 				readVars.add(idEnt);
 			}
@@ -343,9 +342,8 @@ public class OpenMPTransformer extends BaseTransformer {
 			 * Could match other types here that have no ForLoopNode below them
 			 * and skip their traversal to speed things up.
 			 */
-			Iterator<ASTNode> iter = node.children();
-			while (iter.hasNext()) {
-				ASTNode child = iter.next();
+			Iterable<ASTNode> children = node.children();
+			for (ASTNode child : children) {
 				collectRHSRefExprs(child);
 			}
 		}
@@ -357,14 +355,18 @@ public class OpenMPTransformer extends BaseTransformer {
 	private boolean hasArrayRefDependences(Set<OperatorNode> writes,
 			Set<OperatorNode> reads) {
 		for (OperatorNode w : writes) {
-			IdentifierExpressionNode baseWrite = (IdentifierExpressionNode) w.getArgument(0);
+			IdentifierExpressionNode baseWrite = (IdentifierExpressionNode) w
+					.getArgument(0);
 
 			for (OperatorNode r : reads) {
-				IdentifierExpressionNode baseRead = (IdentifierExpressionNode) r.getArgument(0);
+				IdentifierExpressionNode baseRead = (IdentifierExpressionNode) r
+						.getArgument(0);
 
-				if (baseWrite.getIdentifier().getEntity() == baseRead.getIdentifier().getEntity()) {
+				if (baseWrite.getIdentifier().getEntity() == baseRead
+						.getIdentifier().getEntity()) {
 					// Need to check logical equality of these expressions
-					if (!ExpressionEvaluator.isEqualIntExpr(w.getArgument(1), r.getArgument(1))) {
+					if (!ExpressionEvaluator.isEqualIntExpr(w.getArgument(1),
+							r.getArgument(1))) {
 						return true;
 					}
 				}
@@ -372,6 +374,5 @@ public class OpenMPTransformer extends BaseTransformer {
 		}
 		return false;
 	}
-	
-	
+
 }

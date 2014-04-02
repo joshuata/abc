@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
-import java.util.Iterator;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.ASTException;
@@ -84,11 +83,11 @@ public class Pruner extends BaseTransformer {
 		if (node == null)
 			return;
 		else {
-			Iterator<ASTNode> children = node.children();
+			Iterable<ASTNode> children = node.children();
 
 			node.setAttribute(reachedKey, Reachability.UNREACHABLE);
-			while (children.hasNext())
-				markAllUnreachable(children.next());
+			for (ASTNode child : children)
+				markAllUnreachable(child);
 		}
 	}
 

@@ -172,11 +172,9 @@ public class DeclarationAnalyzer {
 			processGotos(body);
 		}
 		if (contract != null) {
-			Iterator<ContractNode> contractIter = contract.childIterator();
+			Iterable<ContractNode> contractIter = contract.childIterable();
 
-			while (contractIter.hasNext()) {
-				ContractNode clause = contractIter.next();
-
+			for (ContractNode clause : contractIter) {
 				if (clause instanceof RequiresNode) {
 					ExpressionNode expression = ((RequiresNode) clause)
 							.getExpression();
@@ -449,19 +447,18 @@ public class DeclarationAnalyzer {
 			declaration.setIsDefinition(true);
 		}
 		if (typeAlignmentSpecifiers != null) {
-			Iterator<TypeNode> typeIter = typeAlignmentSpecifiers
-					.childIterator();
+			Iterable<TypeNode> typeIter = typeAlignmentSpecifiers
+					.childIterable();
 
-			while (typeIter.hasNext())
+			for (TypeNode child : typeIter)
 				variable.addTypeAlignment(entityAnalyzer.typeAnalyzer
-						.processTypeNode(typeIter.next()));
+						.processTypeNode(child));
 		}
 		if (constantAlignmentSpecifiers != null) {
-			Iterator<ExpressionNode> expressionIter = constantAlignmentSpecifiers
-					.childIterator();
+			Iterable<ExpressionNode> expressionIter = constantAlignmentSpecifiers
+					.childIterable();
 
-			while (expressionIter.hasNext()) {
-				ExpressionNode expression = expressionIter.next();
+			for (ExpressionNode expression : expressionIter){
 				Value constant = entityAnalyzer.valueOf(expression);
 
 				if (constant == null)
@@ -528,7 +525,7 @@ public class DeclarationAnalyzer {
 	}
 
 	private void processGotos(ASTNode node) throws SyntaxException {
-		Iterator<ASTNode> childIter = node.children();
+		Iterable<ASTNode> childIter = node.children();
 
 		if (node instanceof GotoNode) {
 			IdentifierNode identifier = ((GotoNode) node).getLabel();
@@ -541,9 +538,7 @@ public class DeclarationAnalyzer {
 						identifier);
 			identifier.setEntity(label);
 		}
-		while (childIter.hasNext()) {
-			ASTNode child = childIter.next();
-
+		for (ASTNode child : childIter) {
 			if (child != null)
 				processGotos(child);
 		}

@@ -266,13 +266,11 @@ public class ScopeAnalyzer implements Analyzer {
 	 */
 	private void processRecursive(ASTNode node, Scope scope, Scope functionScope)
 			throws SyntaxException {
-		Iterator<ASTNode> children = node.children();
+		Iterable<ASTNode> children = node.children();
 
 		assert scope != null;
 		node.setScope(scope);
-		while (children.hasNext()) {
-			ASTNode child = children.next();
-
+		for (ASTNode child : children) {
 			if (child != null)
 				processNode(child, scope, functionScope);
 		}
@@ -280,11 +278,11 @@ public class ScopeAnalyzer implements Analyzer {
 
 	private void clearNode(ASTNode node) {
 		if (node != null) {
-			Iterator<ASTNode> children = node.children();
+			Iterable<ASTNode> children = node.children();
 
 			node.setScope(null);
-			while (children.hasNext())
-				clearNode(children.next());
+			for (ASTNode child : children)
+				clearNode(child);
 		}
 	}
 

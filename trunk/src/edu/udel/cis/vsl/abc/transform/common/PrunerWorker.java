@@ -67,21 +67,19 @@ public class PrunerWorker {
 		if (node.getAttribute(reachedKey) == Reachability.REACHABLE)
 			return;
 		else {
-			Iterator<ASTNode> iter = node.children();
+			Iterable<ASTNode> children = node.children();
 
 			node.setAttribute(reachedKey, Reachability.REACHABLE);
 			reachableNodes.add(node);
 			if (node instanceof FunctionTypeNode) {
 				// special case: don't want to remove unused formal parameters
-				Iterator<VariableDeclarationNode> formalIter = ((FunctionTypeNode) node)
-						.getParameters().childIterator();
+				Iterable<VariableDeclarationNode> formalIter = ((FunctionTypeNode) node)
+						.getParameters().childIterable();
 
-				while (formalIter.hasNext())
-					markReachable(formalIter.next());
+				for (VariableDeclarationNode formal : formalIter)
+					markReachable(formal);
 			}
-			while (iter.hasNext()) {
-				ASTNode child = iter.next();
-
+			for (ASTNode child : children) {
 				if (child != null) {
 					if (child instanceof IdentifierNode) {
 						Entity entity = ((IdentifierNode) child).getEntity();
@@ -134,7 +132,7 @@ public class PrunerWorker {
 		Scope rootScope = root.getScope();
 		Function main = (Function) rootScope.getOrdinaryEntity("main");
 		Iterator<Variable> iter = rootScope.getVariables();
-		Iterator<ASTNode> iter2 = root.children();
+		Iterable<ASTNode> children = root.children();
 
 		while (iter.hasNext()) {
 			Variable variable = iter.next();
@@ -154,9 +152,8 @@ public class PrunerWorker {
 				}
 			}
 		}
-		while (iter2.hasNext()) {
-			ExternalDefinitionNode externalDef = (ExternalDefinitionNode) iter2
-					.next();
+		for (ASTNode child : children) {
+			ExternalDefinitionNode externalDef = (ExternalDefinitionNode) child;
 
 			if (externalDef instanceof PragmaNode
 					|| externalDef instanceof StaticAssertionNode

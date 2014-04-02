@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -394,11 +393,10 @@ public class TypeAnalyzer {
 			List<ObjectType> parameterTypes = new LinkedList<ObjectType>();
 
 			if (hasVariableArgs || !onlyVoid(parameters)) {
-				Iterator<VariableDeclarationNode> parameterIter = parameters
-						.childIterator();
+				Iterable<VariableDeclarationNode> parameterIter = parameters
+						.childIterable();
 
-				while (parameterIter.hasNext()) {
-					VariableDeclarationNode decl = parameterIter.next();
+				for (VariableDeclarationNode decl : parameterIter) {
 					TypeNode parameterTypeNode;
 
 					// C11 6.7.5(2): "An alignment attribute shall not be
@@ -447,8 +445,8 @@ public class TypeAnalyzer {
 				.enumerators();
 		Scope scope = node.getScope();
 		String tag = node.getName(); // could be null
-		Iterator<EnumeratorDeclarationNode> enumeratorIter = enumerators
-				.childIterator();
+		Iterable<EnumeratorDeclarationNode> enumeratorIter = enumerators
+				.childIterable();
 		List<Enumerator> enumeratorList = new LinkedList<Enumerator>();
 		EnumerationType enumerationType = typeFactory
 				.enumerationType(node, tag);
@@ -461,8 +459,7 @@ public class TypeAnalyzer {
 		scope.add(enumeration);
 		enumeration.setDefinition(node);
 		enumeration.addDeclaration(node);
-		while (enumeratorIter.hasNext()) {
-			EnumeratorDeclarationNode decl = enumeratorIter.next();
+		for (EnumeratorDeclarationNode decl : enumeratorIter) {
 			ExpressionNode constantNode = decl.getValue();
 			Enumerator enumerator;
 
@@ -537,13 +534,12 @@ public class TypeAnalyzer {
 			identifier.setEntity(structureOrUnion);
 		structureOrUnion.addDeclaration(node);
 		if (fieldDecls != null) {
-			Iterator<FieldDeclarationNode> fieldIter = fieldDecls
-					.childIterator();
+			Iterable<FieldDeclarationNode> fieldIter = fieldDecls
+					.childIterable();
 			List<Field> fieldList = new LinkedList<Field>();
 
 			structureOrUnion.setDefinition(node);
-			while (fieldIter.hasNext()) {
-				FieldDeclarationNode decl = fieldIter.next();
+			for (FieldDeclarationNode decl : fieldIter) {
 				TypeNode fieldTypeNode = decl.getTypeNode();
 				ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
 				Value bitWidth;
