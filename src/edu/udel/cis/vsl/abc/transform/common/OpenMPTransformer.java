@@ -8,6 +8,7 @@ import java.util.Set;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -26,6 +27,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
+import edu.udel.cis.vsl.abc.util.ExpressionEvaluator;
 import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 /**
@@ -51,13 +53,13 @@ public class OpenMPTransformer extends BaseTransformer {
 	private AttributeKey dependenceKey;
 
 	// Visitor identifies scalars through their "defining" declaration
-	private Set<DeclarationNode> writeVars;
-	private Set<DeclarationNode> readVars;
+	private Set<Entity> writeVars;
+	private Set<Entity> readVars;
 
 	private Set<OperatorNode> writeArrayRefs;
 	private Set<OperatorNode> readArrayRefs;
 
-	private List<DeclarationNode> privateIDs;
+	private List<Entity> privateIDs;
 
 	private SymbolicUniverse universe;
 
@@ -96,13 +98,11 @@ public class OpenMPTransformer extends BaseTransformer {
 			SequenceNode<IdentifierExpressionNode> privateList = ((OmpParallelNode) node)
 					.privateList();
 			if (privateList != null) {
-				privateIDs = new ArrayList<DeclarationNode>();
-				Iterator<IdentifierExpressionNode> it = privateList
-						.childIterator();
+				privateIDs = new ArrayList<Entity>();
+				Iterator<IdentifierExpressionNode> it = privateList.childIterator();
 				while (it.hasNext()) {
-					DeclarationNode dn = it.next().getIdentifier().getEntity()
-							.getDefinition();
-					privateIDs.add(dn);
+					Entity idEnt = it.next().getIdentifier().getEntity();
+					privateIDs.add(idEnt);
 				}
 			} else {
 				privateIDs = null;
@@ -234,8 +234,8 @@ public class OpenMPTransformer extends BaseTransformer {
 			 * RHS
 			 */
 			StatementNode body = fln.getBody();
-			writeVars = new HashSet<DeclarationNode>();
-			readVars = new HashSet<DeclarationNode>();
+			writeVars = new HashSet<Entity>();
+			readVars = new HashSet<Entity>();
 			writeArrayRefs = new HashSet<OperatorNode>();
 			readArrayRefs = new HashSet<OperatorNode>();
 
@@ -258,8 +258,9 @@ public class OpenMPTransformer extends BaseTransformer {
 			/*
 			 * Check for array-based dependences
 			 */
+			boolean hasDeps = hasArrayRefDependences(writeArrayRefs, readArrayRefs);
 			System.out.println("OMP For has array "
-					+ (writeVars.isEmpty() ? "in" : "")
+					+ (hasDeps ? "" : "in")
 					+ "dependent loop iterations");
 
 		} else if (node != null) {
@@ -290,10 +291,9 @@ public class OpenMPTransformer extends BaseTransformer {
 
 			ExpressionNode lhs = assign.getArgument(0);
 			if (lhs instanceof IdentifierExpressionNode) {
-				DeclarationNode idDefn = ((IdentifierExpressionNode) lhs)
-						.getIdentifier().getEntity().getDefinition();
-				if (privateIDs == null || !privateIDs.contains(idDefn)) {
-					writeVars.add(idDefn);
+				Entity idEnt = ((IdentifierExpressionNode) lhs).getIdentifier().getEntity();
+				if (privateIDs == null || !privateIDs.contains(idEnt)) {
+					writeVars.add(idEnt);
 				}
 			} else if (lhs instanceof OperatorNode
 					&& ((OperatorNode) lhs).getOperator() == OperatorNode.Operator.SUBSCRIPT) {
@@ -326,10 +326,10 @@ public class OpenMPTransformer extends BaseTransformer {
 	 */
 	private void collectRHSRefExprs(ASTNode node) {
 		if (node instanceof IdentifierExpressionNode) {
-			DeclarationNode idDefn = ((IdentifierExpressionNode) node)
-					.getIdentifier().getEntity().getDefinition();
-			if (privateIDs == null || !privateIDs.contains(idDefn)) {
-				readVars.add(idDefn);
+			Entity idEnt = ((IdentifierExpressionNode) node)
+					.getIdentifier().getEntity();
+			if (privateIDs == null || !privateIDs.contains(idEnt)) {
+				readVars.add(idEnt);
 			}
 
 		} else if (node instanceof OperatorNode
@@ -357,20 +357,21 @@ public class OpenMPTransformer extends BaseTransformer {
 	private boolean hasArrayRefDependences(Set<OperatorNode> writes,
 			Set<OperatorNode> reads) {
 		for (OperatorNode w : writes) {
-			IdentifierNode baseWrite = (IdentifierNode) w.getArgument(1);
+			IdentifierExpressionNode baseWrite = (IdentifierExpressionNode) w.getArgument(0);
 
 			for (OperatorNode r : reads) {
-				IdentifierNode baseRead = (IdentifierNode) r.getArgument(1);
+				IdentifierExpressionNode baseRead = (IdentifierExpressionNode) r.getArgument(0);
 
-				if (baseWrite.getEntity().getDefinition() != baseRead
-						.getEntity().getDefinition()) {
+				if (baseWrite.getIdentifier().getEntity() == baseRead.getIdentifier().getEntity()) {
 					// Need to check logical equality of these expressions
-					if (!w.getArgument(2).equals(r.getArgument(2))) {
-						return false;
+					if (!ExpressionEvaluator.isEqualIntExpr(w.getArgument(1), r.getArgument(1))) {
+						return true;
 					}
 				}
 			}
 		}
-		return true;
+		return false;
 	}
+	
+	
 }
