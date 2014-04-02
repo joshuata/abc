@@ -134,7 +134,7 @@ public class EntityAnalyzer implements Analyzer {
 	@Override
 	public void analyze(AST ast) throws SyntaxException {
 		ASTNode root = ast.getRootNode();
-		Iterator<ASTNode> children = root.children();
+		Iterable<ASTNode> children = root.children();
 
 		this.rootScope = root.getScope();
 		try {
@@ -142,10 +142,8 @@ public class EntityAnalyzer implements Analyzer {
 		} catch (UnsourcedException e) {
 			throw error(e, root);
 		}
-		while (children.hasNext()) {
-			ASTNode current = children.next();
-
-			processExternalDefinitions((ExternalDefinitionNode) current);
+		for (ASTNode child : children) {
+			processExternalDefinitions((ExternalDefinitionNode) child);
 		}
 		findTentativeDefinitions(rootScope);
 	}
@@ -322,7 +320,7 @@ public class EntityAnalyzer implements Analyzer {
 	// TODO: why don't nodes have "clear" method in them?
 	private void clearNode(ASTNode node) {
 		if (node != null) {
-			Iterator<ASTNode> children = node.children();
+			Iterable<ASTNode> children = node.children();
 
 			if (node instanceof DeclarationNode) {
 				((DeclarationNode) node).setEntity(null);
@@ -363,8 +361,8 @@ public class EntityAnalyzer implements Analyzer {
 			if (node instanceof SwitchNode) {
 				((SwitchNode) node).clear();
 			}
-			while (children.hasNext())
-				clearNode(children.next());
+			for (ASTNode child : children)
+				clearNode(child);
 		}
 	}
 }

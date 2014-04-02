@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.Iterator;
-
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -182,11 +180,10 @@ public class CompoundLiteralAnalyzer {
 	 */
 	private Designation processDesignation(DesignationNode desNode,
 			LiteralTypeNode ltNode) throws SyntaxException {
-		Iterator<DesignatorNode> iter = desNode.childIterator();
+		Iterable<DesignatorNode> iter = desNode.childIterable();
 		Designation result = new Designation(ltNode);
 
-		while (iter.hasNext()) {
-			DesignatorNode designatorNode = iter.next();
+		for (DesignatorNode designatorNode : iter) {
 			int index;
 
 			if (designatorNode instanceof FieldDesignatorNode) {
@@ -226,11 +223,10 @@ public class CompoundLiteralAnalyzer {
 		CommonCompoundLiteralObject result = new CommonCompoundLiteralObject(
 				ltNode, compoundInitNode);
 		Designation position = new Designation(ltNode);
-		Iterator<PairNode<DesignationNode, InitializerNode>> iter = compoundInitNode
-				.childIterator();
+		Iterable<PairNode<DesignationNode, InitializerNode>> iter = compoundInitNode
+				.childIterable();
 
-		while (iter.hasNext()) {
-			PairNode<DesignationNode, InitializerNode> pair = iter.next();
+		for (PairNode<DesignationNode, InitializerNode> pair : iter) {
 			DesignationNode desNode = pair.getLeft();
 			InitializerNode initNode = pair.getRight();
 			LiteralObject subLiteral;

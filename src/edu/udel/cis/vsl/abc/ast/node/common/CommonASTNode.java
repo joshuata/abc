@@ -165,8 +165,8 @@ public abstract class CommonASTNode implements ASTNode {
 	}
 
 	@Override
-	public Iterator<ASTNode> children() {
-		return children.iterator();
+	public Iterable<ASTNode> children() {
+		return children;
 	}
 
 	@Override

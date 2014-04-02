@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -247,10 +246,10 @@ public class SideEffectRemover extends BaseTransformer {
 		ChooseStatementNode result;
 		StatementNode defaultCase = statement.getDefaultCase();
 		Vector<StatementNode> statements = new Vector<StatementNode>();
-		Iterator<StatementNode> iterator = statement.childIterator();
+		Iterable<StatementNode> iterable = statement.childIterable();
 
-		while (iterator.hasNext()) {
-			statements.add(processStatement(iterator.next()));
+		for (StatementNode child : iterable) {
+			statements.add(processStatement(child));
 		}
 		result = nodeFactory.newChooseStatementNode(statement.getSource(),
 				statements);
@@ -874,10 +873,11 @@ public class SideEffectRemover extends BaseTransformer {
 					allItems.add(nodeFactory
 							.newExpressionStatementNode((ExpressionNode) initializer));
 				} else if (initializer instanceof DeclarationListNode) {
-					Iterator<VariableDeclarationNode> iter = ((DeclarationListNode) initializer)
-							.childIterator();
-					while (iter.hasNext()) {
-						allItems.add(iter.next());
+					Iterable<VariableDeclarationNode> iter = ((DeclarationListNode) initializer)
+							.childIterable();
+
+					for (VariableDeclarationNode child : iter) {
+						allItems.add(child);
 					}
 				} else {
 					throw new ABCUnsupportedException(

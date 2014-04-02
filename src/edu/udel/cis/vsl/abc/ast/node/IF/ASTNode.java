@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
@@ -93,7 +92,7 @@ public interface ASTNode {
 	ASTNode child(int index) throws NoSuchElementException;
 
 	/** Returns an iterator over the set of children */
-	Iterator<ASTNode> children();
+	Iterable<ASTNode> children();
 
 	/** Returns a textual representation of this node only. */
 	String toString();

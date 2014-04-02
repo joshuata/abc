@@ -73,16 +73,14 @@ public class CommonAST implements AST {
 		if (node == null) {
 			out.println(prefix + "<absent>");
 		} else {
-			Iterator<ASTNode> children = node.children();
+			Iterable<ASTNode> children = node.children();
 			int childCount = 0;
 
 			node.print(prefix, out, includeSource);
 			out.println();
 			prefix += "| ";
 			// out.println(prefix + node.getScope());
-			while (children.hasNext()) {
-				ASTNode child = (ASTNode) children.next();
-
+			for (ASTNode child : children) {
 				if (child == null)
 					out.println(prefix + childCount + " <absent>");
 				else
@@ -108,12 +106,12 @@ public class CommonAST implements AST {
 		if (node == null)
 			return;
 		else {
-			Iterator<ASTNode> children = node.children();
+			Iterable<ASTNode> children = node.children();
 
 			node.setOwner(null);
 			node.setId(-1);
-			while (children.hasNext())
-				nullifyOwners(children.next());
+			for (ASTNode child : children)
+				nullifyOwners(child);
 		}
 	}
 
@@ -128,7 +126,7 @@ public class CommonAST implements AST {
 	}
 
 	private void setIDsAndOwner(ASTNode node) {
-		Iterator<ASTNode> children;
+		Iterable<ASTNode> children;
 
 		if (node == null)
 			return;
@@ -141,23 +139,19 @@ public class CommonAST implements AST {
 		node.setOwner(this);
 		nodeCount++;
 		children = node.children();
-		while (children.hasNext()) {
-			ASTNode child = (ASTNode) children.next();
-
+		for (ASTNode child : children) {
 			setIDsAndOwner(child);
 		}
 	}
 
 	private void initializeNodeArray(ASTNode node) {
-		Iterator<ASTNode> children;
+		Iterable<ASTNode> children;
 
 		if (node == null)
 			return;
 		this.nodes[node.id()] = node;
 		children = node.children();
-		while (children.hasNext()) {
-			ASTNode child = children.next();
-
+		for (ASTNode child : children) {
 			initializeNodeArray(child);
 		}
 	}

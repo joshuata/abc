@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.common.compound;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
@@ -65,10 +64,11 @@ public class CommonCompoundInitializerNode extends
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		boolean result = true;
+		Iterable<PairNode<DesignationNode, InitializerNode>> iter = childIterable();
 
-		Iterator<PairNode<DesignationNode, InitializerNode>> iter = childIterator();
-		while (iter.hasNext()) {
-			InitializerNode init = iter.next().getRight();
+		for (PairNode<DesignationNode, InitializerNode> pair : iter) {
+			InitializerNode init = pair.getRight();
+
 			result = result && init.isSideEffectFree(errorsAreSideEffects);
 		}
 		return result;
