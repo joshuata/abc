@@ -21,7 +21,7 @@ int main (int argc, char *argv[]) {
       
 #pragma omp parallel for
 	for (i=0; i < N-1; i++)
-	  a[i+1] = a[i+2-1] + 1;
+	  a[i+1] = a[1+i] + 1;
 	  //a[i+2-1] = a[(-2*3) + 2*i - i + 7] + 1;
       
       /*
