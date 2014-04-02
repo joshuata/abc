@@ -49,9 +49,15 @@ typedef struct __MPI_Comm_record *MPI_Request;
 #define MPI_STATUS_IGNORE NULL
 #define MPI_STATUSES_IGNORE NULL
 
+/********************************* Communicator *******************************************/
+
+MPI_Comm MPI_COMM_WORLD;
+
 /********************************* Functions *******************************************/
 
 int MPI_Init(int *argc, char *** argv);
+
+int _MPI_Init(void);
 
 int MPI_Finalize(void);
 

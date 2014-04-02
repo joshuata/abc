@@ -2,9 +2,9 @@
  * function prototypes used in the CIVL-C language.
  */
  
-#ifdef __CIVLC__COMMON
+#ifdef __CIVLC_COMMON__
 #else
-#define __CIVLC__COMMON
+#define __CIVLC_COMMON__
 
 // Standard constants, typedefs:
 
