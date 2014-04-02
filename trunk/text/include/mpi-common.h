@@ -57,7 +57,7 @@ MPI_Comm MPI_COMM_WORLD;
 
 int MPI_Init(int *argc, char *** argv);
 
-int _MPI_Init(void);
+int __MPI_Init(void);
 
 int MPI_Finalize(void);
 
