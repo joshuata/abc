@@ -115,4 +115,9 @@ public class CommonFunctionDeclarationNode extends
 		return NodeKind.FUNCTION_DECLARATION;
 	}
 
+	@Override
+	public OrdinaryDeclarationKind ordinaryDeclarationKind() {
+		return OrdinaryDeclarationKind.FUNCTION_DECLARATION;
+	}
+
 }

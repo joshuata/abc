@@ -47,4 +47,10 @@ public class CommonStaticAssertionNode extends CommonASTNode implements
 		return NodeKind.STATIC_ASSERTION;
 	}
 
+	@Override
+	public BlockItemKind blockItemKind() {
+		// TODO Auto-generated method stub
+		return BlockItemKind.STATIC_ASSERTION;
+	}
+
 }

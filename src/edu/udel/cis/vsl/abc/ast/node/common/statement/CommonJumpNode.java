@@ -3,10 +3,9 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.JumpNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonJumpNode extends CommonASTNode implements JumpNode {
+public class CommonJumpNode extends CommonStatementNode implements JumpNode {
 
 	private JumpKind jumpKind;
 
@@ -43,11 +42,6 @@ public class CommonJumpNode extends CommonASTNode implements JumpNode {
 	@Override
 	public JumpNode copy() {
 		return new CommonJumpNode(getSource(), getKind());
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override

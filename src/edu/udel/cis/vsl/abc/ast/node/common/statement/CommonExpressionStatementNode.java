@@ -4,11 +4,10 @@ import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonExpressionStatementNode extends CommonASTNode implements
-		ExpressionStatementNode {
+public class CommonExpressionStatementNode extends CommonStatementNode
+		implements ExpressionStatementNode {
 
 	public CommonExpressionStatementNode(Source source,
 			ExpressionNode expression) {
@@ -29,11 +28,6 @@ public class CommonExpressionStatementNode extends CommonASTNode implements
 	public ExpressionStatementNode copy() {
 		return new CommonExpressionStatementNode(getSource(),
 				duplicate(getExpression()));
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override

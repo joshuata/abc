@@ -5,10 +5,9 @@ import java.io.PrintStream;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LabeledStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
-import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonLabeledStatementNode extends CommonASTNode implements
+public class CommonLabeledStatementNode extends CommonStatementNode implements
 		LabeledStatementNode {
 
 	public CommonLabeledStatementNode(Source source, LabelNode label,
@@ -35,11 +34,6 @@ public class CommonLabeledStatementNode extends CommonASTNode implements
 	public LabeledStatementNode copy() {
 		return new CommonLabeledStatementNode(getSource(),
 				duplicate(getLabel()), duplicate(getStatement()));
-	}
-
-	@Override
-	public NodeKind nodeKind() {
-		return NodeKind.STATEMENT;
 	}
 
 	@Override

@@ -50,5 +50,10 @@ public class CommonAbstractFunctionDefinitionNode extends
 	public int continuity() {
 		return continuity;
 	}
+	
+	@Override
+	public OrdinaryDeclarationKind ordinaryDeclarationKind() {
+		return OrdinaryDeclarationKind.ABSTRACT_FUNCTION_DEFINITION;
+	}
 
 }

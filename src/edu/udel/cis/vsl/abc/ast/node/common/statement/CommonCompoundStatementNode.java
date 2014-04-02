@@ -30,4 +30,9 @@ public class CommonCompoundStatementNode extends
 		return StatementKind.COMPOUND;
 	}
 
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.STATEMENT;
+	}
+
 }

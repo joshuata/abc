@@ -43,4 +43,9 @@ public class CommonChooseStatementNode extends
 		return StatementKind.CHOOSE;
 	}
 
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.STATEMENT;
+	}
+
 }

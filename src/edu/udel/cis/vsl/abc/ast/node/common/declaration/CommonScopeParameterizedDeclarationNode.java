@@ -82,4 +82,9 @@ public class CommonScopeParameterizedDeclarationNode extends CommonASTNode
 		return NodeKind.SCOPE_PARAMETERIZED_DECLARATION;
 	}
 
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.SCOPED_DECLARATION;
+	}
+
 }
