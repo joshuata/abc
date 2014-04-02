@@ -2402,8 +2402,6 @@ public class ASTBuilder {
 			} else {
 				SequenceNode<VariableDeclarationNode> newFormalSequenceNode;
 				List<VariableDeclarationNode> newFormalList = new LinkedList<VariableDeclarationNode>();
-				Iterable<VariableDeclarationNode> formals = formalSequenceNode
-						.childIterable();
 				Map<String, VariableDeclarationNode> declMap = new HashMap<String, VariableDeclarationNode>();
 
 				for (int i = 0; i < numDeclarations; i++) {
@@ -2433,7 +2431,7 @@ public class ASTBuilder {
 								(VariableDeclarationNode) definition);
 					}
 				}
-				for (VariableDeclarationNode formal : formals) {
+				for (VariableDeclarationNode formal : formalSequenceNode) {
 					String parameterName = formal.getIdentifier().name();
 					VariableDeclarationNode newDeclaration;
 

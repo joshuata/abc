@@ -172,9 +172,7 @@ public class DeclarationAnalyzer {
 			processGotos(body);
 		}
 		if (contract != null) {
-			Iterable<ContractNode> contractIter = contract.childIterable();
-
-			for (ContractNode clause : contractIter) {
+			for (ContractNode clause : contract) {
 				if (clause instanceof RequiresNode) {
 					ExpressionNode expression = ((RequiresNode) clause)
 							.getExpression();
@@ -447,18 +445,12 @@ public class DeclarationAnalyzer {
 			declaration.setIsDefinition(true);
 		}
 		if (typeAlignmentSpecifiers != null) {
-			Iterable<TypeNode> typeIter = typeAlignmentSpecifiers
-					.childIterable();
-
-			for (TypeNode child : typeIter)
+			for (TypeNode child : typeAlignmentSpecifiers)
 				variable.addTypeAlignment(entityAnalyzer.typeAnalyzer
 						.processTypeNode(child));
 		}
 		if (constantAlignmentSpecifiers != null) {
-			Iterable<ExpressionNode> expressionIter = constantAlignmentSpecifiers
-					.childIterable();
-
-			for (ExpressionNode expression : expressionIter){
+			for (ExpressionNode expression : constantAlignmentSpecifiers) {
 				Value constant = entityAnalyzer.valueOf(expression);
 
 				if (constant == null)

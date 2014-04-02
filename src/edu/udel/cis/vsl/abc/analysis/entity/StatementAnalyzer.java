@@ -264,10 +264,9 @@ public class StatementAnalyzer {
 			} else if (initializer instanceof ExpressionNode) {
 				processExpression((ExpressionNode) initializer);
 			} else if (initializer instanceof DeclarationListNode) {
-				Iterable<VariableDeclarationNode> declIter = ((DeclarationListNode) initializer)
-						.childIterable();
+				DeclarationListNode declarationList = (DeclarationListNode) initializer;
 
-				for (VariableDeclarationNode child : declIter)
+				for (VariableDeclarationNode child : declarationList)
 					entityAnalyzer.declarationAnalyzer
 							.processVariableDeclaration(child);
 			} else
@@ -323,10 +322,9 @@ public class StatementAnalyzer {
 				throw error("Guard has non-scalar type " + guardType, guard);
 			processStatement(((WhenNode) statement).getBody());
 		} else if (statement instanceof ChooseStatementNode) {
-			Iterable<StatementNode> children = ((ChooseStatementNode) statement)
-					.childIterable();
+			ChooseStatementNode chooseStatement = (ChooseStatementNode) statement;
 
-			for (StatementNode child : children)
+			for (StatementNode child : chooseStatement)
 				processStatement(child);
 		} else if (statement instanceof WaitNode) {
 			processExpression(((WaitNode) statement).getExpression());
@@ -433,9 +431,7 @@ public class StatementAnalyzer {
 	 */
 	void processCompoundStatement(CompoundStatementNode node)
 			throws SyntaxException {
-		Iterable<BlockItemNode> items = node.childIterable();
-
-		for (BlockItemNode item : items) {
+		for (BlockItemNode item : node) {
 			if (item instanceof StatementNode)
 				processStatement((StatementNode) item);
 			else if (item instanceof StructureOrUnionTypeNode)

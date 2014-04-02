@@ -55,12 +55,12 @@ public class MPITransformer extends BaseTransformer {
 	private static String GCOMM_DESTROY = "$gcomm_destroy";
 	private static String COMM_DESTROY = "$comm_destroy";
 	private static String MPI_MAIN = "__main";
-	private static String MPI_RANK = "_rank";
+	private static String MPI_RANK = "__rank";
 	private static String MPI_INIT = "MPI_Init";
-	private static String MPI_INIT_NEW = "_MPI_Init";
+	private static String MPI_INIT_NEW = "__MPI_Init";
 	private static String MPI_PROCESS = "MPI_Process";
-	private static String NPROCS = "NPROCS";
-	private static String PROCS = "procs";
+	private static String NPROCS = "__NPROCS";
+	private static String PROCS = "__procs";
 	private static String WAIT = "$wait";
 	private static String PROC_TYPE = "$proc";
 

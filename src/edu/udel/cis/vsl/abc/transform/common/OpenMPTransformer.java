@@ -98,9 +98,7 @@ public class OpenMPTransformer extends BaseTransformer {
 					.privateList();
 			if (privateList != null) {
 				privateIDs = new ArrayList<Entity>();
-				Iterable<IdentifierExpressionNode> it = privateList
-						.childIterable();
-				for (IdentifierExpressionNode idExpression : it) {
+				for (IdentifierExpressionNode idExpression : privateList) {
 					Entity idEnt = idExpression.getIdentifier().getEntity();
 
 					privateIDs.add(idEnt);
@@ -192,7 +190,7 @@ public class OpenMPTransformer extends BaseTransformer {
 				if (initializer instanceof SequenceNode<?>) {
 					SequenceNode<VariableDeclarationNode> decls = (SequenceNode<VariableDeclarationNode>) initializer;
 					Iterator<VariableDeclarationNode> it = (Iterator<VariableDeclarationNode>) decls
-							.childIterable();
+							.iterator();
 					VariableDeclarationNode vdn = it.next();
 					if (it.hasNext()) {
 						assert false : "OpenMP Canonical Loop Form violated (single initializer only) :"
