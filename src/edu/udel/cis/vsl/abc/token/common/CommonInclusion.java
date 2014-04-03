@@ -22,10 +22,11 @@ public class CommonInclusion implements Inclusion {
 	 */
 	private Token includeToken;
 
-	public CommonInclusion(File file) {
+	public CommonInclusion(File file, String shortName) {
 		assert file != null;
 		this.file = file;
 		this.includeToken = null;
+		this.shortName = shortName;
 	}
 
 	public CommonInclusion(File file, Token includeToken, String shortName) {

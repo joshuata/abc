@@ -149,4 +149,8 @@ public interface Preprocessor {
 
 	TokenFactory getTokenFactory();
 
+	String shortFileName(String fileName);
+
+	void printShorterFileNameMap(PrintStream out);
+
 }

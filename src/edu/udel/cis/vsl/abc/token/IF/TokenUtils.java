@@ -1,9 +1,6 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
 import java.io.File;
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.Token;
@@ -23,17 +20,6 @@ public class TokenUtils {
 	 */
 	public final static int summaryBound = 10;
 
-	private static HashMap<String, Integer> fileNameMap= new LinkedHashMap<String, Integer>();
-
-	public final static String SHORT_FILE_NAME_PREFIX = "f";
-
-	// /**
-	// * Initialize the file name map.
-	// */
-	// public static void initialization(){
-	// fileNameMap = new LinkedHashMap<String, Integer>();
-	// }
-	
 	/**
 	 * A utility function to extract the filename, line number, and character
 	 * index of a token of any type, and return a string representation of this
@@ -71,6 +57,11 @@ public class TokenUtils {
 			File file = ppToken.getSourceFile();
 
 			filename = file.getName();
+			if (abbreviated) {
+				Formation formation = ppToken.getFormation();
+
+				return ((Inclusion) formation).fileShortName();
+			}
 		} else {
 			CharStream stream = token.getInputStream();
 
@@ -82,35 +73,7 @@ public class TokenUtils {
 		separatorIndex = filename.lastIndexOf(File.pathSeparatorChar);
 		if (separatorIndex >= 0 && separatorIndex < filename.length() - 1)
 			filename = filename.substring(separatorIndex + 1);
-		if (abbreviated) {
-			if (fileNameMap.containsKey(filename)) {
-				filename = SHORT_FILE_NAME_PREFIX + fileNameMap.get(filename);
-			} else {
-				int index = fileNameMap.size();
-
-				fileNameMap.put(filename, index);
-				filename = SHORT_FILE_NAME_PREFIX + index;
-			}
-		}
 		return filename;
-	}
-
-	/**
-	 * Print the list of shorter file names and the corresponding original file
-	 * names
-	 * 
-	 * @param out
-	 *            The output stream to be used.
-	 */
-	public static void printShorterFileNameMap(PrintStream out) {
-		if (fileNameMap.size() > 0) {
-			out.println();
-			out.println("File name list:");
-			for (String fileName : fileNameMap.keySet()) {
-				out.println(SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName)
-						+ "\t: " + fileName);
-			}
-		}
 	}
 
 	public static String summarizeRangeLocation(CToken first, CToken last,

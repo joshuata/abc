@@ -22,7 +22,7 @@ public interface TokenFactory {
 	 * @param file
 	 * @return
 	 */
-	Inclusion newInclusion(File file);
+	Inclusion newInclusion(File file, String shortName);
 
 	Inclusion newInclusion(File file, Token includeToken, String shortName);
 

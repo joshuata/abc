@@ -70,10 +70,10 @@ public class CommonSource implements Source {
 		return TokenUtils.summarizeRange(firstToken, lastToken, abbreviated);
 	}
 
-	@Override
-	public void printShorterFileNameMap(PrintStream out) {
-		TokenUtils.printShorterFileNameMap(out);
-	}
+	// @Override
+	// public void printShorterFileNameMap(PrintStream out) {
+	// TokenUtils.printShorterFileNameMap(out);
+	// }
 }
 
 class SourceTokenIterator implements Iterator<CToken> {

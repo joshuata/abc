@@ -23,6 +23,7 @@ import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.preproc.IF.IllegalMacroArgumentException;
+import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
@@ -154,6 +155,8 @@ public class CommonCTokenSource implements CTokenSource {
 	 */
 	private int outputTokenCount = 0;
 
+	private Preprocessor preprocessor;
+
 	// Constructors...
 
 	/**
@@ -175,15 +178,16 @@ public class CommonCTokenSource implements CTokenSource {
 	 */
 	public CommonCTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
-			Map<String, Macro> macroMap, TokenFactory tokenFactory)
-			throws PreprocessorException {
+			Map<String, Macro> macroMap, TokenFactory tokenFactory,
+			Preprocessor preprocessor) throws PreprocessorException {
 		assert systemIncludePaths != null;
 		assert userIncludePaths != null;
 		this.originalSourceFile = source;
 		this.tokenFactory = tokenFactory;
+		this.preprocessor = preprocessor;
 		try {
 			Tree tree = (Tree) parser.file().getTree();
-			Formation history = tokenFactory.newInclusion(source);
+			Formation history = tokenFactory.newInclusion(source, preprocessor.shortFileName(source.getName()));
 			PreprocessorSourceFileInfo fileInfo = new PreprocessorSourceFileInfo(
 					history, parser, tree, tree);
 			StringPredicate macroDefinedPredicate = new MacroDefinedPredicate(
@@ -208,9 +212,10 @@ public class CommonCTokenSource implements CTokenSource {
 
 	public CommonCTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
-			TokenFactory tokenFactory) throws PreprocessorException {
+			TokenFactory tokenFactory, Preprocessor preprocessor)
+			throws PreprocessorException {
 		this(source, parser, systemIncludePaths, userIncludePaths,
-				new HashMap<String, Macro>(), tokenFactory);
+				new HashMap<String, Macro>(), tokenFactory, preprocessor);
 	}
 
 	// Implementation of methods from CTokenSource...
@@ -1288,7 +1293,8 @@ public class CommonCTokenSource implements CTokenSource {
 					+ file);
 		tree = (Tree) fileReturn.getTree();
 		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(file,
-				filenameToken, ""), parser, tree, tree.getChild(0));
+				filenameToken, preprocessor.shortFileName(filename)), parser,
+				tree, tree.getChild(0));
 	}
 
 	/**
