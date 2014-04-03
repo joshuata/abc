@@ -77,11 +77,8 @@ public class CommonProgram implements Program {
 	@Override
 	public void apply(Transformer transformer) throws SyntaxException {
 		ast = transformer.transform(ast);
-		// MPI transformer ignores the standard analysis for this moment.
-		// if (!transformer.getCode().equals(MPITransformer.CODE)) {
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
-		// }
 	}
 
 	@Override
