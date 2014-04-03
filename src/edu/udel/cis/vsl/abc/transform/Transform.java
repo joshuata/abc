@@ -8,8 +8,6 @@ import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.transform.IF.TransformRecord;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
-import edu.udel.cis.vsl.abc.transform.common.OpenMPTransformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
@@ -52,22 +50,23 @@ public class Transform {
 				}
 			},
 
-			new TransformRecord(MPITransformer.CODE, MPITransformer.LONG_NAME,
-					MPITransformer.SHORT_DESCRIPTION) {
-				@Override
-				public Transformer create(ASTFactory astFactory) {
-					return new MPITransformer(astFactory);
-				}
-			},
-
-			new TransformRecord(OpenMPTransformer.CODE,
-					OpenMPTransformer.LONG_NAME,
-					OpenMPTransformer.SHORT_DESCRIPTION) {
-				@Override
-				public Transformer create(ASTFactory astFactory) {
-					return new OpenMPTransformer(astFactory);
-				}
-			},
+			// new TransformRecord(MPITransformer.CODE,
+			// MPITransformer.LONG_NAME,
+			// MPITransformer.SHORT_DESCRIPTION) {
+			// @Override
+			// public Transformer create(ASTFactory astFactory) {
+			// return new MPITransformer(astFactory);
+			// }
+			// },
+			//
+			// new TransformRecord(OpenMPTransformer.CODE,
+			// OpenMPTransformer.LONG_NAME,
+			// OpenMPTransformer.SHORT_DESCRIPTION) {
+			// @Override
+			// public Transformer create(ASTFactory astFactory) {
+			// return new OpenMPTransformer(astFactory);
+			// }
+			// },
 
 			new TransformRecord(Pruner.CODE, Pruner.LONG_NAME,
 					Pruner.SHORT_DESCRIPTION) {
