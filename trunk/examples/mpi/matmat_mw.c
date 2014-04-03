@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 	fscanf(fp,"%lf", &a[i][j]);
     for (i = 0; i < L; i++)
       for (j = 0; j < M; j++)
-	fscanf(fp,"%lf",&b[i][j]);
+	    fscanf(fp,"%lf",&b[i][j]);
     MPI_Bcast(b, L*M, MPI_DOUBLE, 0, comm);
     for (count = 0; count < nprocs-1 && count < N; count++)
       MPI_Send(&a[count][0], L, MPI_DOUBLE, count+1, count+1, comm);
@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
       MPI_Recv(tmp, M, MPI_DOUBLE, MPI_ANY_SOURCE, MPI_ANY_TAG, comm, &status);
       for (j = 0; j < M; j++) c[status.MPI_TAG-1][j] = tmp[j];
       if (count < N) {
-	MPI_Send(&a[count][0], L, MPI_DOUBLE, status.MPI_SOURCE, count+1, comm);
-	count++;
+	    MPI_Send(&a[count][0], L, MPI_DOUBLE, status.MPI_SOURCE, count+1, comm);
+	    zcount++;
       }
     }
     for (i = 1; i < nprocs; i++) MPI_Send(NULL, 0, MPI_INT, i, 0, comm);

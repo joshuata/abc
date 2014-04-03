@@ -8,7 +8,6 @@ import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.transform.IF.TransformRecord;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.abc.transform.common.IOTransformer;
 import edu.udel.cis.vsl.abc.transform.common.MPITransformer;
 import edu.udel.cis.vsl.abc.transform.common.OpenMPTransformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
@@ -58,14 +57,6 @@ public class Transform {
 				@Override
 				public Transformer create(ASTFactory astFactory) {
 					return new MPITransformer(astFactory);
-				}
-			},
-
-			new TransformRecord(IOTransformer.CODE, IOTransformer.LONG_NAME,
-					IOTransformer.SHORT_DESCRIPTION) {
-				@Override
-				public Transformer create(ASTFactory astFactory) {
-					return new IOTransformer(astFactory);
 				}
 			},
 
