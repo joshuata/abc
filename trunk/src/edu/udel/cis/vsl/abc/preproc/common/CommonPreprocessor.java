@@ -61,7 +61,7 @@ public class CommonPreprocessor implements Preprocessor {
 
 	private TokenFactory tokenFactory = Tokens.newTokenFactory();
 
-	private HashMap<String, Integer> fileNameMap = new LinkedHashMap<String, Integer>();
+	private HashMap<String, Integer> fileNameMap = new LinkedHashMap<>();
 
 	public CommonPreprocessor(File[] systemIncludePaths, File[] userIncludePaths) {
 		this.systemIncludePaths = systemIncludePaths;
@@ -182,6 +182,37 @@ public class CommonPreprocessor implements Preprocessor {
 		}
 	}
 
+	@Override
+	public String shortFileName(String fileName) {
+		if (fileNameMap.containsKey(fileName)) {
+			return SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName);
+		} else {
+			int index = fileNameMap.size();
+
+			fileNameMap.put(fileName, index);
+			return SHORT_FILE_NAME_PREFIX + index;
+		}
+	}
+
+	/**
+	 * Print the list of shorter file names and the corresponding original file
+	 * names
+	 * 
+	 * @param out
+	 *            The output stream to be used.
+	 */
+	@Override
+	public void printShorterFileNameMap(PrintStream out) {
+		if (fileNameMap.size() > 0) {
+			out.println();
+			out.println("File name list:");
+			for (String fileName : fileNameMap.keySet()) {
+				out.println(SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName)
+						+ "\t: " + fileName);
+			}
+		}
+	}
+
 	/**
 	 * Scans and parses the given preprocessor source file, sending a textual
 	 * description of the resulting tree to out. This does not execute any
@@ -225,7 +256,8 @@ public class CommonPreprocessor implements Preprocessor {
 			throws PreprocessorException {
 		PreprocessorParser parser = parser(file);
 		CommonCTokenSource tokenSource = new CommonCTokenSource(file, parser,
-				systemIncludePaths, userIncludePaths, macroMap, tokenFactory);
+				systemIncludePaths, userIncludePaths, macroMap, tokenFactory,
+				this);
 
 		return tokenSource;
 	}

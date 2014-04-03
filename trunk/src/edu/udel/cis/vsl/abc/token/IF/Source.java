@@ -74,13 +74,13 @@ public interface Source {
 	 */
 	String getSummary(boolean abbreviated);
 
-	/**
-	 * Print the list of shorter file names and the corresponding original file
-	 * names.
-	 * 
-	 * @param out
-	 *            The output stream to be used.
-	 */
-	void printShorterFileNameMap(PrintStream out);
+//	/**
+//	 * Print the list of shorter file names and the corresponding original file
+//	 * names.
+//	 * 
+//	 * @param out
+//	 *            The output stream to be used.
+//	 */
+//	void printShorterFileNameMap(PrintStream out);
 
 }
