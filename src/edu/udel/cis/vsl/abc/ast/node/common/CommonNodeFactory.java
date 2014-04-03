@@ -142,6 +142,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonNullStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonSwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonWaitNode;
+import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonWhenNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonAtomicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonBasicTypeNode;
