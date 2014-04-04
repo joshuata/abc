@@ -19,12 +19,20 @@ public interface ASTNode {
 	 * @author siegel
 	 * 
 	 */
-	//useful in CIVL's model builder worker, to get rid of long branches of if-else
+	// useful in CIVL's model builder worker, to get rid of long branches of
+	// if-else
 	public enum NodeKind {
 		PAIR, SEQUENCE, IDENTIFIER, PRAGMA, STATIC_ASSERTION,
 		// COMPOUND_INITIALIZER,
-		DESIGNATION, ARRAY_DESIGNATOR, FIELD_DESIGNATOR, ENUMERATOR_DECLARATION, FIELD_DECLARATION, 
-		VARIABLE_DECLARATION, FUNCTION_DECLARATION, FUNCTION_DEFINITION, TYPEDEF,
+		DESIGNATION,
+		ARRAY_DESIGNATOR,
+		FIELD_DESIGNATOR,
+		ENUMERATOR_DECLARATION,
+		FIELD_DECLARATION,
+		VARIABLE_DECLARATION,
+		FUNCTION_DECLARATION,
+		FUNCTION_DEFINITION,
+		TYPEDEF,
 		// ALIGNOF,
 		// ARROW,
 		// CAST,
@@ -34,12 +42,14 @@ public interface ASTNode {
 		// ENUMERATION_CONSTANT,
 		// FLOATING_CONSTANT,
 		// FUNCTION_CALL,
-		GENERIC_SELECTION, IDENTIFIER_EXPRESSION,
+		GENERIC_SELECTION,
+		IDENTIFIER_EXPRESSION,
 		// INTEGER_CONSTANT,
 		// OPERATOR,
 		// SIZEOF,
 		// STRING_LITERAL,
-		ORDINARY_LABEL, SWITCH_LABEL,
+		ORDINARY_LABEL,
+		SWITCH_LABEL,
 		// COMPOUND_STATEMENT,
 		DECLARATION_LIST,
 		// EXPRESSION_STATEMENT,
@@ -53,18 +63,35 @@ public interface ASTNode {
 		// RETURN,
 		// LABELED_STATEMENT,
 		// SWITCH,
-		ARRAY_TYPE, ATOMIC_TYPE, BASIC_TYPE, ENUMERATION_TYPE, FUNCTION_TYPE, POINTER_TYPE, STRUCT_OR_UNION_TYPE, TYPEDEF_NAME, PROCESS_TYPE, SELF,
+		ARRAY_TYPE,
+		ATOMIC_TYPE,
+		BASIC_TYPE,
+		ENUMERATION_TYPE,
+		FUNCTION_TYPE,
+		POINTER_TYPE,
+		STRUCT_OR_UNION_TYPE,
+		TYPEDEF_NAME,
+		PROCESS_TYPE,
+		SELF,
 		// SPAWN,
 		// WAIT,
 		// ASSERT,
 		// ASSUME,
 		// WHEN,
 		// CHOOSE,
-		INVARIANT, ENSURES, REQUIRES, COLLECTIVE, RESULT,
+		INVARIANT,
+		ENSURES,
+		REQUIRES,
+		COLLECTIVE,
+		RESULT,
 		// REMOTE_REFERENCE,
 		SCOPE_PARAMETERIZED_DECLARATION,
 		// CONSTANT,
-		TYPE, EXPRESSION, STATEMENT, OMP_NODE, OMP_REDUCTION_OPERATOR
+		TYPE,
+		EXPRESSION,
+		STATEMENT,
+		OMP_NODE,
+		OMP_REDUCTION_OPERATOR
 	};
 
 	/** ID number unique within the AST to which this node belongs. */
@@ -91,7 +118,11 @@ public interface ASTNode {
 	 */
 	ASTNode child(int index) throws NoSuchElementException;
 
-	/** Returns an iterator over the set of children */
+	/**
+	 * Returns the sequence of children of this node as an iterable object. Do
+	 * not attempt to cast the iterable to another type and/or modify it; if you
+	 * do, all bets are off. Use it only to iterate over the children.
+	 */
 	Iterable<ASTNode> children();
 
 	/** Returns a textual representation of this node only. */
