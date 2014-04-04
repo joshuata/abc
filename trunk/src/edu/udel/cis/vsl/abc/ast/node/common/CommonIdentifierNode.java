@@ -13,10 +13,6 @@ public class CommonIdentifierNode extends CommonASTNode implements
 
 	private Entity entity;
 
-	// private List<DeclarationNode> declarations;
-
-	// private DeclarationNode definition;
-
 	public CommonIdentifierNode(Source source, String name) {
 		super(source);
 		this.name = name;
@@ -46,26 +42,6 @@ public class CommonIdentifierNode extends CommonASTNode implements
 	public void setEntity(Entity entity) {
 		this.entity = entity;
 	}
-
-	// @Override
-	// public Iterator<DeclarationNode> getDeclarations() {
-	// return declarations.iterator();
-	// }
-	//
-	// @Override
-	// public void addDeclaration(DeclarationNode declaration) {
-	// declarations.add(declaration);
-	// }
-	//
-	// @Override
-	// public DeclarationNode getDefinition() {
-	// return definition;
-	// }
-	//
-	// @Override
-	// public void setDefinition(DeclarationNode declaration) {
-	// this.definition = declaration;
-	// }
 
 	@Override
 	public IdentifierNode copy() {
