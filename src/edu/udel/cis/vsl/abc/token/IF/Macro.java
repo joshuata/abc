@@ -64,4 +64,5 @@ public interface Macro {
 	 */
 	File getFile();
 
+	String shortFileName();
 }

@@ -7,5 +7,6 @@ public interface Formation {
 	String suffix();
 
 	File getLastFile();
-
+	
+	String fileShortName();
 }

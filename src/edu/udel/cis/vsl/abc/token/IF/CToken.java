@@ -28,6 +28,8 @@ public interface CToken extends Token {
 	 * @return the source file
 	 */
 	File getSourceFile();
+	
+	String getFileShortName();
 
 	/**
 	 * Sets the next token in the sequence. The next token, if non-null, should

@@ -67,9 +67,9 @@ public interface TokenFactory {
 
 	// Macros...
 
-	ObjectMacro newObjectMacro(Tree definitionNode, File file);
+	ObjectMacro newObjectMacro(Tree definitionNode, File file, String shortFileName);
 
-	FunctionMacro newFunctionMacro(Tree definitionNode, File file);
+	FunctionMacro newFunctionMacro(Tree definitionNode, File file, String shotFileName);
 
 	// Deprecated...
 

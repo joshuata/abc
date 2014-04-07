@@ -148,13 +148,13 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public ObjectMacro newObjectMacro(Tree definitionNode, File file) {
-		return new CommonObjectMacro(definitionNode, file);
+	public ObjectMacro newObjectMacro(Tree definitionNode, File file, String shortFileName) {
+		return new CommonObjectMacro(definitionNode, file, shortFileName);
 	}
 
 	@Override
-	public FunctionMacro newFunctionMacro(Tree definitionNode, File file) {
-		return new CommonFunctionMacro(definitionNode, file);
+	public FunctionMacro newFunctionMacro(Tree definitionNode, File file, String shortFileName) {
+		return new CommonFunctionMacro(definitionNode, file, shortFileName);
 	}
 
 	@Override

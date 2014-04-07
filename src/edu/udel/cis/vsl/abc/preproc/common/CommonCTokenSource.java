@@ -187,7 +187,8 @@ public class CommonCTokenSource implements CTokenSource {
 		this.preprocessor = preprocessor;
 		try {
 			Tree tree = (Tree) parser.file().getTree();
-			Formation history = tokenFactory.newInclusion(source, preprocessor.shortFileName(source.getName()));
+			Formation history = tokenFactory.newInclusion(source,
+					preprocessor.shortFileName(source.getName()));
 			PreprocessorSourceFileInfo fileInfo = new PreprocessorSourceFileInfo(
 					history, parser, tree, tree);
 			StringPredicate macroDefinedPredicate = new MacroDefinedPredicate(
@@ -1011,12 +1012,15 @@ public class CommonCTokenSource implements CTokenSource {
 	 *             if the macro has already been defined differently
 	 */
 	private void processMacroDefinition(Tree node) throws PreprocessorException {
+		File sourceFile = getCurrentSource();
+		String fileName = sourceFile.getName();
+
 		if (node.getChildCount() == 3)
 			processMacroDefinition(tokenFactory.newFunctionMacro(node,
-					getCurrentSource()));
+					sourceFile, preprocessor.shortFileName(fileName)));
 		else
 			processMacroDefinition(tokenFactory.newObjectMacro(node,
-					getCurrentSource()));
+					sourceFile, preprocessor.shortFileName(fileName)));
 	}
 
 	/**

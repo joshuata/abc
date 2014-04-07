@@ -8,8 +8,8 @@ import edu.udel.cis.vsl.abc.token.IF.ObjectMacro;
 
 public class CommonObjectMacro extends CommonMacro implements ObjectMacro {
 
-	public CommonObjectMacro(Tree definitionNode, File file) {
-		super(definitionNode, file);
+	public CommonObjectMacro(Tree definitionNode, File file, String shortFileName) {
+		super(definitionNode, file, shortFileName);
 	}
 
 	@Override

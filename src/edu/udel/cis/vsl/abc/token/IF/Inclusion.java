@@ -22,5 +22,4 @@ public interface Inclusion extends Formation {
 	 */
 	Token getIncludeToken();
 
-	String fileShortName();
 }
