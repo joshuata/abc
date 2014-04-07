@@ -22,9 +22,12 @@ public abstract class CommonMacro implements Macro {
 
 	protected File file;
 
-	protected CommonMacro(Tree definitionNode, File file) {
+	protected String fileShortName;
+
+	protected CommonMacro(Tree definitionNode, File file, String shortFileName) {
 		this.definitionNode = definitionNode;
 		this.file = file;
+		this.fileShortName = shortFileName;
 	}
 
 	@Override
@@ -75,5 +78,10 @@ public abstract class CommonMacro implements Macro {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public String shortFileName() {
+		return this.fileShortName;
 	}
 }

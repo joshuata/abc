@@ -70,4 +70,9 @@ public class CommonMacroExpansion implements MacroExpansion {
 		return macro.getFile();
 	}
 
+	@Override
+	public String fileShortName() {
+		return this.macro.shortFileName();
+	}
+
 }

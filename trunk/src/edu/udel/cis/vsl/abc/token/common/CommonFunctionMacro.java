@@ -15,8 +15,8 @@ public class CommonFunctionMacro extends CommonMacro implements FunctionMacro {
 
 	private int[] replacementFormalIndexes;
 
-	public CommonFunctionMacro(Tree definitionNode, File file) {
-		super(definitionNode, file);
+	public CommonFunctionMacro(Tree definitionNode, File file, String shortFileName) {
+		super(definitionNode, file, shortFileName);
 		initialize();
 	}
 

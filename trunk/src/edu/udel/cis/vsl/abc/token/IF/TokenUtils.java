@@ -58,9 +58,7 @@ public class TokenUtils {
 
 			filename = file.getName();
 			if (abbreviated) {
-				Formation formation = ppToken.getFormation();
-
-				return ((Inclusion) formation).fileShortName();
+				return ppToken.getFileShortName();
 			}
 		} else {
 			CharStream stream = token.getInputStream();
