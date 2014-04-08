@@ -194,6 +194,7 @@ public class CommonCTokenSource implements CTokenSource {
 			StringPredicate macroDefinedPredicate = new MacroDefinedPredicate(
 					macroMap);
 
+			preprocessor.addHeaderFile(source.getName());
 			this.macroMap = macroMap;
 			sourceStack.push(fileInfo);
 			incrementNextNode(); // skip root "FILE" node
@@ -1296,6 +1297,7 @@ public class CommonCTokenSource implements CTokenSource {
 					+ " syntax errors occurred while scanning included file "
 					+ file);
 		tree = (Tree) fileReturn.getTree();
+		preprocessor.addHeaderFile(filename);
 		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(file,
 				filenameToken, preprocessor.shortFileName(filename)), parser,
 				tree, tree.getChild(0));

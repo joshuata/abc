@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
@@ -62,6 +64,8 @@ public class CommonPreprocessor implements Preprocessor {
 	private TokenFactory tokenFactory = Tokens.newTokenFactory();
 
 	private HashMap<String, Integer> fileNameMap = new LinkedHashMap<>();
+
+	private Set<String> headers = new HashSet<>();
 
 	public CommonPreprocessor(File[] systemIncludePaths, File[] userIncludePaths) {
 		this.systemIncludePaths = systemIncludePaths;
@@ -169,8 +173,10 @@ public class CommonPreprocessor implements Preprocessor {
 	public PreprocessorParser parser(File file) throws PreprocessorException {
 		PreprocessorLexer lexer = lexer(file);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-		this.addFileName(file.getName());
+		String fileName = file.getName();
 
+		this.addHeaderFile(fileName);
+		this.addFileName(fileName);
 		return new PreprocessorParser(tokenStream);
 	}
 
@@ -386,6 +392,17 @@ public class CommonPreprocessor implements Preprocessor {
 			p.debug(System.out, file);
 		else
 			p.printOutput(System.out, file);
+	}
+
+	@Override
+	public void addHeaderFile(String fileName) {
+		if (fileName.endsWith(".h"))
+			this.headers.add(fileName);
+	}
+
+	@Override
+	public Set<String> headerFiles() {
+		return this.headers;
 	}
 
 }
