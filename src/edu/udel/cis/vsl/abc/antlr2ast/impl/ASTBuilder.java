@@ -301,6 +301,7 @@ public class ASTBuilder {
 	static final int CIVLATOM = CivlCParser.CIVLATOM;
 	static final int IMPLIES = CivlCParser.IMPLIES;
 	static final int DERIVATIVE_EXPRESSION = CivlCParser.DERIVATIVE_EXPRESSION;
+	static final int PROCNULL = CivlCParser.PROCNULL;
 
 	// Instance fields...
 
@@ -610,6 +611,8 @@ public class ASTBuilder {
 							(CommonTree) expressionTree.getChild(1), scope));
 		case SELF:
 			return nodeFactory.newSelfNode(source);
+		case PROCNULL:
+			return nodeFactory.newProcnullNode(source);
 		case HERE:
 			return nodeFactory.newHereNode(source);
 		case ROOT:

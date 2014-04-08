@@ -116,6 +116,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonHereOrRootNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonQuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonRemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonResultNode;
@@ -181,7 +182,7 @@ public class CommonNodeFactory implements NodeFactory {
 	private StandardUnsignedIntegerType booleanType;
 
 	private ObjectType processType;
-	
+
 	private ObjectType scopeType;
 
 	public CommonNodeFactory(TypeFactory typeFactory, ValueFactory valueFactory) {
@@ -392,7 +393,7 @@ public class CommonNodeFactory implements NodeFactory {
 	public ScopeOfNode newScopeOfNode(Source source, ExpressionNode argument) {
 		return new CommonScopeOfNode(source, argument);
 	}
-	
+
 	@Override
 	public VariableDeclarationNode newVariableDeclarationNode(Source source,
 			IdentifierNode name, TypeNode type) {
@@ -709,24 +710,24 @@ public class CommonNodeFactory implements NodeFactory {
 		result.setInitialType(processType);
 		return result;
 	}
-	
+
 	@Override
 	public ExpressionNode newHereNode(Source source) {
-		ExpressionNode result = new CommonHereOrRootNode(source, "$here", scopeType);
+		ExpressionNode result = new CommonHereOrRootNode(source, "$here",
+				scopeType);
 
 		result.setInitialType(scopeType);
 		return result;
 	}
-	
+
 	@Override
 	public ExpressionNode newRootNode(Source source) {
-		ExpressionNode result = new CommonHereOrRootNode(source, "$root", scopeType);
+		ExpressionNode result = new CommonHereOrRootNode(source, "$root",
+				scopeType);
 
 		result.setInitialType(scopeType);
 		return result;
 	}
-	
-	
 
 	@Override
 	public ExpressionNode newResultNode(Source source) {
@@ -779,6 +780,14 @@ public class CommonNodeFactory implements NodeFactory {
 	public AtomicNode newAtomicStatementNode(Source statementSource,
 			boolean deterministic, StatementNode body) {
 		return new CommonAtomicNode(statementSource, deterministic, body);
+	}
+
+	@Override
+	public ExpressionNode newProcnullNode(Source source) {
+		ExpressionNode result = new CommonProcnullNode(source, processType);
+
+		result.setInitialType(processType);
+		return result;
 	}
 
 }
