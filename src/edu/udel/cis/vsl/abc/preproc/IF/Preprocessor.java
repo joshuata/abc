@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.preproc.IF;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Set;
 
 import org.antlr.runtime.Lexer;
 import org.antlr.runtime.Parser;
@@ -152,5 +153,9 @@ public interface Preprocessor {
 	String shortFileName(String fileName);
 
 	void printShorterFileNameMap(PrintStream out);
+
+	void addHeaderFile(String fileName);
+
+	Set<String> headerFiles();
 
 }
