@@ -56,6 +56,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.ProcnullNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
@@ -353,6 +354,8 @@ public class ExpressionAnalyzer {
 		} else if (node instanceof StringLiteralNode) {
 			// type should already be set
 		} else if (node instanceof SelfNode) {
+			// type is process type, already set
+		} else if (node instanceof ProcnullNode) {
 			// type is process type, already set
 		} else if (node instanceof HereOrRootNode) {
 			// type is scope type, already set
@@ -1536,9 +1539,11 @@ public class ExpressionAnalyzer {
 		Type type0 = addStandardConversions(arg0);
 		Type type1 = addStandardConversions(arg1);
 
-		if (type0.kind() == TypeKind.PROCESS && type1.kind() == TypeKind.PROCESS) {
+		if (type0.kind() == TypeKind.PROCESS
+				&& type1.kind() == TypeKind.PROCESS) {
 			// no conversions necessary
-		} else if (type0.kind() == TypeKind.SCOPE && type1.kind() == TypeKind.SCOPE) {
+		} else if (type0.kind() == TypeKind.SCOPE
+				&& type1.kind() == TypeKind.SCOPE) {
 			// no conversions necessary
 		} else if (type0 instanceof ArithmeticType
 				&& type1 instanceof ArithmeticType) {

@@ -145,6 +145,7 @@ REQUIRES	:	'$requires';
 RESULT		:	'$result';
 RSLIST		:	'|>';  // LSLIST and RSLIST enclose a scope list
 SELF		:	'$self';
+PROCNULL	:	'$proc_null';
 HERE		:	'$here';
 ROOT		:	'$root';
 SCOPE		:	'$scopeDUPLICATE';

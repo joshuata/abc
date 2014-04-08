@@ -272,12 +272,14 @@ public interface NodeFactory {
 	ConstantNode newBooleanConstantNode(Source source, boolean value);
 
 	/**
-	 * "\self"
+	 * "$self"
 	 * 
 	 * @param source
 	 * @return
 	 */
 	ExpressionNode newSelfNode(Source source);
+	
+	ExpressionNode newProcnullNode(Source source);
 
 	/**
 	 * "\result"
