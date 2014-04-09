@@ -8,6 +8,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonOmpSyncNode extends CommonOmpStatementNode implements
@@ -33,8 +34,9 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	 * @param eofToken
 	 * @param kind
 	 */
-	public CommonOmpSyncNode(Source source, OmpSyncNodeKind kind) {
-		super(source);
+	public CommonOmpSyncNode(Source source, OmpSyncNodeKind kind,
+			StatementNode statement) {
+		super(source, statement);
 		this.ompSyncNodeKind = kind;
 		this.ompStatementKind = OmpStatementNodeKind.SYNCHRONIZATION;
 		this.addChild(null);// child 8
@@ -131,7 +133,7 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	@Override
 	public OmpSyncNode copy() {
 		OmpSyncNode newSyncNode = new CommonOmpSyncNode(this.getSource(),
-				this.ompSyncNodeKind);
+				this.ompSyncNodeKind, null);
 		int numChildren = this.numChildren();
 
 		for (int i = 0; i < numChildren; i++) {

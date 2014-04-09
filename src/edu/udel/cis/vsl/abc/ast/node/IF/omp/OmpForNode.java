@@ -24,7 +24,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
  * @author Manchun Zheng
  * 
  */
-public interface OmpForNode extends OmpWorkshareNode {
+public interface OmpForNode extends OmpWorksharingNode {
 
 	public enum OmpScheduleKind {
 		STATIC, DYNAMIC, GUIDED, AUTO, RUNTIME

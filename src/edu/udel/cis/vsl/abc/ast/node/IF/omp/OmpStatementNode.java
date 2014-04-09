@@ -4,6 +4,28 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 
+/**
+ * An OpenMP Children of an OmpStatementNode are:
+ * <ul>
+ * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "sharedList", the list of
+ * identifiers declared by <code>shared</code></li>
+ * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "privateList", the list of
+ * identifiers declared by <code>private</code></li>
+ * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "firstprivateList", the list
+ * of identifiers declared by <code>firstprivate</code></li>
+ * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "lastprivateList", the list
+ * of identifiers declared by <code>lastprivate</code></li>
+ * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "copyinList", the list of
+ * identifiers declared by <code>copyin</code></li>
+ * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "copyprivateList", the list
+ * of identifiers declared by <code>copyprivate</code></li>
+ * <li>SequenceNode&lt;OmpReductionNode&gt; "reductionList", the list of
+ * operators and identifiers declared by <code>reduction</code></li>
+ * <li>StatementNode, the statement node affected by this pragma</li>.
+ * </ul>
+ * In the constructor, these children are all set to null.
+ * 
+ */
 public interface OmpStatementNode extends OmpNode, StatementNode {
 	public enum OmpStatementNodeKind {
 		PARALLEL, SYNCHRONIZATION, WORKSHARE
@@ -31,7 +53,8 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	/**
 	 * Returns the statement node affected by this OpenMP pragma. e.g., the
 	 * following code is represented as an OpenMP parallel node with the
-	 * following compound statements as its statement node.<code>
+	 * following compound statements as its statement node.<br>
+	 * <code>
 	 * #prama omp parallel
 	 * {
 	 *   ...//statements

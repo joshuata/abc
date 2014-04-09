@@ -14,8 +14,6 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 		OmpParallelNode {
-	// private ExpressionNode numThreads = null;
-	// private ExpressionNode ifClause = null;
 	private boolean isDefaultShared = true;
 
 	/**
@@ -29,8 +27,8 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 	 * 
 	 * @param source
 	 */
-	public CommonOmpParallelNode(Source source) {
-		super(source);
+	public CommonOmpParallelNode(Source source, StatementNode statement) {
+		super(source, statement);
 		this.ompStatementKind = OmpStatementNodeKind.PARALLEL;
 		this.addChild(null);// child 8
 		this.addChild(null);// child 9
@@ -40,11 +38,10 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 			List<CToken> body, CToken eofToken, ExpressionNode numThreads,
 			ExpressionNode ifClause, StatementNode statementNode,
 			boolean isDefaultShared) {
-		super(source);
+		super(source, statementNode);
 		this.ompStatementKind = OmpStatementNodeKind.PARALLEL;
-		this.setChild(7, statementNode);
-		this.setChild(8, numThreads);
-		this.setChild(9, ifClause);
+		this.setNumThreads(numThreads);
+		this.setIfClause(ifClause);
 		this.isDefaultShared = isDefaultShared;
 	}
 
@@ -110,7 +107,7 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 	@Override
 	public OmpParallelNode copy() {
 		OmpParallelNode newParallelNode = new CommonOmpParallelNode(
-				this.getSource());
+				this.getSource(), null);
 		int numChildren = this.numChildren();
 
 		for (int i = 0; i < numChildren; i++) {
