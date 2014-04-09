@@ -18,6 +18,8 @@ public class CommonProgram implements Program {
 
 	private Analyzer standardAnalyzer;
 
+	private boolean hasOmpPragma = false;
+
 	// private Transformer pruner;
 
 	// private Transformer sideEffectRemover;
@@ -111,5 +113,15 @@ public class CommonProgram implements Program {
 		for (String code : codes)
 			transformers.add(Transform.newTransformer(code, astFactory));
 		apply(transformers);
+	}
+
+	@Override
+	public void setHasOmpPragma(boolean value) {
+		this.hasOmpPragma = value;
+	}
+
+	@Override
+	public boolean hasOmpPragma() {
+		return this.hasOmpPragma;
 	}
 }

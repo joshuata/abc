@@ -114,5 +114,9 @@ public interface Program {
 	 *             sequence
 	 */
 	void applyTransformers(Iterable<String> codes) throws SyntaxException;
+	
+	void setHasOmpPragma(boolean value);
+	
+	boolean hasOmpPragma();
 
 }

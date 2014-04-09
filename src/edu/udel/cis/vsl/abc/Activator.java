@@ -66,7 +66,7 @@ import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 public class Activator {
 
 	private static String bar = "===================";
-	
+
 	private SymbolicUniverse universe = SARL.newStandardUniverse();
 
 	private TokenFactory sourceFactory = Tokens.newTokenFactory();
@@ -308,6 +308,7 @@ public class Activator {
 		AST ast = getRawTranslationUnit();
 		Program program = programFactory.newProgram(ast, this.universe);
 
+		program.setHasOmpPragma(ast.hasOmpPragma());
 		return program;
 	}
 
@@ -411,7 +412,8 @@ public class Activator {
 		try {
 			builder = new ASTBuilder(parser, astFactory, tree);
 			ast = builder.getTranslationUnit(); // creates ast
-			program = programFactory.newProgram(ast, this.universe); // analyzes ast
+			// analyzes ast
+			program = programFactory.newProgram(ast, this.universe);
 			ast = program.getAST();
 		} catch (Exception e) {
 			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
