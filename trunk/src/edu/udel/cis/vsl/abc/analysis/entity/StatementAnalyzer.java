@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.Iterator;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
@@ -304,9 +303,8 @@ public class StatementAnalyzer {
 			processStatement(((SwitchNode) statement).getBody());
 		} else if (statement instanceof PragmaNode) {
 			entityAnalyzer.processPragma((PragmaNode) statement);
-			if (statement instanceof OmpStatementNode) {
-				processOmpStatement((OmpStatementNode) statement);
-			}
+		} else if (statement instanceof OmpStatementNode) {
+			processOmpStatement((OmpStatementNode) statement);
 		} else if (statement instanceof NullStatementNode) {
 			// nothing to do
 		} else if (statement instanceof AssumeNode) {
@@ -339,9 +337,9 @@ public class StatementAnalyzer {
 			throws SyntaxException {
 		OmpStatementNodeKind kind = statement.ompStatementNodeKind();
 		SequenceNode<OmpReductionNode> reductionList = (SequenceNode<OmpReductionNode>) statement
-				.child(7);
+				.reductionList();
 
-		for (int i = 1; i <= 6; i++) {
+		for (int i = 0; i <= 5; i++) {
 			SequenceNode<ExpressionNode> list = (SequenceNode<ExpressionNode>) statement
 					.child(i);
 
@@ -376,7 +374,8 @@ public class StatementAnalyzer {
 			switch (workshare.ompWorkshareNodeKind()) {
 			case FOR:
 				OmpForNode forNode = (OmpForNode) statement;
-				List<FunctionCallNode> assertions = forNode.assertions();
+				SequenceNode<FunctionCallNode> assertions = forNode
+						.assertions();
 				FunctionCallNode invariant = forNode.invariant();
 				ExpressionNode chunkSize = forNode.chunkSize();
 
@@ -432,6 +431,8 @@ public class StatementAnalyzer {
 	void processCompoundStatement(CompoundStatementNode node)
 			throws SyntaxException {
 		for (BlockItemNode item : node) {
+			if (item == null)
+				continue;
 			if (item instanceof StatementNode)
 				processStatement((StatementNode) item);
 			else if (item instanceof StructureOrUnionTypeNode)

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
 import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -38,6 +39,8 @@ public class CommonASTFactory implements ASTFactory {
 	private TypeFactory typeFactory;
 
 	private EntityFactory entityFactory;
+
+	private ASTBuilder astBuilder;
 
 	public CommonASTFactory(NodeFactory nodeFactory, TokenFactory tokenFactory,
 			TypeFactory typeFactory) {
@@ -235,5 +238,15 @@ public class CommonASTFactory implements ASTFactory {
 			throw new ASTException("unreachable");
 		}
 		return result;
+	}
+
+	@Override
+	public ASTBuilder getASTBuilder() {
+		return this.astBuilder;
+	}
+
+	@Override
+	public void setASTBuilder(ASTBuilder astBuilder) {
+		this.astBuilder = astBuilder;
 	}
 }

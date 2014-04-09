@@ -315,7 +315,7 @@ public class ASTBuilder {
 
 	private CommonTree rootTree;
 
-	private OmpBuilder ompBuilder;
+	// private OmpBuilder ompBuilder;
 
 	// Constructors...
 
@@ -334,11 +334,10 @@ public class ASTBuilder {
 			CommonTree rootTree) {
 		this.parser = parser;
 		this.unitFactory = unitFactory;
+		unitFactory.setASTBuilder(this);
 		this.nodeFactory = unitFactory.getNodeFactory();
 		this.sourceFactory = unitFactory.getTokenFactory();
 		this.rootTree = rootTree;
-		this.ompBuilder = new OmpBuilder(nodeFactory.getValueFactory(),
-				this.nodeFactory, this.sourceFactory, this);
 	}
 
 	// The "main" instance method...
@@ -2263,11 +2262,11 @@ public class ASTBuilder {
 
 			body.add(token);
 		}
-		if (identifier.name().equals("omp")) {
-			newlineToken.setType(CivlCParser.EOF);
-			return ompBuilder.getOmpNode(source, identifier, scope, body,
-					newlineToken);
-		}
+		// if (identifier.name().equals("omp")) {
+		// newlineToken.setType(CivlCParser.EOF);
+		// return ompBuilder.getOmpNode(source, identifier, scope, body,
+		// newlineToken);
+		// }
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
 	}

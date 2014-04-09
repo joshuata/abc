@@ -48,6 +48,14 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKind;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -278,7 +286,7 @@ public interface NodeFactory {
 	 * @return
 	 */
 	ExpressionNode newSelfNode(Source source);
-	
+
 	ExpressionNode newProcnullNode(Source source);
 
 	/**
@@ -625,7 +633,7 @@ public interface NodeFactory {
 			SequenceNode<ContractNode> contract, CompoundStatementNode body);
 
 	/**
-	 * Create a new abstract function definition.
+	 * Creates a new abstract function definition.
 	 * 
 	 * @param source
 	 *            The source information for the abstract function definition.
@@ -650,13 +658,12 @@ public interface NodeFactory {
 	ValueFactory getValueFactory();
 
 	/**
-	 * Create a new atomic statement node with the data provided.
+	 * Creates a new atomic statement node with the data provided.
 	 * 
 	 * @param statementSource
 	 *            The source information of the node
 	 * @param deterministic
-	 *            The flag to denote whether the atomic node is $datomic or
-	 *            $atomic
+	 *            The flag to denote whether the atomic node is $atom or $atomic
 	 * @param body
 	 *            The body statement node of the atomic node
 	 * @return The new atomic statement node
@@ -664,10 +671,232 @@ public interface NodeFactory {
 	AtomicNode newAtomicStatementNode(Source statementSource,
 			boolean deterministic, StatementNode body);
 
+	/**
+	 * Creates a new constant expression node representing <code>$here</code>.
+	 * 
+	 * @param source
+	 *            The source code element of the new node
+	 * @return a new constant expression node representing <code>$here</code>
+	 */
 	ExpressionNode newHereNode(Source source);
 
+	/**
+	 * Creates a new constant expression node representing <code>$root</code>.
+	 * 
+	 * @param source
+	 *            The source code element of the new node
+	 * @return a new constant expression node representing <code>$root</code>
+	 */
 	ExpressionNode newRootNode(Source source);
 
+	/**
+	 * Creates a new expression node representing <code>$scopeof(expr)</code>.
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param argument
+	 *            The argument of the <code>$scopeof(expr)</code> expression.
+	 * @return a new constant expression node representing <code>$here</code>
+	 */
 	ScopeOfNode newScopeOfNode(Source source, ExpressionNode argument);
 
+	/**
+	 * Creates a new OpenMP parallel node, representing
+	 * <code>#pragma omp parallel...</code>. The clauses of the node can be
+	 * updated by calling the corresponding setters, e.g, setStatementNode(),
+	 * setPrivateList(), etc.
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @return The new OpenMP parallel statement node created.
+	 */
+	OmpParallelNode newOmpParallelNode(Source source);
+
+	/**
+	 * Creates a new OpenMP for node, representing
+	 * <code>#pragma omp for...</code>. The clauses of the node can be updated
+	 * by calling the corresponding setters, e.g, setStatementNode(),
+	 * setPrivateList(), etc.
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @return The new OpenMP for node created.
+	 */
+	OmpForNode newOmpForNode(Source source);
+
+	/**
+	 * Creates a new OpenMP master node, representing
+	 * <code>#pragma omp master...</code>. A master node has exactly one child
+	 * node, i.e., the statement node corresponding to the block affected by the
+	 * master construct. The syntax of the master construct is:<br>
+	 * <code>#pragma omp master new-line <br>
+	 * structured-block</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the master construct.
+	 * @return The new OpenMP master node created.
+	 */
+	OmpSyncNode newOmpMasterNode(Source source, StatementNode statement);
+
+	/**
+	 * Creates a new OpenMP critical node, representing
+	 * <code>#pragma omp critical...</code>. A critical node has at most two
+	 * children the name of the critical section and the statement node
+	 * corresponding to the block affected by the critical construct. The syntax
+	 * of the critical construct is:<br>
+	 * <code>#pragma omp critical [(name)] new-line <br>
+	 * structured-block</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param name
+	 *            The name of the critical section.
+	 * @param statement
+	 *            The statement node of the critical construct.
+	 * @return The new OpenMP critical node created.
+	 */
+	OmpSyncNode newOmpCriticalNode(Source source, IdentifierNode name,
+			StatementNode statement);
+
+	/**
+	 * Creates a new OpenMP barrier node, representing
+	 * <code>#pragma omp barrier...</code>. A critical node has NO child node.
+	 * The syntax of the barrier construct is:<br>
+	 * <code>#pragma omp barrier new-line</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param name
+	 *            The name of the barrier construct.
+	 * @return The new OpenMP barrier node created.
+	 */
+	OmpSyncNode newOmpBarrierNode(Source source);
+
+	/**
+	 * Creates a new OpenMP barrier node, representing
+	 * <code>#pragma omp flush...</code>. A flush node has at most one child
+	 * node: the list of variables of the flush operation. The syntax of the
+	 * flush construct is:<br>
+	 * <code>#pragma omp flush [(list)] new-line</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param name
+	 *            The name of the flush construct.
+	 * @param variables
+	 *            The list of variables of the flush operation.
+	 * @return The new OpenMP flush node created.
+	 */
+	OmpSyncNode newOmpFlushNode(Source source,
+			SequenceNode<IdentifierExpressionNode> variables);
+
+	/**
+	 * Creates a new OpenMP ordered node, representing
+	 * <code>#pragma omp ordered...</code>. An ordered node has exactly one
+	 * child node, i.e., the statement node corresponding to the block affected
+	 * by the ordered construct. The syntax of the ordered construct is:<br>
+	 * <code>#pragma omp ordered new-line<br>
+	 * structured-block</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param name
+	 *            The name of the ordered section.
+	 * @param statement
+	 *            The statement node of the ordered construct.
+	 * @return The new OpenMP ordered node created.
+	 */
+	OmpSyncNode newOmpOrederedNode(Source source, StatementNode statement);
+
+	/**
+	 * Creates a new OpenMP sections node, representing
+	 * <code>#pragma omp sections...</code>. The clauses of the node can be
+	 * updated by calling the corresponding setters, e.g, setStatementNode(),
+	 * setPrivateList(), etc.
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @return The new OpenMP sections statement node created.
+	 */
+	OmpWorkshareNode newOmpSectionsNode(Source source);
+
+	/**
+	 * Creates a new OpenMP section node, representing
+	 * <code>#pragma omp section...</code>. A section node has exactly one child
+	 * node, i.e., the statement node corresponding to the block affected by the
+	 * section construct. The syntax of the section construct is:<br>
+	 * <code>#pragma omp section new-line <br>
+	 * structured-block</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the section construct.
+	 * @return The new OpenMP section node created.
+	 */
+	OmpWorkshareNode newOmpSectionNode(Source source, StatementNode statement);
+
+	/**
+	 * Creates a new OpenMP single node, representing
+	 * <code>#pragma omp single...</code>. The syntax of the single construct is
+	 * as follows:<br>
+	 * <code>#pragma omp single [clause[[,] clause] ...] new-line<br>
+	 * structured-block</code><br>
+	 * where clause is one of the following:<br>
+	 * <code>private(list) </code><br>
+	 * <code>firstprivate(list)  </code><br>
+	 * <code>copyprivate(list)</code><br>
+	 * <code>nowait</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @return The new OpenMP single node created.
+	 */
+	OmpWorkshareNode newOmpSingleNode(Source source);
+
+	/**
+	 * Creates a new OpenMP threadprivate node.
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param variables
+	 *            The list of variables declared by the clause.
+	 * @return The new OpenMP threadprivate node created.
+	 */
+	OmpDeclarativeNode newOmpThreadprivateNode(Source source,
+			SequenceNode<IdentifierExpressionNode> variables);
+
+	/**
+	 * Creates a new OpenMP reduction node with a standard operator.
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param operator
+	 *            The operator of the reduction node.
+	 * @param variables
+	 *            The variables of the reduction clause.
+	 * @return The new OpenMP reduction node.
+	 */
+	OmpSymbolReductionNode newOmpSymbolReductionNode(Source source,
+			Operator operator, SequenceNode<IdentifierExpressionNode> variables);
+
+	/**
+	 * Creates a new OpenMP reduction node with an identifier operator (i.e.,
+	 * function names).
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param function
+	 *            The name of the function of the reduction node.
+	 * @param variables
+	 *            The variables of the reduction clause.
+	 * @return The new OpenMP reduction node.
+	 */
+	OmpFunctionReductionNode newOmpFunctionReductionNode(Source source,
+			IdentifierExpressionNode function,
+			SequenceNode<IdentifierExpressionNode> variables);
+
+	OmpWorkshareNode newWorkshareNode(Source source, OmpWorkshareNodeKind kind);
 }

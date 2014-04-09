@@ -1,29 +1,30 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
-import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		OmpSyncNode {
 	private OmpSyncNodeKind ompSyncNodeKind;
-	private IdentifierNode criticalName;
+
+	// private IdentifierNode criticalName;
 
 	// private SequenceNode<IdentifierNode> flushedList;
 
 	/**
 	 * Children
 	 * <ul>
-	 * <li>Children 0-8: same as {@link CommonOmpStatementNode};</li>
-	 * <li>Child 9: SequenceNode&lt;IdentifierNode&gt; "flushedList", the list
+	 * <li>Children 0-7: same as {@link CommonOmpStatementNode};</li>
+	 * <li>Child 8: SequenceNode&lt;IdentifierNode&gt; "flushedList", the list
 	 * of identifiers declared by <code>flushed()</code> ;</li>
+	 * <li>Child 9: IdentifierNode, optional "name" of critical construct.</li>
 	 * </ul>
 	 * 
 	 * @param source
@@ -32,11 +33,11 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	 * @param eofToken
 	 * @param kind
 	 */
-	public CommonOmpSyncNode(Source source, IdentifierNode identifier,
-			List<CToken> body, CToken eofToken, OmpSyncNodeKind kind) {
-		super(source, identifier, body, eofToken);
+	public CommonOmpSyncNode(Source source, OmpSyncNodeKind kind) {
+		super(source);
 		this.ompSyncNodeKind = kind;
 		this.ompStatementKind = OmpStatementNodeKind.SYNCHRONIZATION;
+		this.addChild(null);// child 8
 		this.addChild(null);// child 9
 	}
 
@@ -58,13 +59,13 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 
 	@Override
 	public IdentifierNode criticalName() {
-		return this.criticalName;
+		return (IdentifierNode) this.child(9);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public SequenceNode<IdentifierExpressionNode> flushedList() {
-		return (SequenceNode<IdentifierExpressionNode>) this.child(9);
+		return (SequenceNode<IdentifierExpressionNode>) this.child(8);
 	}
 
 	// MASTER, CRITICAL, BARRIER, FLUSH
@@ -94,36 +95,52 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	@Override
 	public void setCriticalName(IdentifierNode name) {
 		assert this.ompSyncNodeKind == OmpSyncNodeKind.CRITICAL;
-		this.criticalName = name;
-
+		this.setChild(9, name);
 	}
 
 	@Override
 	public void setFlushedList(SequenceNode<IdentifierExpressionNode> list) {
 		assert this.ompSyncNodeKind == OmpSyncNodeKind.FLUSH;
-		this.setChild(9, list);
+		this.setChild(8, list);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	protected void printExtras(String prefix, PrintStream out) {
-		int count;
-		SequenceNode<IdentifierExpressionNode> flushedList = (SequenceNode<IdentifierExpressionNode>) this
-				.child(9);
+	// @SuppressWarnings("unchecked")
+	// @Override
+	// protected void printExtras(String prefix, PrintStream out) {
+	// int count;
+	// SequenceNode<IdentifierExpressionNode> flushedList =
+	// (SequenceNode<IdentifierExpressionNode>) this
+	// .child(8);
+	//
+	// if (flushedList != null) {
+	// count = flushedList.numChildren();
+	// if (count > 0) {
+	// out.println();
+	// out.print(prefix + "flush(");
+	// for (int i = 0; i < count; i++) {
+	// out.print(flushedList.getSequenceChild(i).getIdentifier()
+	// .name());
+	// if (i < count - 1)
+	// out.print(",");
+	// }
+	// out.print(")");
+	// }
+	// }
+	// }
 
-		if (flushedList != null) {
-			count = flushedList.numChildren();
-			if (count > 0) {
-				out.println();
-				out.print(prefix + "flush(");
-				for (int i = 0; i < count; i++) {
-					out.print(flushedList.getSequenceChild(i).getIdentifier()
-							.name());
-					if (i < count - 1)
-						out.print(",");
-				}
-				out.print(")");
+	@Override
+	public OmpSyncNode copy() {
+		OmpSyncNode newSyncNode = new CommonOmpSyncNode(this.getSource(),
+				this.ompSyncNodeKind);
+		int numChildren = this.numChildren();
+
+		for (int i = 0; i < numChildren; i++) {
+			ASTNode child = this.child(i);
+
+			if (child != null) {
+				newSyncNode.setChild(i, child.copy());
 			}
 		}
+		return newSyncNode;
 	}
 }

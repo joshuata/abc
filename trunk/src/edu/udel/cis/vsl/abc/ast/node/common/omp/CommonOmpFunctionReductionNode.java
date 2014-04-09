@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
@@ -13,7 +12,7 @@ public class CommonOmpFunctionReductionNode extends CommonOmpReductionNode
 		implements OmpFunctionReductionNode {
 
 	public CommonOmpFunctionReductionNode(Source source,
-			IdentifierNode identifier,
+			IdentifierExpressionNode identifier,
 			SequenceNode<IdentifierExpressionNode> variables) {
 		super(source);
 		this.addChild(identifier);

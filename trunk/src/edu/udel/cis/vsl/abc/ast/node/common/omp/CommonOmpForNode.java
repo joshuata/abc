@@ -1,47 +1,43 @@
 package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ABCRuntimeException;
-import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
-import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		OmpForNode {
 
 	private OmpScheduleKind schedule;
-	// private ExpressionNode chunkSize;
 	private int collapse;
 	private boolean ordered;
-	private List<FunctionCallNode> assertions;
-	private FunctionCallNode invariant;
 
 	/**
 	 * Children
 	 * <ul>
-	 * <li>Children 0-8: same as {@link CommonOmpStatementNode};</li>
-	 * <li>Child 9: ExpressionNode, the expression of chunk_size in
+	 * <li>Children 0-7: same as {@link CommonOmpStatementNode};</li>
+	 * <li>Child 8: ExpressionNode, the expression of chunk_size in
 	 * <code>schedule()</code> ;</li>
+	 * <li>Child 9: SequenceNode&lt;FunctionCallNode&gt;, the list of assertions
+	 * to be checked befor entering the for loop;</li>
+	 * <li>Child 10: FunctionCallNode, the loop invariant;</li>
 	 * </ul>
 	 * 
 	 * @param source
-	 * @param identifier
-	 * @param body
-	 * @param eofToken
 	 */
-	public CommonOmpForNode(Source source, IdentifierNode identifier,
-			List<CToken> body, CToken eofToken) {
-		super(source, identifier, body, eofToken, OmpWorkshareNodeKind.FOR);
+	public CommonOmpForNode(Source source) {
+		super(source, OmpWorkshareNodeKind.FOR);
 		collapse = 1;
 		schedule = OmpScheduleKind.STATIC;
 		ordered = false;
+		this.addChild(null);// child 8
 		this.addChild(null);// child 9
-		// chunkSize = null;
+		this.addChild(null);// child 10
 	}
 
 	@Override
@@ -59,14 +55,15 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		return this.ordered;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<FunctionCallNode> assertions() {
-		return this.assertions;
+	public SequenceNode<FunctionCallNode> assertions() {
+		return (SequenceNode<FunctionCallNode>) this.child(9);
 	}
 
 	@Override
 	public FunctionCallNode invariant() {
-		return this.invariant;
+		return (FunctionCallNode) this.child(10);
 	}
 
 	@Override
@@ -76,7 +73,7 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 
 	@Override
 	public ExpressionNode chunkSize() {
-		return (ExpressionNode) this.child(9);
+		return (ExpressionNode) this.child(8);
 	}
 
 	@Override
@@ -96,15 +93,14 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 
 	@Override
 	public void setChunsize(ExpressionNode chunkSize) {
-		this.setChild(9, chunkSize);
+		this.setChild(8, chunkSize);
 	}
 
 	@Override
 	protected void printExtras(String prefix, PrintStream out) {
 		String scheduleText;
-		ExpressionNode chunkSize = (ExpressionNode) this.child(9);
+		ExpressionNode chunkSize = (ExpressionNode) this.child(8);
 
-		// STATIC, DYNAMIC, GUIDED, AUTO, RUNTIME
 		switch (schedule) {
 		case STATIC:
 			scheduleText = "static";
@@ -146,12 +142,30 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 	}
 
 	@Override
-	public void setAssertions(List<FunctionCallNode> assertions) {
-		this.assertions = assertions;
+	public void setAssertions(SequenceNode<FunctionCallNode> assertions) {
+		this.setChild(9, assertions);
 	}
 
 	@Override
 	public void setInvariant(FunctionCallNode invariant) {
-		this.invariant = invariant;
+		this.setChild(9, invariant);
+	}
+
+	@Override
+	public OmpForNode copy() {
+		OmpForNode newForNode = new CommonOmpForNode(this.getSource());
+		int numChildren = this.numChildren();
+
+		for (int i = 0; i < numChildren; i++) {
+			ASTNode child = this.child(i);
+
+			if (child != null) {
+				newForNode.setChild(i, child.copy());
+			}
+		}
+		newForNode.setCollapse(this.collapse);
+		newForNode.setOrdered(this.ordered);
+		newForNode.setSchedule(this.schedule);
+		return newForNode;
 	}
 }
