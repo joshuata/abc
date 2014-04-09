@@ -51,7 +51,7 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 	 * @param body
 	 * @param eofToken
 	 */
-	public CommonOmpStatementNode(Source source) {
+	public CommonOmpStatementNode(Source source, StatementNode statement) {
 		super(source);
 		nowait = false;
 		this.addChild(null);// child 0
@@ -61,7 +61,7 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 		this.addChild(null);// child 4
 		this.addChild(null);// child 5
 		this.addChild(null);// child 6
-		this.addChild(null);// child 7
+		this.addChild(statement);// child 7
 	}
 
 	@Override

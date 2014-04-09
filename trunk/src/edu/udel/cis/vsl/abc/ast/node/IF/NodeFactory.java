@@ -54,8 +54,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -708,9 +708,11 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the parallel construct.
 	 * @return The new OpenMP parallel statement node created.
 	 */
-	OmpParallelNode newOmpParallelNode(Source source);
+	OmpParallelNode newOmpParallelNode(Source source, StatementNode statement);
 
 	/**
 	 * Creates a new OpenMP for node, representing
@@ -720,9 +722,11 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the parallel construct.
 	 * @return The new OpenMP for node created.
 	 */
-	OmpForNode newOmpForNode(Source source);
+	OmpForNode newOmpForNode(Source source, StatementNode statement);
 
 	/**
 	 * Creates a new OpenMP master node, representing
@@ -762,7 +766,7 @@ public interface NodeFactory {
 
 	/**
 	 * Creates a new OpenMP barrier node, representing
-	 * <code>#pragma omp barrier...</code>. A critical node has NO child node.
+	 * <code>#pragma omp barrier...</code>. A barrier node has NO child node.
 	 * The syntax of the barrier construct is:<br>
 	 * <code>#pragma omp barrier new-line</code>
 	 * 
@@ -818,9 +822,11 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the ordered construct.
 	 * @return The new OpenMP sections statement node created.
 	 */
-	OmpWorkshareNode newOmpSectionsNode(Source source);
+	OmpWorksharingNode newOmpSectionsNode(Source source, StatementNode statement);
 
 	/**
 	 * Creates a new OpenMP section node, representing
@@ -836,7 +842,7 @@ public interface NodeFactory {
 	 *            The statement node of the section construct.
 	 * @return The new OpenMP section node created.
 	 */
-	OmpWorkshareNode newOmpSectionNode(Source source, StatementNode statement);
+	OmpWorksharingNode newOmpSectionNode(Source source, StatementNode statement);
 
 	/**
 	 * Creates a new OpenMP single node, representing
@@ -852,9 +858,11 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the section construct.
 	 * @return The new OpenMP single node created.
 	 */
-	OmpWorkshareNode newOmpSingleNode(Source source);
+	OmpWorksharingNode newOmpSingleNode(Source source, StatementNode statement);
 
 	/**
 	 * Creates a new OpenMP threadprivate node.
@@ -898,5 +906,23 @@ public interface NodeFactory {
 			IdentifierExpressionNode function,
 			SequenceNode<IdentifierExpressionNode> variables);
 
-	OmpWorkshareNode newWorkshareNode(Source source, OmpWorkshareNodeKind kind);
+	/**
+	 * Creates a new OpenMP worksharing node with a specific kind. The kind
+	 * could be:
+	 * <ul>
+	 * <li>SECTIONS</li>
+	 * <li>SINGLE</li>
+	 * <li>SECTION</li>
+	 * <li>FOR</li>
+	 * </ul>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param kind
+	 *            The kind of the worksharing node, either FOR, SECTIONS,
+	 *            SECTION or SINGLE.
+	 * @return The new OpenMP worksharing node.
+	 */
+	OmpWorksharingNode newWorksharingNode(Source source,
+			OmpWorksharingNodeKind kind);
 }

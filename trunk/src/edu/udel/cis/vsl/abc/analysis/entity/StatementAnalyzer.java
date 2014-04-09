@@ -25,7 +25,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode.OmpReductionNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode.OmpStatementNodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -369,7 +369,7 @@ public class StatementAnalyzer {
 				processExpression(parallel.numThreads());
 			break;
 		case WORKSHARE:
-			OmpWorkshareNode workshare = (OmpWorkshareNode) statement;
+			OmpWorksharingNode workshare = (OmpWorksharingNode) statement;
 
 			switch (workshare.ompWorkshareNodeKind()) {
 			case FOR:

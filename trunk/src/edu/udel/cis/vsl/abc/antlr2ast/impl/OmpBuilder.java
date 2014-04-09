@@ -69,8 +69,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.parse.common.OmpParser;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
@@ -86,7 +86,9 @@ public class OmpBuilder {
 	private TokenFactory sourceFactory;
 	private Source source;
 	private ASTFactory astFactory;
-	private SimpleScope scope;
+
+	// private SimpleScope scope;
+	// private StatementNode statement;
 
 	/**
 	 * Constructs a new OmpBuilder for the given ANTLR tree of OpenMP.
@@ -205,8 +207,8 @@ public class OmpBuilder {
 		return new CommonTokenStream(source);
 	}
 
-	public OmpNode getOmpNode(Source source, SimpleScope scope,
-			Iterator<CToken> ctokens) throws SyntaxException {
+	public OmpNode getOmpNode(Source source, Iterator<CToken> ctokens)
+			throws SyntaxException {
 		try {
 			List<CToken> tokenList = new ArrayList<>();
 			TokenStream tokens;
@@ -218,7 +220,6 @@ public class OmpBuilder {
 				tokenList.add(ctokens.next());
 			}
 			tokens = this.ompTokenStream(tokenList);
-			this.scope = scope;
 			this.source = source;
 			parser = new OmpParser(tokens);
 			rootTree = (CommonTree) parser.openmp_construct().getTree();
@@ -234,9 +235,10 @@ public class OmpBuilder {
 				return translateFor(rootTree);
 			case SECTIONS:
 				return translateWorkshare(rootTree,
-						OmpWorkshareNodeKind.SECTIONS);
+						OmpWorksharingNodeKind.SECTIONS);
 			case SINGLE:
-				return translateWorkshare(rootTree, OmpWorkshareNodeKind.SINGLE);
+				return translateWorkshare(rootTree,
+						OmpWorksharingNodeKind.SINGLE);
 			case MASTER:
 				return nodeFactory.newOmpMasterNode(source, null);
 			case CRITICAL:
@@ -276,11 +278,11 @@ public class OmpBuilder {
 		}
 	}
 
-	private OmpWorkshareNode translateWorkshare(CommonTree workshareTree,
-			OmpWorkshareNodeKind kind) {
+	private OmpWorksharingNode translateWorkshare(CommonTree workshareTree,
+			OmpWorksharingNodeKind kind) {
 		int numChildren = workshareTree.getChildCount();
-		OmpWorkshareNode workshareNode = nodeFactory.newWorkshareNode(source,
-				kind);
+		OmpWorksharingNode workshareNode = nodeFactory.newWorksharingNode(
+				source, kind);
 		boolean hasNowait = false;
 
 		for (int i = 0; i < numChildren; i++) {
@@ -311,7 +313,7 @@ public class OmpBuilder {
 
 	private OmpForNode translateFor(CommonTree forTree) throws SyntaxException {
 		int numChildren = forTree.getChildCount();
-		OmpForNode forNode = nodeFactory.newOmpForNode(this.source);
+		OmpForNode forNode = nodeFactory.newOmpForNode(this.source, null);
 
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree forClause = (CommonTree) (forTree.getChild(i))
@@ -366,7 +368,7 @@ public class OmpBuilder {
 			if (forClause.getChildCount() > 1) {
 				CommonTree chunkSizeTree = (CommonTree) forClause.getChild(1);
 				ExpressionNode chunkSizeNode = astFactory.getASTBuilder()
-						.translateExpression(chunkSizeTree, this.scope);
+						.translateExpression(chunkSizeTree, null);
 
 				forNode.setChunsize(chunkSizeNode);
 			}
@@ -382,8 +384,8 @@ public class OmpBuilder {
 	private OmpNode translateParallel(CommonTree paralle)
 			throws SyntaxException {
 		int numChildren = paralle.getChildCount();
-		OmpParallelNode parallelNode = nodeFactory
-				.newOmpParallelNode(this.source);
+		OmpParallelNode parallelNode = nodeFactory.newOmpParallelNode(
+				this.source, null);
 		boolean hasIf = false;
 		boolean hasNumThreads = false;
 
@@ -436,12 +438,12 @@ public class OmpBuilder {
 		switch (child.getType()) {
 		case IF:
 			expression = astFactory.getASTBuilder().translateExpression(
-					(CommonTree) child.getChild(0), scope);
+					(CommonTree) child.getChild(0), null);
 			parallelNode.setIfClause(expression);
 			return IF;
 		case NUM_THREADS:
 			expression = astFactory.getASTBuilder().translateExpression(
-					(CommonTree) child.getChild(0), scope);
+					(CommonTree) child.getChild(0), null);
 			parallelNode.setNumThreads(expression);
 			return NUM_THREADS;
 		default:
@@ -452,9 +454,9 @@ public class OmpBuilder {
 	private OmpParallelNode translateParallelFor(CommonTree parallelFor)
 			throws SyntaxException {
 		int numChildren = parallelFor.getChildCount();
-		OmpParallelNode parallelNode = nodeFactory
-				.newOmpParallelNode(this.source);
-		OmpForNode forNode = nodeFactory.newOmpForNode(this.source);
+		OmpParallelNode parallelNode = nodeFactory.newOmpParallelNode(
+				this.source, null);
+		OmpForNode forNode = nodeFactory.newOmpForNode(this.source, null);
 
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree parallelForClause = (CommonTree) parallelFor.getChild(i);
@@ -481,9 +483,10 @@ public class OmpBuilder {
 	private OmpParallelNode translateParallelSections(
 			CommonTree parallelSections) throws SyntaxException {
 		int numChildren = parallelSections.getChildCount();
-		OmpParallelNode parallelNode = nodeFactory
-				.newOmpParallelNode(this.source);
-		OmpWorkshareNode sectionsNode = nodeFactory.newOmpSectionsNode(source);
+		OmpParallelNode parallelNode = nodeFactory.newOmpParallelNode(
+				this.source, null);
+		OmpWorksharingNode sectionsNode = nodeFactory.newOmpSectionsNode(
+				source, null);
 
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree parallelSectionsClause = (CommonTree) parallelSections

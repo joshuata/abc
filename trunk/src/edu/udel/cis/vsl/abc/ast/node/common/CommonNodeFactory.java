@@ -64,8 +64,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -806,43 +806,41 @@ public class CommonNodeFactory implements NodeFactory {
 		return result;
 	}
 
+	/* *************************** OpenMP Section ************************** */
+
 	@Override
-	public OmpParallelNode newOmpParallelNode(Source source) {
-		return new CommonOmpParallelNode(source);
+	public OmpParallelNode newOmpParallelNode(Source source,
+			StatementNode statement) {
+		return new CommonOmpParallelNode(source, statement);
 	}
 
 	@Override
-	public OmpForNode newOmpForNode(Source source) {
-		return new CommonOmpForNode(source);
+	public OmpForNode newOmpForNode(Source source, StatementNode statement) {
+		return new CommonOmpForNode(source, statement);
 	}
 
 	@Override
 	public OmpSyncNode newOmpMasterNode(Source source, StatementNode statement) {
-		OmpSyncNode masterNode = new CommonOmpSyncNode(source,
-				OmpSyncNodeKind.MASTER);
-
-		masterNode.setStatementNode(statement);
-		return masterNode;
+		return new CommonOmpSyncNode(source, OmpSyncNodeKind.MASTER, statement);
 	}
 
 	@Override
 	public OmpSyncNode newOmpBarrierNode(Source source) {
-		return new CommonOmpSyncNode(source, OmpSyncNodeKind.BARRIER);
+		return new CommonOmpSyncNode(source, OmpSyncNodeKind.BARRIER, null);
 	}
 
 	@Override
-	public OmpWorkshareNode newOmpSectionsNode(Source source) {
-		return new CommonOmpWorkshareNode(source, OmpWorkshareNodeKind.SECTIONS);
-	}
-
-	@Override
-	public OmpWorkshareNode newOmpSectionNode(Source source,
+	public OmpWorksharingNode newOmpSectionsNode(Source source,
 			StatementNode statement) {
-		OmpWorkshareNode sectionNode = new CommonOmpWorkshareNode(source,
-				OmpWorkshareNodeKind.SECTION);
+		return new CommonOmpWorkshareNode(source,
+				OmpWorksharingNodeKind.SECTIONS, statement);
+	}
 
-		sectionNode.setStatementNode(statement);
-		return sectionNode;
+	@Override
+	public OmpWorksharingNode newOmpSectionNode(Source source,
+			StatementNode statement) {
+		return new CommonOmpWorkshareNode(source,
+				OmpWorksharingNodeKind.SECTION, statement);
 	}
 
 	@Override
@@ -861,10 +859,9 @@ public class CommonNodeFactory implements NodeFactory {
 	public OmpSyncNode newOmpCriticalNode(Source source, IdentifierNode name,
 			StatementNode statement) {
 		OmpSyncNode criticalNode = new CommonOmpSyncNode(source,
-				OmpSyncNodeKind.CRITICAL);
+				OmpSyncNodeKind.CRITICAL, statement);
 
 		criticalNode.setCriticalName(name);
-		criticalNode.setStatementNode(statement);
 		return criticalNode;
 	}
 
@@ -872,7 +869,7 @@ public class CommonNodeFactory implements NodeFactory {
 	public OmpSyncNode newOmpFlushNode(Source source,
 			SequenceNode<IdentifierExpressionNode> variables) {
 		OmpSyncNode flushNode = new CommonOmpSyncNode(source,
-				OmpSyncNodeKind.FLUSH);
+				OmpSyncNodeKind.FLUSH, null);
 
 		flushNode.setFlushedList(variables);
 		return flushNode;
@@ -880,16 +877,14 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public OmpSyncNode newOmpOrederedNode(Source source, StatementNode statement) {
-		OmpSyncNode orderedNode = new CommonOmpSyncNode(source,
-				OmpSyncNodeKind.ORDERED);
-
-		orderedNode.setStatementNode(statement);
-		return orderedNode;
+		return new CommonOmpSyncNode(source, OmpSyncNodeKind.ORDERED, statement);
 	}
 
 	@Override
-	public OmpWorkshareNode newOmpSingleNode(Source source) {
-		return new CommonOmpWorkshareNode(source, OmpWorkshareNodeKind.SINGLE);
+	public OmpWorksharingNode newOmpSingleNode(Source source,
+			StatementNode statement) {
+		return new CommonOmpWorkshareNode(source,
+				OmpWorksharingNodeKind.SINGLE, statement);
 	}
 
 	@Override
@@ -900,9 +895,9 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public OmpWorkshareNode newWorkshareNode(Source source,
-			OmpWorkshareNodeKind kind) {
-		return new CommonOmpWorkshareNode(source, kind);
+	public OmpWorksharingNode newWorksharingNode(Source source,
+			OmpWorksharingNodeKind kind) {
+		return new CommonOmpWorkshareNode(source, kind, null);
 	}
 
 }

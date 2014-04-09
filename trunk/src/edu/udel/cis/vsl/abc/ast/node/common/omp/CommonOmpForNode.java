@@ -8,17 +8,65 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
+/**
+ * This implements the OpenMP loop construct. The loop construct specifies that
+ * the iterations of one or more associated loops will be executed in parallel
+ * by threads in the team in the context of their implicit tasks. The iterations
+ * are distributed across threads that already exist in the team executing the
+ * parallel region to which the loop region binds.<br>
+ * The syntax of the loop construct is as follows:<br>
+ * <code>
+ * #pragma omp for [clause[[,] clause] ... ] new-line <br>
+ * for-loops<br>
+ * </code> where clause is one of the following:<br>
+ * <code>private(list)<br>
+ * firstprivate(list) <br>
+ * lastprivate(list) <br>
+ * reduction(reduction-identifier: list) <br>
+ * schedule(kind[, chunk_size]) <br>
+ * collapse(n)<br>
+ * ordered<br>
+ * nowait<br></code>
+ * 
+ * @author Manchun Zheng
+ * 
+ */
 public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		OmpForNode {
 
+	/**
+	 * The schedule specified by the optional schedule clause
+	 * <code>schedule(kind[, chunk_size])</code>. The schedule can be one of the
+	 * following:
+	 * <ul>
+	 * <li>STATIC (default)</li>
+	 * <li>DYNAMIC</li>
+	 * <li>GUIDED</li>
+	 * <li>AUTO</li>
+	 * <li>RUNTIME</li>
+	 * </ul>
+	 */
 	private OmpScheduleKind schedule;
+
+	/**
+	 * The number of loops of this node, specified by the optional clause
+	 * <code>collapse(n)</code>. If <code>collapse(n)</code> is absent, collapse
+	 * is 1 by default.
+	 */
 	private int collapse;
+
+	/**
+	 * True if the clause <code>ordered</code> is present, otherwise, false
+	 * (default).
+	 */
 	private boolean ordered;
 
 	/**
-	 * Children
+	 * Creates a new instance of CommonOmpForNode. The children are:
+	 * 
 	 * <ul>
 	 * <li>Children 0-7: same as {@link CommonOmpStatementNode};</li>
 	 * <li>Child 8: ExpressionNode, the expression of chunk_size in
@@ -27,11 +75,15 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 	 * to be checked befor entering the for loop;</li>
 	 * <li>Child 10: FunctionCallNode, the loop invariant;</li>
 	 * </ul>
+	 * All children are set to null except the statement node.
 	 * 
 	 * @param source
+	 *            The source code element of the OpenMP for node.
+	 * @param statement
+	 *            The statement node of the OpenMP for node to be created.
 	 */
-	public CommonOmpForNode(Source source) {
-		super(source, OmpWorkshareNodeKind.FOR);
+	public CommonOmpForNode(Source source, StatementNode statement) {
+		super(source, OmpWorksharingNodeKind.FOR, statement);
 		collapse = 1;
 		schedule = OmpScheduleKind.STATIC;
 		ordered = false;
@@ -153,7 +205,7 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 
 	@Override
 	public OmpForNode copy() {
-		OmpForNode newForNode = new CommonOmpForNode(this.getSource());
+		OmpForNode newForNode = new CommonOmpForNode(this.getSource(), null);
 		int numChildren = this.numChildren();
 
 		for (int i = 0; i < numChildren; i++) {
