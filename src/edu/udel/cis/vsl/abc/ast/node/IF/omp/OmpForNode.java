@@ -1,12 +1,25 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
-import java.util.List;
-
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 
 /**
- * This interface
+ * This interface implements the OpenMP loop construct. <br>
+ * The syntax of the loop construct is specified in Section 2.7.1, OpenMP 4.0.0,
+ * as follows: <br>
+ * <code>#pragma omp for [clause[[,] clause] ... ] new-line<br> 
+ * for-loops</code><br>
+ * where clause is one of the following:<br>
+ * <code>
+ * private(list)<br>
+ * firstprivate(list)<br> 
+ * lastprivate(list)<br> 
+ * reduction(reduction-identifier: list) <br>
+ * schedule(kind[, chunk_size]) <br>
+ * collapse(n)<br>
+ * ordered<br>
+ * nowait</code>
  * 
  * @author Manchun Zheng
  * 
@@ -28,8 +41,8 @@ public interface OmpForNode extends OmpWorkshareNode {
 	void setSchedule(OmpScheduleKind ompScheduleKind);
 
 	/**
-	 * Returns the number of loops associated with the loop construct.
-	 * 1 by default if there is no collapse clause.
+	 * Returns the number of loops associated with the loop construct. 1 by
+	 * default if there is no collapse clause.
 	 * 
 	 * @return
 	 */
@@ -60,9 +73,9 @@ public interface OmpForNode extends OmpWorkshareNode {
 	 * 
 	 * @return
 	 */
-	List<FunctionCallNode> assertions();
+	SequenceNode<FunctionCallNode> assertions();
 
-	void setAssertions(List<FunctionCallNode> assertions);
+	void setAssertions(SequenceNode<FunctionCallNode> assertions);
 
 	/**
 	 * Returns the loop invariant.

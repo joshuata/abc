@@ -33,8 +33,8 @@ public class CommonProgram implements Program {
 		// this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
 		// this.mpiTransformer = mpiTransformer;
-		 standardAnalyzer.clear(ast);
-		 standardAnalyzer.analyze(ast);
+		standardAnalyzer.clear(ast);
+		standardAnalyzer.analyze(ast);
 	}
 
 	@Override
@@ -77,8 +77,11 @@ public class CommonProgram implements Program {
 	@Override
 	public void apply(Transformer transformer) throws SyntaxException {
 		ast = transformer.transform(ast);
+
+		// if (transformer.getCode() != OmpTransformer.CODE) {
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
+		// }
 	}
 
 	@Override

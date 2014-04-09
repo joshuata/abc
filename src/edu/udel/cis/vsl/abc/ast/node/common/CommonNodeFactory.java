@@ -57,6 +57,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorkshareNode.OmpWorkshareNodeKind;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -127,6 +136,13 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonStringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonOrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonSwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpFunctionReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpParallelNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSymbolReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSyncNode;
+import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpWorkshareNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
@@ -788,6 +804,105 @@ public class CommonNodeFactory implements NodeFactory {
 
 		result.setInitialType(processType);
 		return result;
+	}
+
+	@Override
+	public OmpParallelNode newOmpParallelNode(Source source) {
+		return new CommonOmpParallelNode(source);
+	}
+
+	@Override
+	public OmpForNode newOmpForNode(Source source) {
+		return new CommonOmpForNode(source);
+	}
+
+	@Override
+	public OmpSyncNode newOmpMasterNode(Source source, StatementNode statement) {
+		OmpSyncNode masterNode = new CommonOmpSyncNode(source,
+				OmpSyncNodeKind.MASTER);
+
+		masterNode.setStatementNode(statement);
+		return masterNode;
+	}
+
+	@Override
+	public OmpSyncNode newOmpBarrierNode(Source source) {
+		return new CommonOmpSyncNode(source, OmpSyncNodeKind.BARRIER);
+	}
+
+	@Override
+	public OmpWorkshareNode newOmpSectionsNode(Source source) {
+		return new CommonOmpWorkshareNode(source, OmpWorkshareNodeKind.SECTIONS);
+	}
+
+	@Override
+	public OmpWorkshareNode newOmpSectionNode(Source source,
+			StatementNode statement) {
+		OmpWorkshareNode sectionNode = new CommonOmpWorkshareNode(source,
+				OmpWorkshareNodeKind.SECTION);
+
+		sectionNode.setStatementNode(statement);
+		return sectionNode;
+	}
+
+	@Override
+	public OmpDeclarativeNode newOmpThreadprivateNode(Source source,
+			SequenceNode<IdentifierExpressionNode> variables) {
+		return new CommonOmpDeclarativeNode(source, variables);
+	}
+
+	@Override
+	public OmpSymbolReductionNode newOmpSymbolReductionNode(Source source,
+			Operator operator, SequenceNode<IdentifierExpressionNode> variables) {
+		return new CommonOmpSymbolReductionNode(source, operator, variables);
+	}
+
+	@Override
+	public OmpSyncNode newOmpCriticalNode(Source source, IdentifierNode name,
+			StatementNode statement) {
+		OmpSyncNode criticalNode = new CommonOmpSyncNode(source,
+				OmpSyncNodeKind.CRITICAL);
+
+		criticalNode.setCriticalName(name);
+		criticalNode.setStatementNode(statement);
+		return criticalNode;
+	}
+
+	@Override
+	public OmpSyncNode newOmpFlushNode(Source source,
+			SequenceNode<IdentifierExpressionNode> variables) {
+		OmpSyncNode flushNode = new CommonOmpSyncNode(source,
+				OmpSyncNodeKind.FLUSH);
+
+		flushNode.setFlushedList(variables);
+		return flushNode;
+	}
+
+	@Override
+	public OmpSyncNode newOmpOrederedNode(Source source, StatementNode statement) {
+		OmpSyncNode orderedNode = new CommonOmpSyncNode(source,
+				OmpSyncNodeKind.ORDERED);
+
+		orderedNode.setStatementNode(statement);
+		return orderedNode;
+	}
+
+	@Override
+	public OmpWorkshareNode newOmpSingleNode(Source source) {
+		return new CommonOmpWorkshareNode(source, OmpWorkshareNodeKind.SINGLE);
+	}
+
+	@Override
+	public OmpFunctionReductionNode newOmpFunctionReductionNode(Source source,
+			IdentifierExpressionNode function,
+			SequenceNode<IdentifierExpressionNode> variables) {
+		return new CommonOmpFunctionReductionNode(source, function, variables);
+	}
+
+	@Override
+	public OmpWorkshareNode newWorkshareNode(Source source,
+			OmpWorkshareNodeKind kind) {
+		return new CommonOmpWorkshareNode(source, kind);
 	}
 
 }

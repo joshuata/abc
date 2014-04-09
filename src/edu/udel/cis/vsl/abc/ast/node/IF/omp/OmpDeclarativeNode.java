@@ -1,13 +1,26 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 
-public interface OmpDeclarativeNode extends OmpNode {
+/**
+ * This represents the OpenMP declarative pragma. Currently, only threadprivate
+ * is supported.
+ * 
+ * @author Manchun Zheng
+ * 
+ */
+public interface OmpDeclarativeNode extends OmpNode, ExternalDefinitionNode {
 	public enum OmpDeclarativeNodeKind {
 		THREADPRIVATE
 	}
 
+	/**
+	 * The kind of this OpenMP declarative node.
+	 * 
+	 * @return
+	 */
 	OmpDeclarativeNodeKind ompDeclarativeNodeKind();
 
 	void setList(SequenceNode<IdentifierExpressionNode> list);

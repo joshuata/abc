@@ -213,9 +213,8 @@ public class EntityAnalyzer implements Analyzer {
 					.processTypedefDeclaration((TypedefDeclarationNode) node);
 		} else if (node instanceof PragmaNode) {
 			processPragma((PragmaNode) node);
-			if (node instanceof OmpDeclarativeNode) {
-				processOmpDeclarativeNode((OmpDeclarativeNode) node);
-			}
+		} else if (node instanceof OmpDeclarativeNode) {
+			processOmpDeclarativeNode((OmpDeclarativeNode) node);
 		} else if (node instanceof StaticAssertionNode) {
 			processStaticAssertion((StaticAssertionNode) node);
 		} else if (node instanceof StructureOrUnionTypeNode) {

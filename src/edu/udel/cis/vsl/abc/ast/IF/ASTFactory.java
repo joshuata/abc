@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.IF;
 
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -67,5 +68,9 @@ public interface ASTFactory {
 	 * @return type after substitutions performed
 	 */
 	Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map);
+	
+	ASTBuilder getASTBuilder();
+
+	void setASTBuilder(ASTBuilder astBuilder);
 
 }
