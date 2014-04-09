@@ -51,6 +51,18 @@ public interface ASTFactory {
 	 */
 	AST newTranslationUnit(ASTNode root) throws SyntaxException;
 
+	/**
+	 * Same as newTranslationUnit(ASTNode root), except that it has an extra
+	 * argument denoting if OpenMP pragmas are present.
+	 * 
+	 * @param root
+	 * @param hasOmpPragma
+	 * @return
+	 * @throws SyntaxException
+	 */
+	AST newTranslationUnit(ASTNode root, boolean hasOmpPragma)
+			throws SyntaxException;
+
 	NodeFactory getNodeFactory();
 
 	TokenFactory getTokenFactory();
@@ -68,7 +80,7 @@ public interface ASTFactory {
 	 * @return type after substitutions performed
 	 */
 	Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map);
-	
+
 	ASTBuilder getASTBuilder();
 
 	void setASTBuilder(ASTBuilder astBuilder);

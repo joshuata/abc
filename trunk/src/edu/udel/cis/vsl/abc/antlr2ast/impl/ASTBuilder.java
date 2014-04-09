@@ -315,6 +315,11 @@ public class ASTBuilder {
 
 	private CommonTree rootTree;
 
+	/**
+	 * True iff there is at least one OpenMP pragma.
+	 */
+	private boolean hasOmpPragma;
+
 	// private OmpBuilder ompBuilder;
 
 	// Constructors...
@@ -355,7 +360,7 @@ public class ASTBuilder {
 	public AST getTranslationUnit() throws SyntaxException {
 		ASTNode root = translateTranslationUnit(rootTree);
 
-		return unitFactory.newTranslationUnit(root);
+		return unitFactory.newTranslationUnit(root, this.hasOmpPragma);
 	}
 
 	// Supporting methods...
@@ -2262,11 +2267,9 @@ public class ASTBuilder {
 
 			body.add(token);
 		}
-		// if (identifier.name().equals("omp")) {
-		// newlineToken.setType(CivlCParser.EOF);
-		// return ompBuilder.getOmpNode(source, identifier, scope, body,
-		// newlineToken);
-		// }
+		if (identifier.name().equals("omp")) {
+			this.hasOmpPragma = true;
+		}
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
 	}
@@ -2563,6 +2566,10 @@ public class ASTBuilder {
 		}
 		return nodeFactory.newTranslationUnitNode(newSource(translationUnit),
 				definitions);
+	}
+
+	public boolean hasOmpPragma() {
+		return this.hasOmpPragma;
 	}
 
 }

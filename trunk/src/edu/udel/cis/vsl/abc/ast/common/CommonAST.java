@@ -36,10 +36,13 @@ public class CommonAST implements AST {
 
 	private ArrayList<OrdinaryEntity> externalEntities = new ArrayList<OrdinaryEntity>();
 
-	public CommonAST(ASTFactory astFactory, ASTNode root)
+	private boolean hasOmpPragma;
+
+	public CommonAST(ASTFactory astFactory, ASTNode root, boolean hasOmpPragma)
 			throws SyntaxException {
 		this.root = root;
 		this.astFactory = astFactory;
+		this.hasOmpPragma = hasOmpPragma;
 		initialize();
 	}
 
@@ -184,6 +187,11 @@ public class CommonAST implements AST {
 	@Override
 	public Iterator<OrdinaryEntity> getExternalEntities() {
 		return externalEntities.iterator();
+	}
+	
+	@Override
+	public boolean hasOmpPragma(){
+		return this.hasOmpPragma;
 	}
 
 }

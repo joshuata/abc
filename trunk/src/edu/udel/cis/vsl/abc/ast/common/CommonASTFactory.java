@@ -50,8 +50,9 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	@Override
-	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
-		AST unit = new CommonAST(this, (CommonASTNode) root);
+	public AST newTranslationUnit(ASTNode root, boolean hasOmpPragma)
+			throws SyntaxException {
+		AST unit = new CommonAST(this, (CommonASTNode) root, hasOmpPragma);
 
 		// do some preparation?
 		return unit;
@@ -248,5 +249,13 @@ public class CommonASTFactory implements ASTFactory {
 	@Override
 	public void setASTBuilder(ASTBuilder astBuilder) {
 		this.astBuilder = astBuilder;
+	}
+
+	@Override
+	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
+		AST unit = new CommonAST(this, (CommonASTNode) root, false);
+
+		// do some preparation?
+		return unit;
 	}
 }
