@@ -830,7 +830,7 @@ public class ExpressionAnalyzer {
 
 	/**
 	 * Given a left hand side expression, try to find the scope in which the
-	 * memory object refered to by that expression is stored.
+	 * memory object referred to by that expression is stored.
 	 * 
 	 * @param node
 	 *            a LHS expression node
@@ -860,6 +860,7 @@ public class ExpressionAnalyzer {
 					result = (Scope) scopeValue;
 				else
 					result = entityAnalyzer.rootScope;
+				break;
 			}
 			case SUBSCRIPT:
 				result = scopeOf(((OperatorNode) node).getArgument(0));

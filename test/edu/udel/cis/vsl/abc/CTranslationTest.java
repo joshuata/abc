@@ -103,4 +103,9 @@ public class CTranslationTest {
 	public void tagGood1() throws ABCException, IOException {
 		check("tagGood1");
 	}
+	
+	@Test
+	public void a2d() throws ABCException, IOException {
+		check("a2d");
+	}
 }
