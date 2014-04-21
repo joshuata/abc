@@ -112,7 +112,7 @@ typedef struct __queue__ {
   $message messages[];
 } $queue;
  
-/* A globle communicator datatype which must be operated by local communicators.
+/* A global communicator datatype which must be operated by local communicators.
  * This communicator type has the same meaning as the communicator type in MPI
  * standards*/
 typedef struct __gcomm__ {
@@ -121,16 +121,51 @@ typedef struct __gcomm__ {
   $queue buf[][]; // message buffers
 } * $gcomm;
 
-
-/* A datatype representing a local communicator which used for 
- * operating globle communicators. The local communicator type has 
- * a handle of a globle communicator. This type represents for 
+/* A datatype representing a local communicator which is used for 
+ * operating global communicators. The local communicator type has 
+ * a handle of a global communicator. This type represents for 
  * a set of processes which have ranks in common.
  */
- typedef struct __comm__ {
+typedef struct __comm__ {
   int place;
   $gcomm gcomm;
  } * $comm;
+
+/* A datatype representing a global barrier which must be operated by local
+ * barriers. 
+ */
+typedef struct __gbarrier__ {
+  int nprocs;
+  $proc proc_map[]; // initialized as all $proc_null.
+  _Bool in_barrier[]; // initialized as all false.
+  int num_in_barrier; // initialized as 0.
+ } * $gbarrier;
+ 
+/* A datatype representing a global barrier which used for 
+ * operating global barriers. The local barrier type has 
+ * a handle of a global barrier.
+ */
+typedef struct __barrier__ {
+  int place;
+  $gbarrier gbarrier; // initialized as 0.
+ } * $barrier;
+ 
+/* Creates a new barrier object and returns a handle to it.
+ * The barrier has the specified size.
+ * The new object will be allocated in the given scope. */
+$gbarrier $gbarrier_create($scope scope, int size);
+
+void $gbarrier_destroy($gbarrier barrier);
+
+$barrier $barrier_create($scope scope, $gbarrier gbarrier, int place);
+
+void $barrier_enter($barrier barrier);
+
+void $barrier_exit($barrier barrier);
+
+void $barrier_call($barrier barrier);
+
+void $barrier_destroy($barrier barrier);
 
 /* This version of gcomm_create should only be called if size is concrete. */ 
 $gcomm $gcomm_create2($scope scope, int size);
