@@ -1050,7 +1050,7 @@ public class SideEffectRemover extends BaseTransformer {
 		} else if (expression instanceof CastNode) {
 			ExpressionNode argument = ((CastNode) expression).getArgument();
 
-			if (argument.isSideEffectFree(false)) {
+			if (argument.isSideEffectFree(false) || isMallocCall(argument)) {
 				result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
 						expression.copy(), new Vector<BlockItemNode>());
 			} else {
