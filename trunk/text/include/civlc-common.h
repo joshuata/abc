@@ -150,6 +150,12 @@ typedef struct __barrier__ {
   $gbarrier gbarrier; // initialized as 0.
  } * $barrier;
  
+typedef struct __int_iter__ {
+  int size;
+  int content[];
+  int index; //initialized as 0
+} $int_iter;
+ 
 /* Creates a new barrier object and returns a handle to it.
  * The barrier has the specified size.
  * The new object will be allocated in the given scope. */
@@ -239,7 +245,14 @@ _Bool $gcomm_defined($gcomm gcomm);
 /* Returns $true iff comm points to a valid object. */
 _Bool $comm_defined($comm comm);
 
-///* Sets (*p) with the constant value representing NULL of $proc type. */
-//void $proc_null($proc *p);
+/* Tells whether the integer iterator has any more elements */
+_Bool $int_iter_hasNext($int_iter iter);
+
+/* Returns the next element in the iterator (and updates the iterator) */
+int $int_iter_next($int_iter iter);
+
+/* Creates a new iterator for an array of integers, and returns the
+ * handle of the iterator. */
+$int_iter $int_iter_create($scope scope, int *array, int size);
 
 #endif
