@@ -359,7 +359,7 @@ public class Activator {
 		return ast;
 	}
 
-	private void printProgram(PrintStream out, Program program) {
+	public void printProgram(PrintStream out, Program program) {
 		program.print(out);
 		out.println("\n\nSymbol Table:\n");
 		program.printSymbolTable(out);

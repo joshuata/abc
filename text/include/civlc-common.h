@@ -154,7 +154,7 @@ typedef struct __int_iter__ {
   int size;
   int content[];
   int index; //initialized as 0
-} $int_iter;
+} * $int_iter;
  
 /* Creates a new barrier object and returns a handle to it.
  * The barrier has the specified size.
@@ -254,5 +254,8 @@ int $int_iter_next($int_iter iter);
 /* Creates a new iterator for an array of integers, and returns the
  * handle of the iterator. */
 $int_iter $int_iter_create($scope scope, int *array, int size);
+
+/* Deletes an $int_iter object from the heap. */
+void $int_iter_destroy($int_iter iter);
 
 #endif
