@@ -7,9 +7,6 @@
   #endif
 
 /********************************* Types **********************************************/
-
-typedef $comm MPI_Comm;
-
 /* Datatypes (type MPI_Datatype) */
 typedef enum {
   MPI_INT,
@@ -46,10 +43,24 @@ typedef struct __MPI_Comm_record *MPI_Request;
 #define MPI_ANY_TAG -2
 #define MPI_PROC_NULL -3
 
+#define BCAST_TAG 999
+#define REDUCE_TAG 998
+
 #define MPI_STATUS_IGNORE NULL
 #define MPI_STATUSES_IGNORE NULL
 
 /********************************* Communicator *******************************************/
+
+/* Definition of CMPI_Gcomm and MPI_Comm */
+typedef struct CMPI_Gcomm {
+  $gcomm p2p; // point-to-point communication
+  $gcomm col; // collective communication
+} CMPI_Gcomm;
+
+typedef struct MPI_Comm {
+  $comm p2p; // point-to-point communication
+  $comm col; // collective communication
+} MPI_Comm;
 
 MPI_Comm MPI_COMM_WORLD;
 
@@ -111,5 +122,14 @@ int MPI_Type_commit(MPI_Datatype *datatype);
 int MPI_Type_free(MPI_Datatype *datatype);
 
 double MPI_Wtime(void);
+
+/******************************* CIVL Communicator functions  *************************/
+CMPI_Gcomm CMPI_Gcomm_create($scope scope, int size);
+
+MPI_Comm MPI_Comm_create($scope scope, CMPI_Gcomm gc, int rank);
+
+void CMPI_Gcomm_destroy(CMPI_Gcomm gc);
+
+void MPI_Comm_destroy(MPI_Comm comm);
 
 #endif
