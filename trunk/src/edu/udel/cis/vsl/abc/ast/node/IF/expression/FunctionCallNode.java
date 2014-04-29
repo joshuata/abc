@@ -44,4 +44,13 @@ public interface FunctionCallNode extends ExpressionNode {
 	 */
 	SequenceNode<ExpressionNode> getScopeList();
 
+	/**
+	 * Updates the actual parameters of the function call node.
+	 * 
+	 * @param arguments
+	 *            The actual parameters to be used to update the function call
+	 *            node.
+	 */
+	void setArguments(SequenceNode<ExpressionNode> arguments);
+
 }

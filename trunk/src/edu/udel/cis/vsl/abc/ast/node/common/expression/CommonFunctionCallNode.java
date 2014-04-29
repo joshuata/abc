@@ -45,6 +45,11 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 	public void setArgument(int index, ExpressionNode value) {
 		((CommonASTNode) child(1)).setChild(index, value);
 	}
+	
+	@Override
+	public void setArguments(SequenceNode<ExpressionNode> arguments) {
+		this.setChild(1, arguments);
+	}
 
 	@Override
 	protected void printBody(PrintStream out) {
