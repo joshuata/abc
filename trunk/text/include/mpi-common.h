@@ -51,6 +51,12 @@ typedef struct __MPI_Comm_record *MPI_Request;
 
 /********************************* Communicator *******************************************/
 
+typedef enum __MPI_Status__ {
+  __UNINIT,
+  __INIT,
+  __FINALIZED
+} __MPI_Status__;
+
 /* Definition of CMPI_Gcomm and MPI_Comm */
 typedef struct CMPI_Gcomm {
   $gcomm p2p; // point-to-point communication
@@ -60,6 +66,7 @@ typedef struct CMPI_Gcomm {
 typedef struct MPI_Comm {
   $comm p2p; // point-to-point communication
   $comm col; // collective communication
+  __MPI_Status__ status;
 } MPI_Comm;
 
 MPI_Comm MPI_COMM_WORLD;
@@ -68,9 +75,11 @@ MPI_Comm MPI_COMM_WORLD;
 
 int MPI_Init(int *argc, char *** argv);
 
-int __MPI_Init(void);
+int __MPI_Init(MPI_Comm* comm);
 
 int MPI_Finalize(void);
+
+int __MPI_Finalize(MPI_Comm* comm);
 
 int MPI_Comm_rank(MPI_Comm comm, int *rank);
 
