@@ -325,7 +325,7 @@ public class Activator {
 	 *             if AST has a syntax error
 	 */
 	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
-		AST ast = astFactory.newTranslationUnit(root);
+		AST ast = astFactory.newAST(root);
 
 		Analysis.performStandardAnalysis(ast);
 		return ast;

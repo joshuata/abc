@@ -133,7 +133,7 @@ public class Pruner extends BaseTransformer {
 			// but not the declaration, need to replace that node with an
 			// expression statement node.
 			root.keepOnly(reachable);
-			newAst = astFactory.newTranslationUnit(root);
+			newAst = astFactory.newAST(root);
 			return newAst;
 		}
 	}

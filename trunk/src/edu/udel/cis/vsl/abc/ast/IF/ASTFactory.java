@@ -9,9 +9,20 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
+import edu.udel.cis.vsl.abc.token.IF.Inclusion;
+import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
+/**
+ * An ASTFactory is used to create all objects associated to an AST. It actually
+ * encompasses a number of other factories which deal with specific kinds of
+ * objects. For examples, there is a {#link NodeFactory} for creating {#link
+ * ASTNode}s, a {#link TypeFactory} for creating {#link Type}s, and so on.
+ * 
+ * @author siegel
+ * 
+ */
 public interface ASTFactory {
 
 	/**
@@ -26,11 +37,12 @@ public interface ASTFactory {
 	 * After this method returns, the nodes belonging to the new AST will be
 	 * essentially immutable (with exceptions for certain "harmless" fields that
 	 * cannot effect the correctness of the AST). If you want to modify the AST,
-	 * you have to invoke its "release" method, which disolves the AST but
-	 * leaves the nodes untouched and free (so mutable again), and then create a
-	 * new AST once the modifications are complete. You may also invoke the
-	 * AST's clone() method to create a new AST equivalent to the original, with
-	 * all new nodes, if you want to keep the original AST.
+	 * you have to invoke its {@link AST#release()} method, which disolves the
+	 * AST but leaves the nodes untouched and free (so mutable again), and then
+	 * create a new AST once the modifications are complete. You may also invoke
+	 * {@link ASTNode#copy()} on the root node and use it to create a new AST
+	 * equivalent to the original, with all new nodes, if you want to keep the
+	 * original AST.
 	 * 
 	 * Some of the interpretation that takes place:
 	 * 
@@ -42,31 +54,55 @@ public interface ASTFactory {
 	 * 
 	 * <li>determines and sets the cases in the switch statements</li>
 	 * 
-	 * 
 	 * <ul>
 	 * 
 	 * @param root
 	 *            the root node of the new AST
 	 * @return the new AST
+	 * @throws SyntaxException
+	 *             if something violating the syntax rules is found while
+	 *             traversing this AST
 	 */
-	AST newTranslationUnit(ASTNode root) throws SyntaxException;
+	AST newAST(ASTNode root) throws SyntaxException;
 
 	/**
-	 * Same as newTranslationUnit(ASTNode root), except that it has an extra
+	 * Same as {#link {@link #newAST(ASTNode)}, except that it has an extra
 	 * argument denoting if OpenMP pragmas are present.
 	 * 
 	 * @param root
+	 *            the root node of the new AST
 	 * @param hasOmpPragma
-	 * @return
+	 *            does the tree contain any OpenMP pragma nodes?
+	 * @return the new AST
 	 * @throws SyntaxException
+	 *             if something violating the syntax rules is found while
+	 *             traversing this AST
 	 */
-	AST newTranslationUnit(ASTNode root, boolean hasOmpPragma)
-			throws SyntaxException;
+	AST newAST(ASTNode root, boolean hasOmpPragma) throws SyntaxException;
 
+	/**
+	 * Returns the node factory used by this AST factory. The node factory is
+	 * responsible for producing new AST nodes.
+	 * 
+	 * @return the node factory
+	 */
 	NodeFactory getNodeFactory();
 
+	/**
+	 * Returns the token factory used by this AST factory. The token factory is
+	 * responsible for creating not only tokens, but a number of objects related
+	 * to tokens, such as {@link Source} and {@link Inclusion} objects.
+	 * 
+	 * @return the token factory
+	 */
 	TokenFactory getTokenFactory();
 
+	/**
+	 * Returns the type factory used by this AST factory. The type factory is
+	 * used to create {@link Type} objects.
+	 * 
+	 * @return the type factory
+	 */
 	TypeFactory getTypeFactory();
 
 	/**
@@ -81,8 +117,21 @@ public interface ASTFactory {
 	 */
 	Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map);
 
+	/**
+	 * Returns the ASTBuilder used by this AST factory. The ASTBuilder is used
+	 * to translate an ANTLR tree to an AST.
+	 * 
+	 * @return
+	 */
 	ASTBuilder getASTBuilder();
 
+	/**
+	 * Sets the ASTBuilder used by this AST factory. The ASTBuilder is used to
+	 * translate an ANTLR tree to an AST.
+	 * 
+	 * @param astBuilder
+	 *            the ASTBuilder to use
+	 */
 	void setASTBuilder(ASTBuilder astBuilder);
 
 }

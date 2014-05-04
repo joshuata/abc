@@ -96,9 +96,4 @@ public interface StructureOrUnionType extends UnqualifiedObjectType {
 
 	/** Make incomplete. */
 	void clear();
-
-	// StructureOrUnion getEntity();
-
-	// void setEntity(StructureOrUnion entity);
-
 }

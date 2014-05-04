@@ -360,7 +360,7 @@ public class ASTBuilder {
 	public AST getTranslationUnit() throws SyntaxException {
 		ASTNode root = translateTranslationUnit(rootTree);
 
-		return unitFactory.newTranslationUnit(root, this.hasOmpPragma);
+		return unitFactory.newAST(root, this.hasOmpPragma);
 	}
 
 	// Supporting methods...
