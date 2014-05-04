@@ -91,7 +91,7 @@ public class SideEffectRemover extends BaseTransformer {
 				removeSideEffects((FunctionDefinitionNode) node);
 			}
 		}
-		return astFactory.newTranslationUnit(rootNode);
+		return astFactory.newAST(rootNode);
 	}
 
 	private void removeSideEffects(FunctionDefinitionNode function)

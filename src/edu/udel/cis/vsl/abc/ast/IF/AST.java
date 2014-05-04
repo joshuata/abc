@@ -7,38 +7,58 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 
 /**
- * An abstract representation of a C "translation unit"---the thing that results
- * from translating a file (which may in turn include other files).
+ * A representation of a program as an abstract syntax tree.
  * 
  * Each AST encompasses a set of AST nodes. Those nodes are "owned" by the AST.
- * A node can owned by at most one AST. A node may also be free---not owned by
- * any AST.
+ * A node can be owned by at most one AST. A node may also be free---not owned
+ * by any AST.
  * 
  * With few exceptions, nodes owned by an AST cannot be modified. If you want to
  * modify them (for example, to implement an AST transformation), you first have
- * to release the AST using the method {@link #release}.
+ * to "release" the AST using the method {@link #release}.
+ * 
+ * Note that an AST is a rooted tree. In particular, there is a unique path from
+ * the root to any node in the tree.
  * 
  * @author siegel
  * 
  */
 public interface AST {
 
-	/** Returns the ASTFactory responsible for creating this translation unit. */
+	/**
+	 * Returns the ASTFactory associated to this AST. This is the factory that
+	 * was used to create the AST.
+	 * 
+	 * @return the ASTFactory responsible for creating this AST
+	 */
 	ASTFactory getASTFactory();
 
-	/** Returns the root node of the tree. */
+	/**
+	 * Returns the root node of the abstract syntax tree.
+	 * 
+	 * @return the root node
+	 */
 	ASTNode getRootNode();
 
-	/** The number of nodes in the tree. */
+	/**
+	 * Returns the number of nodes in the tree.
+	 * 
+	 * @return the number of nodes in the tree
+	 * */
 	int getNumberOfNodes();
 
 	/**
-	 * Returns the node with the given id number, The id must lie between 0 and
+	 * Returns the node with the given id number. The id must lie between 0 and
 	 * n-1, inclusive, where n is the number of nodes.
+	 * 
+	 * @return the node in this tree with the given id
 	 */
 	ASTNode getNode(int id);
 
-	/** Pretty-prints the entire tree */
+	/**
+	 * Pretty-prints the entire tree. This should be a human-readable
+	 * representation.
+	 * */
 	void print(PrintStream out);
 
 	/**
@@ -82,5 +102,12 @@ public interface AST {
 	 */
 	void add(OrdinaryEntity entity);
 
+	/**
+	 * Determines whether there is any OpenMP pragma node in this tree. This is
+	 * a pragma node with pragma identifier "omp". Such a node is generated from
+	 * a line starting with "#pragma omp" in the source code.
+	 * 
+	 * @return true iff this AST contains an OpenMP pragma node
+	 */
 	boolean hasOmpPragma();
 }

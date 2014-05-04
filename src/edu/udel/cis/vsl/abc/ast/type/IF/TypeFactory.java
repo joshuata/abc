@@ -123,6 +123,8 @@ import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
  * See 5.2.4.2.1 for the minimum values of the bounds for each standard integer
  * type.
  * 
+ * @author siegel
+ * 
  */
 public interface TypeFactory {
 

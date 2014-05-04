@@ -3,22 +3,46 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 import java.io.PrintStream;
 
 /**
+ * <p>
  * An instance of Type represents a C type. A type is a conceptual entity, not a
  * syntactic element. This class is the root of the type hierarchy for all types
  * used to represent C types.
+ * </p>
  * 
+ * <p>
+ * There may also be additional types that are not part of C, but are part of
+ * some extension to C (such as CIVL-C).
+ * </p>
+ * 
+ * <p>
  * Summary of type hierarchy:
+ * </p>
  * 
- * <pre>
- * Type
- * | FunctionType
- * | ObjectType
- * | | UnqualifiedObjectType
- * | | | ArithmeticType, ArrayType, AtomicType, StandardBasicType, ...
- * | | QualifiedObjectType (one or more of const, volatile, restrict)
- * </pre>
+ * {@link Type}
+ * <ul>
+ * <li>{@link FunctionType}
+ * <li>{@link ObjectType}
+ * <ul>
+ * <li>{@link UnqualifiedObjectType}
+ * <ul>
+ * <li>{@link ArithmeticType}</li>
+ * <li>{@link ArrayType}</li>
+ * <li>{@link AtomicType}</li>
+ * <li>{@link StandardBasicType}</li>
+ * <li>etc.</li>
+ * </ul>
+ * </li>
+ * <li>{@link QualifiedObjectType}
+ * <ul>
+ * <li>uses one or more of <code>const</code>, <code>volatile</code>,
+ * <code>restrict</code>, etc.</li>
+ * </ul>
+ * </li>
+ * </ul>
+ * </ul>
  * 
- * Note: AtomicType and QualifiedType constructors take an UnqualifiedType.
+ * Note: {@link AtomicType} and {@link QualifiedType} constructors take an
+ * {@link UnqualifiedObjectType}.
  * 
  * @author siegel
  * 
@@ -29,54 +53,94 @@ public interface Type {
 	 * The different kinds of types.
 	 */
 	public static enum TypeKind {
+		/**
+		 * The <code>void</code> type, used to represent no type in places where
+		 * a type is syntactically required.
+		 */
 		VOID,
+		/**
+		 * A "standard basic type"; an instance of {@link StandardBasicType}
+		 */
 		BASIC,
+		/**
+		 * An integer type which is not a standard basic type. The C Standard
+		 * allows a C implementation to provide additional integer types beyond
+		 * those specified in the Standard.
+		 */
 		OTHER_INTEGER,
+		/**
+		 * An enumeration type; an instance of {@link EnumerationType}
+		 */
 		ENUMERATION,
+		/**
+		 * An array type; an instance of {@link ArrayType}
+		 */
 		ARRAY,
+		/**
+		 * A structure or union type; an instance of
+		 * {@link StructureOrUnionType}
+		 */
 		STRUCTURE_OR_UNION,
+		/**
+		 * A function type; an instance of {@link FunctionType}
+		 */
 		FUNCTION,
+		/**
+		 * A pointer type; an instance of {@link PointerType}
+		 */
 		POINTER,
+		/**
+		 * An atomic type; an instance of {@link AtomicType}
+		 */
 		ATOMIC,
+		/**
+		 * A qualified object type; an instance of {@link QualifiedObjectType}
+		 */
 		QUALIFIED,
+		/**
+		 * The CIVL-C process type, represented by <code>$proc</code>
+		 */
 		PROCESS,
+		/**
+		 * The CIVL-C scope type, represented by <code>$scope</code>
+		 */
 		SCOPE,
+		/**
+		 * The CIVL-C heap type, represened by <code>$heap</code>
+		 */
 		HEAP
 	};
 
 	/**
 	 * The kind of type this is. See definition of the enumerated type
-	 * TypeNameKind. These kinds partition the set of all type names.
-	 * 
-	 * If the kind is BASIC, this object can be safely cast to
-	 * StandardBasicType.
-	 * 
-	 * If the kind is OTHER_INTEGER, the object can be safely cast to
-	 * IntegerType, but not to StandardBasicType.
-	 * 
-	 * If the kind is ENUMERATION, this object can be safely cast to
-	 * EnumerationType.
-	 * 
-	 * If the kind is ARRAY, this object can be safely cast to ArrayType.
-	 * 
-	 * If the kind is STRUCTURE_OR_UNION, this object can be safely cast to
-	 * StructureOrUnionType.
-	 * 
-	 * If the kind is FUNCTION, this object can be safely cast to FunctionType.
-	 * 
-	 * If the kind is POINTER, this object can be safely cast to PointerType.
-	 * 
-	 * If the kind is ATOMIC, this object can be safely cast to AtomicType.
-	 * 
-	 * If the kind if QUALIFIED, this object can be safely cast to
-	 * QualifiedObjectType.
+	 * {@link TypeKind}. These kinds partition the set of all types.
 	 * 
 	 * @return the kind of this type
 	 */
 	TypeKind kind();
 
 	/**
-	 * Is this type a "VM" type (variable modified type)?
+	 * Is this type a "VM" type (variable modified type)? This is defined in the
+	 * C11 Standard Sec. 6.7.6:
+	 * 
+	 * <blockquote> If, in the nested sequence of declarators in a full
+	 * declarator, there is a declarator specifying a variable length array
+	 * type, the type specified by the full declarator is said to be variably
+	 * modified. Furthermore, any type derived by declarator type derivation
+	 * from a variably modified type is itself variably modified. </blockquote>
+	 * 
+	 * The definition of "variable length array type" is given in Sec. 6.7.6.2:
+	 * 
+	 * <blockquote> If the size is not present, the array type is an incomplete
+	 * type. If the size is * instead of being an expression, the array type is
+	 * a variable length array type of unspecified size, which can only be used
+	 * in declarations or type names with function prototype scope;143) such
+	 * arrays are nonetheless complete types. If the size is an integer constant
+	 * expression and the element type has a known constant size, the array type
+	 * is not a variable length array type; otherwise, the array type is a
+	 * variable length array type. (Variable length arrays are a conditional
+	 * feature that implementations need not support; see 6.10.8.3.)
+	 * </blockquote>
 	 * 
 	 * @return true iff this type is a VM type
 	 */

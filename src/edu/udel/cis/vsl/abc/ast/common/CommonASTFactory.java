@@ -50,7 +50,7 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	@Override
-	public AST newTranslationUnit(ASTNode root, boolean hasOmpPragma)
+	public AST newAST(ASTNode root, boolean hasOmpPragma)
 			throws SyntaxException {
 		AST unit = new CommonAST(this, (CommonASTNode) root, hasOmpPragma);
 
@@ -252,7 +252,7 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	@Override
-	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
+	public AST newAST(ASTNode root) throws SyntaxException {
 		AST unit = new CommonAST(this, (CommonASTNode) root, false);
 
 		// do some preparation?
