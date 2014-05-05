@@ -40,4 +40,9 @@ public class CommonBasicTypeNode extends CommonTypeNode implements
 		return result;
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.BASIC;
+	}
+
 }

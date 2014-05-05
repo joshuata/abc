@@ -34,4 +34,8 @@ public class CommonScopeTypeNode extends CommonTypeNode {
 		out.print("$scope");
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.SCOPE;
+	}
 }

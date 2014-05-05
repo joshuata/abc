@@ -32,4 +32,9 @@ public class CommonAtomicTypeNode extends CommonTypeNode implements
 		return result;
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.ATOMIC;
+	}
+
 }

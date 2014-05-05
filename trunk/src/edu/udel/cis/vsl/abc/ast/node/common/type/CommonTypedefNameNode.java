@@ -50,4 +50,8 @@ public class CommonTypedefNameNode extends CommonTypeNode implements
 		return (SequenceNode<ExpressionNode>) child(1);
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.TYPEDEF_NAME;
+	}
 }

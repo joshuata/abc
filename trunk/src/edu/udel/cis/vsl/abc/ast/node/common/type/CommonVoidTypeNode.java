@@ -28,4 +28,8 @@ public class CommonVoidTypeNode extends CommonTypeNode {
 		return result;
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.VOID;
+	}
 }

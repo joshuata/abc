@@ -9,16 +9,7 @@ public interface TypeNode extends SizeableNode {
 	 * The different kinds of type names.
 	 */
 	public static enum TypeNodeKind {
-		VOID,
-		BASIC,
-		ENUMERATION,
-		ARRAY,
-		STRUCTURE_OR_UNION,
-		FUNCTION,
-		POINTER,
-		ATOMIC,
-		TYPEDEF_NAME,
-		SCOPE
+		VOID, BASIC, ENUMERATION, ARRAY, STRUCTURE_OR_UNION, FUNCTION, POINTER, ATOMIC, TYPEDEF_NAME, SCOPE
 	};
 
 	/**
@@ -106,5 +97,11 @@ public interface TypeNode extends SizeableNode {
 
 	@Override
 	TypeNode copy();
+
+	/**
+	 * 
+	 * @return The kind of this type node.
+	 */
+	TypeNodeKind typeNodeKind();
 
 }
