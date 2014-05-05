@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
 
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
@@ -95,33 +96,39 @@ import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
- * The factory used to construct the nodes of the Abstract Syntax Tree of a
- * translation unit.
+ * <p>
+ * The factory used to construct the nodes of Abstract Syntax Trees.
+ * </p>
  * 
+ * <p>
  * The user constructs the nodes of an AST using the methods in this class.
  * These nodes have the structure of a tree, the root node being the node
- * representing the translation unit; the children of the root node correspond
- * to the "external definitions" of the unit. Once these have been constructed,
- * the {@link ASTFactory#newAST} method is invoked on the root node to actually
- * construct the TranslationUnit object. This performs a number of analyses and
- * stores additional information about the translation unit. A number of errors
- * can be detected and reported at this stage. Among other things, this also
- * computes the abstract "type" of every variable, function, and expression. It
- * also computes the scope and linkage of all identifiers.
+ * representing the translation unit or program; the children of the root node
+ * correspond to the "external definitions" of the unit. Once these have been
+ * constructed, the {@link ASTFactory#newAST} method is invoked on the root node
+ * to actually construct the AST object. This performs a number of analyses and
+ * stores additional information about the AST. A number of errors can be
+ * detected and reported at this stage. Among other things, this also computes
+ * the abstract "type" of every variable, function, and expression. It also
+ * computes the scope and linkage of all identifiers.
+ * </p>
  * 
+ * <p>
  * After the AST is created, the AST (and all of its nodes) become immutable.
- * Every node has an "owner" (originally null), which is set to the
- * TranslationUnit object at this time. If you want to modify the tree, you must
- * first invoke the "release" method, which frees the nodes from ownership by
- * the TranslationUnit object, setting the "owner" fields again to null. They
- * can then be modified, and then "newTranslationUnit" called again to
- * re-analylze and re-build a translation unit. Alternatively, you can also
- * clone, if you want to keep the old translation unit around for some reason.
+ * Every node has an "owner" (originally <code>null</code>), which is set to the
+ * new AST object at this time. If you want to modify the tree, you must first
+ * invoke the {@link AST#release()} method, which frees the nodes from ownership
+ * by the AST object, setting the "owner" fields again to <code>null</code>.
+ * They can then be modified, and then {@link ASTFactory#newAST} called again to
+ * re-analylze and re-build an AST. Alternatively, you can also clone the tree,
+ * if you want to keep the old AST around for some reason.
+ * </p>
  * 
- * Finally, one or more translation unit can be combined to form a complete
- * "program" using the newProgram method. This corresponds to "linking" in the
- * usual compiler sense. (Not yet implemented.)
- * 
+ * <p>
+ * Finally, one or more ASTs can be combined to form a complete "program" using
+ * the newProgram method. This corresponds to "linking" in the usual compiler
+ * sense. (Not yet implemented.)
+ * </p>
  * 
  * @author siegel
  * 
