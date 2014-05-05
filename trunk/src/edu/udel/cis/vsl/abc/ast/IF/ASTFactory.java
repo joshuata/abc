@@ -66,21 +66,6 @@ public interface ASTFactory {
 	AST newAST(ASTNode root) throws SyntaxException;
 
 	/**
-	 * Same as {#link {@link #newAST(ASTNode)}, except that it has an extra
-	 * argument denoting if OpenMP pragmas are present.
-	 * 
-	 * @param root
-	 *            the root node of the new AST
-	 * @param hasOmpPragma
-	 *            does the tree contain any OpenMP pragma nodes?
-	 * @return the new AST
-	 * @throws SyntaxException
-	 *             if something violating the syntax rules is found while
-	 *             traversing this AST
-	 */
-	AST newAST(ASTNode root, boolean hasOmpPragma) throws SyntaxException;
-
-	/**
 	 * Returns the node factory used by this AST factory. The node factory is
 	 * responsible for producing new AST nodes.
 	 * 

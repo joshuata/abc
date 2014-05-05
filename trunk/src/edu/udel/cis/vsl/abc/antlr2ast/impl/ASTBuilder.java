@@ -1,26 +1,6 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ALIGNOF;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.AMPERSAND;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.AND;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ARROW;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ASSIGN;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.ATOMIC;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BIG_O;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITANDEQ;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITOR;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITOREQ;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITXOR;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BITXOREQ;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.BREAK;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.CHARACTER_CONSTANT;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.COMMA;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.CONST;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.CONTINUE;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DIV;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DIVEQ;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DO;
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.DOT;
+import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +69,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
-import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -107,202 +86,6 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
  */
 public class ASTBuilder {
 
-	// Convenient constants...
-
-	// static final int ALIGNAS = CivlCParser.ALIGNAS;
-	// static final int ALIGNOF = CivlCParser.ALIGNOF;
-	// static final int AMPERSAND = CivlCParser.AMPERSAND;
-	// static final int AND = CivlCParser.AND;
-	// static final int ARROW = CivlCParser.ARROW;
-	// static final int ASSIGN = CivlCParser.ASSIGN;
-	// static final int ATOMIC = CivlCParser.ATOMIC;
-	// static final int AUTO = CivlCParser.AUTO;
-	// static final int BIG_O = CivlCParser.BIG_O;
-	// static final int BITANDEQ = CivlCParser.BITANDEQ;
-	// static final int BITOR = CivlCParser.BITOR;
-	// static final int BITOREQ = CivlCParser.BITOREQ;
-	// static final int BITXOR = CivlCParser.BITXOR;
-	// static final int BITXOREQ = CivlCParser.BITXOREQ;
-	// static final int BOOL = CivlCParser.BOOL;
-	// static final int BREAK = CivlCParser.BREAK;
-	// static final int CASE = CivlCParser.CASE;
-	// static final int CHAR = CivlCParser.CHAR;
-	// static final int CHARACTER_CONSTANT = CivlCParser.CHARACTER_CONSTANT;
-	// static final int COLON = CivlCParser.COLON;
-	// static final int COMMA = CivlCParser.COMMA;
-	// static final int COMMENT = CivlCParser.COMMENT;
-	// static final int COMPLEX = CivlCParser.COMPLEX;
-	// static final int CONST = CivlCParser.CONST;
-	// static final int CONTINUE = CivlCParser.CONTINUE;
-	// static final int DEFAULT = CivlCParser.DEFAULT;
-	// static final int DIV = CivlCParser.DIV;
-	// static final int DIVEQ = CivlCParser.DIVEQ;
-	// static final int DO = CivlCParser.DO;
-	// static final int DOT = CivlCParser.DOT;
-	static final int DOUBLE = CivlCParser.DOUBLE;
-	static final int ELLIPSIS = CivlCParser.ELLIPSIS;
-	static final int ELSE = CivlCParser.ELSE;
-	static final int ENUM = CivlCParser.ENUM;
-	static final int EQUALS = CivlCParser.EQUALS;
-	static final int EXTERN = CivlCParser.EXTERN;
-	static final int FLOAT = CivlCParser.FLOAT;
-	static final int FLOATING_CONSTANT = CivlCParser.FLOATING_CONSTANT;
-	static final int FOR = CivlCParser.FOR;
-	static final int GENERIC = CivlCParser.GENERIC;
-	static final int GOTO = CivlCParser.GOTO;
-	static final int GT = CivlCParser.GT;
-	static final int GTE = CivlCParser.GTE;
-	static final int IDENTIFIER = CivlCParser.IDENTIFIER;
-	static final int IF = CivlCParser.IF;
-	static final int IMAGINARY = CivlCParser.IMAGINARY;
-	static final int INLINE = CivlCParser.INLINE;
-	static final int INT = CivlCParser.INT;
-	static final int INTEGER_CONSTANT = CivlCParser.INTEGER_CONSTANT;
-	static final int LCURLY = CivlCParser.LCURLY;
-	static final int LONG = CivlCParser.LONG;
-	static final int LPAREN = CivlCParser.LPAREN;
-	static final int LSQUARE = CivlCParser.LSQUARE;
-	static final int LT = CivlCParser.LT;
-	static final int LTE = CivlCParser.LTE;
-	static final int MINUSMINUS = CivlCParser.MINUSMINUS;
-	static final int MOD = CivlCParser.MOD;
-	static final int MODEQ = CivlCParser.MODEQ;
-	static final int NEQ = CivlCParser.NEQ;
-	static final int NEWLINE = CivlCParser.NEWLINE;
-	static final int NORETURN = CivlCParser.NORETURN;
-	static final int NOT = CivlCParser.NOT;
-	static final int OR = CivlCParser.OR;
-	static final int OTHER = CivlCParser.OTHER;
-	static final int PARENTHESIZED_EXPRESSION = CivlCParser.PARENTHESIZED_EXPRESSION;
-	static final int PLUS = CivlCParser.PLUS;
-	static final int PLUSEQ = CivlCParser.PLUSEQ;
-	static final int PLUSPLUS = CivlCParser.PLUSPLUS;
-	static final int POST_DECREMENT = CivlCParser.POST_DECREMENT;
-	static final int POST_INCREMENT = CivlCParser.POST_INCREMENT;
-	static final int PRE_DECREMENT = CivlCParser.PRE_DECREMENT;
-	static final int PRE_INCREMENT = CivlCParser.PRE_INCREMENT;
-	static final int PP_NUMBER = CivlCParser.PP_NUMBER;
-	static final int PRAGMA = CivlCParser.PRAGMA;
-	static final int QMARK = CivlCParser.QMARK;
-	static final int RCURLY = CivlCParser.RCURLY;
-	static final int REGISTER = CivlCParser.REGISTER;
-	static final int RESTRICT = CivlCParser.RESTRICT;
-	static final int RETURN = CivlCParser.RETURN;
-	static final int RPAREN = CivlCParser.RPAREN;
-	static final int RSQUARE = CivlCParser.RSQUARE;
-	static final int SEMI = CivlCParser.SEMI;
-	static final int SHIFTLEFT = CivlCParser.SHIFTLEFT;
-	static final int SHIFTLEFTEQ = CivlCParser.SHIFTLEFTEQ;
-	static final int SHIFTRIGHT = CivlCParser.SHIFTRIGHT;
-	static final int SHIFTRIGHTEQ = CivlCParser.SHIFTRIGHTEQ;
-	static final int SHORT = CivlCParser.SHORT;
-	static final int SIGNED = CivlCParser.SIGNED;
-	static final int SIZEOF = CivlCParser.SIZEOF;
-	static final int SCOPEOF = CivlCParser.SCOPEOF;
-	static final int STAR = CivlCParser.STAR;
-	static final int STAREQ = CivlCParser.STAREQ;
-	static final int STATIC = CivlCParser.STATIC;
-	static final int STATICASSERT = CivlCParser.STATICASSERT;
-	static final int STRING_LITERAL = CivlCParser.STRING_LITERAL;
-	static final int STRUCT = CivlCParser.STRUCT;
-	static final int SUB = CivlCParser.SUB;
-	static final int SUBEQ = CivlCParser.SUBEQ;
-	static final int SWITCH = CivlCParser.SWITCH;
-	static final int THREADLOCAL = CivlCParser.THREADLOCAL;
-	static final int TILDE = CivlCParser.TILDE;
-	static final int TYPEDEF = CivlCParser.TYPEDEF;
-	static final int UNION = CivlCParser.UNION;
-	static final int UNSIGNED = CivlCParser.UNSIGNED;
-	static final int VOID = CivlCParser.VOID;
-	static final int VOLATILE = CivlCParser.VOLATILE;
-	static final int WHILE = CivlCParser.WHILE;
-	static final int WS = CivlCParser.WS;
-	static final int ABSENT = CivlCParser.ABSENT;
-	static final int ABSTRACT_DECLARATOR = CivlCParser.ABSTRACT_DECLARATOR;
-	static final int ARGUMENT_LIST = CivlCParser.ARGUMENT_LIST;
-	static final int ARRAY_ELEMENT_DESIGNATOR = CivlCParser.ARRAY_ELEMENT_DESIGNATOR;
-	static final int ARRAY_SUFFIX = CivlCParser.ARRAY_SUFFIX;
-	static final int COMPOUND_STATEMENT = CivlCParser.COMPOUND_STATEMENT;
-	static final int BLOCK_ITEM_LIST = CivlCParser.BLOCK_ITEM_LIST;
-	static final int CALL = CivlCParser.CALL;
-	static final int CASE_LABELED_STATEMENT = CivlCParser.CASE_LABELED_STATEMENT;
-	static final int CAST = CivlCParser.CAST;
-	static final int COMPOUND_LITERAL = CivlCParser.COMPOUND_LITERAL;
-	static final int DECLARATION = CivlCParser.DECLARATION;
-	static final int DECLARATION_LIST = CivlCParser.DECLARATION_LIST;
-	static final int DECLARATION_SPECIFIERS = CivlCParser.DECLARATION_SPECIFIERS;
-	static final int DECLARATOR = CivlCParser.DECLARATOR;
-	static final int DEFAULT_LABELED_STATEMENT = CivlCParser.DEFAULT_LABELED_STATEMENT;
-	static final int DESIGNATED_INITIALIZER = CivlCParser.DESIGNATED_INITIALIZER;
-	static final int DESIGNATION = CivlCParser.DESIGNATION;
-	static final int DIRECT_ABSTRACT_DECLARATOR = CivlCParser.DIRECT_ABSTRACT_DECLARATOR;
-	static final int DIRECT_DECLARATOR = CivlCParser.DIRECT_DECLARATOR;
-	static final int ENUMERATION_CONSTANT = CivlCParser.ENUMERATION_CONSTANT;
-	static final int ENUMERATOR = CivlCParser.ENUMERATOR;
-	static final int ENUMERATOR_LIST = CivlCParser.ENUMERATOR_LIST;
-	static final int EXPR = CivlCParser.EXPR;
-	static final int EXPRESSION_STATEMENT = CivlCParser.EXPRESSION_STATEMENT;
-	static final int FIELD_DESIGNATOR = CivlCParser.FIELD_DESIGNATOR;
-	static final int FUNCTION_DEFINITION = CivlCParser.FUNCTION_DEFINITION;
-	static final int FUNCTION_SUFFIX = CivlCParser.FUNCTION_SUFFIX;
-	static final int GENERIC_ASSOCIATION = CivlCParser.GENERIC_ASSOCIATION;
-	static final int GENERIC_ASSOC_LIST = CivlCParser.GENERIC_ASSOC_LIST;
-	static final int IDENTIFIER_LABELED_STATEMENT = CivlCParser.IDENTIFIER_LABELED_STATEMENT;
-	static final int IDENTIFIER_LIST = CivlCParser.IDENTIFIER_LIST;
-	static final int INDEX = CivlCParser.INDEX;
-	static final int INITIALIZER_LIST = CivlCParser.INITIALIZER_LIST;
-	static final int INIT_DECLARATOR = CivlCParser.INIT_DECLARATOR;
-	static final int INIT_DECLARATOR_LIST = CivlCParser.INIT_DECLARATOR_LIST;
-	static final int OPERATOR = CivlCParser.OPERATOR;
-	static final int PARAMETER_DECLARATION = CivlCParser.PARAMETER_DECLARATION;
-	static final int PARAMETER_LIST = CivlCParser.PARAMETER_LIST;
-	static final int PARAMETER_TYPE_LIST = CivlCParser.PARAMETER_TYPE_LIST;
-	static final int POINTER = CivlCParser.POINTER;
-	static final int SCALAR_INITIALIZER = CivlCParser.SCALAR_INITIALIZER;
-	static final int SPECIFIER_QUALIFIER_LIST = CivlCParser.SPECIFIER_QUALIFIER_LIST;
-	static final int STRUCT_DECLARATION = CivlCParser.STRUCT_DECLARATION;
-	static final int STRUCT_DECLARATION_LIST = CivlCParser.STRUCT_DECLARATION_LIST;
-	static final int STRUCT_DECLARATOR = CivlCParser.STRUCT_DECLARATOR;
-	static final int STRUCT_DECLARATOR_LIST = CivlCParser.STRUCT_DECLARATOR;
-	static final int TRANSLATION_UNIT = CivlCParser.TRANSLATION_UNIT;
-	static final int TYPE = CivlCParser.TYPE;
-	static final int TYPEDEF_NAME = CivlCParser.TYPEDEF_NAME;
-	static final int TYPE_NAME = CivlCParser.TYPE_NAME;
-	static final int TYPE_QUALIFIER_LIST = CivlCParser.TYPE_QUALIFIER_LIST;
-
-	// added for CIVL-C...
-
-	// static final int PROC = CivlCParser.PROC;
-	static final int SELF = CivlCParser.SELF;
-	static final int HERE = CivlCParser.HERE;
-	static final int ROOT = CivlCParser.ROOT;
-	static final int INPUT = CivlCParser.INPUT;
-	static final int OUTPUT = CivlCParser.OUTPUT;
-	static final int SPAWN = CivlCParser.SPAWN;
-	// static final int WAIT = CivlCParser.WAIT;
-	// static final int ASSERT = CivlCParser.ASSERT;
-	static final int TRUE = CivlCParser.TRUE;
-	static final int FALSE = CivlCParser.FALSE;
-	static final int ASSUME = CivlCParser.ASSUME;
-	static final int WHEN = CivlCParser.WHEN;
-	static final int CHOOSE = CivlCParser.CHOOSE;
-	static final int INVARIANT = CivlCParser.INVARIANT;
-	static final int REQUIRES = CivlCParser.REQUIRES;
-	static final int ENSURES = CivlCParser.ENSURES;
-	static final int RESULT = CivlCParser.RESULT;
-	static final int AT = CivlCParser.AT;
-	static final int COLLECTIVE = CivlCParser.COLLECTIVE;
-	static final int SCOPE = CivlCParser.SCOPE;
-	static final int SCOPE_NAME = CivlCParser.SCOPE_NAME;
-	static final int FORALL = CivlCParser.FORALL;
-	static final int EXISTS = CivlCParser.EXISTS;
-	static final int UNIFORM = CivlCParser.UNIFORM;
-	static final int CIVLATOMIC = CivlCParser.CIVLATOMIC;
-	static final int CIVLATOM = CivlCParser.CIVLATOM;
-	static final int IMPLIES = CivlCParser.IMPLIES;
-	static final int DERIVATIVE_EXPRESSION = CivlCParser.DERIVATIVE_EXPRESSION;
-	static final int PROCNULL = CivlCParser.PROCNULL;
-
 	// Instance fields...
 
 	private CParser parser;
@@ -314,13 +97,6 @@ public class ASTBuilder {
 	private ASTFactory unitFactory;
 
 	private CommonTree rootTree;
-
-	/**
-	 * True iff there is at least one OpenMP pragma.
-	 */
-	private boolean hasOmpPragma;
-
-	// private OmpBuilder ompBuilder;
 
 	// Constructors...
 
@@ -360,7 +136,7 @@ public class ASTBuilder {
 	public AST getTranslationUnit() throws SyntaxException {
 		ASTNode root = translateTranslationUnit(rootTree);
 
-		return unitFactory.newAST(root, this.hasOmpPragma);
+		return unitFactory.newAST(root);
 	}
 
 	// Supporting methods...
@@ -484,28 +260,6 @@ public class ASTBuilder {
 			return result;
 		}
 	}
-
-	// private SequenceNode<IdentifierNode> translateIdentifierList(String name,
-	// CommonTree list) {
-	// int kind = list.getType();
-	// if (kind == ABSENT) {
-	// return null;
-	// } else {
-	// int numChildren = list.getChildCount();
-	// LinkedList<IdentifierNode> nodeList = new LinkedList<IdentifierNode>();
-	// SequenceNode<IdentifierNode> result;
-	// Source source = newSource(list);
-	//
-	// for (int i = 0; i < numChildren; i++) {
-	// CommonTree child = (CommonTree) list.getChild(i);
-	// IdentifierNode identifierNode = translateIdentifier(child);
-	//
-	// nodeList.add(identifierNode);
-	// }
-	// result = nodeFactory.newSequenceNode(source, name, nodeList);
-	// return result;
-	// }
-	// }
 
 	private IntegerConstantNode translateIntegerConstant(Source source,
 			CommonTree integerConstant) throws SyntaxException {
@@ -2267,9 +2021,6 @@ public class ASTBuilder {
 
 			body.add(token);
 		}
-		if (identifier.name().equals("omp")) {
-			this.hasOmpPragma = true;
-		}
 		return nodeFactory
 				.newPragmaNode(source, identifier, body, newlineToken);
 	}
@@ -2567,11 +2318,6 @@ public class ASTBuilder {
 		return nodeFactory.newTranslationUnitNode(newSource(translationUnit),
 				definitions);
 	}
-
-	public boolean hasOmpPragma() {
-		return this.hasOmpPragma;
-	}
-
 }
 
 /**

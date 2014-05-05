@@ -308,7 +308,6 @@ public class Activator {
 		AST ast = getRawTranslationUnit();
 		Program program = programFactory.newProgram(ast, this.universe);
 
-		program.setHasOmpPragma(ast.hasOmpPragma());
 		return program;
 	}
 

@@ -50,15 +50,6 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	@Override
-	public AST newAST(ASTNode root, boolean hasOmpPragma)
-			throws SyntaxException {
-		AST unit = new CommonAST(this, (CommonASTNode) root, hasOmpPragma);
-
-		// do some preparation?
-		return unit;
-	}
-
-	@Override
 	public NodeFactory getNodeFactory() {
 		return nodeFactory;
 	}

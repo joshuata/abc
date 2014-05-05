@@ -109,13 +109,4 @@ public interface AST {
 	 *            an Entity with internal or external linkage
 	 */
 	void add(OrdinaryEntity entity);
-
-	/**
-	 * Determines whether there is any OpenMP pragma node in this tree. This is
-	 * a pragma node with pragma identifier "omp". Such a node is generated from
-	 * a line starting with "#pragma omp" in the source code.
-	 * 
-	 * @return true iff this AST contains an OpenMP pragma node
-	 */
-	boolean hasOmpPragma();
 }
