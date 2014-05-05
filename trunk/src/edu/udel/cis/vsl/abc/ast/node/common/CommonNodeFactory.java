@@ -315,8 +315,7 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public CharacterConstantNode newCharacterConstantNode(Source source,
-			String representation, ExecutionCharacter character)
-			throws SyntaxException {
+			String representation, ExecutionCharacter character) {
 		CharacterValue constant = valueFactory.characterValue(character);
 
 		return new CommonCharacterConstantNode(source, representation, constant);

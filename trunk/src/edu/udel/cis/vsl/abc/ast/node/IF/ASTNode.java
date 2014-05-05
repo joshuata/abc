@@ -13,100 +13,46 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 public interface ASTNode {
 
 	/**
-	 * The different kind of nodes. Not yet using this, but could if it turns
-	 * out to be useful.
+	 * The different kind of AST nodes. Every AST node falls into one of the
+	 * following categories.
 	 * 
 	 * @author siegel
 	 * 
 	 */
-	// useful in CIVL's model builder worker, to get rid of long branches of
-	// if-else
 	public enum NodeKind {
-		PAIR, SEQUENCE, IDENTIFIER, PRAGMA, STATIC_ASSERTION,
-		// COMPOUND_INITIALIZER,
-		DESIGNATION,
 		ARRAY_DESIGNATOR,
-		FIELD_DESIGNATOR,
+		COLLECTIVE,
+		DECLARATION_LIST,
+		DESIGNATION,
+		ENSURES,
 		ENUMERATOR_DECLARATION,
+		EXPRESSION,
 		FIELD_DECLARATION,
-		VARIABLE_DECLARATION,
+		FIELD_DESIGNATOR,
 		FUNCTION_DECLARATION,
 		FUNCTION_DEFINITION,
-		TYPEDEF,
-		// ALIGNOF,
-		// ARROW,
-		// CAST,
-		// CHARACTER_CONSTANT,
-		// COMPOUND_LITERAL,
-		// DOT,
-		// ENUMERATION_CONSTANT,
-		// FLOATING_CONSTANT,
-		// FUNCTION_CALL,
 		GENERIC_SELECTION,
+		IDENTIFIER,
 		IDENTIFIER_EXPRESSION,
-		// INTEGER_CONSTANT,
-		// OPERATOR,
-		// SIZEOF,
-		// STRING_LITERAL,
-		ORDINARY_LABEL,
-		SWITCH_LABEL,
-		// COMPOUND_STATEMENT,
-		DECLARATION_LIST,
-		// EXPRESSION_STATEMENT,
-		// FOR,
-		// WHILE,
-		// DO_WHILE,
-		// GOTO,
-		// IF,
-		// CONTINUE,
-		// BREAK,
-		// RETURN,
-		// LABELED_STATEMENT,
-		// SWITCH,
-		ARRAY_TYPE,
-		ATOMIC_TYPE,
-		BASIC_TYPE,
-		ENUMERATION_TYPE,
-		FUNCTION_TYPE,
-		POINTER_TYPE,
-		STRUCT_OR_UNION_TYPE,
-		TYPEDEF_NAME,
-		PROCESS_TYPE,
-		SELF,
-		// SPAWN,
-		// WAIT,
-		// ASSERT,
-		// ASSUME,
-		// WHEN,
-		// CHOOSE,
 		INVARIANT,
-		ENSURES,
-		REQUIRES,
-		COLLECTIVE,
-		RESULT,
-		// REMOTE_REFERENCE,
-		SCOPE_PARAMETERIZED_DECLARATION,
-		// CONSTANT,
-		TYPE,
-		EXPRESSION,
-		STATEMENT,
 		OMP_NODE,
-		OMP_REDUCTION_OPERATOR
+		OMP_REDUCTION_OPERATOR,
+		ORDINARY_LABEL,
+		PAIR,
+		PRAGMA,
+		REQUIRES,
+		RESULT,
+		SCOPE_PARAMETERIZED_DECLARATION,
+		SELF,
+		SEQUENCE,
+		STATEMENT,
+		STATIC_ASSERTION,
+		SWITCH_LABEL,
+		TYPE,
+		TYPEDEF,
+		TYPEDEF_NAME,
+		VARIABLE_DECLARATION
 	};
-
-	/** ID number unique within the AST to which this node belongs. */
-	int id();
-
-	void setId(int id);
-
-	/** The parent of this node, or null if this node has no parent. */
-	ASTNode parent();
-
-	/** The index of this node among the children of its parent. */
-	int childIndex();
-
-	/** Returns the number of children nodes of this AST node. */
-	int numChildren();
 
 	/**
 	 * Returns the index-th child node of this AST node.
@@ -118,6 +64,9 @@ public interface ASTNode {
 	 */
 	ASTNode child(int index) throws NoSuchElementException;
 
+	/** The index of this node among the children of its parent. */
+	int childIndex();
+
 	/**
 	 * Returns the sequence of children of this node as an iterable object. Do
 	 * not attempt to cast the iterable to another type and/or modify it; if you
@@ -125,11 +74,14 @@ public interface ASTNode {
 	 */
 	Iterable<ASTNode> children();
 
-	/** Returns a textual representation of this node only. */
-	String toString();
-
-	/** Prints a textual representation of this node. */
-	void print(String prefix, PrintStream out, boolean includeSource);
+	/**
+	 * Returns a deep copy of this AST node. The node and all of its descendants
+	 * will be cloned. The cloning does not copy analysis or attribute
+	 * information.
+	 * 
+	 * @return deep copy of this node
+	 */
+	ASTNode copy();
 
 	/**
 	 * Returns the attribute value associated to the given key, or null if no
@@ -139,11 +91,20 @@ public interface ASTNode {
 	Object getAttribute(AttributeKey key);
 
 	/**
-	 * Sets the attribute value associated to the given key. This method also
-	 * checks that the value belongs to the correct class. Note that attribute
-	 * keys are generated in the ASTFactory.
+	 * Returns the "owner" of this AST, i.e., the AST to which this node
+	 * belongs. This can be <code>null</code>, in which case we say this node is
+	 * "free".
+	 * 
+	 * @return the owner of this node or <code>null</code>
 	 */
-	void setAttribute(AttributeKey key, Object value);
+	AST getOwner();
+
+	/**
+	 * Gets the scope in which this syntactic element occurs.
+	 * 
+	 * @return the scope
+	 */
+	Scope getScope();
 
 	/**
 	 * Returns the source object that locates the origin of this program
@@ -154,59 +115,8 @@ public interface ASTNode {
 	 */
 	Source getSource();
 
-	/**
-	 * Gets the scope in which this syntactic element occurs.
-	 * 
-	 * @return the scope
-	 */
-	Scope getScope();
-
-	/**
-	 * Sets the scope of this syntactic element.
-	 * 
-	 * @param scope
-	 *            the scope
-	 */
-	void setScope(Scope scope);
-
-	void setOwner(AST owner);
-
-	AST getOwner();
-
-	/**
-	 * Sets the child node at the given index. This ASTNode must be either null
-	 * or free (not owned by an AST) if this is called. A non-null child must
-	 * have a null parent, i.e., not be the child of another node. The caller is
-	 * responsible for ensuring that the child is of the appropriate kind and
-	 * type. The index can be any nonnegative integer. The list of children will
-	 * be expanded as necessary with null values in order to incorporate the
-	 * index.
-	 * 
-	 * @param index
-	 *            nonnegative integer
-	 * @param child
-	 *            a node (or null) to be made the index-th child of this node
-	 */
-	void setChild(int index, ASTNode child);
-
-	/**
-	 * Removes the child at given index from the node. The index must be in the
-	 * range [0,numChildren-1]. If there is no child at the given index (i.e.,
-	 * child is null), this is a no-op.
-	 * 
-	 * @param index
-	 *            nonnegative integer
-	 */
-	void removeChild(int index);
-
-	/**
-	 * Returns a deep copy of this AST node. The node and all of its descendants
-	 * will be cloned. The cloning does not copy analysis or attribute
-	 * information.
-	 * 
-	 * @return deep copy of this node
-	 */
-	ASTNode copy();
+	/** ID number unique within the AST to which this node belongs. */
+	int id();
 
 	/**
 	 * Removes all children that do not satisfy the predicate and applies this
@@ -233,4 +143,67 @@ public interface ASTNode {
 	 * @return The node kind defined as an enum element
 	 */
 	NodeKind nodeKind();
+
+	/** Returns the number of children nodes of this AST node. */
+	int numChildren();
+
+	/** The parent of this node, or null if this node has no parent. */
+	ASTNode parent();
+
+	/** Prints a textual representation of this node. */
+	void print(String prefix, PrintStream out, boolean includeSource);
+
+	/**
+	 * Removes the child at given index from the node. The index must be in the
+	 * range [0,numChildren-1]. If there is no child at the given index (i.e.,
+	 * child is null), this is a no-op.
+	 * 
+	 * @param index
+	 *            nonnegative integer
+	 */
+	void removeChild(int index);
+
+	/**
+	 * Sets the attribute value associated to the given key. This method also
+	 * checks that the value belongs to the correct class. Note that attribute
+	 * keys are generated in the ASTFactory.
+	 */
+	void setAttribute(AttributeKey key, Object value);
+
+	/**
+	 * Sets the child node at the given index. This ASTNode must be either null
+	 * or free (not owned by an AST) if this is called. A non-null child must
+	 * have a null parent, i.e., not be the child of another node. The caller is
+	 * responsible for ensuring that the child is of the appropriate kind and
+	 * type. The index can be any nonnegative integer. The list of children will
+	 * be expanded as necessary with null values in order to incorporate the
+	 * index.
+	 * 
+	 * @param index
+	 *            nonnegative integer
+	 * @param child
+	 *            a node (or null) to be made the index-th child of this node
+	 */
+	void setChild(int index, ASTNode child);
+
+	void setId(int id);
+
+	/**
+	 * Sets the owner of this node to the given AST.
+	 * 
+	 * @param owner
+	 *            the AST to make the owner of this node
+	 */
+	void setOwner(AST owner);
+
+	/**
+	 * Sets the scope of this syntactic element.
+	 * 
+	 * @param scope
+	 *            the scope
+	 */
+	void setScope(Scope scope);
+
+	/** Returns a textual representation of this node only. */
+	String toString();
 }

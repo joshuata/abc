@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.ast.IF;
 import java.io.PrintStream;
 import java.util.Iterator;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 
@@ -13,12 +14,18 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * A node can be owned by at most one AST. A node may also be free---not owned
  * by any AST.
  * 
+ * The AST also methods to return the internal and external entities associated
+ * to the AST.
+ * 
  * With few exceptions, nodes owned by an AST cannot be modified. If you want to
  * modify them (for example, to implement an AST transformation), you first have
  * to "release" the AST using the method {@link #release}.
  * 
  * Note that an AST is a rooted tree. In particular, there is a unique path from
  * the root to any node in the tree.
+ * 
+ * @see {@link Entity}
+ * @see {@link ASTNode}
  * 
  * @author siegel
  * 
@@ -63,7 +70,8 @@ public interface AST {
 
 	/**
 	 * Dissolves this AST. The nodes will be untouched, except they will become
-	 * "free"--no longer owned by any AST. They can therefore be modified.
+	 * "free"--no longer owned by any AST. They can therefore be modified. Also
+	 * nullifies the sets of internal/external entities associated to the AST.
 	 */
 	void release();
 
