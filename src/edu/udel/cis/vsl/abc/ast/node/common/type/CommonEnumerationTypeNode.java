@@ -97,4 +97,8 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 		return BlockItemKind.ENUMERATOR;
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.ENUMERATION;
+	}
 }

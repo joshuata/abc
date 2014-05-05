@@ -87,4 +87,8 @@ public class CommonFunctionTypeNode extends CommonTypeNode implements
 		return result;
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.FUNCTION;
+	}
 }

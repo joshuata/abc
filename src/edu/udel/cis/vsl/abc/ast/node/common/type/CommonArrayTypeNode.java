@@ -142,4 +142,9 @@ public class CommonArrayTypeNode extends CommonTypeNode implements
 		return result;
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.ARRAY;
+	}
+
 }

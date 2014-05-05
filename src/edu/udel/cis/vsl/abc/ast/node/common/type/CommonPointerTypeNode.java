@@ -43,4 +43,8 @@ public class CommonPointerTypeNode extends CommonTypeNode implements
 		return (ExpressionNode) child(1);
 	}
 
+	@Override
+	public TypeNodeKind typeNodeKind() {
+		return TypeNodeKind.POINTER;
+	}
 }
