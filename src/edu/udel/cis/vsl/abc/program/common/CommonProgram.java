@@ -7,6 +7,9 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
@@ -18,23 +21,12 @@ public class CommonProgram implements Program {
 
 	private Analyzer standardAnalyzer;
 
-	private boolean hasOmpPragma = false;
-
-	// private Transformer pruner;
-
-	// private Transformer sideEffectRemover;
-
-	// private MPITransformer mpiTransformer;
-
 	private AST ast;
 
 	public CommonProgram(Analyzer standardAnalyzer, AST ast,
 			SymbolicUniverse universe) throws SyntaxException {
 		this.standardAnalyzer = standardAnalyzer;
-		// this.pruner = pruner;
-		// this.sideEffectRemover = sideEffectRemover;
 		this.ast = ast;
-		// this.mpiTransformer = mpiTransformer;
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
 	}
@@ -43,23 +35,6 @@ public class CommonProgram implements Program {
 	public AST getAST() {
 		return ast;
 	}
-
-	// @Override
-	// public void removeSideEffects() throws SyntaxException {
-	// ast = sideEffectRemover.transform(ast);
-	// standardAnalyzer.clear(ast);
-	// // debugging code...
-	// // System.out.println("\n\nRemoved side effects...\n\n");
-	// // ast.print(System.out);
-	// standardAnalyzer.analyze(ast);
-	// }
-
-	// @Override
-	// public void prune() throws SyntaxException {
-	// ast = pruner.transform(ast);
-	// standardAnalyzer.clear(ast);
-	// standardAnalyzer.analyze(ast);
-	// }
 
 	@Override
 	public void print(PrintStream out) {
@@ -79,11 +54,8 @@ public class CommonProgram implements Program {
 	@Override
 	public void apply(Transformer transformer) throws SyntaxException {
 		ast = transformer.transform(ast);
-
-		// if (transformer.getCode() != OmpTransformer.CODE) {
 		standardAnalyzer.clear(ast);
 		standardAnalyzer.analyze(ast);
-		// }
 	}
 
 	@Override
@@ -116,12 +88,23 @@ public class CommonProgram implements Program {
 	}
 
 	@Override
-	public void setHasOmpPragma(boolean value) {
-		this.hasOmpPragma = value;
+	public boolean hasOmpPragma() {
+		return this.hasOmpPragmaInASTNode(ast.getRootNode());
 	}
 
-	@Override
-	public boolean hasOmpPragma() {
-		return this.hasOmpPragma;
+	private boolean hasOmpPragmaInASTNode(ASTNode node) {
+		if (node.nodeKind() == NodeKind.PRAGMA) {
+			PragmaNode pragmaNode = (PragmaNode) node;
+
+			if (pragmaNode.getPragmaIdentifier().name().equals("omp"))
+				return true;
+		} else {
+			for (ASTNode child : node.children()) {
+				if (child != null)
+					if (this.hasOmpPragmaInASTNode(child))
+						return true;
+			}
+		}
+		return false;
 	}
 }

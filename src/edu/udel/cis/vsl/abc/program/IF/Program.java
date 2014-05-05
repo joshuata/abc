@@ -16,10 +16,6 @@ import edu.udel.cis.vsl.abc.transform.IF.Transformer;
  */
 public interface Program {
 
-	// public enum TransformMode {
-	// MPI, OMP, PTHREAD
-	// }
-
 	/**
 	 * Returns the abstract syntax tree of this program. Note that this can
 	 * return different values as the program is modified. I.e., a whole new AST
@@ -36,25 +32,6 @@ public interface Program {
 	 * @return the token factory
 	 */
 	TokenFactory getTokenFactory();
-
-	// /**
-	// * Modifies this program by factoring out expressions with side-effects
-	// into
-	// * separate statements. The AST may be replaced with a new one.
-	// *
-	// * @throws SyntaxException
-	// */
-	// void removeSideEffects() throws SyntaxException;
-	//
-	// /**
-	// * If this Program contains a "main" function, this method will remove any
-	// * elements which cannot be reached starting from that function.
-	// Otherwise,
-	// * it does nothing.
-	// *
-	// * @throws SyntaxException
-	// */
-	// void prune() throws SyntaxException;
 
 	/**
 	 * Prints a human readable abstract representation of the program to the
@@ -114,9 +91,14 @@ public interface Program {
 	 *             sequence
 	 */
 	void applyTransformers(Iterable<String> codes) throws SyntaxException;
-	
-	void setHasOmpPragma(boolean value);
-	
+
+	/**
+	 * Checks if the AST of this program contains any pragma node with the
+	 * identifier "omp".
+	 * 
+	 * @return True if the AST of this program contains at least one pragma
+	 *         nodes with the identifier "omp"
+	 */
 	boolean hasOmpPragma();
 
 }
