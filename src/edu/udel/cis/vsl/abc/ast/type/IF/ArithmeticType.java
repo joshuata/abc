@@ -5,24 +5,35 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
  * enumeration types, and the floating types (which include the real and the
  * complex floating types).
  * 
+ * <p>
  * The arithmetic type hierarchy can best be described by the following outline,
  * which defines a directed acyclic graph. Note that it is not a tree, as the
- * IntegerType and BasicType categories have in their intersection the type char
- * and the SignedOrUnisgnedIntegerTypes.
+ * {@link IntegerType} and {@link StandardBasicType} categories have in their
+ * intersection the type <code>char</code> and the
+ * {@link SignedOrUnisgnedIntegerType}s.
+ * </p>
  * 
- * <pre>
- * UnqualifiedObjectType
- * | ArithmeticType
- * | | IntegerType
- * | | | char
- * | | | EnumerationType
- * | | | SignedOrUnsignedIntegerType
- * | | BasicType
- * | | | char
- * | | | SignedOrUnsignedIntegerType
- * | | | FloatingType
- * </pre>
  * 
+ * {@link UnqualifiedObjectType}
+ * <ul>
+ * <li>{@link ArithmeticType}
+ * <ul>
+ * <li>{@link IntegerType}
+ * <ul>
+ * <li><code>char</code></li>
+ * <li>{@link EnumerationType}</li>
+ * <li>{@link SignedOrUnsignedIntegerType}</li>
+ * </ul>
+ * </li>
+ * <li>{@link StandardBasicType}
+ * <ul>
+ * <li><code>char</code></li>
+ * <li>{@link SignedOrUnsignedIntegerType}</li>
+ * <li>{@link FloatingType}</li>
+ * </ul>
+ * </li>
+ * <ul></li>
+ * </ul>
  * 
  * @author siegel
  */

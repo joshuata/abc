@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
 
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
@@ -99,17 +100,17 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * 
  * The user constructs the nodes of an AST using the methods in this class.
  * These nodes have the structure of a tree, the root node being the node
- * representing the translation unit; the chidren of the root node correspond to
- * the "external definitions" of the unit. Once these have been constructed, the
- * newTranslationUnit method is invoked on the root node to actually construct
- * the TranslationUnit object. This performs a number of analyses and stores
- * additional information about the translation unit. A number of errors can be
- * detected and reported at this stage. Among other things, this also computes
- * the abstract "type" of every variable, function, and expression. It also
- * computes the scope and linkage of all identifiers.
+ * representing the translation unit; the children of the root node correspond
+ * to the "external definitions" of the unit. Once these have been constructed,
+ * the {@link ASTFactory#newAST} method is invoked on the root node to actually
+ * construct the TranslationUnit object. This performs a number of analyses and
+ * stores additional information about the translation unit. A number of errors
+ * can be detected and reported at this stage. Among other things, this also
+ * computes the abstract "type" of every variable, function, and expression. It
+ * also computes the scope and linkage of all identifiers.
  * 
- * After the TranslationUnit is created, the unit (and all of its nodes) become
- * immutable. Every node has an "owner" (originally null), which is set to the
+ * After the AST is created, the AST (and all of its nodes) become immutable.
+ * Every node has an "owner" (originally null), which is set to the
  * TranslationUnit object at this time. If you want to modify the tree, you must
  * first invoke the "release" method, which frees the nodes from ownership by
  * the TranslationUnit object, setting the "owner" fields again to null. They
@@ -119,7 +120,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * 
  * Finally, one or more translation unit can be combined to form a complete
  * "program" using the newProgram method. This corresponds to "linking" in the
- * usual compiler sense.
+ * usual compiler sense. (Not yet implemented.)
  * 
  * 
  * @author siegel
@@ -175,41 +176,157 @@ public interface NodeFactory {
 
 	// Identifiers...
 
+	/**
+	 * Constructs and returns a new identifier node with given source object and
+	 * name.
+	 * 
+	 * @param source
+	 *            source information for the identifier use
+	 * @param name
+	 *            the name of this identifier
+	 * @return a new identifier node
+	 */
 	IdentifierNode newIdentifierNode(Source source, String name);
 
 	// Type Nodes ...
 
+	/**
+	 * Returns a new type node for a basic type.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the basic type
+	 * @param kind
+	 *            the kind of the basic type
+	 * @return the new basic type node
+	 */
 	BasicTypeNode newBasicTypeNode(Source source, BasicTypeKind kind);
 
+	/**
+	 * Returns a new void type node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of "void"
+	 * @return the new void type node
+	 */
 	TypeNode newVoidTypeNode(Source source);
 
+	/**
+	 * Constructs and returns a new enumeration type node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the enumeration type
+	 * @param tag
+	 *            the enumeration tag, i.e., the name of the enumeration, the
+	 *            string that follows <code>enum</code>
+	 * @param enumerators
+	 * @return the new enumeration type node
+	 */
 	EnumerationTypeNode newEnumerationTypeNode(Source source,
 			IdentifierNode tag,
 			SequenceNode<EnumeratorDeclarationNode> enumerators);
 
+	/**
+	 * Constructs and returns a new array type node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the array type
+	 * @param elementType
+	 *            the node representing the element type
+	 * @param extent
+	 *            the node representing the expression in square brackets, i.e.,
+	 *            the array length or "extent"
+	 * @return the new array type node
+	 */
 	ArrayTypeNode newArrayTypeNode(Source source, TypeNode elementType,
 			ExpressionNode extent);
 
+	/**
+	 * Constructs and returns a new atomic type node.
+	 * 
+	 * @param source
+	 *            the source information for the occurrence of the atomic type
+	 * @param baseType
+	 *            the base type, i.e., the type modified by the "atomic"
+	 * @return the new atomic type node
+	 */
 	AtomicTypeNode newAtomicTypeNode(Source source, TypeNode baseType);
 
+	/**
+	 * Constructs and returns a new pointer type node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the pointer type
+	 * @param referencedType
+	 *            the type pointed to
+	 * @param scopeModifier
+	 *            optional scope modifier expression (a CIVL-C construct)
+	 * @return the new pointer type node
+	 */
 	PointerTypeNode newPointerTypeNode(Source source, TypeNode referencedType,
 			ExpressionNode scopeModifier);
 
+	/**
+	 * Constructs and returns a new structure or union type node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the structure or
+	 *            union type node
+	 * @param isStruct
+	 *            <code>true</code> for a structure type, <code>false</code> for
+	 *            a union type
+	 * @param tag
+	 *            the tag of the structure or union, i.e., the string that
+	 *            follows <code>struct</code> or <code>union</code>. Maybe
+	 *            <code>null</code>.
+	 * @param structDeclList
+	 *            the sequence of field declarations; may be <code>null</code>
+	 * @return the new structure or union type node
+	 */
 	StructureOrUnionTypeNode newStructOrUnionTypeNode(Source source,
 			boolean isStruct, IdentifierNode tag,
 			SequenceNode<FieldDeclarationNode> structDeclList);
 
+	/**
+	 * Constructs and returns a new function type node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the function type
+	 * @param returnType
+	 *            the node representing the return type of the function type
+	 * @param formals
+	 *            the sequence of formal parameter declaration nodes for the
+	 *            function type
+	 * @param hasIdentifierList
+	 *            <code>true</code> if the function is declared using an
+	 *            identifier list (i.e., without types associated to the
+	 *            parameters); <code>false</code> if the function is declared
+	 *            with a parameter declaration list
+	 * @return the function type node
+	 */
 	FunctionTypeNode newFunctionTypeNode(Source source, TypeNode returnType,
 			SequenceNode<VariableDeclarationNode> formals,
 			boolean hasIdentifierList);
 
+	/**
+	 * Returns a new scope type node ("<code>$scope</code>"). This is a CIVL-C
+	 * type.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of <code>$scope</code>
+	 * @return the new instance of scope type
+	 */
 	TypeNode newScopeTypeNode(Source source);
 
 	/**
-	 * Source is same as that of the identifier name.
+	 * Returns a new instance of a typedef name node. This is a use of a typedef
+	 * name. The source is the same as that of the identifier name.
 	 * 
 	 * @param name
-	 * @return
+	 *            the identifier node representing the use of the typedef name
+	 * @param scopeList
+	 *            optional CIVL-C construct: list of scope parameters used to
+	 *            instantiate a scope-parameterized typedef
+	 * @return the new typedef name node wrapping the given identifier node
 	 */
 	TypedefNameNode newTypedefNameNode(IdentifierNode name,
 			SequenceNode<ExpressionNode> scopeList);
@@ -227,6 +344,8 @@ public interface NodeFactory {
 	 * isConstantExpression() returns false, this method may or may not return a
 	 * non-null value.
 	 * 
+	 * @param expression
+	 *            an expression node
 	 * @return the constant value obtained by evaluating this expression, or
 	 *         null if the expression cannot be evaluated
 	 */
@@ -237,80 +356,248 @@ public interface NodeFactory {
 	 * to be, tell it by invoking this method.
 	 * 
 	 * @param expression
+	 *            the expression node that has been determined to have a
+	 *            constant value
 	 * @param value
-	 * @return
+	 *            the constant vale to associate to that expression node
 	 */
 	void setConstantValue(ExpressionNode expression, Value value);
 
 	// Constant and literal expressions ...
 
+	/**
+	 * Returns a new character constant node. A character constant is a literal
+	 * charcter in a program, something like <code>'a'</code>. C distinguishes
+	 * between characters in the source code, and "execution characters" which
+	 * are encoded in various ways by source code elements. Unicode characters
+	 * can all be encoded using appropriate escape sequences.
+	 * 
+	 * @param source
+	 *            the source information for the occurrence of the character
+	 *            constant
+	 * @param representation
+	 *            the way the character literal actually appears in the program
+	 *            source code
+	 * @param character
+	 *            the execution character represented by the character constant
+	 * @return the new character constant node
+	 */
 	CharacterConstantNode newCharacterConstantNode(Source source,
-			String representation, ExecutionCharacter character)
-			throws SyntaxException;
+			String representation, ExecutionCharacter character);
 
+	/**
+	 * Constructs a new string literal node. A string literal occurs in the
+	 * program source code as <code>"..."</code>.
+	 * 
+	 * @param source
+	 *            the source information for the occurrence of the string
+	 *            literal. The string literal is usually a single token.
+	 * @param representation
+	 *            the way the string literal actually appears in the program
+	 *            source code, with escape sequences intact
+	 * @param literal
+	 *            the string literal object obtained by interpreting the
+	 *            representation
+	 * @return the new string literal node
+	 */
 	StringLiteralNode newStringLiteralNode(Source source,
-			String representation, StringLiteral literal)
-			throws SyntaxException;
+			String representation, StringLiteral literal);
 
+	/**
+	 * Constructs a new integer constant node. An integer constant is an
+	 * occurrence of a literal integer in the source, which encodes a concrete
+	 * integer value. The C11 Standard specifies the format for integer
+	 * constants, which includes various letter suffixes that can occur at the
+	 * end of the constant, in Sec. 6.4.4.1. The integer constant value is
+	 * constructed by interpreting the representation.
+	 * 
+	 * @param source
+	 *            the source information for the integer constant
+	 * @param representation
+	 *            the way the integer actually appears in the program source
+	 *            code
+	 * @return the new integer constant node
+	 * @throws SyntaxException
+	 *             if the representation does not conform to the format
+	 *             specified in the C11 Standard
+	 */
 	IntegerConstantNode newIntegerConstantNode(Source source,
 			String representation) throws SyntaxException;
 
+	/**
+	 * Constructs a new floating constant node. A floating constant is an
+	 * occurrence of a literal floating point number in the source, which
+	 * encodes a concrete floating point value. The C11 Standard specifies the
+	 * format for floating constants, which includes various letter suffixes
+	 * that can occur at the end of the constant, in Sec. 6.4.4.2. The floating
+	 * constant value is constructed by interpreting the representation.
+	 * 
+	 * @param source
+	 *            the source information for the floating constant
+	 * @param representation
+	 *            the way the floating constant actually appears in the program
+	 *            source code
+	 * @return the new floating constant node
+	 * @throws SyntaxException
+	 *             if the representation does not conform to the format
+	 *             specified in the C11 Standard
+	 */
 	FloatingConstantNode newFloatingConstantNode(Source source,
 			String representation) throws SyntaxException;
 
 	/**
-	 * Source is same as that of identifier.
+	 * Constructs a new enumeration constant node. This represents an occurrence
+	 * of an enumeration constant, i.e., a use of a previously declared
+	 * enumerator, in the program. This node just wraps an identifier node. The
+	 * source is same as that of identifier.
 	 * 
 	 * @param name
-	 * @return
+	 *            the identifier node which is the occurrence of the enumeration
+	 *            constant
+	 * @return the new enumeration constant node
 	 */
 	EnumerationConstantNode newEnumerationConstantNode(IdentifierNode name);
 
+	/**
+	 * Returns a new compound literal node. A compound literal is a C construct
+	 * used to represent a literal array, structure, or union value. Compound
+	 * literals are described in the C11 Standard in Secs. 6.5.2.5 and 6.7.9.
+	 * 
+	 * From Sec. 6.5.2, the syntax is:
+	 * 
+	 * <pre>
+	 * ( type-name ) { initializer-list }
+	 * ( type-name ) { initializer-list , }
+	 * </pre>
+	 * 
+	 * and from Sec. 6.7.9:
+	 * 
+	 * <pre>
+	 * initializer:
+	 *   assignment-expression
+	 *   { initializer-list } { initializer-list , }
+	 * 
+	 * initializer-list:
+	 *   designationopt initializer
+	 *   initializer-list , designationopt initializer
+	 * 
+	 * designation:
+	 *   designator-list =
+	 * 
+	 * designator-list:
+	 *   designator
+	 *   designator-list designator
+	 * 
+	 * designator:
+	 *   [ constant-expression ]
+	 *   . identifier
+	 * </pre>
+	 * 
+	 * 
+	 * @param source
+	 *            source information for the entire compound literal construct
+	 * @param typeNode
+	 *            node representing the type name portion of the compound
+	 *            literal
+	 * @param initializerList
+	 *            node representing the initializer list portion of the compound
+	 *            literal
+	 * @return the new compound literal node
+	 */
 	CompoundLiteralNode newCompoundLiteralNode(Source source,
 			TypeNode typeNode, CompoundInitializerNode initializerList);
 
 	/**
-	 * "\true" or "\false".
+	 * Constructs a new node representing a CIVL-C boolean constant, "
+	 * <code>$true</code>" or "<code>$false</code>".
 	 * 
 	 * @param source
+	 *            source information for the occurrence of the boolean constant
 	 * @param value
-	 *            true for "\true", false for "\false"
-	 * @return
+	 *            <code>true</code> for <code>$true</code>, <code>false</code>
+	 *            for <code>$false</code>
+	 * @return the new boolean constant node
 	 */
 	ConstantNode newBooleanConstantNode(Source source, boolean value);
 
 	/**
-	 * "$self"
+	 * Constructs a new node representing an occurrence of the CIVL-C "self"
+	 * process constant, written "<code>$self</code>".
 	 * 
 	 * @param source
-	 * @return
+	 *            source information for the occurrence of the constant
+	 *            <code>$self</code>
+	 * @return the new expression node representing the constant
 	 */
 	ExpressionNode newSelfNode(Source source);
 
+	/**
+	 * Constructs a new node representing an occurrence of the CIVL-C
+	 * "null process" constant, written <code>$proc_null</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the constant
+	 *            <code>$proc_null</code>
+	 * @return the new expression node representing the constant
+	 */
 	ExpressionNode newProcnullNode(Source source);
 
 	/**
-	 * "\result"
+	 * Constructs a new node representing an occurrence of the CIVL-C expression
+	 * "<code>$result</code>", used in function constracts to represent the
+	 * result returned by the function.
 	 * 
 	 * @param source
-	 * @return
+	 *            source information for the occurrence of the expression
+	 *            <code>$result</code>
+	 * @return the new expression node
 	 */
 	ExpressionNode newResultNode(Source source);
 
 	// Other Expressions...
 
 	/**
-	 * Source is not necessarily same as identifier because you might want to
-	 * include surrounding parentheses in the expression.
+	 * Constructs a new identifier expression node. This is an expression node
+	 * which just wraps an identifier. Idenfiers can be used as expressions in
+	 * various ways in C: a variable or the name of a function, for example.
+	 * 
+	 * The source is not necessarily the same as the identifier because you
+	 * might want to include surrounding parentheses in the expression.
 	 * 
 	 * @param identifier
-	 * @return
+	 *            the identifier node being wrapped
+	 * @return the new identifier expression node
 	 */
 	IdentifierExpressionNode newIdentifierExpressionNode(Source source,
 			IdentifierNode identifier);
 
+	/**
+	 * Constructs a new "align-of" node. This represents an occurrence of the
+	 * C11 construct <code>_Alignof(typename)</code>. See C11 Sec. 6.5.3.4. The
+	 * value is considered an integer constant, i.e., it is known at
+	 * compile-time.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the expression
+	 * @param type
+	 *            the type name portion of the expression
+	 * @return the new align-of node
+	 */
 	AlignOfNode newAlignOfNode(Source source, TypeNode type);
 
+	/**
+	 * Constructs a new cast node. This represents an occurrence of a cast
+	 * expression <code>(typename)argument</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the complete cast
+	 *            expression
+	 * @param type
+	 *            node representing the type name
+	 * @param argument
+	 *            the argument part of the expression
+	 * @return the new cast node
+	 */
 	CastNode newCastNode(Source source, TypeNode type, ExpressionNode argument);
 
 	FunctionCallNode newFunctionCallNode(Source source,

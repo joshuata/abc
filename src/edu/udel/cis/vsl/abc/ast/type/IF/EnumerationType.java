@@ -6,8 +6,9 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 
 /**
- * An enumeration type. An enumeration type consists of a tag and a sequence of
- * enumerators. Each enumerator consists of an identifier and an optional
+ * An enumeration type. An enumeration type consists of a key, a tag, and a
+ * sequence of enumerators. The key is used to determine when two enumeration
+ * types are equal. Each enumerator consists of an identifier and an optional
  * constant expression.
  * 
  * @author siegel
@@ -59,10 +60,11 @@ public interface EnumerationType extends IntegerType {
 	 * enumerator consists of a name and optional constant expression. If the
 	 * optional constant expression is absent, it will be null.
 	 * 
-	 * This will return null if the type is incomplete, i.e., the enumerators
-	 * have not yet been specified
+	 * This will return <code>null</code> if the type is incomplete, i.e., the
+	 * enumerators have not yet been specified
 	 * 
-	 * @return the sequence node for the enumerators of this type, or null
+	 * @return the sequence node for the enumerators of this type, or
+	 *         <code>null</code>
 	 */
 	Iterator<Enumerator> getEnumerators();
 
@@ -79,7 +81,8 @@ public interface EnumerationType extends IntegerType {
 	void complete(List<Enumerator> enumerators);
 
 	/**
-	 * Make incomplete.
+	 * Makes this type incomplete, i.e., sets the enumerators to
+	 * <code>null</code>.
 	 */
 	void clear();
 }

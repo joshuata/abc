@@ -4,18 +4,19 @@ package edu.udel.cis.vsl.abc.ast.node.IF;
  * A marker interface to mark nodes that can appear in global scope, such as
  * variable declarations, function definitions, etc.
  * 
- * Every instance of ExternalDefinitionNode is also an instance of exactly one
- * of the following types:
+ * Every instance of <code>ExternalDefinitionNode</code> is also an instance of
+ * exactly one of the following types:
  * 
  * <ul>
- * <li>VariableDeclarationNode</li>
- * <li>FunctionDeclarationNode (includes FunctionDefinitionNode)</li>
- * <li>StructureOrUnionTypeNode</li>
- * <li>EnumerationTypeNode</li>
- * <li>PragmaNode</li>
- * <li>StaticAssertionNode</li>
- * <li>TypedefDeclarationNode</li>
- * <li>AssumeNode</li>
+ * <li>{@link VariableDeclarationNode}</li>
+ * <li>{@link FunctionDeclarationNode} (includes {@link FunctionDefinitionNode})
+ * </li>
+ * <li>{@link StructureOrUnionTypeNode}</li>
+ * <li>{@link EnumerationTypeNode}</li>
+ * <li>{@link PragmaNode}</li>
+ * <li>{@link StaticAssertionNode}</li>
+ * <li>{@link TypedefDeclarationNode}</li>
+ * <li>{@link AssumeNode}</li>
  * </ul>
  */
 public interface ExternalDefinitionNode extends ASTNode {

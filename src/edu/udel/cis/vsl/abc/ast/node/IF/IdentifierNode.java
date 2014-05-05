@@ -5,11 +5,12 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 /**
  * An identifier can denote: (1) an object, (2) a function, (3) a tag of a
  * structure, union, or enumeration, (4) a member of a structure, union, or
- * enumeration, (5) a typedef name, or (6) a label name.
+ * enumeration, (5) a typedef name, or (6) a label name. All of these things are
+ * called "entities".
  * 
- * Each of these is represented by a different subtype of Identifier. Each
- * subtype provides an appropriate method to get the declaration of the
- * identifier.
+ * An identifier node represents any occurrence of an identifier in a program.
+ * 
+ * @see {@link Entity}
  * 
  * @author siegel
  * 
@@ -19,6 +20,8 @@ public interface IdentifierNode extends ASTNode {
 	/**
 	 * Returns the name of this identifier node. This is a non-null string. This
 	 * is typically the string that actually appears in the source code.
+	 * 
+	 * @return the name of this identifier
 	 */
 	String name();
 
@@ -41,8 +44,8 @@ public interface IdentifierNode extends ASTNode {
 	 * The information provided by the getEntity methods in the AST is what is
 	 * typically referred to as the "symbol table".
 	 * 
-	 * @return the entity to which this identifier refers, or null if that
-	 *         information has not yet been computed
+	 * @return the entity to which this identifier refers, or <code>null</code>
+	 *         if that information has not yet been computed
 	 */
 	Entity getEntity();
 

@@ -1,9 +1,10 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
 /**
- * The floating types come in three kinds: float, double, long double,
- * representing increasing precision. Each also comes in a real and complex
- * variant.
+ * The floating types come in four kinds: <code>float</code>,
+ * <code>double</code>, <code>long double</code>, representing increasing
+ * precision, and "real", a CIVL-C type denoted <code>$real</code> representing
+ * the mathematical real numbers. Each also comes in a real and complex variant.
  * 
  * @author siegel
  * 
