@@ -21,7 +21,7 @@
  * There is a simple command-line interface for ABC (see
  * {@link edu.udel.cis.vsl.abc.ABC ABC}), but
  * most users will want to use ABC through its API.  To use the API, it is
- * helpful to have some understanding of the modular struture of ABC.
+ * helpful to have some understanding of the modular structure of ABC.
  * 
  * The ABC source code is decomposed into modules, each with a well-defined
  * interface and set of responsibilities.  Some of these modules

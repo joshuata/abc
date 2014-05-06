@@ -273,6 +273,8 @@ public class SpecifierAnalysis {
 				throw error("Unknown declaration specifier", node);
 			}
 		}
+		if (typeNameKind == null)
+			throw error("Declaration is missing a type name", specifierListNode);
 		if (typeNameKind == TypeNodeKind.BASIC) {
 			basicTypeKind = BasicMultiset.getBasicTypeKind(set);
 			if (basicTypeKind == null)
