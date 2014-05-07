@@ -69,16 +69,4 @@ public class NameTransformer extends BaseTransformer {
 		}
 	}
 
-	@Override
-	public String getCode() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getShortDescription() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }
