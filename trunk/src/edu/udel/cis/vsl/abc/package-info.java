@@ -38,6 +38,15 @@
  *   </ul>
  * </li>
  * 
+ * <li><strong>config</strong> ({@link edu.udel.cis.vsl.abc.config})
+ *   <ul>
+ *   <li>responsibilities: representation of configuration parameters for ABC</li>
+ *   <li>uses: nothing</li>
+ *   <li>interface: {@link edu.udel.cis.vsl.abc.config.IF}</li>
+ *   <li>entry point: {@link edu.udel.cis.vsl.abc.config.Configurations Configurations}</li>
+ *   </ul>
+ * </li>
+ * 
  * <li><strong>token</strong> ({@link edu.udel.cis.vsl.abc.token})
  *   <ul>
  *   <li>responsibilities: representing tokens; keeping track of the 
@@ -52,25 +61,16 @@
  * <li><strong>preproc</strong> ({@link edu.udel.cis.vsl.abc.preproc})
  *   <ul>
  *   <li>responsibilities: preprocessing; generation of post-preprocessor token stream</li>
- *   <li>uses: <strong>util</strong>, <strong>token</strong></li>
+ *   <li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.preproc.IF}</li>
  *   <li>entry point: {@link edu.udel.cis.vsl.abc.preproc.Preprocess Preprocess}</li>
- *   </ul>
- * </li>
- * 
- * <li><strong>config</strong> ({@link edu.udel.cis.vsl.abc.config})
- *   <ul>
- *   <li>responsibilities: representation of configuration parameters for ABC</li>
- *   <li>uses: nothing</li>
- *   <li>interface: {@link edu.udel.cis.vsl.abc.config.IF}</li>
- *   <li>entry point: {@link edu.udel.cis.vsl.abc.config.Configurations Configurations}</li>
  *   </ul>
  * </li>
  * 
  * <li><strong>parse</strong> ({@link edu.udel.cis.vsl.abc.parse})
  *   <ul>
  *   <li>responsibilities: preprocessing and parsing source files to produce an ANTRL tree representation of a translation unit</li>
- *   <li>uses: <strong>util</strong>, <strong>preproc</strong>, <strong>token</strong>, <strong>config</strong></li>
+ *   <li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong>, <strong>preproc</strong></li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.parse.IF}</li>
  *   <li>entry point: {@link edu.udel.cis.vsl.abc.parse.Parse Parse}</li>
  *   </ul>
@@ -131,7 +131,7 @@
  * <li><strong>antlr2ast</strong> ({@link edu.udel.cis.vsl.abc.antlr2ast})
  *   <ul>
  *   <li>responsibilities: translation of ANTLR tree to AST</li>
- *   <li>uses: <strong>preproc</strong>, <strong>parse</strong>, <strong>ast</strong></li>
+ *   <li>uses: <strong>util</strong>, <strong>preproc</strong>, <strong>parse</strong>, <strong>ast</strong></li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST}</li>
  *   <li>entry point: {@link edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST}</li>
  *   </ul>
@@ -141,7 +141,7 @@
  *   <ul>
  *   <li>responsibilities: analyzing AST, creation of entities, resolution of
  *   all identifiers, determination of all scopes, types, and entities</li>
- *   <li>uses: <strong></strong></li>
+ *   <li>uses: <strong>config</strong>, <strong>token</strong>, <strong>ast</strong></li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.analysis.IF}</li>
  *   <li>entry point: {@link edu.udel.cis.vsl.abc.analysis.Analysis Analysis}</li>
  *   </ul>
@@ -150,7 +150,7 @@
  * <li><strong>transform</strong> ({@link edu.udel.cis.vsl.abc.transform})
  *   <ul>
  *   <li>responsibilities: transformations of an AST</li>
- *   <li>uses: <strong></strong></li>
+ *   <li>uses: <strong>token</strong>, <strong>ast</strong></li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.transform.IF}</li>
  *   <li>entry point: {@link edu.udel.cis.vsl.abc.transform.Transform Transform}</li>
  *   </ul>
@@ -159,16 +159,32 @@
  * <li><strong>program</strong> ({@link edu.udel.cis.vsl.abc.program})
  *   <ul>
  *   <li>responsibilities: mutable representation of a program</li>
- *   <li>uses: <strong></strong></li>
+ *   <li>uses: <strong>token</strong>, <strong>ast</strong>, <strong>analysis</strong>, <strong>transform</strong></li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.program.IF}</li>
  *   <li>entry point: {@link edu.udel.cis.vsl.abc.program.Programs Programs}</li>
  *   </ul>
  * </li>
  * 
- * <li>main
+ * <li><strong>main</strong> (this package)
+ *   <ul>
+ *   <li>responsibilities: command line interface, Activator class for
+ *   marshalling of tools in tool chain</li>
+ *   <li>uses: <strong>util</strong>, <strong>token</strong>, 
+ *   <strong>preproc</strong>, <strong>parse</strong>, <strong>ast</strong>,
+ *   <strong>antlr2ast</strong>, <strong>analysis</strong>, <strong>transform</strong>,
+ *   <strong>program</strong>
+ *   </li>
+ *   <li>interface: {@link edu.udel.cis.vsl.abc.ABC ABC}, {@link edu.udel.cis.vsl.abc.Activator Activator}</li>
+ *   <li>entry point: {@link edu.udel.cis.vsl.abc.ABC ABC}</li>
+ *   </ul>
  * </li>
  * 
  * </ol>
+ * 
+ * <p>TODO: currently some design errors: (1) everything uses a configuration constant in ABC (the class),
+ * this needs to be changed so these modules are not using the main module. (2)
+ * the ast module is using antlr2ast but it shouldn't. (3) a class in util is
+ * using a bunch of AST things; it needs to be moved, probably to ast module.</p>
  */
 package edu.udel.cis.vsl.abc;
 
