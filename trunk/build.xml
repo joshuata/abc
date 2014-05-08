@@ -276,7 +276,25 @@
 	<target name="javadoc">
 		<delete dir="${javadoc.dir}" quiet="true" />
 		<mkdir dir="${javadoc.dir}" />
-		<javadoc destdir="${javadoc.dir}" Overview="src/overview.html" author="false" version="true" use="true" windowtitle="API for ABC ${revision}" access="public" classpathref="test.execute.classpath" sourcepath="${src.dir}" failonerror="false">
+		<javadoc destdir="${javadoc.dir}" Overview="src/overview.html" author="false" version="true" use="true" windowtitle="API for ABC ${revision}" access="public" classpathref="test.execute.classpath" failonerror="false">
+
+			<packageset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/IF" />
+				<include name="**/IF/**" />
+				<include name="edu/udel/cis/vsl/abc" />
+				<include name="edu/udel/cis/vsl/abc/analysis" />
+				<include name="edu/udel/cis/vsl/abc/antlr2ast" />
+				<include name="edu/udel/cis/vsl/abc/ast" />
+				<include name="edu/udel/cis/vsl/abc/config" />
+				<include name="edu/udel/cis/vsl/abc/err" />
+				<include name="edu/udel/cis/vsl/abc/parse" />
+				<include name="edu/udel/cis/vsl/abc/preproc" />
+				<include name="edu/udel/cis/vsl/abc/program" />
+				<include name="edu/udel/cis/vsl/abc/token" />
+				<include name="edu/udel/cis/vsl/abc/transform" />
+				<include name="edu/udel/cis/vsl/abc/util" />
+			</packageset>
+
 		</javadoc>
 	</target>
 
