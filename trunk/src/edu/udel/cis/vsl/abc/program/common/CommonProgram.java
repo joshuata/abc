@@ -15,7 +15,6 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 public class CommonProgram implements Program {
 
@@ -23,8 +22,8 @@ public class CommonProgram implements Program {
 
 	private AST ast;
 
-	public CommonProgram(Analyzer standardAnalyzer, AST ast,
-			SymbolicUniverse universe) throws SyntaxException {
+	public CommonProgram(Analyzer standardAnalyzer, AST ast)
+			throws SyntaxException {
 		this.standardAnalyzer = standardAnalyzer;
 		this.ast = ast;
 		standardAnalyzer.clear(ast);

@@ -46,8 +46,6 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 import edu.udel.cis.vsl.abc.util.ANTLRUtils;
-import edu.udel.cis.vsl.sarl.SARL;
-import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 /**
  * Marshalls together the various components of the ABC tool chain to perform
@@ -70,8 +68,6 @@ import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 public class Activator {
 
 	private static String bar = "===================";
-
-	private SymbolicUniverse universe = SARL.newStandardUniverse();
 
 	private TokenFactory sourceFactory = Tokens.newTokenFactory();
 
@@ -107,6 +103,8 @@ public class Activator {
 	private Analyzer standardAnalyzer;
 
 	private ProgramFactory programFactory;
+
+	private ASTBuilder astBuilder;
 
 	/**
 	 * Creates a new Activator instance with the given file and include paths.
@@ -348,7 +346,7 @@ public class Activator {
 	public Program getProgram() throws ParseException, SyntaxException,
 			PreprocessorException {
 		AST ast = getRawTranslationUnit();
-		Program program = programFactory.newProgram(ast, this.universe);
+		Program program = programFactory.newProgram(ast);
 
 		return program;
 	}
@@ -432,7 +430,7 @@ public class Activator {
 		AST ast;
 		CParser parser;
 		CommonTree tree;
-		ASTBuilder builder;
+		// ASTBuilder builder;
 		Program program;
 
 		// print the original source file...
@@ -451,10 +449,10 @@ public class Activator {
 		out.flush();
 		ast = null;
 		try {
-			builder = new ASTBuilder(parser, astFactory, tree);
-			ast = builder.getTranslationUnit(); // creates ast
+			this.astBuilder = new ASTBuilder(parser, astFactory, tree);
+			ast = this.astBuilder.getTranslationUnit(); // creates ast
 			// analyzes ast
-			program = programFactory.newProgram(ast, this.universe);
+			program = programFactory.newProgram(ast);
 			ast = program.getAST();
 		} catch (Exception e) {
 			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
@@ -496,12 +494,7 @@ public class Activator {
 		return showTranslation(out, new LinkedList<String>());
 	}
 
-	/**
-	 * Return the symbolic universe.
-	 * 
-	 * @return
-	 */
-	public SymbolicUniverse universe() {
-		return this.universe;
+	public ASTBuilder getASTBuilder() {
+		return this.astBuilder;
 	}
 }

@@ -53,7 +53,6 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
-import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
@@ -85,7 +84,8 @@ public class OmpBuilder {
 	private NodeFactory nodeFactory;
 	private TokenFactory sourceFactory;
 	private Source source;
-	private ASTFactory astFactory;
+
+	private ASTBuilder astBuilder;
 
 	// private SimpleScope scope;
 	// private StatementNode statement;
@@ -102,10 +102,10 @@ public class OmpBuilder {
 	 * 
 	 */
 	public OmpBuilder(ValueFactory valueFactory, NodeFactory nodeFactory,
-			TokenFactory tokenFactory, ASTFactory astFactory) {
+			TokenFactory tokenFactory, ASTBuilder astBuilder) {
 		this.nodeFactory = nodeFactory;
 		this.sourceFactory = tokenFactory;
-		this.astFactory = astFactory;
+		this.astBuilder = astBuilder;
 	}
 
 	private TokenStream ompTokenStream(List<CToken> ctokens) {
@@ -367,8 +367,8 @@ public class OmpBuilder {
 			}
 			if (forClause.getChildCount() > 1) {
 				CommonTree chunkSizeTree = (CommonTree) forClause.getChild(1);
-				ExpressionNode chunkSizeNode = astFactory.getASTBuilder()
-						.translateExpression(chunkSizeTree, null);
+				ExpressionNode chunkSizeNode = astBuilder.translateExpression(
+						chunkSizeTree, null);
 
 				forNode.setChunsize(chunkSizeNode);
 			}
@@ -437,12 +437,12 @@ public class OmpBuilder {
 
 		switch (child.getType()) {
 		case IF:
-			expression = astFactory.getASTBuilder().translateExpression(
+			expression = astBuilder.translateExpression(
 					(CommonTree) child.getChild(0), null);
 			parallelNode.setIfClause(expression);
 			return IF;
 		case NUM_THREADS:
-			expression = astFactory.getASTBuilder().translateExpression(
+			expression = astBuilder.translateExpression(
 					(CommonTree) child.getChild(0), null);
 			parallelNode.setNumThreads(expression);
 			return NUM_THREADS;
