@@ -6,7 +6,6 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.sarl.IF.SymbolicUniverse;
 
 public class CommonProgramFactory implements ProgramFactory {
 
@@ -24,24 +23,9 @@ public class CommonProgramFactory implements ProgramFactory {
 		return astFactory;
 	}
 
-	// @Override
-	// public Analyzer getStandardAnalyzer() {
-	// return standardAnalyzer;
-	// }
-
-	// @Override
-	// public Transformer getPruner() {
-	// return pruner;
-	// }
-	//
-	// @Override
-	// public Transformer getSideEffectRemover() {
-	// return sideEffectRemover;
-	// }
-
 	@Override
-	public Program newProgram(AST ast, SymbolicUniverse universe) throws SyntaxException {
-		return new CommonProgram(standardAnalyzer, ast, universe);
+	public Program newProgram(AST ast) throws SyntaxException {
+		return new CommonProgram(standardAnalyzer, ast);
 	}
 
 }

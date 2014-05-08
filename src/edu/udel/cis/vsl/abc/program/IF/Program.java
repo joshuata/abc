@@ -100,5 +100,4 @@ public interface Program {
 	 *         nodes with the identifier "omp"
 	 */
 	boolean hasOmpPragma();
-
 }

@@ -4,6 +4,7 @@
  #ifdef __STDIO_COMMON__
  #else
  #define __STDIO_COMMON__
+ 
 
 /* Functions */
 
