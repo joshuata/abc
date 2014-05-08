@@ -32,12 +32,12 @@ public interface Transformer {
 	/**
 	 * Apply a transformation to a translation unit.
 	 * 
-	 * @param unit
-	 *            The translation unit being modified.
+	 * @param ast
+	 *            The abstract syntax tree being modified.
 	 * @throws SyntaxException
-	 *             If it encounters an error in the translation unit or an
-	 *             unhandled case.
+	 *             If it encounters an error in the AST or an some case which it
+	 *             cannot handle
 	 */
-	AST transform(AST unit) throws SyntaxException;
+	AST transform(AST ast) throws SyntaxException;
 
 }

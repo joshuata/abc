@@ -6,18 +6,16 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 public interface Combiner {
 
 	/**
-	 * Combine two translation units into a single unit.
+	 * Combine two ASTs into a single AST.
 	 * 
-	 * @param unit0
-	 *            The first translation unit being combined.
-	 * @param unit1
-	 *            The second translation unit being combined.
-	 * @return The translation unit representing the combination of unit0 and
-	 *         unit1.
+	 * @param ast0
+	 *            The first AST being combined.
+	 * @param ast1
+	 *            The second AST being combined.
+	 * @return The AST representing the combination of ast0 and ast1.
 	 * @throws SyntaxException
-	 *             If it encounters an error in the translation units or an
-	 *             unhandled case.
+	 *             If it encounters an error in the ASTs or an unhandled case.
 	 */
-	 AST combine(AST unit0, AST unit1) throws SyntaxException;
+	AST combine(AST ast0, AST ast1) throws SyntaxException;
 
 }

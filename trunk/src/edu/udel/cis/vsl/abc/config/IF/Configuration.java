@@ -17,6 +17,21 @@ import java.math.BigInteger;
  */
 public interface Configuration {
 
+	public static enum Language {
+		C, CIVL_C
+	};
+
+	/**
+	 * The language of the program being processed. C is the default, but if the
+	 * file suffix ends in ".cvl" the command line processor will change it to
+	 * CIVL_C. As this is a public static variable, it can also be set manually.
+	 */
+	// public static Language language = Language.C;
+
+	Language getLanguage();
+	
+	void setLanguage(Language language);
+
 	BigInteger unsignedCharMax();
 
 	BigInteger unsignedShortIntMax();

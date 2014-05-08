@@ -3,8 +3,6 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ABC;
-import edu.udel.cis.vsl.abc.ABC.Language;
 import edu.udel.cis.vsl.abc.ast.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
@@ -73,6 +71,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -125,6 +124,8 @@ public class ExpressionAnalyzer {
 
 	private IntegerType intType;
 
+	private Language language;
+
 	// ************************** Constructors ****************************
 
 	ExpressionAnalyzer(EntityAnalyzer entityAnalyzer,
@@ -135,6 +136,7 @@ public class ExpressionAnalyzer {
 		this.intType = typeFactory.signedIntegerType(SignedIntKind.INT);
 		this.astFactory = entityAnalyzer.astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
+		this.language = entityAnalyzer.configuration.getLanguage();
 	}
 
 	// ************************* Exported Methods **************************
@@ -1745,7 +1747,7 @@ public class ExpressionAnalyzer {
 	 */
 	private boolean isPointerToCompleteObjectType(Type type) {
 		if (type instanceof PointerType) {
-			if (ABC.language == Language.CIVL_C)
+			if (language == Language.CIVL_C)
 				return true;
 			else {
 				Type baseType = ((PointerType) type).referencedType();
