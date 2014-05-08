@@ -25,6 +25,9 @@ import edu.udel.cis.vsl.abc.ast.type.Types;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.Values;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
+import edu.udel.cis.vsl.abc.config.Configurations;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.parse.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
@@ -89,26 +92,27 @@ public class Activator {
 	private ConversionFactory conversionFactory = Conversions
 			.newConversionFactory(typeFactory);
 
-	private Analyzer standardAnalyzer = Analysis.newStandardAnalyzer(
-			astFactory, entityFactory, nodeFactory, sourceFactory,
-			conversionFactory);
-
 	private Transformer sideEffectRemover = Transform.newTransformer("sef",
 			astFactory);
 
 	private Transformer pruner = Transform.newTransformer("prune", astFactory);
 
-	private ProgramFactory programFactory = Programs.newProgramFactory(
-			astFactory, standardAnalyzer);
+	private Configuration configuration;
+
+	private File file;
 
 	private Preprocessor preprocessor;
 
-	private File file;
+	private Analyzer standardAnalyzer;
+
+	private ProgramFactory programFactory;
 
 	/**
 	 * Creates a new Activator instance with the given file and include paths.
 	 * No action is taken: the file is not opened.
 	 * 
+	 * @param language
+	 *            the language to use (C or CIVL-C)
 	 * @param file
 	 *            an input file
 	 * @param systemIncludes
@@ -116,12 +120,29 @@ public class Activator {
 	 * @param userIncludes
 	 *            list of user include paths
 	 */
-	public Activator(File file, File[] systemIncludes, File[] userIncludes) {
-		String filename = file.getName();
-
+	public Activator(Language language, File file, File[] systemIncludes,
+			File[] userIncludes) {
 		this.file = file;
-		ABC.setLanguageFromName(filename);
+		configuration = Configurations.newMinimalConfiguration();
+		configuration.setLanguage(language);
 		preprocessor = preprocessorFactory.newPreprocessor(systemIncludes,
+				userIncludes);
+		standardAnalyzer = Analysis.newStandardAnalyzer(configuration,
+				astFactory, entityFactory, conversionFactory);
+		programFactory = Programs.newProgramFactory(astFactory,
+				standardAnalyzer);
+	}
+
+	/**
+	 * Constructs new activator using the filename to determine which language
+	 * to use.
+	 * 
+	 * @param file
+	 * @param systemIncludes
+	 * @param userIncludes
+	 */
+	public Activator(File file, File[] systemIncludes, File[] userIncludes) {
+		this(getLanguageFromName(file.getName()), file, systemIncludes,
 				userIncludes);
 	}
 
@@ -134,6 +155,26 @@ public class Activator {
 	 */
 	public Activator(File file) {
 		this(file, new File[0], new File[0]);
+	}
+
+	/**
+	 * Determines language from filename. If it ends in ".cvl" or ".cvh", it's
+	 * CIVL_C, else it's C.
+	 * 
+	 * @param name
+	 *            filename
+	 * @return CIVL_C or C
+	 */
+	private static Language getLanguageFromName(String name) {
+		int dotIndex = name.lastIndexOf('.');
+
+		if (dotIndex >= 0) {
+			String suffix = name.substring(dotIndex + 1, name.length());
+
+			if ("cvl".equals(suffix) || "cvh".equals(suffix))
+				return Language.CIVL_C;
+		}
+		return Language.C;
 	}
 
 	/**
@@ -283,10 +324,10 @@ public class Activator {
 	 */
 	public AST getTranslationUnit() throws ParseException, SyntaxException,
 			PreprocessorException {
-		AST unit = getRawTranslationUnit();
+		AST ast = getRawTranslationUnit();
 
-		Analysis.performStandardAnalysis(unit);
-		return unit;
+		Analysis.performStandardAnalysis(configuration, ast);
+		return ast;
 	}
 
 	/**
@@ -326,7 +367,7 @@ public class Activator {
 	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
 		AST ast = astFactory.newAST(root);
 
-		Analysis.performStandardAnalysis(ast);
+		Analysis.performStandardAnalysis(configuration, ast);
 		return ast;
 	}
 
@@ -340,11 +381,11 @@ public class Activator {
 	 */
 	public AST getSideEffectFreeTranslationUnit() throws SyntaxException,
 			ParseException, PreprocessorException {
-		AST unit = getTranslationUnit();
+		AST ast = getTranslationUnit();
 
-		unit = sideEffectRemover.transform(unit);
-		Analysis.performStandardAnalysis(unit);
-		return unit;
+		ast = sideEffectRemover.transform(ast);
+		Analysis.performStandardAnalysis(configuration, ast);
+		return ast;
 	}
 
 	public AST getSideEffectFreePrunedTranslationUnit() throws SyntaxException,
@@ -352,9 +393,9 @@ public class Activator {
 		AST ast = getTranslationUnit();
 
 		ast = pruner.transform(ast);
-		Analysis.performStandardAnalysis(ast);
+		Analysis.performStandardAnalysis(configuration, ast);
 		ast = sideEffectRemover.transform(ast);
-		Analysis.performStandardAnalysis(ast);
+		Analysis.performStandardAnalysis(configuration, ast);
 		return ast;
 	}
 

@@ -96,22 +96,22 @@ public class EntityAnalyzer implements Analyzer {
 
 	Scope rootScope;
 
-	// Private fields...
+	Configuration configuration;
 
-	private Configuration configuration;
+	// Private fields...
 
 	private TokenFactory sourceFactory;
 
 	// Constructors...
 
-	public EntityAnalyzer(ASTFactory astFactory, EntityFactory entityFactory,
-			NodeFactory nodeFactory, TokenFactory sourceFactory,
-			ConversionFactory conversionFactory) {
+	public EntityAnalyzer(Configuration configuration, ASTFactory astFactory,
+			EntityFactory entityFactory, ConversionFactory conversionFactory) {
+		this.configuration = configuration;
 		this.astFactory = astFactory;
-		this.nodeFactory = nodeFactory;
+		this.nodeFactory = astFactory.getNodeFactory();
 		this.typeFactory = conversionFactory.getTypeFactory();
 		this.valueFactory = nodeFactory.getValueFactory();
-		this.sourceFactory = sourceFactory;
+		this.sourceFactory = astFactory.getTokenFactory();
 		this.entityFactory = entityFactory;
 		this.standardTypes = new StandardTypes(entityFactory, typeFactory);
 		this.declarationAnalyzer = new DeclarationAnalyzer(this);

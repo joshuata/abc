@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.transform.Transform;
 
@@ -34,17 +35,6 @@ public class ABC {
 
 	public final static String date = "31-mar-2014";
 
-	public static enum Language {
-		C, CIVL_C
-	};
-
-	/**
-	 * The language of the program being processed. C is the default, but if the
-	 * file suffix ends in ".cvl" the command line processor will change it to
-	 * CIVL_C. As this is a public static variable, it can also be set manually.
-	 */
-	public static Language language = Language.C;
-
 	/**
 	 * Produces a new Activator for operating on the given file, using the given
 	 * include paths for preprocessing. Uses the default language.
@@ -61,30 +51,16 @@ public class ABC {
 	 */
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes) {
-		// TokenUtils.initialization();
 		return new Activator(file, systemIncludes, userIncludes);
 	}
 
 	public static Activator activator(File file, File[] systemIncludes,
 			File[] userIncludes, Language kind) {
-		// TokenUtils.initialization();
-		language = kind;
-		return new Activator(file, systemIncludes, userIncludes);
+		return new Activator(kind, file, systemIncludes, userIncludes);
 	}
 
 	public static Activator activator(File file) {
 		return new Activator(file);
-	}
-
-	public static void setLanguageFromName(String name) {
-		int dotIndex = name.lastIndexOf('.');
-
-		if (dotIndex >= 0) {
-			String suffix = name.substring(dotIndex + 1, name.length());
-
-			if ("cvl".equals(suffix))
-				language = Language.CIVL_C;
-		}
 	}
 
 	private static void help(PrintStream out) {
@@ -207,10 +183,6 @@ public class ABC {
 		}
 		if (infileName == null)
 			err("No input file specified");
-		if (languageChoice == null)
-			setLanguageFromName(infileName);
-		else
-			language = languageChoice;
 		infile = new File(infileName);
 		userIncludes = userIncludeList.toArray(new File[0]);
 		systemIncludes = systemIncludeList.toArray(new File[0]);
@@ -218,7 +190,12 @@ public class ABC {
 			result.out = System.out;
 		else
 			result.out = new PrintStream(new File(outfileName));
-		result.activator = new Activator(infile, systemIncludes, userIncludes);
+		if (languageChoice == null)
+			result.activator = new Activator(infile, systemIncludes,
+					userIncludes);
+		else
+			result.activator = new Activator(languageChoice, infile,
+					systemIncludes, userIncludes);
 		result.verbose = verbose;
 		result.preprocOnly = preprocOnly;
 		result.transformCodes = transformCodes;
@@ -247,34 +224,6 @@ public class ABC {
 			program.print(config.out);
 		}
 		config.out.close();
-		// else {
-		// Program program = config.activator.getProgram();
-		// int numNodes1 = program.getAST().getNumberOfNodes();
-		// int numNodes2;
-		//
-		// System.out.println("AST has " + numNodes1 + " nodes.");
-		// if (config.prune) {
-		// System.out.print("Pruning... ");
-		// System.out.flush();
-		// program.prune();
-		// numNodes2 = program.getAST().getNumberOfNodes();
-		// System.out.println("pruned " + (numNodes1 - numNodes2)
-		// + " nodes yielding AST with " + numNodes2 + " nodes.");
-		// System.out.flush();
-		// }
-		// if (config.sef) {
-		// System.out.print("Removing side-effects... ");
-		// System.out.flush();
-		// program.removeSideEffects();
-		// System.out.println("resulting AST has "
-		// + program.getAST().getNumberOfNodes() + " nodes.");
-		// System.out.flush();
-		// }
-		// System.out.println();
-		// System.out.flush();
-		// program.print(config.out);
-		// config.out.flush();
-		// }
 	}
 }
 

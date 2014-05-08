@@ -3,8 +3,6 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.LinkedList;
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ABC;
-import edu.udel.cis.vsl.abc.ABC.Language;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
@@ -51,6 +49,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -75,6 +74,8 @@ public class TypeAnalyzer {
 
 	private ValueFactory valueFactory;
 
+	private Language language;
+
 	/**
 	 * The type used for enumerators, i.e., the elements of enumeration types.
 	 * It is an unspecified integer type according to the C Standard.
@@ -92,6 +93,7 @@ public class TypeAnalyzer {
 		this.valueFactory = entityAnalyzer.valueFactory;
 		this.enumeratorType = (IntegerType) typeFactory
 				.basicType(BasicTypeKind.INT);
+		this.language = entityAnalyzer.configuration.getLanguage();
 	}
 
 	// ************************** Private Methods **************************
@@ -151,8 +153,7 @@ public class TypeAnalyzer {
 			throw error("Non-object type used for element type of array type",
 					elementTypeNode);
 		elementType = (ObjectType) tempElementType;
-		if (ABC.language == Language.C && !isParameter
-				&& !elementType.isComplete())
+		if (language == Language.C && !isParameter && !elementType.isComplete())
 			throw error("Element type of array type is not complete",
 					elementTypeNode);
 		// C11 6.7.3(3):

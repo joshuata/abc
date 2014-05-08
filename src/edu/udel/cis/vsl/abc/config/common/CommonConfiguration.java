@@ -6,6 +6,8 @@ import edu.udel.cis.vsl.abc.config.IF.Configuration;
 
 public class CommonConfiguration implements Configuration {
 
+	Language language = Language.C;
+
 	/** number of bits for smallest object that is not a bit-field (byte) */
 	BigInteger CHAR_BIT = new BigInteger("8");
 
@@ -65,6 +67,16 @@ public class CommonConfiguration implements Configuration {
 
 	/** maximum value for an object of type unsigned long long int */
 	BigInteger ULLONG_MAX = new BigInteger("18446744073709551615");// 2^64-1
+
+	@Override
+	public Language getLanguage() {
+		return language;
+	}
+
+	@Override
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
 
 	@Override
 	public BigInteger unsignedCharMax() {
