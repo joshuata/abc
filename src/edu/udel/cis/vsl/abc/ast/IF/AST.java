@@ -8,24 +8,34 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 
 /**
+ * <p>
  * A representation of a program as an abstract syntax tree.
+ * </p>
  * 
+ * <p>
  * Each AST encompasses a set of AST nodes. Those nodes are "owned" by the AST.
  * A node can be owned by at most one AST. A node may also be free---not owned
  * by any AST.
+ * </p>
  * 
+ * <p>
  * The AST also methods to return the internal and external entities associated
  * to the AST.
+ * </p>
  * 
+ * <p>
  * With few exceptions, nodes owned by an AST cannot be modified. If you want to
  * modify them (for example, to implement an AST transformation), you first have
  * to "release" the AST using the method {@link #release}.
+ * </p>
  * 
+ * <p>
  * Note that an AST is a rooted tree. In particular, there is a unique path from
  * the root to any node in the tree.
+ * </p>
  * 
- * @see {@link Entity}
- * @see {@link ASTNode}
+ * @see Entity
+ * @see ASTNode
  * 
  * @author siegel
  * 
