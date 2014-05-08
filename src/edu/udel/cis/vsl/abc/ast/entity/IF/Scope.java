@@ -8,13 +8,18 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
 /**
+ * <p>
  * A lexical (static) scope in a translation unit. The C11 Standard specifies 4
  * kinds of scopes: FILE, BLOCK, FUNCTION, and FUNCTION_PROTOTYPE.
+ * </p>
  * 
+ * <p>
  * A scope contains declarations of various kinds of entities. An "entity" is
  * any conceptual thing which can be named using an identifier. An entity may be
  * declared in more than one scope (though the process of "linkage").
+ * </p>
  * 
+ * <p>
  * Global declarations are in the FILE scope. A BLOCK scope corresponds to a
  * block. The BLOCK scope corresponding to a function body includes the formal
  * parameters as well as the outermost local parameters. The only entities with
@@ -22,12 +27,14 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * target of a "goto" statement. A FUNCTION_PROTOTYPE scope occurs only in a
  * function prototype, i.e., a function delcaration without body; such a scope
  * extends to the end of the declarator for the function prototype.
+ * </p>
  * 
- * 
- * 
+ * <p>
  * The set of all scopes in a translation unit forms a tree. The root of the
  * tree is the FILE scope.
+ * </p>
  * 
+ * <p>
  * There are four kinds of name spaces in a scope: (1) the label namesapce,
  * which consists of all the (standard) label names in the scope; (2) the tag
  * namespace, which consists of all the tags used in struct, union, and
@@ -41,18 +48,25 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * both a variable and a function in the same scope; nor could it denote both a
  * struct tag and an enumeration tag in the same scope; but two different
  * structs in the same scope can both have a field named "X".
+ * </p>
  * 
+ * <p>
  * Ordinary entities include: functions, variables (that are not fields),
  * enumeration constants, and typedefs.
+ * </p>
  * 
+ * <p>
  * Note that "label" means standard label: the kind that is specified by an
  * identifier followed by a colon. Not a "case label" (CASE followed by a
  * constant expression then colon, used in switch statements), and not the
  * "default" label (also used in switch statements).
+ * </p>
  * 
+ * <p>
  * Note: Entities can have no name. It is OK if two distinct entities have no
  * name; they are not the same entity. It is as if each is given a new name
  * distinct from all other names.
+ * </p>
  */
 public interface Scope extends ScopeValue {
 

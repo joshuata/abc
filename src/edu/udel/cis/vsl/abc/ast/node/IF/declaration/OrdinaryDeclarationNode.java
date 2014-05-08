@@ -5,25 +5,30 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 
 /**
+ * <p>
  * A declaration of a variable or function via a C "declarator". In addition to
  * the identifier (common to all declarations), this also specifies a type and
  * storage information.
+ * </p>
  * 
+ * <p>
  * Note that this is not used to declare members of structures or unions
- * ("fields"). A FieldDeclaration is used for that.
+ * ("fields"). A {@link FieldDeclarationNode} is used for that.
+ * </p>
  * 
  * @author siegel
  * 
  */
 public interface OrdinaryDeclarationNode extends BlockItemNode,
 		DeclarationNode, ExternalDefinitionNode {
-	
-	public enum OrdinaryDeclarationKind{
+
+	public enum OrdinaryDeclarationKind {
 		VARIABLE_DECLARATION,
-		FUNCTION_DECLARATION, FUNCTION_DEFINITION, 
+		FUNCTION_DECLARATION,
+		FUNCTION_DEFINITION,
 		ABSTRACT_FUNCTION_DEFINITION
 	}
-	
+
 	OrdinaryDeclarationKind ordinaryDeclarationKind();
 
 	/**
