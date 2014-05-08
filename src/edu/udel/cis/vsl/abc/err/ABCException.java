@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc;
+package edu.udel.cis.vsl.abc.err;
 
 /**
  * The root of the ABC non-runtime-exception hierarchy. These are exceptions

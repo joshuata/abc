@@ -2,10 +2,10 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.ArrayList;
 
-import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
+import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 

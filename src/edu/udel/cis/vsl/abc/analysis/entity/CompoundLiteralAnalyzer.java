@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -22,6 +21,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
+import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
