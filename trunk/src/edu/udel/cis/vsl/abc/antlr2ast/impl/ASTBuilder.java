@@ -94,7 +94,7 @@ public class ASTBuilder {
 
 	private TokenFactory sourceFactory;
 
-	private ASTFactory unitFactory;
+	private ASTFactory astFactory;
 
 	private CommonTree rootTree;
 
@@ -111,13 +111,12 @@ public class ASTBuilder {
 	 *            the CTokenSource used to produce the ANTLR tree
 	 * 
 	 */
-	public ASTBuilder(CParser parser, ASTFactory unitFactory,
+	public ASTBuilder(CParser parser, ASTFactory astFactory,
 			CommonTree rootTree) {
 		this.parser = parser;
-		this.unitFactory = unitFactory;
-		unitFactory.setASTBuilder(this);
-		this.nodeFactory = unitFactory.getNodeFactory();
-		this.sourceFactory = unitFactory.getTokenFactory();
+		this.astFactory = astFactory;
+		this.nodeFactory = astFactory.getNodeFactory();
+		this.sourceFactory = astFactory.getTokenFactory();
 		this.rootTree = rootTree;
 	}
 
@@ -136,7 +135,7 @@ public class ASTBuilder {
 	public AST getTranslationUnit() throws SyntaxException {
 		ASTNode root = translateTranslationUnit(rootTree);
 
-		return unitFactory.newAST(root);
+		return astFactory.newAST(root);
 	}
 
 	// Supporting methods...
