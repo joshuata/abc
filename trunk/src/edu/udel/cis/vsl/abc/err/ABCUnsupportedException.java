@@ -1,4 +1,5 @@
-package edu.udel.cis.vsl.abc;
+package edu.udel.cis.vsl.abc.err;
+
 
 public class ABCUnsupportedException extends ABCRuntimeException {
 

@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import edu.udel.cis.vsl.abc.ABCException;
+import edu.udel.cis.vsl.abc.err.ABCException;
 
 public class SyntaxException extends ABCException {
 

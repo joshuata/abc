@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast;
 
-import edu.udel.cis.vsl.abc.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
 
 /**
  * Runtime exception thrown when something goes wrong with the AST.

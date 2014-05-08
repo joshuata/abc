@@ -3,10 +3,10 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-import edu.udel.cis.vsl.abc.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundLiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.LiteralObject;
+import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
 
 /**
  * Implementation of CompoundLiteral that provides additional functionality for

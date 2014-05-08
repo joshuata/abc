@@ -2,7 +2,7 @@ package edu.udel.cis.vsl.abc.preproc.IF;
 
 import org.antlr.runtime.Token;
 
-import edu.udel.cis.vsl.abc.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
 
 public class PreprocessorRuntimeException extends ABCRuntimeException {
 	/**
