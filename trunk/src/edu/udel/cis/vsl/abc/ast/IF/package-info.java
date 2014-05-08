@@ -4,8 +4,9 @@
  * 
  * <ul>
  * 
- * <li>main: this package, declaring the interfaces {@link AST}
- * and {@link ASTFactory}
+ * <li>main: this package, declaring the interfaces 
+ * {@link edu.udel.cis.vsl.abc.ast.IF.AST AST}
+ * and {@link edu.udel.cis.vsl.abc.ast.IF.ASTFactory ASTFactory}.
  * </li>
  * 
  * <li><strong>value</strong> ({@link edu.udel.cis.vsl.abc.ast.value})
@@ -55,3 +56,4 @@
  * </ul>
  */
 package edu.udel.cis.vsl.abc.ast.IF;
+
