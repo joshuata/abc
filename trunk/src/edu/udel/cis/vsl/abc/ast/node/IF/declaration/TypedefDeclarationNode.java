@@ -5,9 +5,22 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 
+/**
+ * A node representing a typedef declaration. The identifier node in this
+ * declaration is the name of the typedef. The other child is a type node, which
+ * is the type being assigned to that identifier.
+ * 
+ * @author siegel
+ * 
+ */
 public interface TypedefDeclarationNode extends DeclarationNode,
 		ExternalDefinitionNode, BlockItemNode {
 
+	/**
+	 * Returns the typedef entity itself associated to this declaration.
+	 * 
+	 * @return the typedef
+	 */
 	@Override
 	Typedef getEntity();
 
@@ -19,31 +32,13 @@ public interface TypedefDeclarationNode extends DeclarationNode,
 	 */
 	TypeNode getTypeNode();
 
+	/**
+	 * Sets the type node child of this typedef declaration node.
+	 * 
+	 * @param type
+	 *            the type node to be made a child of this node
+	 */
 	void setTypeNode(TypeNode type);
-
-	// /**
-	// * A typedef declaration can have any number of scope parameters
-	// associated
-	// * to it, e.g.:
-	// *
-	// * <pre>
-	// * <s1,s2,s3> typedef struct _triple {
-	// * double *<s1> a;
-	// * double *<s2> b;
-	// * double *<s3> c;
-	// * } triple;
-	// * </pre>
-	// *
-	// * When triple is used
-	// *
-	// * <pre>
-	// * triple&lt;t1, t2, t3&gt; t;
-	// * </pre>
-	// *
-	// * @return the list of scope identifiers in the declaration, or null if no
-	// * such list occurred
-	// */
-	// SequenceNode<VariableDeclarationNode> getScopeList();
 
 	@Override
 	TypedefDeclarationNode copy();

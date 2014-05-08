@@ -1,38 +1,42 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 
 /**
+ * <p>
  * The root of the declaration type hierarchy. According to C11, "A declaration
  * specifies the interpretation and attributes of a set of identifiers." An
  * object of this type specifies a declaration for exactly one identifier.
+ * </p>
  * 
+ * <p>
  * A DeclarationNode does not correspond exactly to the notion of "declaration"
  * in the C Standard. For example, in the C Standard, a static assertion is a
  * kind of declaration. This seems more like a grammatical convenience (since a
  * static assertion can appear almost anywhere a declaration can) then a logical
  * organization of the concepts, as a static assertion does not specify
  * "the interpretation and attributes of a set of identifiers".
+ * </p>
  * 
- * Every Declaration occurs in exactly one Scope.
+ * <p>
+ * Every declaration node has at least one child: an identifier node for the
+ * identifier being declared. It is possible for that identifier node to be
+ * null.
+ * </p>
  * 
- * TODO: some declarations can have any number of scope parameters
- * associated to them, e.g.:
+ * <p>
+ * Furthermore, every declaration node declares some abstract thing, called an
+ * entity. This class provides a method to get and set that entity.
+ * </p>
  * 
- * <pre>
- * <s1,s2,s3> double *<s2> f(double *<s1> x, double *<s3> y);
- * </pre>
+ * <p>
+ * Every Declaration occurs in exactly one {@link Scope}.
+ * </p>
  * 
- * When f is called:
- * 
- * <pre>
- * f<t1,t2,t3>(a,b)
- * </pre>
- * 
- * Kinds of declarations that can have scope parameter lists:
- * typedefs, functions.
+ * @see {@link Entity}
  * 
  * @author siegel
  * 
@@ -72,7 +76,6 @@ public interface DeclarationNode extends ASTNode {
 	 * first (or only) declaration of the identifier."
 	 * 
 	 * @return true if this is the identifier's definition.
-	 * 
 	 */
 	boolean isDefinition();
 
@@ -91,6 +94,12 @@ public interface DeclarationNode extends ASTNode {
 	 */
 	Entity getEntity();
 
+	/**
+	 * Sets the entity associated to this declaration.
+	 * 
+	 * @param entity
+	 *            the entity to associate to this node
+	 */
 	void setEntity(Entity entity);
 
 	@Override
