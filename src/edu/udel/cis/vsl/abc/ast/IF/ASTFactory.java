@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.IF;
 
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -101,22 +100,5 @@ public interface ASTFactory {
 	 * @return type after substitutions performed
 	 */
 	Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map);
-
-	/**
-	 * Returns the ASTBuilder used by this AST factory. The ASTBuilder is used
-	 * to translate an ANTLR tree to an AST.
-	 * 
-	 * @return
-	 */
-	ASTBuilder getASTBuilder();
-
-	/**
-	 * Sets the ASTBuilder used by this AST factory. The ASTBuilder is used to
-	 * translate an ANTLR tree to an AST.
-	 * 
-	 * @param astBuilder
-	 *            the ASTBuilder to use
-	 */
-	void setASTBuilder(ASTBuilder astBuilder);
 
 }
