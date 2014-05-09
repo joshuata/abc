@@ -1,6 +1,5 @@
-package edu.udel.cis.vsl.abc.ast.type;
+package edu.udel.cis.vsl.abc.ast.type.IF;
 
-import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.common.CommonTypeFactory;
 
 public class Types {

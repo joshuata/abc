@@ -1,6 +1,5 @@
-package edu.udel.cis.vsl.abc.config;
+package edu.udel.cis.vsl.abc.config.IF;
 
-import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.config.common.CommonConfiguration;
 
 public class Configurations {

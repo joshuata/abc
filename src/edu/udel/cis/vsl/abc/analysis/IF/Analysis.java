@@ -1,12 +1,11 @@
-package edu.udel.cis.vsl.abc.analysis;
+package edu.udel.cis.vsl.abc.analysis.IF;
 
-import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.analysis.common.StandardAnalyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.conversion.Conversions;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
-import edu.udel.cis.vsl.abc.ast.entity.Entities;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversions;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entities;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
