@@ -16,7 +16,7 @@ public interface ConstantNode extends ExpressionNode {
 	 * Returns the representation of the constant exactly as it occurred in the
 	 * source code.
 	 * 
-	 * @return
+	 * @return the original representation of this constant in the source code
 	 */
 	String getStringRepresentation();
 

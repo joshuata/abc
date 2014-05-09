@@ -373,7 +373,7 @@ public class Activator {
 	/**
 	 * Returns the analyzed AST with all side-effects expressions removed.
 	 * 
-	 * @return
+	 * @return the AST obtained from the given one by removing side-effects
 	 * @throws SyntaxException
 	 * @throws ParseException
 	 * @throws PreprocessorException
@@ -485,7 +485,7 @@ public class Activator {
 	 * Shows translation with no transformers.
 	 * 
 	 * @param out
-	 * @return
+	 * @return the final program
 	 * @throws ABCException
 	 * @throws IOException
 	 */

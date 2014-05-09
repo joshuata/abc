@@ -13,7 +13,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
  * 
  * It is also used to represent a compound literal.
  * 
- * @see {@link CompoundLiteralNode}
+ * @see CompoundLiteralNode
  * 
  * @author siegel
  * 

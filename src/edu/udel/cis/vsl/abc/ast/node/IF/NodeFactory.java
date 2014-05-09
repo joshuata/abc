@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF;
 
+import java.beans.Expression;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
@@ -726,9 +727,13 @@ public interface NodeFactory {
 	 * Returns a new declaration of an "object" variable with no initializer.
 	 * 
 	 * @param source
+	 *            the source information for the variable declaration
 	 * @param name
+	 *            the identifier node corresponding to the name of the variable
+	 *            in its declaration
 	 * @param type
-	 * @return
+	 *            the node corresponding to the type in the declaration
+	 * @return the new variable declaration node with the given chidren
 	 */
 	VariableDeclarationNode newVariableDeclarationNode(Source source,
 			IdentifierNode name, TypeNode type);
@@ -752,13 +757,14 @@ public interface NodeFactory {
 	 * "definition").
 	 * 
 	 * @param source
+	 *            source information for this declaration
 	 * @param name
+	 *            the identifier node for the name of this function
 	 * @param type
-	 *            type of the function: can be either a FunctionTypeNode or a
-	 *            ScopeParameterizedTypeNode whose body is a FunctionTypeNode
+	 *            node representing the type of the function
 	 * @param contract
-	 *            sequence of contract elements or null
-	 * @return
+	 *            sequence of contract elements or <code>null</code>
+	 * @return the new function declaration node formed from given children
 	 */
 	FunctionDeclarationNode newFunctionDeclarationNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
@@ -820,26 +826,34 @@ public interface NodeFactory {
 			List<BlockItemNode> items);
 
 	/**
-	 * Source is same as that of the expression.
+	 * Constructs a new expression statement node. This is a statement which
+	 * wraps an expression. The source is the same as that of the expression.
 	 * 
 	 * @param expression
-	 * @return
+	 *            the expression node
+	 * @return the new expression statement node wrapping that expression
 	 */
 	ExpressionStatementNode newExpressionStatementNode(ExpressionNode expression);
 
 	StatementNode newNullStatementNode(Source source);
 
 	/**
+	 * Constructs a new <code>for</code> loop node.
 	 * 
 	 * @param initializer
-	 *            an Expression or another instance of ForLoopInitializerNode,
-	 *            such as one produced from a list of delcarations; may be null
+	 *            the initializer part of the <code>for</code> loop, an
+	 *            {@link Expression} or another instance of
+	 *            {@link ForLoopInitializerNode}, such as one produced from a
+	 *            list of delcarations; may be <code>null</code>
 	 * @param condition
+	 *            the condition part of the <code>for</code> loop
 	 * @param incrementer
+	 *            the incrementer part of the <code>for</code> loop
 	 * @param body
+	 *            the body of the <code>for</code> loop
 	 * @param invariant
-	 *            loop invariant: may be null
-	 * @return
+	 *            loop invariant: may be <code>null</code>
+	 * @return the new <code>for</code> loop node
 	 */
 	ForLoopNode newForLoopNode(Source source,
 			ForLoopInitializerNode initializer, ExpressionNode condition,
@@ -858,23 +872,31 @@ public interface NodeFactory {
 	GotoNode newGotoNode(Source source, IdentifierNode label);
 
 	/**
-	 * Creates new if statement when there is no false ("else") branch.
+	 * Creates new <code>if</code> statement node when there is no false
+	 * ("else") branch.
 	 * 
 	 * @param source
+	 *            source information for the statement
 	 * @param condition
+	 *            the condition expression
 	 * @param trueBranch
-	 * @return
+	 *            the body of the <code>if</code> statement
+	 * @return the new <code>if</code> statement node formed from given children
 	 */
 	IfNode newIfNode(Source source, ExpressionNode condition,
 			StatementNode trueBranch);
 
 	/**
-	 * False branch may be null if there is no "else" clause.
+	 * Creates a new <code>if</code> statement node. False branch may be null if
+	 * there is no "else" clause.
 	 * 
 	 * @param condition
+	 *            the branch condition
 	 * @param trueBranch
+	 *            the statement for the "true" branch
 	 * @param falseBranch
-	 * @return
+	 *            the statement for the "false" branch
+	 * @return the new <code>if</code> statement node
 	 */
 	IfNode newIfNode(Source source, ExpressionNode condition,
 			StatementNode trueBranch, StatementNode falseBranch);
@@ -884,10 +906,13 @@ public interface NodeFactory {
 	JumpNode newBreakNode(Source source);
 
 	/**
-	 * Argument may be null.
+	 * Creates a new <code>return</code> statement node. Argument may be
+	 * <code>null</code>.
 	 * 
 	 * @param argument
-	 * @return
+	 *            the expression being returned or <code>null</code> if there is
+	 *            none
+	 * @return the new <code>return</code> statement node
 	 */
 	ReturnNode newReturnNode(Source source, ExpressionNode argument);
 
@@ -898,8 +923,6 @@ public interface NodeFactory {
 			StatementNode body);
 
 	WaitNode newWaitNode(Source source, ExpressionNode expression);
-
-	// AssertNode newAssertNode(Source source, ExpressionNode expression);
 
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 
@@ -1066,8 +1089,6 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
-	 * @param name
-	 *            The name of the barrier construct.
 	 * @return The new OpenMP barrier node created.
 	 */
 	OmpSyncNode newOmpBarrierNode(Source source);
@@ -1081,8 +1102,6 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
-	 * @param name
-	 *            The name of the flush construct.
 	 * @param variables
 	 *            The list of variables of the flush operation.
 	 * @return The new OpenMP flush node created.
@@ -1100,8 +1119,6 @@ public interface NodeFactory {
 	 * 
 	 * @param source
 	 *            The source code element of the new node.
-	 * @param name
-	 *            The name of the ordered section.
 	 * @param statement
 	 *            The statement node of the ordered construct.
 	 * @return The new OpenMP ordered node created.

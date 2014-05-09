@@ -10,7 +10,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
  * 
  * An identifier node represents any occurrence of an identifier in a program.
  * 
- * @see {@link Entity}
+ * @see Entity
  * 
  * @author siegel
  * 

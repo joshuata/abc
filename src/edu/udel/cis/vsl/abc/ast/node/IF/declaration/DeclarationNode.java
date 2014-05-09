@@ -36,7 +36,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
  * Every Declaration occurs in exactly one {@link Scope}.
  * </p>
  * 
- * @see {@link Entity}
+ * @see Entity
  * 
  * @author siegel
  * 

@@ -40,7 +40,7 @@ public interface FunctionCallNode extends ExpressionNode {
 	 * f<s1,s2>(...)
 	 * </code>
 	 * 
-	 * @return
+	 * @return the scope parameters
 	 */
 	SequenceNode<ExpressionNode> getScopeList();
 

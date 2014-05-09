@@ -14,9 +14,9 @@ public interface Enumerator extends OrdinaryEntity {
 
 	/**
 	 * Returns the optional constant integer value assigned to this enumerator,
-	 * or null if this is missing.
+	 * or <code>null</code> if this is missing.
 	 * 
-	 * @return
+	 * @return the integer value of this enumerator constant
 	 */
 	Value getValue();
 }

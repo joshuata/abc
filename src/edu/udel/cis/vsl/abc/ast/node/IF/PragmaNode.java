@@ -58,7 +58,7 @@ public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 	 * Returns the tokens of the pragma body as an ANTLR TokenSource, which can
 	 * then be fed into an ANTLR parser for syntactic analysis.
 	 * 
-	 * @return
+	 * @return a token source for the tokens comprising this pragma
 	 */
 	TokenSource getTokenSource();
 

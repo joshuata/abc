@@ -70,7 +70,7 @@ public interface Entity {
 	 * of the entity. It can be null in certain situations (e.g., an unnamed
 	 * field).
 	 * 
-	 * @return
+	 * @return the name of this entity
 	 */
 	String getName();
 
@@ -93,26 +93,32 @@ public interface Entity {
 	/**
 	 * Returns the definition, i.e., the defining declaration of this entity.
 	 * 
-	 * @return
+	 * @return the definition of this entity or <code>null</code>
 	 */
 	DeclarationNode getDefinition();
 
+	/**
+	 * Sets the definition for this entity.
+	 * 
+	 * @param declaration
+	 *            the declaration node for the definition
+	 */
 	void setDefinition(DeclarationNode declaration);
 
 	/**
 	 * Returns the kind of linkage this entity has.
 	 * 
-	 * @return
+	 * @return the kind of linkage this entity has
 	 */
 	LinkageKind getLinkage();
 
 	void setLinkage(LinkageKind linkage);
 
 	/**
-	 * Other than Label, every kind of Entity has a type, returned by this
-	 * method. For a Label, this returns null.
+	 * Other than {@link Label}, every kind of Entity has a type, returned by
+	 * this method. For a {@link Label}, this returns <code>null</code>.
 	 * 
-	 * @return
+	 * @return the type of this entity or <code>null</code>
 	 */
 	Type getType();
 
