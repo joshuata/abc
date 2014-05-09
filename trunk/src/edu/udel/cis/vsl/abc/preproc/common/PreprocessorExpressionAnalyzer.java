@@ -13,7 +13,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorExpressionException;
-import edu.udel.cis.vsl.abc.util.StringPredicate;
+import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
 
 /**
  * A class for parsing conditional expressions in preprocessor conditionals

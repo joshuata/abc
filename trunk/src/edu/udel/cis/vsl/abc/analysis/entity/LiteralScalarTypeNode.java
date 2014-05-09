@@ -1,7 +1,7 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
-import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 
 public class LiteralScalarTypeNode extends LiteralTypeNode {
 

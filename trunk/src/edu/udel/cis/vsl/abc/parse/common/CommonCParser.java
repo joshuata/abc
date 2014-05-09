@@ -23,7 +23,7 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.common.CommonCToken;
-import edu.udel.cis.vsl.abc.util.ANTLRUtils;
+import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 public class CommonCParser implements CParser {
 
@@ -63,11 +63,6 @@ public class CommonCParser implements CParser {
 	@Override
 	public TokenStream getTokenStream() {
 		return stream;
-	}
-
-	@Override
-	public CivlCParser getParser() {
-		return parser;
 	}
 
 	/**

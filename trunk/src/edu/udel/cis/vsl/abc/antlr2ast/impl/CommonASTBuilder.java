@@ -13,6 +13,8 @@ import java.util.Set;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 
+import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.SimpleScope;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -84,7 +86,7 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
  * @author siegel
  * 
  */
-public class ASTBuilder {
+public class CommonASTBuilder implements ASTBuilder {
 
 	// Instance fields...
 
@@ -111,7 +113,7 @@ public class ASTBuilder {
 	 *            the CTokenSource used to produce the ANTLR tree
 	 * 
 	 */
-	public ASTBuilder(CParser parser, ASTFactory astFactory,
+	public CommonASTBuilder(CParser parser, ASTFactory astFactory,
 			CommonTree rootTree) {
 		this.parser = parser;
 		this.astFactory = astFactory;
@@ -120,7 +122,7 @@ public class ASTBuilder {
 		this.rootTree = rootTree;
 	}
 
-	// The "main" instance method...
+	// Public methods...
 
 	/**
 	 * The main method: given an ANTLR tree, produces a TranslationUnit.
@@ -132,10 +134,22 @@ public class ASTBuilder {
 	 *             if there is something in the tree that does not conform to
 	 *             the C11 standard
 	 */
+	@Override
 	public AST getTranslationUnit() throws SyntaxException {
 		ASTNode root = translateTranslationUnit(rootTree);
 
 		return astFactory.newAST(root);
+	}
+
+	@Override
+	public ExpressionNode translateExpression(CommonTree expressionTree,
+			SimpleScope scope) throws SyntaxException {
+		int kind = expressionTree.getType();
+
+		if (kind == ABSENT)
+			return null;
+		return translateExpression(newSource(expressionTree), expressionTree,
+				scope);
 	}
 
 	// Supporting methods...
@@ -294,16 +308,6 @@ public class ASTBuilder {
 
 		return nodeFactory.newStringLiteralNode(source,
 				stringLiteral.getText(), token.getStringLiteral());
-	}
-
-	public ExpressionNode translateExpression(CommonTree expressionTree,
-			SimpleScope scope) throws SyntaxException {
-		int kind = expressionTree.getType();
-
-		if (kind == ABSENT)
-			return null;
-		return translateExpression(newSource(expressionTree), expressionTree,
-				scope);
 	}
 
 	/**
