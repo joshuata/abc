@@ -1,9 +1,5 @@
 package edu.udel.cis.vsl.abc.parse.common;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -14,16 +10,11 @@ import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocess;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.common.CommonCToken;
-import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 public class CommonCParser implements CParser {
 
@@ -35,34 +26,20 @@ public class CommonCParser implements CParser {
 
 	private TokenFactory tokenFactory;
 
-	public CommonCParser(Preprocessor preprocessor, CTokenSource tokenSource) {
+	public CommonCParser(CTokenSource tokenSource) {
 		this.tokenSource = tokenSource;
 		this.tokenFactory = tokenSource.getTokenFactory();
 		this.stream = new CommonTokenStream(tokenSource);
 		this.parser = new CivlCParser(stream);
 	}
 
-	public CommonCParser(Preprocessor preprocessor, File file)
-			throws PreprocessorException {
-		this(preprocessor, preprocessor.outputTokenSource(file));
-	}
-
-	@Override
-	public CTokenSource getTokenSource() {
-		return tokenSource;
-	}
-
-	@Override
-	public TokenStream getTokenStream() {
-		return stream;
-	}
-
 	/**
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some
 	 * "post-processing" has been done to the tree to fill in some fields.
 	 * 
-	 * @return
+	 * @return the ANTLR tree that results from parsing
 	 * @throws ParseException
+	 *             if something goes wrong parsing the input
 	 */
 	@Override
 	public CommonTree getTree() throws ParseException {
@@ -162,31 +139,9 @@ public class CommonCParser implements CParser {
 		}
 	}
 
-	/**
-	 * Combines all steps of the parsing process, starting from a File and
-	 * returning a post-processed tree.
-	 */
-	public static CommonTree parse(Preprocessor preprocessor, File file)
-			throws PreprocessorException, ParseException {
-		CommonCParser treeParser = new CommonCParser(preprocessor, file);
-
-		return treeParser.getTree();
-	}
-
-	public static void printTree(PrintStream out, CommonTree tree) {
-		ANTLRUtils.printTree(out, tree);
-	}
-
-	public static void printTree(PrintStream out, Preprocessor preprocessor,
-			File file) throws PreprocessorException, ParseException {
-		printTree(out, parse(preprocessor, file));
-	}
-
 	@Override
 	public Source source(CommonTree tree) {
 		CToken firstToken = null, lastToken = null;
-		CTokenSource tokenSource = getTokenSource();
-
 		int start = tree.getTokenStartIndex();
 		int stop = tree.getTokenStopIndex();
 
@@ -203,26 +158,6 @@ public class CommonCParser implements CParser {
 		else if (lastToken == null)
 			lastToken = firstToken;
 		return tokenFactory.newSource(firstToken, lastToken);
-	}
-
-	/**
-	 * A simple main method that should just be used for simple tests. Use the
-	 * main method in class ABC to get all the bells and whistles.
-	 * 
-	 * @param args
-	 * @throws PreprocessorException
-	 * @throws ParseException
-	 * @throws IOException
-	 */
-	public static void main(String[] args) throws PreprocessorException,
-			ParseException, IOException {
-		String filename = args[0];
-		File file = new File(filename);
-		PreprocessorFactory preprocessorFactory = Preprocess
-				.newPreprocessorFactory();
-		Preprocessor preprocessor = preprocessorFactory.newPreprocessor();
-
-		printTree(System.out, preprocessor, file);
 	}
 
 	@Override

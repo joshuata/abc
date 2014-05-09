@@ -62,7 +62,7 @@
 
 		<li><strong>preproc</strong>
 			<ol>
-				<li>responsibilities: preprocessing; generation of
+				<li>responsibilities: preprocessing a file to generate a
 					post-preprocessor token stream</li>
 				<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
 				<li>interface: {@link edu.udel.cis.vsl.abc.preproc.IF}</li>
@@ -72,10 +72,9 @@
 
 		<li><strong>parse</strong>
 			<ol>
-				<li>responsibilities: preprocessing and parsing source files to
-					produce an ANTRL tree representation of a translation unit</li>
-				<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong>,
-					<strong>preproc</strong></li>
+				<li>responsibilities: parsing a token stream to produce an
+					ANTLR tree representation of a translation unit</li>
+				<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
 				<li>interface: {@link edu.udel.cis.vsl.abc.parse.IF}</li>
 				<li>entry point: {@link edu.udel.cis.vsl.abc.parse.IF.Parse
 					Parse}</li>
@@ -124,6 +123,7 @@
 									edu.udel.cis.vsl.abc.ast.conversion.IF}</li>
 								<li>entry point: {@link
 									edu.udel.cis.vsl.abc.ast.conversion.IF.Conversions Conversions}
+
 
 								
 							</ol></li>

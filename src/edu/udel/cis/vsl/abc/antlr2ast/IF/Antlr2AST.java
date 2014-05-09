@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.antlr2ast.IF;
 
-import java.io.File;
 import java.io.PrintStream;
 
 import org.antlr.runtime.tree.CommonTree;
@@ -17,11 +16,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Values;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
-import edu.udel.cis.vsl.abc.parse.IF.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocess;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
@@ -108,15 +103,15 @@ public class Antlr2AST {
 		tu.print(out);
 	}
 
-	public static void main(String[] args) throws PreprocessorException,
-			ParseException, SyntaxException {
-		String filename = args[0];
-		File file = new File(filename);
-		Preprocessor preprocessor = Preprocess.newPreprocessorFactory()
-				.newPreprocessor();
-		CParser parser = Parse.newCParser(preprocessor, file);
-
-		buildAndPrintAST(System.out, parser);
-	}
+	// public static void main(String[] args) throws PreprocessorException,
+	// ParseException, SyntaxException {
+	// String filename = args[0];
+	// File file = new File(filename);
+	// Preprocessor preprocessor = Preprocess.newPreprocessorFactory()
+	// .newPreprocessor();
+	// CParser parser = Parse.newCParser(preprocessor, file);
+	//
+	// buildAndPrintAST(System.out, parser);
+	// }
 
 }

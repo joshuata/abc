@@ -1,15 +1,20 @@
 package edu.udel.cis.vsl.abc.parse.IF;
 
-import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
-import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
- * I used the following perl script to generate the constants:
+ * <p>
+ * Simple interfacer for a parser of C programs. It includes a bunch of integer
+ * constants which are ID numbers of each kind of token (real or fake) that can
+ * occur in a C parse tree.
+ * </p>
+ * 
+ * The token constants are just extracted from the ANTLR-generated parser using
+ * the following Perl script:
  * 
  * <pre>
  * open(FILE, "fields.txt") || die "could not open fields.txt";
@@ -22,11 +27,16 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * close(FILE);
  * </pre>
  * 
+ * I thought this approach would be better than exporting the entire
+ * ANTLR-generated parser; I don't want other code in ABC or elsewhere tied so
+ * totally to the generated code. On the other hand, other code does need to
+ * access these constants.
+ * 
  * @author siegel
  * 
  */
 public interface CParser {
-	
+
 	// constants defined in the ANTLR-generated parser
 
 	public static final int EOF = CivlCParser.EOF;
@@ -306,10 +316,6 @@ public interface CParser {
 	public static final int TYPE_NAME = CivlCParser.TYPE_NAME;
 	public static final int TYPE_QUALIFIER_LIST = CivlCParser.TYPE_QUALIFIER_LIST;
 
-	CTokenSource getTokenSource();
-
-	TokenStream getTokenStream();
-
 	/**
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some
 	 * "post-processing" has been done to the tree to fill in some fields.
@@ -320,7 +326,7 @@ public interface CParser {
 	CommonTree getTree() throws ParseException;
 
 	/**
-	 * Given a node in the parse tree, return a source object for it.
+	 * Given a node in the parse tree, returns a source object for it.
 	 * 
 	 * @param tree
 	 *            node in tree returned by method getTree()
@@ -329,6 +335,16 @@ public interface CParser {
 	 */
 	Source source(CommonTree tree);
 
+	/**
+	 * Creates a new syntax exception.
+	 * 
+	 * @param message
+	 *            the message to print out when this exception is reported to
+	 *            the user
+	 * @param tree
+	 *            the node in the ANTLR tree that led to this exception
+	 * @return the new syntax exception
+	 */
 	SyntaxException newSyntaxException(String message, CommonTree tree);
 
 }
