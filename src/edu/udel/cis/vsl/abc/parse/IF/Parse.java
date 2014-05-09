@@ -18,5 +18,4 @@ public class Parse {
 			throws PreprocessorException {
 		return new CommonCParser(preprocessor, file);
 	}
-
 }

@@ -306,6 +306,7 @@ public class Activator {
 		CParser parser = Parse.newCParser(preprocessor, file);
 		AST ast = Antlr2AST.build(parser, astFactory, null);
 
+		this.astBuilder = Antlr2AST.newASTBuilder(parser, astFactory, null);
 		return ast;
 	}
 
