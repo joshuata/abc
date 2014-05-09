@@ -1,6 +1,5 @@
-package edu.udel.cis.vsl.abc.token;
+package edu.udel.cis.vsl.abc.token.IF;
 
-import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.common.CommonTokenFactory;
 
 public class Tokens {

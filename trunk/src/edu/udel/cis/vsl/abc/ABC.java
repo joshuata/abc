@@ -11,7 +11,7 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.transform.Transform;
+import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
 /**
  * The main class for the ABC C front end. Provides a simple command line

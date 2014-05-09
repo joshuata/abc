@@ -1,6 +1,5 @@
-package edu.udel.cis.vsl.abc.ast;
+package edu.udel.cis.vsl.abc.ast.IF;
 
-import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.common.CommonASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;

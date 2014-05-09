@@ -2,7 +2,7 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 
 import java.util.Iterator;
 
-import edu.udel.cis.vsl.abc.ast.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 
 /**
  * According to C11, a function type is characterized by the return type and the

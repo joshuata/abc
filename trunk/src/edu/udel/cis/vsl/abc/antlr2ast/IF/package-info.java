@@ -3,7 +3,6 @@
  * takes an ANTLR tree representation of a program
  * and produces an ABC Abstract Syntax Tree.
  * 
- * @see edu.udel.cis.vsl.abc.antlr2ast.Antlr2AST
+ * @see edu.udel.cis.vsl.abc.antlr2ast.IF.Antlr2AST
  */
-package edu.udel.cis.vsl.abc.antlr2ast;
-
+package edu.udel.cis.vsl.abc.antlr2ast.IF;

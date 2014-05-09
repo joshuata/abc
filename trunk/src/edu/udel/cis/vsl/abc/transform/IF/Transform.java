@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.transform;
+package edu.udel.cis.vsl.abc.transform.IF;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -6,8 +6,6 @@ import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
-import edu.udel.cis.vsl.abc.transform.IF.TransformRecord;
-import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 

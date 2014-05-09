@@ -3,7 +3,7 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;

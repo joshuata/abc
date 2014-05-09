@@ -1,8 +1,7 @@
-package edu.udel.cis.vsl.abc.parse;
+package edu.udel.cis.vsl.abc.parse.IF;
 
 import java.io.File;
 
-import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.common.CommonCParser;
 import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;

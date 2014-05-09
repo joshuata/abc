@@ -1,6 +1,5 @@
-package edu.udel.cis.vsl.abc.ast.conversion;
+package edu.udel.cis.vsl.abc.ast.conversion.IF;
 
-import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.common.CommonConversionFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 
