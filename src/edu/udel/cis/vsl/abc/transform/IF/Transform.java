@@ -6,6 +6,7 @@ import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.transform.common.CompareCombiner;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
@@ -167,5 +168,15 @@ public class Transform {
 		if (record == null)
 			throw new ABCRuntimeException("No transformation with code " + code);
 		return record.create(astFactory);
+	}
+
+	/**
+	 * Constructs a new compare combiner for combining two CIVL programs into
+	 * one which compares the two for functional equivalence.
+	 * 
+	 * @return the new compare combiner
+	 */
+	public static Combiner newCompareCombiner() {
+		return new CompareCombiner();
 	}
 }
