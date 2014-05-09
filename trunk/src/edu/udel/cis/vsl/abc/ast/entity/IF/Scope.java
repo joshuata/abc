@@ -283,7 +283,7 @@ public interface Scope extends ScopeValue {
 	/**
 	 * Returns iterator over all (standard) labels declared in this scope.
 	 * 
-	 * @return
+	 * @return iterator over all standard labels declared in this scope
 	 */
 	Iterator<Label> getLabels();
 
@@ -299,9 +299,10 @@ public interface Scope extends ScopeValue {
 	 * 
 	 * @param labelId
 	 *            the label's id
-	 * @return label
-	 * @exeption IllegalArgumentException if the labelId is less than 0 or
-	 *           greater than or equal to the number of labels in this scope
+	 * @return the label with the given id
+	 * @exception IllegalArgumentException
+	 *                if the labelId is less than 0 or greater than or equal to
+	 *                the number of labels in this scope
 	 */
 	Label getLabel(int labelId);
 

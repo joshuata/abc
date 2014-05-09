@@ -7,19 +7,25 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 /**
  * This interface implements the OpenMP loop construct. <br>
  * The syntax of the loop construct is specified in Section 2.7.1, OpenMP 4.0.0,
- * as follows: <br>
- * <code>#pragma omp for [clause[[,] clause] ... ] new-line<br> 
- * for-loops</code><br>
- * where clause is one of the following:<br>
- * <code>
- * private(list)<br>
- * firstprivate(list)<br> 
- * lastprivate(list)<br> 
- * reduction(reduction-identifier: list) <br>
- * schedule(kind[, chunk_size]) <br>
- * collapse(n)<br>
- * ordered<br>
- * nowait</code>
+ * as follows:
+ * 
+ * <pre>
+ * #pragma omp for [clause[[,] clause] ... ] new-line 
+ * for-loops
+ * </pre>
+ * 
+ * where clause is one of the following:
+ * 
+ * <pre>
+ * private(list)
+ * firstprivate(list) 
+ * lastprivate(list) 
+ * reduction(reduction-identifier: list)
+ * schedule(kind[, chunk_size])
+ * collapse(n)
+ * ordered
+ * nowait
+ * </pre>
  * 
  * @author Manchun Zheng
  * 

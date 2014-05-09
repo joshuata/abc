@@ -19,7 +19,7 @@ public interface OmpDeclarativeNode extends OmpNode, ExternalDefinitionNode {
 	/**
 	 * The kind of this OpenMP declarative node.
 	 * 
-	 * @return
+	 * @return the declarative kind of this OpenMP declarative node
 	 */
 	OmpDeclarativeNodeKind ompDeclarativeNodeKind();
 
@@ -32,7 +32,7 @@ public interface OmpDeclarativeNode extends OmpNode, ExternalDefinitionNode {
 	 * <li><code>threadprivate()</code>: an empty sequence node</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of variables in this declarative construct
 	 */
 	SequenceNode<IdentifierExpressionNode> variables();
 }

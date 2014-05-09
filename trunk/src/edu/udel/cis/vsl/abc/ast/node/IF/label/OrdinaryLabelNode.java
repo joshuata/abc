@@ -22,7 +22,7 @@ public interface OrdinaryLabelNode extends LabelNode, DeclarationNode {
 	/**
 	 * The function in which this label occurs. A label has "function scope".
 	 * 
-	 * @return
+	 * @return the function in which this label occurs
 	 */
 	Function getFunction();
 

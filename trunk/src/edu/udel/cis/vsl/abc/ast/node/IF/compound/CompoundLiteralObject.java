@@ -26,18 +26,19 @@ public interface CompoundLiteralObject extends LiteralObject {
 	int size();
 
 	/**
-	 * Return the index-th element of this compound literal. May be null.
+	 * Return the index-th element of this compound literal. May be
+	 * <code>null</code>.
 	 * 
 	 * @param index
 	 *            integer in range [0,size-1]
-	 * @return
+	 * @return the object in position index in this compound literal
 	 */
 	LiteralObject get(int index);
 
 	/**
 	 * Return the corresponding AST node of the compound literal object.
 	 * 
-	 * @return
+	 * @return the AST node corresponding to this compound literal
 	 */
 	ASTNode getSourceNode();
 

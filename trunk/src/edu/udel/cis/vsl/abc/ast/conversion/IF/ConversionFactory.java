@@ -266,7 +266,8 @@ public interface ConversionFactory {
 	 * Is the given pointer type a pointer an object type?
 	 * 
 	 * @param type
-	 * @return
+	 * @return <code>true</code> iff the pointer type's base type is an object
+	 *         type
 	 */
 	boolean isPointerToObject(PointerType type);
 
