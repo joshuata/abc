@@ -3,8 +3,9 @@ package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
 /**
- * A "when" statement has the form "when (guard) body", where guard is a
- * boolean-valued expression and body is a statement.
+ * Represents a CIVL-C guarded command. A <code>$when</code> statement has the
+ * form <code>$when (guard) body</code>, where guard is a boolean-valued
+ * expression and body is a statement.
  * 
  * @author siegel
  * 
@@ -20,9 +21,9 @@ public interface WhenNode extends StatementNode {
 	ExpressionNode getGuard();
 
 	/**
-	 * The body of the "when" statement.
+	 * The body of this <code>$when</code> statement.
 	 * 
-	 * @return
+	 * @return the body
 	 */
 	StatementNode getBody();
 

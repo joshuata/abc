@@ -27,7 +27,7 @@ public interface StructureOrUnionTypeNode extends TypeNode, DeclarationNode,
 	 * Returns the tag for this struct or union type. The tag is the name
 	 * associated to the type.
 	 * 
-	 * @return
+	 * @return the tag
 	 */
 	IdentifierNode getTag();
 

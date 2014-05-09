@@ -183,7 +183,7 @@ public interface Type {
 	 * The types created by the type factories are given unique id numbers. This
 	 * method returns the id number of this type.
 	 * 
-	 * @return
+	 * @return the id number of this type
 	 */
 	int getId();
 
