@@ -35,8 +35,8 @@ import edu.udel.cis.vsl.abc.token.IF.ObjectMacro;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.util.Pair;
-import edu.udel.cis.vsl.abc.util.StringPredicate;
+import edu.udel.cis.vsl.abc.util.IF.Pair;
+import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
 
 /**
  * A CTokenSource is created by opening a file, scanning that file and executing

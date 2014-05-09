@@ -9,8 +9,8 @@ import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analysis;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.Antlr2AST;
-import edu.udel.cis.vsl.abc.antlr2ast.impl.ASTBuilder;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.ASTs;
@@ -26,9 +26,9 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Values;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
-import edu.udel.cis.vsl.abc.config.IF.Configurations;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
-import edu.udel.cis.vsl.abc.err.ABCException;
+import edu.udel.cis.vsl.abc.config.IF.Configurations;
+import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
@@ -45,7 +45,7 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.abc.util.ANTLRUtils;
+import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 /**
  * Marshalls together the various components of the ABC tool chain to perform
@@ -449,7 +449,7 @@ public class Activator {
 		out.flush();
 		ast = null;
 		try {
-			this.astBuilder = new ASTBuilder(parser, astFactory, tree);
+			this.astBuilder = Antlr2AST.newASTBuilder(parser, astFactory, tree);
 			ast = this.astBuilder.getTranslationUnit(); // creates ast
 			// analyzes ast
 			program = programFactory.newProgram(ast);

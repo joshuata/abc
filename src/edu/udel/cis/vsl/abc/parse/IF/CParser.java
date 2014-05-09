@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.parse.IF;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
-import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -16,8 +15,6 @@ public interface CParser {
 	CTokenSource getTokenSource();
 
 	TokenStream getTokenStream();
-
-	CivlCParser getParser();
 
 	/**
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some

@@ -2,7 +2,7 @@ package edu.udel.cis.vsl.abc.parse.IF;
 
 import org.antlr.runtime.Token;
 
-import edu.udel.cis.vsl.abc.err.ABCException;
+import edu.udel.cis.vsl.abc.err.IF.ABCException;
 
 public class ParseException extends ABCException {
 

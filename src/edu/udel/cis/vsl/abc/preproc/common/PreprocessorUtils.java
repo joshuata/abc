@@ -13,7 +13,7 @@ import org.antlr.runtime.tree.CommonTree;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorExpressionException;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.util.ANTLRUtils;
+import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 public class PreprocessorUtils {
 

@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundLiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.LiteralObject;
-import edu.udel.cis.vsl.abc.err.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 
 /**
  * Implementation of CompoundLiteral that provides additional functionality for
