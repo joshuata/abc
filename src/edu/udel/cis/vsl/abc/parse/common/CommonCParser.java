@@ -27,8 +27,6 @@ import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 public class CommonCParser implements CParser {
 
-	private Preprocessor preprocessor;
-
 	private CTokenSource tokenSource;
 
 	private TokenStream stream;
@@ -38,7 +36,6 @@ public class CommonCParser implements CParser {
 	private TokenFactory tokenFactory;
 
 	public CommonCParser(Preprocessor preprocessor, CTokenSource tokenSource) {
-		this.preprocessor = preprocessor;
 		this.tokenSource = tokenSource;
 		this.tokenFactory = tokenSource.getTokenFactory();
 		this.stream = new CommonTokenStream(tokenSource);
@@ -48,11 +45,6 @@ public class CommonCParser implements CParser {
 	public CommonCParser(Preprocessor preprocessor, File file)
 			throws PreprocessorException {
 		this(preprocessor, preprocessor.outputTokenSource(file));
-	}
-
-	@Override
-	public Preprocessor getPreprocessor() {
-		return preprocessor;
 	}
 
 	@Override

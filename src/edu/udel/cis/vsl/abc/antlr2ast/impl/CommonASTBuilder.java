@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
-import static edu.udel.cis.vsl.abc.parse.common.CivlCParser.*;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
