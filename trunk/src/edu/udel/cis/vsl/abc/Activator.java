@@ -283,7 +283,7 @@ public class Activator {
 	 */
 	public CommonTree getAntlrTree() throws PreprocessorException,
 			ParseException {
-		CParser parser = Parse.newCParser(preprocessor, file);
+		CParser parser = Parse.newCParser(preprocessor.outputTokenSource(file));
 		CommonTree tree = parser.getTree();
 
 		return tree;
@@ -303,7 +303,7 @@ public class Activator {
 	 */
 	public AST getRawTranslationUnit() throws ParseException, SyntaxException,
 			PreprocessorException {
-		CParser parser = Parse.newCParser(preprocessor, file);
+		CParser parser = Parse.newCParser(preprocessor.outputTokenSource(file));
 		AST ast = Antlr2AST.build(parser, astFactory, null);
 
 		this.astBuilder = Antlr2AST.newASTBuilder(parser, astFactory, null);
@@ -443,7 +443,7 @@ public class Activator {
 		out.println();
 		// print the ANTLR Tree...
 		out.println(bar + " ANTLR Parse Tree " + bar);
-		parser = Parse.newCParser(preprocessor, file);
+		parser = Parse.newCParser(preprocessor.outputTokenSource(file));
 		tree = parser.getTree();
 		ANTLRUtils.printTree(out, tree);
 		out.println();
