@@ -6,6 +6,7 @@ import java.io.PrintStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonASTBuilder;
+import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonOmpBuilder;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.ASTs;
@@ -42,6 +43,20 @@ public class Antlr2AST {
 	public static ASTBuilder newASTBuilder(CParser parser,
 			ASTFactory astFactory, CommonTree rootTree) {
 		return new CommonASTBuilder(parser, astFactory, rootTree);
+	}
+
+	/**
+	 * Returns a new OmpBuilder.
+	 * 
+	 * @param astFactory
+	 *            the AST factory to use to construct the new AST components.
+	 * @param astBuilder
+	 *            the AST builder to be reused.
+	 * @return the new OmpBuilder
+	 */
+	public static OmpBuilder newOmpBuilder(ASTFactory astFactory,
+			ASTBuilder astBuilder) {
+		return new CommonOmpBuilder(astFactory, astBuilder);
 	}
 
 	public static AST translate(CParser parser, CommonTree rootTree)

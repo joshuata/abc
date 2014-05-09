@@ -1,47 +1,47 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.AMPERSAND;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.ATOMIC;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.BARRIER;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.BITOR;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.BITXOR;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.COLLAPSE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.COPYIN;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.COPYPRIVATE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.CRITICAL;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.DATA_CLAUSE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.DEFAULT;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.DYNAMIC;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.FLUSH;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.FOR;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.FST_PRIVATE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.GUIDED;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.IDENTIFIER;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.IF;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.LST_PRIVATE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.MASTER;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.NONE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.NOWAIT;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.NUM_THREADS;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.ORDERED;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PARALLEL;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PARALLEL_FOR;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PARALLEL_SECTIONS;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PLUS;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.PRIVATE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.REDUCTION;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.RUNTIME;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.SCHEDULE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.SECTION;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.SECTIONS;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.SHARED;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.SINGLE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.STAR;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.STATIC;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.SUB;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.THD_PRIVATE;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.UNIQUE_FOR;
-import static edu.udel.cis.vsl.abc.parse.common.OmpParser.UNIQUE_PARALLEL;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.AMPERSAND;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.ATOMIC;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.BARRIER;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.BITOR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.BITXOR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.COLLAPSE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.COPYIN;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.COPYPRIVATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.CRITICAL;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.DATA_CLAUSE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.DEFAULT;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.DYNAMIC;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.FLUSH;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.FOR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.FST_PRIVATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.GUIDED;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.IDENTIFIER;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.IF;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.LST_PRIVATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.MASTER;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.NONE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.NOWAIT;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.NUM_THREADS;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.ORDERED;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PARALLEL;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PARALLEL_FOR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PARALLEL_SECTIONS;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PLUS;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PRIVATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.REDUCTION;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.RUNTIME;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SCHEDULE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SECTION;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SECTIONS;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SHARED;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SINGLE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.STAR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.STATIC;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SUB;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.THD_PRIVATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UNIQUE_FOR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UNIQUE_PARALLEL;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -54,6 +54,8 @@ import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.OmpBuilder;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
@@ -69,27 +71,20 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
-import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
-import edu.udel.cis.vsl.abc.parse.common.OmpParser;
+import edu.udel.cis.vsl.abc.parse.IF.OmpCParser;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
-public class OmpBuilder {
-
-	// private OmpNodeFactory ompNodeFactory;
+public class CommonOmpBuilder implements OmpBuilder {
 	private NodeFactory nodeFactory;
 	private TokenFactory sourceFactory;
 	private Source source;
-
 	private ASTBuilder astBuilder;
-
-	// private SimpleScope scope;
-	// private StatementNode statement;
 
 	/**
 	 * Constructs a new OmpBuilder for the given ANTLR tree of OpenMP.
@@ -102,10 +97,9 @@ public class OmpBuilder {
 	 *            the CTokenSource used to produce the ANTLR tree
 	 * 
 	 */
-	public OmpBuilder(ValueFactory valueFactory, NodeFactory nodeFactory,
-			TokenFactory tokenFactory, ASTBuilder astBuilder) {
-		this.nodeFactory = nodeFactory;
-		this.sourceFactory = tokenFactory;
+	public CommonOmpBuilder(ASTFactory astFactory, ASTBuilder astBuilder) {
+		this.nodeFactory = astFactory.getNodeFactory();
+		this.sourceFactory = astFactory.getTokenFactory();
 		this.astBuilder = astBuilder;
 	}
 
@@ -208,12 +202,12 @@ public class OmpBuilder {
 		return new CommonTokenStream(source);
 	}
 
+	@Override
 	public OmpNode getOmpNode(Source source, Iterator<CToken> ctokens)
 			throws SyntaxException {
 		try {
 			List<CToken> tokenList = new ArrayList<>();
 			TokenStream tokens;
-			OmpParser parser;
 			CommonTree rootTree;
 			int type;
 
@@ -222,8 +216,7 @@ public class OmpBuilder {
 			}
 			tokens = this.ompTokenStream(tokenList);
 			this.source = source;
-			parser = new OmpParser(tokens);
-			rootTree = (CommonTree) parser.openmp_construct().getTree();
+			rootTree = OmpCParser.parse(tokens);
 			type = rootTree.getType();
 			switch (type) {
 			case PARALLEL_FOR:
