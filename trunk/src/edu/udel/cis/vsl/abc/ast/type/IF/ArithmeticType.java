@@ -10,7 +10,7 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
  * which defines a directed acyclic graph. Note that it is not a tree, as the
  * {@link IntegerType} and {@link StandardBasicType} categories have in their
  * intersection the type <code>char</code> and the
- * {@link SignedOrUnisgnedIntegerType}s.
+ * {@link SignedOrUnsignedIntegerType}s.
  * </p>
  * 
  * 
