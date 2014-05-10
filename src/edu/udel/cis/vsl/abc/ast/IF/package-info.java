@@ -1,6 +1,7 @@
 /**
- * <p>The ast module, providing an Abstract Syntax Tree
- * representation of a program.  This module is large
+ * <p>Module <strong>ast</strong> defines an Abstract Syntax Tree
+ * representation of a program, the
+ * {@link edu.udel.cis.vsl.abc.ast.IF.AST AST}.  This module is large
  * and is therefore divided into several submodules.
  * Each submodule has its own interface.  This package proper contains
  * the module entry point, {@link edu.udel.cis.vsl.abc.ast.IF.ASTs}
@@ -15,7 +16,7 @@
  * and {@link edu.udel.cis.vsl.abc.ast.IF.ASTFactory ASTFactory}.
  * </li>
  * 
- * <li><strong>value</strong>
+ * <li><strong>ast.value</strong>
  *   <ul>
  *   <li>responsibilities: representation of concrete value, such as characters, integers, floating point values</li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.ast.value.IF}</li>
@@ -23,7 +24,7 @@
  *   </ul>
  * </li>
  * 
- * <li><strong>type</strong>
+ * <li><strong>ast.type</strong>
  *   <ul>
  *   <li>responsibilities: representation of types</li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.ast.type.IF}</li>
@@ -31,7 +32,7 @@
  *   </ul>
  * </li>
  *
- * <li><strong>entity</strong>
+ * <li><strong>ast.entity</strong>
  *   <ul>
  *   <li>responsibilities: representation of abstract program entities which can
  *   be named by an identifier, including variables, functions, labels, scopes, 
@@ -41,7 +42,7 @@
  *   </ul>
  * </li>
  * 
- * <li><strong>conversion</strong>
+ * <li><strong>ast.conversion</strong>
  *   <ul>
  *   <li>responsibilities: representation of C's implicit conversions, such
  *   as the conversion of an array to a pointer to the first element of the
@@ -51,7 +52,7 @@
  *   </ul>
  * </li>
  *
- * <li><strong>node</strong>
+ * <li><strong>ast.node</strong>
  *   <ul>
  *   <li>responsibilities: representation of AST nodes</li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.ast.node.IF}</li>

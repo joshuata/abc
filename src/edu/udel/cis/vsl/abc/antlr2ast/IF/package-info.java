@@ -1,5 +1,5 @@
 /**
- * The antlr2ast package provides a translator which
+ * The <strong>antlr2ast</strong> module provides a translator which
  * takes an ANTLR tree representation of a program
  * and produces an ABC Abstract Syntax Tree.
  * 

@@ -8,20 +8,18 @@ import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonASTBuilder;
 import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonOmpBuilder;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.IF.ASTs;
-import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
-import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
-import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
-import edu.udel.cis.vsl.abc.ast.type.IF.Types;
-import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
-import edu.udel.cis.vsl.abc.ast.value.IF.Values;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.token.IF.Tokens;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
+/**
+ * A factory class for producing new instances of {@link ASTBuilder} and
+ * {@link OmpBuilder} and for using those classes in some common scenarios.
+ * 
+ * @author siegel
+ * 
+ */
 public class Antlr2AST {
 
 	/**
@@ -54,22 +52,28 @@ public class Antlr2AST {
 		return new CommonOmpBuilder(astFactory, astBuilder);
 	}
 
-	public static AST translate(CParser parser, CommonTree rootTree)
-			throws SyntaxException {
-		TypeFactory typeFactory = Types.newTypeFactory();
-		ValueFactory valueFactory = Values.newValueFactory(typeFactory);
-		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
-				valueFactory);
-		TokenFactory sourceFactory = Tokens.newTokenFactory();
-		ASTFactory astFactory = ASTs.newASTFactory(nodeFactory, sourceFactory,
-				typeFactory);
-		CommonASTBuilder builder = new CommonASTBuilder(parser, astFactory,
-				rootTree);
-
-		return builder.getTranslationUnit();
-	}
-
-	public static AST build(CParser parser, ASTFactory unitFactory,
+	/**
+	 * Parses a program to produce an ANTLR tree and then translates that tree
+	 * to an AST. This method constructs an {@link ASTBuilder} and uses it to do
+	 * the translation. This is mainly intended to help with debugging or
+	 * demonstrating how to use ABC.
+	 * 
+	 * @param parser
+	 *            the parser used to parse a token stream; the token stream
+	 *            should already be set in the parser
+	 * @param astFactory
+	 *            the AST factory used to construct new AST components
+	 * @param out
+	 *            a stream to which to print the ANTLR tree; if
+	 *            <code>null</code> it will not be printed
+	 * @return the new AST
+	 * @throws ParseException
+	 *             if the program cannot be parsed because of a grammatical
+	 *             violation
+	 * @throws SyntaxException
+	 *             if the program contains a static error
+	 */
+	public static AST build(CParser parser, ASTFactory astFactory,
 			PrintStream out) throws ParseException, SyntaxException {
 		CommonTree rootTree = parser.getTree();
 		CommonASTBuilder builder;
@@ -79,27 +83,7 @@ public class Antlr2AST {
 			out.println();
 			out.flush();
 		}
-		builder = new CommonASTBuilder(parser, unitFactory, rootTree);
+		builder = new CommonASTBuilder(parser, astFactory, rootTree);
 		return builder.getTranslationUnit();
-	}
-
-	public static AST buildAST(CParser parser, PrintStream out)
-			throws ParseException, SyntaxException {
-		TypeFactory typeFactory = Types.newTypeFactory();
-		ValueFactory valueFactory = Values.newValueFactory(typeFactory);
-		NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
-				valueFactory);
-		TokenFactory sourceFactory = Tokens.newTokenFactory();
-		ASTFactory unitFactory = ASTs.newASTFactory(nodeFactory, sourceFactory,
-				typeFactory);
-
-		return build(parser, unitFactory, out);
-	}
-
-	public static void buildAndPrintAST(PrintStream out, CParser parser)
-			throws ParseException, SyntaxException {
-		AST tu = buildAST(parser, out);
-
-		tu.print(out);
 	}
 }
