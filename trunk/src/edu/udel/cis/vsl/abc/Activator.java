@@ -137,8 +137,11 @@ public class Activator {
 	 * to use.
 	 * 
 	 * @param file
+	 *            an input file
 	 * @param systemIncludes
+	 *            list of system include paths
 	 * @param userIncludes
+	 *            list of user include paths
 	 */
 	public Activator(File file, File[] systemIncludes, File[] userIncludes) {
 		this(getLanguageFromName(file.getName()), file, systemIncludes,
@@ -372,12 +375,18 @@ public class Activator {
 	}
 
 	/**
-	 * Returns the analyzed AST with all side-effects expressions removed.
+	 * Returns the analyzed AST with all side-effect expressions removed.
+	 * Side-effects are removed by breaking up expressions into multiple
+	 * statements, possibly introducing temporary variables, so that only
+	 * assignment statements and function calls have side-effects.
 	 * 
 	 * @return the AST obtained from the given one by removing side-effects
-	 * @throws SyntaxException
 	 * @throws ParseException
+	 *             if a parsing error occurs
+	 * @throws SyntaxException
+	 *             if a syntax error is found in the parsed file
 	 * @throws PreprocessorException
+	 *             if an error occurs in preprocessing the file
 	 */
 	public AST getSideEffectFreeTranslationUnit() throws SyntaxException,
 			ParseException, PreprocessorException {
@@ -388,6 +397,21 @@ public class Activator {
 		return ast;
 	}
 
+	/**
+	 * Returns the analyzed AST which has been pruned to remove unreachable
+	 * nodes and then had all side-effects removed. Side-effects are removed by
+	 * breaking up expressions into multiple statements, possibly introducing
+	 * temporary variables, so that only assignment statements and function
+	 * calls have side-effects.
+	 * 
+	 * @return the AST obtained from the given one by removing side-effects
+	 * @throws ParseException
+	 *             if a parsing error occurs
+	 * @throws SyntaxException
+	 *             if a syntax error is found in the parsed file
+	 * @throws PreprocessorException
+	 *             if an error occurs in preprocessing the file
+	 */
 	public AST getSideEffectFreePrunedTranslationUnit() throws SyntaxException,
 			ParseException, PreprocessorException {
 		AST ast = getTranslationUnit();
@@ -399,6 +423,15 @@ public class Activator {
 		return ast;
 	}
 
+	/**
+	 * Prints the program, symbol table, and type information to the given
+	 * output stream in a plain-text, human-readable format.
+	 * 
+	 * @param out
+	 *            the output stream
+	 * @param program
+	 *            the program
+	 */
 	public void printProgram(PrintStream out, Program program) {
 		program.print(out);
 		out.println("\n\nSymbol Table:\n");
@@ -415,6 +448,9 @@ public class Activator {
 	 * recommended for small examples.
 	 * 
 	 * @param out
+	 *            the output stream
+	 * @param transformers
+	 *            a list of transformers to apply to the program
 	 * @return the AST
 	 * @throws PreprocessorException
 	 *             if preprocessing fails
@@ -431,7 +467,6 @@ public class Activator {
 		AST ast;
 		CParser parser;
 		CommonTree tree;
-		// ASTBuilder builder;
 		Program program;
 
 		// print the original source file...
@@ -473,6 +508,27 @@ public class Activator {
 		return program;
 	}
 
+	/**
+	 * Show every stage of translation, including the state of the AST after
+	 * each transform is applied. This is a lot of output and is only
+	 * recommended for small examples.
+	 * 
+	 * @param out
+	 *            the output stream
+	 * @param transformerCodes
+	 *            a list of transformer codes specifying the transformers to
+	 *            apply to the program; each code is a short string used to
+	 *            identify a particular transformation
+	 * @return the AST
+	 * @throws PreprocessorException
+	 *             if preprocessing fails
+	 * @throws ParseException
+	 *             if parsing the preprocessed file fails
+	 * @throws SyntaxException
+	 *             if analysis of syntax fails
+	 * @throws IOException
+	 *             if file cannot be read
+	 */
 	public Program showTranslation(PrintStream out,
 			Iterable<String> transformCodes) throws ABCException, IOException {
 		LinkedList<Transformer> transformers = new LinkedList<>();
@@ -486,15 +542,24 @@ public class Activator {
 	 * Shows translation with no transformers.
 	 * 
 	 * @param out
+	 *            the output stream
 	 * @return the final program
 	 * @throws ABCException
+	 *             if something is wrong with the program
 	 * @throws IOException
+	 *             if a file cannot be opened
 	 */
 	public Program showTranslation(PrintStream out) throws ABCException,
 			IOException {
 		return showTranslation(out, new LinkedList<String>());
 	}
 
+	/**
+	 * Returns the ASTBuilder used by this Activator to translate the ANTLR tree
+	 * to an ABC AST.
+	 * 
+	 * @return the ASTBuilder
+	 */
 	public ASTBuilder getASTBuilder() {
 		return this.astBuilder;
 	}

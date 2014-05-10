@@ -1,7 +1,6 @@
 /**
- * <p>Public interface for the declaration submodule.
- * This is a submodule of the node module, which is a submodule
- * of the ast module.</p>
+ * <p>The <strong>ast.node.declaration</strong> submodule defines nodes
+ * and other object deadling with declarations in a program.</p>
  * 
  * <p>This module deals with every kind of declaration in a program.
  * The interface

@@ -1,11 +1,10 @@
 /**
- * <p>Public interface for the main submodule of the node module.
- * This package declares the primary interfaces used for nodes
- * in an Abstract Syntax Tree.</p>
+ * <p>Submodule <strong>ast.node</strong> defines every kind of
+ * node in an AST.</p>
  * 
  * <p>The interface {@link edu.udel.cis.vsl.abc.ast.node.IF.ASTNode}
  * is the root of the AST node
- * type hierarchy.   All AST nodes must implement that interface.</p>
+ * type hierarchy.   All AST nodes implement that interface.</p>
  * 
  * <p>Other miscellaneous interfaces dealing with nodes are included
  * in this package.  This includes the
