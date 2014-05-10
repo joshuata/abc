@@ -13,6 +13,12 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
+/**
+ * A factory for producing instances of {@link Conversion}.
+ * 
+ * @author siegel
+ * 
+ */
 public interface ConversionFactory {
 
 	TypeFactory getTypeFactory();
@@ -26,7 +32,7 @@ public interface ConversionFactory {
 	 * let c1 = arithmeticConversion(type1, newType) and add the nontrivial
 	 * conversion c1 to the sequence of conversions for its expression. Repeat
 	 * for type2: if newType != type2, let c2=arithmeticConversion(type2,
-	 * newType) and add c2 to the sequence of conversionsn for its expression.
+	 * newType) and add c2 to the sequence of conversions for its expression.
 	 * 
 	 * @param oldType
 	 *            an arithmetic type: the original type of an expression
@@ -39,18 +45,19 @@ public interface ConversionFactory {
 			ArithmeticType newType);
 
 	/**
-	 * Returns a non-trivial LvalueConversion with old type the given type, or
-	 * null if the conversion is trivial.
+	 * Returns a non-trivial {@link LvalueConversion} with old type the given
+	 * type, or null if the conversion is trivial.
 	 * 
 	 * C11 Sec. 6.3.2.1:
 	 * 
 	 * <blockquote>
 	 * 
-	 * Except when it is the operand of the sizeof operator, the _Alignof
-	 * operator, the unary & operator, the ++ operator, the -- operator, or the
-	 * left operand of the . operator or an assignment operator, an lvalue that
-	 * does not have array type is converted to the value stored in the
-	 * designated object (and is no longer an lvalue); this is called lvalue
+	 * Except when it is the operand of the sizeof operator, the
+	 * <code>_Alignof</code> operator, the unary <code>&</code> operator, the
+	 * <code>++</code> operator, the <code>--</code> operator, or the left
+	 * operand of the <code>.</code> operator or an assignment operator, an
+	 * lvalue that does not have array type is converted to the value stored in
+	 * the designated object (and is no longer an lvalue); this is called lvalue
 	 * conversion. If the lvalue has qualified type, the value has the
 	 * unqualified version of the type of the lvalue; additionally, if the
 	 * lvalue has atomic type, the value has the non-atomic version of the type
@@ -88,12 +95,13 @@ public interface ConversionFactory {
 	 * 
 	 * C11 Sec. 6.3.2.1:
 	 * 
-	 * "Except when it is the operand of the sizeof operator, the _Alignof
-	 * operator, or the unary & operator, or is a string literal used to
-	 * initialize an array, an expression that has type "array of type" is
-	 * converted to an expression with type "pointer to type" that points to the
-	 * initial element of the array object and is not an lvalue. If the array
-	 * object has register storage class, the behavior is undefined."
+	 * "Except when it is the operand of the <code>sizeof</code> operator, the
+	 * <code>_Alignof</code> operator, or the unary <code>&</code> operator, or
+	 * is a string literal used to initialize an array, an expression that has
+	 * type "array of type" is converted to an expression with type
+	 * "pointer to type" that points to the initial element of the array object
+	 * and is not an lvalue. If the array object has register storage class, the
+	 * behavior is undefined."
 	 * 
 	 * @param type
 	 *            any array type
@@ -109,10 +117,11 @@ public interface ConversionFactory {
 	 * C11 Sec. 6.3.2.1:
 	 * 
 	 * <blockquote> A function designator is an expression that has function
-	 * type. Except when it is the operand of the sizeof operator, the _Alignof
-	 * operator, or the unary & operator, a function designator with type
-	 * "function returning type" is converted to an expression that has type
-	 * "pointer to function returning type". </blockquote>
+	 * type. Except when it is the operand of the <code>sizeof</code> operator,
+	 * the <code>_Alignof</code> operator, or the unary <code>&</code> operator,
+	 * a function designator with type "function returning type" is converted to
+	 * an expression that has type "pointer to function returning type".
+	 * </blockquote>
 	 * 
 	 * @param type
 	 *            a function type
@@ -121,12 +130,55 @@ public interface ConversionFactory {
 	 */
 	FunctionConversion functionConversion(FunctionType type);
 
+	/**
+	 * Creates a new compatible-structure-or-union-conversion object from the
+	 * given structure-or-union types.
+	 * 
+	 * @param type1
+	 *            a structure or union type
+	 * @param type2
+	 *            a compatible structure or union type
+	 * @return the conversion from type1 to type2
+	 */
 	CompatibleStructureOrUnionConversion compatibleStructureOrUnionConversion(
 			StructureOrUnionType type1, StructureOrUnionType type2);
 
+	/**
+	 * Creates a new compatible-pointer-conversion object from the first pointer
+	 * type to the second.
+	 * 
+	 * @param type1
+	 *            a pointer type
+	 * @param type2
+	 *            a pointer type which is either compatible with type1 or is
+	 *            obtained from type1 by adding qualifiers to the type of thing
+	 *            pointed to
+	 * @return the conversion
+	 */
 	CompatiblePointerConversion compatiblePointerConversion(PointerType type1,
 			PointerType type2);
 
+	/**
+	 * <p>
+	 * Creates a new conversion object between some pointer type and the type
+	 * <code>void*</code> (pointer-to-void). From C11 Sec. 6.3.2.3:
+	 * 
+	 * <blockquote> A pointer to void may be converted to or from a pointer to
+	 * any object type. A pointer to any object type may be converted to a
+	 * pointer to void and back again; the result shall compare equal to the
+	 * original pointer. </blockquote>
+	 * </p>
+	 * 
+	 * <p>
+	 * One of the two arguments must be a pointer-to-void.
+	 * </p>
+	 * 
+	 * @param type1
+	 *            a pointer type
+	 * @param type2
+	 *            a pointer type
+	 * @return the conversion object from type1 to type2
+	 */
 	VoidPointerConversion voidPointerConversion(PointerType type1,
 			PointerType type2);
 
@@ -144,7 +196,7 @@ public interface ConversionFactory {
 			PointerType type2);
 
 	/**
-	 * Conversion from any pointer type to a boolean (_Bool).
+	 * Conversion from any pointer type to a boolean (<code>_Bool</code>).
 	 * 
 	 * @param oldType
 	 * @return PointerBoolConversion with given oldType and newType the boolean
@@ -204,9 +256,10 @@ public interface ConversionFactory {
 	 * </blockquote>
 	 * 
 	 * These suggest the following types of conversions be used, respectively,
-	 * for the cases above: ArithmeticConversion,
-	 * CompatibleStructureOrUnionConversion, CompatiblePointerConversion,
-	 * VoidPointerConversion, NullPointerConversion, PointerBoolConversion.
+	 * for the cases above: {@link ArithmeticConversion},
+	 * {@link CompatibleStructureOrUnionConversion},
+	 * {@link CompatiblePointerConversion}, {@link VoidPointerConversion},
+	 * {@link NullPointerConversion}, {@link PointerBoolConversion}.
 	 * 
 	 * The processing of a simple assignement expression then proceeds as
 	 * follows:

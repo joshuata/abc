@@ -30,7 +30,8 @@ public interface ASTBuilder {
 	 * @param expressionTree
 	 *            an ANTLR tree node corresponding to an expression
 	 * @param scope
-	 *            the simple scope of the expression being translated
+	 *            the simple scope in which the expression being translated
+	 *            occurs
 	 * @return the root of the ABC tree for the translated expression
 	 * @throws SyntaxException
 	 *             if there is a syntax error in the expression
