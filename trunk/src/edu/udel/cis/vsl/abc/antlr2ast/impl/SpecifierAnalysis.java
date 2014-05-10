@@ -8,7 +8,6 @@ import org.antlr.runtime.tree.CommonTree;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
-import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -47,18 +46,18 @@ public class SpecifierAnalysis {
 
 	// the basic type specifier keywords and VOID...
 
-	public final static int VOID = CivlCParser.VOID;
-	public final static int CHAR = CivlCParser.CHAR;
-	public final static int SHORT = CivlCParser.SHORT;
-	public final static int INT = CivlCParser.INT;
-	public final static int LONG = CivlCParser.LONG;
-	public final static int FLOAT = CivlCParser.FLOAT;
-	public final static int DOUBLE = CivlCParser.DOUBLE;
-	public final static int REAL = CivlCParser.REAL;
-	public final static int SIGNED = CivlCParser.SIGNED;
-	public final static int UNSIGNED = CivlCParser.UNSIGNED;
-	public final static int BOOL = CivlCParser.BOOL;
-	public final static int COMPLEX = CivlCParser.COMPLEX;
+	public final static int VOID = CParser.VOID;
+	public final static int CHAR = CParser.CHAR;
+	public final static int SHORT = CParser.SHORT;
+	public final static int INT = CParser.INT;
+	public final static int LONG = CParser.LONG;
+	public final static int FLOAT = CParser.FLOAT;
+	public final static int DOUBLE = CParser.DOUBLE;
+	public final static int REAL = CParser.REAL;
+	public final static int SIGNED = CParser.SIGNED;
+	public final static int UNSIGNED = CParser.UNSIGNED;
+	public final static int BOOL = CParser.BOOL;
+	public final static int COMPLEX = CParser.COMPLEX;
 
 	// Instance variables...
 
@@ -180,7 +179,7 @@ public class SpecifierAnalysis {
 				setTypeNameKind(TypeNodeKind.VOID);
 				setTypeSpecifierNode(node);
 				break;
-			case CivlCParser.ATOMIC:
+			case CParser.ATOMIC:
 				if (node.getChildCount() > 0) {
 					atomicTypeCount++;
 					setTypeNameKind(TypeNodeKind.ATOMIC);
@@ -189,79 +188,79 @@ public class SpecifierAnalysis {
 					atomicQualifier = true;
 				}
 				break;
-			case CivlCParser.STRUCT:
+			case CParser.STRUCT:
 				structTypeCount++;
 				setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
 				setTypeSpecifierNode(node);
 				break;
-			case CivlCParser.UNION:
+			case CParser.UNION:
 				unionTypeCount++;
 				setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
 				setTypeSpecifierNode(node);
 				break;
-			case CivlCParser.ENUM:
+			case CParser.ENUM:
 				enumTypeCount++;
 				setTypeNameKind(TypeNodeKind.ENUMERATION);
 				setTypeSpecifierNode(node);
 				break;
-			case CivlCParser.TYPEDEF_NAME:
+			case CParser.TYPEDEF_NAME:
 				typedefNameCount++;
 				setTypeNameKind(TypeNodeKind.TYPEDEF_NAME);
 				setTypeSpecifierNode(node);
 				break;
-			case CivlCParser.CONST:
+			case CParser.CONST:
 				constQualifier = true;
 				break;
-			case CivlCParser.RESTRICT:
+			case CParser.RESTRICT:
 				restrictQualifier = true;
 				break;
-			case CivlCParser.VOLATILE:
+			case CParser.VOLATILE:
 				volatileQualifier = true;
 				break;
-			case CivlCParser.INPUT:
+			case CParser.INPUT:
 				inputQualifier = true;
 				break;
-			case CivlCParser.OUTPUT:
+			case CParser.OUTPUT:
 				outputQualifier = true;
 				break;
-			case CivlCParser.TYPEDEF:
+			case CParser.TYPEDEF:
 				typedefCount++;
 				break;
-			case CivlCParser.EXTERN:
+			case CParser.EXTERN:
 				externCount++;
 				break;
-			case CivlCParser.STATIC:
+			case CParser.STATIC:
 				staticCount++;
 				break;
-			case CivlCParser.THREADLOCAL:
+			case CParser.THREADLOCAL:
 				threadLocalCount++;
 				break;
-			case CivlCParser.AUTO:
+			case CParser.AUTO:
 				autoCount++;
 				break;
-			case CivlCParser.REGISTER:
+			case CParser.REGISTER:
 				registerCount++;
 				break;
-			case CivlCParser.INLINE:
+			case CParser.INLINE:
 				inlineSpecifier = true;
 				break;
-			case CivlCParser.NORETURN:
+			case CParser.NORETURN:
 				noreturnSpecifier = true;
 				break;
-			case CivlCParser.ALIGNAS: {
+			case CParser.ALIGNAS: {
 				int alignKind = ((CommonTree) node.getChild(0)).getType();
 				CommonTree argument = (CommonTree) node.getChild(1);
 
-				if (alignKind == CivlCParser.TYPE) {
+				if (alignKind == CParser.TYPE) {
 					alignmentTypeNodes.add(argument);
-				} else if (kind == CivlCParser.EXPR) {
+				} else if (kind == CParser.EXPR) {
 					alignmentExpressionNodes.add(argument);
 				} else {
 					throw error("Unexpected kind of ALIGN_AS argument", node);
 				}
 				break;
 			}
-			case CivlCParser.ABSTRACT:
+			case CParser.ABSTRACT:
 				abstractSpecifier = true;
 				if (node.getChildCount() == 0) {
 					continuity = 0;

@@ -35,6 +35,7 @@ import edu.udel.cis.vsl.abc.token.IF.ObjectMacro;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 import edu.udel.cis.vsl.abc.util.IF.Pair;
 import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
 
@@ -1092,7 +1093,7 @@ public class CommonCTokenSource implements CTokenSource {
 
 		// TODO: somehow the line number is not right. It is set to one.
 
-		source = PreprocessorUtils.makeTokenSourceFromList(expandedFirst);
+		source = TokenUtils.makeTokenSourceFromList(expandedFirst);
 		// evaluate to get integer result...
 		result = expressionAnalyzer.evaluate(source);
 		// move to the appropriate point based on result...

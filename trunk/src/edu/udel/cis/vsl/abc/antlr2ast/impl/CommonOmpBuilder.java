@@ -74,11 +74,11 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNod
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.parse.IF.OmpCParser;
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 /**
  * Builds an OpenMP AST node from a given token collection representing a
@@ -223,7 +223,7 @@ public class CommonOmpBuilder implements OmpBuilder {
 				token.setNext(null);
 			}
 		}
-		source = PreprocessorUtils.makeTokenSourceFromList(ctokens.get(0));
+		source = TokenUtils.makeTokenSourceFromList(ctokens.get(0));
 		return new CommonTokenStream(source);
 	}
 
