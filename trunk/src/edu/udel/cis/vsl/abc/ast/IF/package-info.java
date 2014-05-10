@@ -15,7 +15,7 @@
  * and {@link edu.udel.cis.vsl.abc.ast.IF.ASTFactory ASTFactory}.
  * </li>
  * 
- * <li><strong>value</strong> ({@link edu.udel.cis.vsl.abc.ast.value})
+ * <li><strong>value</strong>
  *   <ul>
  *   <li>responsibilities: representation of concrete value, such as characters, integers, floating point values</li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.ast.value.IF}</li>
@@ -23,7 +23,7 @@
  *   </ul>
  * </li>
  * 
- * <li><strong>type</strong> ({@link edu.udel.cis.vsl.abc.ast.type})
+ * <li><strong>type</strong>
  *   <ul>
  *   <li>responsibilities: representation of types</li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.ast.type.IF}</li>
@@ -31,7 +31,7 @@
  *   </ul>
  * </li>
  *
- * <li><strong>entity</strong> ({@link edu.udel.cis.vsl.abc.ast.entity})
+ * <li><strong>entity</strong>
  *   <ul>
  *   <li>responsibilities: representation of abstract program entities which can
  *   be named by an identifier, including variables, functions, labels, scopes, 
@@ -41,7 +41,7 @@
  *   </ul>
  * </li>
  * 
- * <li><strong>conversion</strong> ({@link edu.udel.cis.vsl.abc.ast.conversion})
+ * <li><strong>conversion</strong>
  *   <ul>
  *   <li>responsibilities: representation of C's implicit conversions, such
  *   as the conversion of an array to a pointer to the first element of the
@@ -51,7 +51,7 @@
  *   </ul>
  * </li>
  *
- * <li><strong>node</strong> ({@link edu.udel.cis.vsl.abc.ast.node})
+ * <li><strong>node</strong>
  *   <ul>
  *   <li>responsibilities: representation of AST nodes</li>
  *   <li>interface: {@link edu.udel.cis.vsl.abc.ast.node.IF}</li>

@@ -41,7 +41,7 @@ import java.io.PrintStream;
  * </ul>
  * </ul>
  * 
- * Note: {@link AtomicType} and {@link QualifiedType} constructors take an
+ * Note: {@link AtomicType} and {@link QualifiedObjectType} constructors take an
  * {@link UnqualifiedObjectType}.
  * 
  * @author siegel

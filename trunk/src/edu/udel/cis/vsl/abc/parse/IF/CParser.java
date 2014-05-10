@@ -295,8 +295,9 @@ public interface CParser {
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some
 	 * "post-processing" has been done to the tree to fill in some fields.
 	 * 
-	 * @return
+	 * @return the ANTLR tree resulting from parsing and clean up
 	 * @throws ParseException
+	 *             if there is a syntax exception
 	 */
 	CommonTree getTree() throws ParseException;
 

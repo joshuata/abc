@@ -128,12 +128,14 @@ public interface ValueFactory {
 	 * time.
 	 * 
 	 * @param value
-	 * @return
+	 *            a value
+	 * @return yes, no, or maybe, depending on whether the value is determined
+	 *         to be zero
 	 */
 	Answer isZero(Value value);
 
 	// Value creation...
-	
+
 	IntegerValue plusOne(IntegerValue value);
 
 	CharacterValue characterValue(ExecutionCharacter character);
@@ -143,11 +145,14 @@ public interface ValueFactory {
 	IntegerValue integerValue(IntegerType type, BigInteger integerValue);
 
 	/**
-	 * For convenience.
+	 * An integer value of the given type and with the given Java int value.
+	 * Provided for convenience.
 	 * 
 	 * @param type
+	 *            an integer type
 	 * @param intValue
-	 * @return
+	 *            a Java int
+	 * @return the integer value with given type and int value
 	 */
 	IntegerValue integerValue(IntegerType type, int intValue);
 

@@ -180,7 +180,8 @@ public interface TypeFactory {
 	 * can return previously returned instances.
 	 * 
 	 * @param referencedType
-	 * @param scope
+	 *            the base type of the pointer type
+	 * @param scopeRestriction
 	 *            scope restriction or null
 	 * @return a pointer type as specified
 	 */
@@ -188,13 +189,14 @@ public interface TypeFactory {
 
 	/**
 	 * The atomic type associated to a base type. This type may be denoted
-	 * "_Atomic(baseType)" or by using the type qualifier _Atomic in a
-	 * declaration. The base type cannot be an array type, a function type, an
-	 * atomic type, or a qualified type. However, the resulting AtomicType can
-	 * be qualified.
+	 * <code>_Atomic(baseType)</code> or by using the type qualifier
+	 * <code>_Atomic</code> in a declaration. The base type cannot be an array
+	 * type, a function type, an atomic type, or a qualified type. However, the
+	 * resulting AtomicType can be qualified.
 	 * 
 	 * @param baseType
-	 * @return
+	 *            the base type
+	 * @return the atomic type
 	 */
 	AtomicType atomicType(UnqualifiedObjectType baseType);
 
@@ -356,7 +358,8 @@ public interface TypeFactory {
 	 * The return type cannot be an array type or a function type.
 	 * 
 	 * @param returnType
-	 * @return
+	 *            the return type of the function
+	 * @return the function type
 	 */
 	FunctionType functionType(ObjectType returnType);
 
@@ -368,7 +371,7 @@ public interface TypeFactory {
 	 * 
 	 * @param returnType
 	 *            the type returned by calls to the function
-	 * @param fromIdenifierList
+	 * @param fromIdentifierList
 	 *            was this type generated from a function definition using an
 	 *            identifier list (as opposed to a parameter type list)?
 	 * @param parameterTypes

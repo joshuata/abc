@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 
 /**

@@ -43,12 +43,14 @@ public class TokenUtils {
 	}
 
 	/**
+	 * Computes a short version of the file name from a token's source file.
 	 * 
 	 * @param token
+	 *            a token
 	 * @param abbreviated
 	 *            true iff the result is an abbreviated file name, i.e., shorter
 	 *            file name, which is calculated by the static hash map.
-	 * @return
+	 * @return the short file name
 	 */
 	public static String getShortFilename(Token token, boolean abbreviated) {
 		String filename;
@@ -178,7 +180,7 @@ public class TokenUtils {
 	public static TokenSource makeTokenSourceFromList(CToken first) {
 		return new ListTokenSource(first);
 	}
-	
+
 	/**
 	 * Given a CommonTree node, forms a token source from the children of that
 	 * node. Adds an EOF token to the end of the source.
@@ -189,7 +191,6 @@ public class TokenUtils {
 	public static TokenSource makeTokenSourceFromChildren(CommonTree node) {
 		return new NodeTokenSource(node);
 	}
-
 
 }
 
