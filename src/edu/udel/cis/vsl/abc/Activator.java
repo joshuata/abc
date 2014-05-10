@@ -515,10 +515,10 @@ public class Activator {
 	 * 
 	 * @param out
 	 *            the output stream
-	 * @param transformerCodes
-	 *            a list of transformer codes specifying the transformers to
-	 *            apply to the program; each code is a short string used to
-	 *            identify a particular transformation
+	 * @param transformCodes
+	 *            a list of transform codes specifying the transformers to apply
+	 *            to the program; each code is a short string used to identify a
+	 *            particular transformation
 	 * @return the AST
 	 * @throws PreprocessorException
 	 *             if preprocessing fails

@@ -16,5 +16,4 @@ public interface ArithmeticConversion extends Conversion {
 
 	@Override
 	ArithmeticType getNewType();
-
 }
