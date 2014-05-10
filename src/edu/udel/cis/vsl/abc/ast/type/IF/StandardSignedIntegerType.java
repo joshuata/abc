@@ -54,7 +54,7 @@ public interface StandardSignedIntegerType extends SignedIntegerType,
 	 * Is -m <= x <= M, where m=getMinimumMinValue(), M=getMinimumMaxValue.
 	 * 
 	 * @param intVal
-	 * @return
+	 * @return <code>true</code> iff -m <= x <= M
 	 */
 	boolean inMinimumRange(BigInteger intVal);
 }

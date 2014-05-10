@@ -9,10 +9,10 @@ public interface UnionValue extends CompoundValue {
 	 * Returns the field of the union to which this value belongs, since a union
 	 * can only hold the value of one of its fieldsl
 	 * 
-	 * @return
+	 * @return the field to which this value belongs
 	 */
 	Field getField();
-	
+
 	Value getMemberValue();
 
 	@Override

@@ -4,7 +4,9 @@
  * of the ast module.</p>
  * 
  * <p>This module deals with every kind of declaration in a program.
- * The interface {@link DeclarationNode} is the root of the declaration
+ * The interface
+ * {@link edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode}
+ * is the root of the declaration
  * node hierarchy.  Other more specific declaration nodes extend
  * that one (for variables, functions, etc.).  This module includes
  * other elements associated to declarations, such as initializers and 

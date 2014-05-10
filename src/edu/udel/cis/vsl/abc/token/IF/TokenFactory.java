@@ -20,7 +20,10 @@ public interface TokenFactory {
 	 * Inclusion record for original source file.
 	 * 
 	 * @param file
-	 * @return
+	 *            the file which was included
+	 * @param shortName
+	 *            a short name for the file
+	 * @return a new inclusion record
 	 */
 	Inclusion newInclusion(File file, String shortName);
 
@@ -67,9 +70,11 @@ public interface TokenFactory {
 
 	// Macros...
 
-	ObjectMacro newObjectMacro(Tree definitionNode, File file, String shortFileName);
+	ObjectMacro newObjectMacro(Tree definitionNode, File file,
+			String shortFileName);
 
-	FunctionMacro newFunctionMacro(Tree definitionNode, File file, String shotFileName);
+	FunctionMacro newFunctionMacro(Tree definitionNode, File file,
+			String shotFileName);
 
 	// Deprecated...
 

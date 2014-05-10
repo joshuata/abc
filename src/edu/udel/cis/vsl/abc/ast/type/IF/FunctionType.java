@@ -65,12 +65,14 @@ public interface FunctionType extends Type {
 	int getNumParameters() throws ASTException;
 
 	/**
+	 * Returns the type of the index-th parameter.
 	 * 
 	 * @param index
+	 *            integer in range [0,n-1], where n is the number of parameters
 	 * 
 	 * @exception ASTException
 	 *                if the parameter information is not known
-	 * @return
+	 * @return the index-th parameter type
 	 */
 	ObjectType getParameterType(int index);
 

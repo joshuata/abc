@@ -70,17 +70,8 @@ public interface Source {
 	 *            true iff want to have the shorter file name in the location,
 	 *            e.g, "f1:127.4-128.1" instead of
 	 *            "longOrignialFile.c:127.4-128.1"
-	 * @return
+	 * @return summary of location and text
 	 */
 	String getSummary(boolean abbreviated);
-
-//	/**
-//	 * Print the list of shorter file names and the corresponding original file
-//	 * names.
-//	 * 
-//	 * @param out
-//	 *            The output stream to be used.
-//	 */
-//	void printShorterFileNameMap(PrintStream out);
 
 }
