@@ -102,16 +102,4 @@ public class Antlr2AST {
 
 		tu.print(out);
 	}
-
-	// public static void main(String[] args) throws PreprocessorException,
-	// ParseException, SyntaxException {
-	// String filename = args[0];
-	// File file = new File(filename);
-	// Preprocessor preprocessor = Preprocess.newPreprocessorFactory()
-	// .newPreprocessor();
-	// CParser parser = Parse.newCParser(preprocessor, file);
-	//
-	// buildAndPrintAST(System.out, parser);
-	// }
-
 }

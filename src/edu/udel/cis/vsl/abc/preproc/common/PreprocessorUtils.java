@@ -4,15 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
-import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorExpressionException;
-import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 public class PreprocessorUtils {
@@ -233,21 +230,6 @@ public class PreprocessorUtils {
 		}
 	}
 
-	public static TokenSource makeTokenSourceFromList(CToken first) {
-		return new ListTokenSource(first);
-	}
-
-	/**
-	 * Given a CommonTree node, forms a token source from the children of that
-	 * node. Adds an EOF token to the end of the source.
-	 * 
-	 * 
-	 * @param node
-	 */
-	public static TokenSource makeTokenSourceFromChildren(CommonTree node) {
-		return new NodeTokenSource(node);
-	}
-
 	public static void source(PrintStream out, File file)
 			throws PreprocessorException {
 		try {
@@ -258,108 +240,4 @@ public class PreprocessorUtils {
 		}
 	}
 
-}
-
-/**
- * A simple TokenSource formed from a linked list of PreprocessorTokens, given
- * the first element in the list. The token source appends an infinite number of
- * EOFs after the last token in the list.
- * 
- * @author siegel
- * 
- */
-class ListTokenSource implements TokenSource {
-
-	private CToken current;
-
-	ListTokenSource(CToken first) {
-		this.current = first;
-	}
-
-	@Override
-	public Token nextToken() {
-		Token result = current;
-
-		if (result == null)
-			result = Token.EOF_TOKEN;
-
-		else
-			current = current.getNext();
-		return result;
-	}
-
-	@Override
-	public String getSourceName() {
-		if (current == null)
-			return "unknown";
-
-		CharStream stream = current.getInputStream();
-
-		if (stream == null)
-			return "unknown";
-
-		String name = stream.getSourceName();
-
-		if (name == null)
-			return "unknown";
-
-		return name;
-	}
-
-}
-
-/**
- * A simple TokenSource formed by iterating over the children of a CommonTree
- * node.
- * 
- * @author siegel
- * 
- */
-class NodeTokenSource implements TokenSource {
-
-	private CommonTree root;
-
-	/**
-	 * Index of the next child that will be returned by a call to nextToken().
-	 */
-	private int position = 0;
-
-	private int numChildren;
-
-	NodeTokenSource(CommonTree root) {
-		this.root = root;
-		this.numChildren = root.getChildCount();
-	}
-
-	@Override
-	public Token nextToken() {
-		if (position >= numChildren)
-			return Token.EOF_TOKEN;
-		else {
-			Token result = ((CommonTree) root.getChild(position)).getToken();
-
-			position++;
-			return result;
-		}
-	}
-
-	@Override
-	public String getSourceName() {
-		Token token = root.getToken();
-
-		if (token == null)
-			return "unknown";
-
-		CharStream stream = token.getInputStream();
-
-		if (stream == null)
-			return "unknown";
-
-		String name = stream.getSourceName();
-
-		if (name == null)
-			return "unknown";
-
-		return name;
-	}
 }
