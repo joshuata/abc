@@ -4,6 +4,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
+/**
+ * An Enumerator corresponds to one of the identifiers in the list in an
+ * enumeration.
+ * 
+ * @author siegel
+ * 
+ */
 public interface Enumerator extends OrdinaryEntity {
 
 	@Override

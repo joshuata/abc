@@ -209,7 +209,7 @@ public class CommonASTFactory implements ASTFactory {
 					}
 					newFields.add(entityFactory.newField(
 							oldField.getDefinition(), newFieldType,
-							oldField.getBidWidth(), newStructureOrUnion));
+							oldField.getBitWidth(), newStructureOrUnion));
 				}
 			}
 			if (newStructureOrUnion == null)
