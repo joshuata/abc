@@ -5,12 +5,23 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 
 /**
+ * <p>
  * A node representing a function declaration. This includes a function
  * prototype as well as a function definition.
+ * </p>
  * 
+ * <p>
  * The children include: (0) an identifier node, the name of the function; (1) a
  * type node which is the type of the function (necessarily a function type),
- * and (2) a contract node for the function contract, which may be null.
+ * and (2) a contract node for the function contract, which may be
+ * <code>null</code>.
+ * </p>
+ * 
+ * <p>
+ * A C function declaration may contain addition specifiers (e.g.,
+ * <code>_Noreturn</code>). These specifiers are represented by boolean fields
+ * in this node; they do not require additional children nodes.
+ * </p>
  * 
  * @author siegel
  * 
@@ -23,7 +34,8 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	/**
 	 * Does the declaration include the <code>inline</code> function specifier?
 	 * 
-	 * @return true if declaration contains <code>inline</code>
+	 * @return <code>true</code> iff declaration contains <code>inline</code>
+	 * @see #setInlineFunctionSpecifier(boolean)
 	 */
 	boolean hasInlineFunctionSpecifier();
 
@@ -34,6 +46,7 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	 *            if <code>true</code>, says that this function declaration
 	 *            contains the <code>inline</code> specifier, if
 	 *            <code>false</code>, it doesn't
+	 * @see #hasInlineFunctionSpecifier()
 	 */
 	void setInlineFunctionSpecifier(boolean value);
 
@@ -42,6 +55,7 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	 * specifier?
 	 * 
 	 * @return <code>true</code> iff declaration contains <code>_Noreturn</code>
+	 * @see #setNoreturnFunctionSpecifier(boolean)
 	 */
 	boolean hasNoreturnFunctionSpecifier();
 
@@ -52,6 +66,7 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	 *            if <code>true</code>, says that this function declaration
 	 *            contains the <code>_Noreturn</code> specifier, if
 	 *            <code>false</code>, it doesn't
+	 * @see #hasNoreturnFunctionSpecifier()
 	 */
 	void setNoreturnFunctionSpecifier(boolean value);
 
@@ -60,6 +75,7 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	 * <code>null</code>. It is a child node of this node.
 	 * 
 	 * @return the contract node child of this node
+	 * @see #setContract(SequenceNode)
 	 */
 	SequenceNode<ContractNode> getContract();
 
@@ -68,6 +84,7 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	 * 
 	 * @param contract
 	 *            the contract node to be made a child of this node
+	 * @see #getContract()
 	 */
 	void setContract(SequenceNode<ContractNode> contract);
 

@@ -8,6 +8,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * into an array) or a field designator (specifying a member of a struct or
  * union).
  * 
+ * @see ArrayDesignatorNode
+ * @see FieldDesignatorNode
+ * 
  * @author siegel
  * 
  */

@@ -5,10 +5,16 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 
 /**
- * A scope-parameterized declaration node. Certain declarations can be
+ * <p>
+ * A CIVL-C scope-parameterized declaration node. Certain declarations can be
  * parameterized by scopes. These declarations involve a sequence of formal
  * scope parameters. Those formals can then be used in the "body" of the
  * declaration.
+ * </p>
+ * 
+ * <p>
+ * Will be deprecated soon.
+ * </p>
  * 
  * @author siegel
  * 

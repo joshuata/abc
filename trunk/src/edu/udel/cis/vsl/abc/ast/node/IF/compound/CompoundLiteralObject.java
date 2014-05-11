@@ -1,13 +1,21 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.compound;
 
+import java.util.NoSuchElementException;
+
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 
 /**
+ * <p>
  * A compound literal is an abstract representation of a literal array, struct,
- * or union value in a C program.
+ * or union value in a C program. An instance of this class represents the
+ * abstract value that a compound initializer or compound literal expression
+ * defines.
+ * </p>
  * 
- * Reads that go beyond the bounds of the inferred type will result in a
- * NoSuchElementException.
+ * <p>
+ * Note: reads that go beyond the bounds of the inferred type will result in a
+ * {@link NoSuchElementException}.
+ * </p>
  * 
  * @author siegel
  * 
@@ -36,7 +44,7 @@ public interface CompoundLiteralObject extends LiteralObject {
 	LiteralObject get(int index);
 
 	/**
-	 * Return the corresponding AST node of the compound literal object.
+	 * Returns the corresponding AST node of the compound literal object.
 	 * 
 	 * @return the AST node corresponding to this compound literal
 	 */

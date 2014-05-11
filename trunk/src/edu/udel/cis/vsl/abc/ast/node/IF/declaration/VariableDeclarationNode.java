@@ -6,7 +6,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 
 /**
- * A declaration of a C "object".
+ * A declaration of a variable ("object").
  * 
  * @author siegel
  * 
@@ -17,87 +17,147 @@ public interface VariableDeclarationNode extends OrdinaryDeclarationNode {
 	Variable getEntity();
 
 	/**
-	 * Does the declaration include the "auto" storage class specifier?
+	 * <p>
+	 * Does the declaration include the <code>auto</code> storage class
+	 * specifier? Default value is <code>false</code>, it can be changed using
+	 * {@link #setAutoStorage(boolean)}.
+	 * </p>
 	 * 
-	 * For objects only, not functions. See comments for hasRegisterStorage.
-	 * 
-	 * @return true if declaration contains "auto"
+	 * @return <code>true</code> if declaration contains <code>auto</code>
+	 * @see #setAutoStorage(boolean)
 	 */
 	boolean hasAutoStorage();
 
+	/**
+	 * Sets the value that will be returned by {@link #hasAutoStorage()}.
+	 * 
+	 * @param value
+	 *            <code>true</code> if declaration contains <code>auto</code>
+	 */
 	void setAutoStorage(boolean value);
 
 	/**
-	 * Does the declaration include the "register" storage class specifier?.
+	 * <p>
+	 * Does the declaration include the <code>register</code> storage class
+	 * specifier?. Intially <code>false</code>, the value can be changed using
+	 * {@link #setRegisterStorage(boolean)}.
+	 * </p>
 	 * 
-	 * C11 6.9(2): "The storage-class specifiers auto and register shall not
-	 * appear in the declaration specifiers in an external declaration."
+	 * <p>
+	 * C11 6.9(2): "The storage-class specifiers <code>auto</code> and
+	 * <code>register</code> shall not appear in the declaration specifiers in
+	 * an external declaration."
+	 * </p>
 	 * 
+	 * <p>
 	 * C11 6.7.1(7): "The declaration of an identifier for a function that has
 	 * block scope shall have no explicit storage-class specifier other than
-	 * extern."
+	 * <code>extern</code>."
+	 * </p>
 	 * 
+	 * <p>
 	 * Since the only remaining kinds of scopes are function prototype and
 	 * function, neither of which can contain function declarations, I conclude
-	 * that auto and register can never occur in a function declaration.
+	 * that <code>auto</code> and <code>register</code> can never occur in a
+	 * function declaration.
+	 * </p>
 	 * 
+	 * <p>
 	 * Ergo: this is for objects only, not functions.
+	 * </p>
 	 * 
-	 * @return true if declaration contains "register"
+	 * @return <code>true</code> iff declaration contains <code>register</code>
 	 */
 	boolean hasRegisterStorage();
 
+	/**
+	 * Sets the value that will be returned by {@link #hasRegisterStorage()}.
+	 * 
+	 * @param value
+	 *            <code>true</code> iff declaration contains
+	 *            <code>register</code>
+	 */
 	void setRegisterStorage(boolean value);
 
 	/**
-	 * Optional initializer for the object being declared.
+	 * Gets the (optional) initializer for the object being declared. Returns
+	 * <code>null</code> if the declaration does not use an initializer. Default
+	 * value is <code>null</code>; it can be changed using
+	 * {@link #setInitializer(InitializerNode)}.
 	 * 
-	 * For objects only (not functions).
-	 * 
-	 * @return the initializer for the new object, or null if no initializer is
-	 *         present
+	 * @return the initializer for the object, or <code>null</code> if no
+	 *         initializer is present
 	 */
 	InitializerNode getInitializer();
 
+	/**
+	 * Sets the value that will be returned by {@link #getInitializer()}.
+	 * 
+	 * @param initializer
+	 *            the initializer for the object, or <code>null</code> if no
+	 *            initializer is present
+	 */
 	void setInitializer(InitializerNode initializer);
 
 	/**
-	 * Does the declaration include the "_Thread_local" storage class specifier?
+	 * Does the declaration include the <code>_Thread_local</code> storage class
+	 * specifier? Default value is <code>null</code>; it can be changed using
+	 * {@link #setThreadLocalStorage(boolean)}.
 	 * 
-	 * Used for "objects" only (not functions).
-	 * 
-	 * @return true if declaration contains "_Thread_local"
+	 * @return <code>true</code> iff declaration contains
+	 *         <code>_Thread_local</code>
 	 */
 	boolean hasThreadLocalStorage();
 
+	/**
+	 * Sets the value that will be returned by {@link #hasThreadLocalStorage()}.
+	 * 
+	 * @param value
+	 *            <code>true</code> iff declaration contains
+	 *            <code>_Thread_local</code>
+	 */
 	void setThreadLocalStorage(boolean value);
 
 	/**
 	 * An object declaration may contain any number of alignment specifiers.
-	 * These have the form "_Alignas ( Type )" and
-	 * "_Alignas ( constant-expression )". This method returns the types
-	 * occurring in the first form (if any).
+	 * These have the form <code>_Alignas ( Type )</code> and
+	 * <code>_Alignas ( constant-expression )</code>. This method returns the
+	 * types occurring in the first form (if any). Initially <code>null</code>,
+	 * this node can be set using
+	 * {@link #setTypeAlignmentSpecifiers(SequenceNode)}.
 	 * 
-	 * For objects only (not functions).
-	 * 
-	 * @return type alignments
+	 * @return sequence node of type alignments
 	 */
 	SequenceNode<TypeNode> typeAlignmentSpecifiers();
 
+	/**
+	 * Sets the node that will be returned by {@link #typeAlignmentSpecifiers()}
+	 * .
+	 * 
+	 * @param specifiers
+	 *            sequence node of type alignments
+	 */
 	void setTypeAlignmentSpecifiers(SequenceNode<TypeNode> specifiers);
 
 	/**
 	 * An object declaration may contain any number of alignment specifiers.
-	 * These have the form "_Alignas ( Type )" and
-	 * "_Alignas ( constant-expression )". This method returns the constant
-	 * expressions occurring in the second form (if any).
+	 * These have the form <code>_Alignas ( Type )</code> and
+	 * <code>_Alignas ( constant-expression )</code>. This method returns the
+	 * constant expressions occurring in the second form (if any). Default value
+	 * is <code>null</code>, the node can be set using
+	 * {@link #setConstantAlignmentSpecifiers(SequenceNode)}.
 	 * 
-	 * For objects only (not functions).
-	 * 
-	 * @return constant alignments
+	 * @return sequence node of constant alignments
 	 */
 	SequenceNode<ExpressionNode> constantAlignmentSpecifiers();
 
+	/**
+	 * Sets the node that will be returned by method
+	 * {@link #constantAlignmentSpecifiers()}.
+	 * 
+	 * @param specifiers
+	 *            sequence node of constant alignments
+	 */
 	void setConstantAlignmentSpecifiers(SequenceNode<ExpressionNode> specifiers);
 
 	@Override

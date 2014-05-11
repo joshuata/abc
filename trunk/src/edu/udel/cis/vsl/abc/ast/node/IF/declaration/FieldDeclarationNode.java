@@ -13,9 +13,11 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 public interface FieldDeclarationNode extends DeclarationNode {
 
 	/**
-	 * Returns the type of the field being declared. This may be null.
+	 * Returns the type of the field being declared. This may be
+	 * <code>null</code>.
 	 * 
 	 * @return the type node child of this node
+	 * @see #setTypeNode(TypeNode)
 	 */
 	TypeNode getTypeNode();
 
@@ -24,6 +26,7 @@ public interface FieldDeclarationNode extends DeclarationNode {
 	 * 
 	 * @param type
 	 *            the type of the field being declared
+	 * @see #getTypeNode()
 	 */
 	void setTypeNode(TypeNode type);
 
@@ -35,6 +38,7 @@ public interface FieldDeclarationNode extends DeclarationNode {
 	 * 
 	 * @return the optional bit field width expression (<code>null</code> if
 	 *         absent)
+	 * @see #setBitFieldWidth(ExpressionNode)
 	 */
 	ExpressionNode getBitFieldWidth();
 
@@ -43,6 +47,7 @@ public interface FieldDeclarationNode extends DeclarationNode {
 	 * 
 	 * @param width
 	 *            the expression to be the bit field width of this node
+	 * @see #getBitFieldWidth()
 	 */
 	void setBitFieldWidth(ExpressionNode width);
 

@@ -4,6 +4,7 @@
  * compound initializers.
  * 
  * @see edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode
+ * @see edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode
  */
 package edu.udel.cis.vsl.abc.ast.node.IF.compound;
 
