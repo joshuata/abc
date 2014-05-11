@@ -36,7 +36,7 @@ public class CommonField extends CommonEntity implements Field {
 	}
 
 	@Override
-	public Value getBidWidth() {
+	public Value getBitWidth() {
 		return bitWidth;
 	}
 

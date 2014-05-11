@@ -142,8 +142,8 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 					String thatName = thatField.getName();
 					ObjectType thisType = thisField.getType();
 					ObjectType thatType = thatField.getType();
-					Value thisWidth = thisField.getBidWidth();
-					Value thatWidth = thatField.getBidWidth();
+					Value thisWidth = thisField.getBitWidth();
+					Value thatWidth = thatField.getBitWidth();
 
 					if (thisName == null) {
 						if (thatName != null)
@@ -180,7 +180,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 			for (Field field : fields) {
 				Type fieldType = field.getType();
 				String fieldName = field.getName();
-				Value bitWidth = field.getBidWidth();
+				Value bitWidth = field.getBitWidth();
 
 				out.println();
 				out.print(prefix + "| Field[name=" + fieldName);
