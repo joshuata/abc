@@ -12,11 +12,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 public interface FunctionDefinitionNode extends FunctionDeclarationNode {
 
 	/**
-	 * Returns the body of the function, a compound statement. The value
-	 * returned is non-null iff this declaration is the definition of the
-	 * function.
+	 * Returns the body of the function, a compound statement.
 	 * 
-	 * @return the function body, or null if not a definition
+	 * @return the function body
 	 */
 	CompoundStatementNode getBody();
 

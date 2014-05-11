@@ -30,21 +30,38 @@ public interface CompoundInitializerNode extends InitializerNode,
 	 * type of the variable which it is being used to initialize.
 	 * 
 	 * @return the type of this initializer
+	 * @see #setType(ObjectType)
 	 */
 	ObjectType getType();
 
+	/**
+	 * Sets the type of this initializer
+	 * 
+	 * @param type
+	 *            the type of the thing being initialized
+	 * @see #getType()
+	 */
 	void setType(ObjectType type);
 
 	/**
 	 * Returns the compound literal object obtained by analyzing the tree rooted
 	 * at this compound initializer node. The compound literal object provides
 	 * an abstract view of the literal which is very simple and easy to use.
-	 * This method will return null before the analysis has been carried out.
+	 * This method will return <code>null</code> before the analysis has been
+	 * carried out. The analyzer will set the literal object value using method
+	 * {@link #setLiteralObject(CompoundLiteralObject)}.
 	 * 
 	 * @return the compound literal object or null
 	 */
 	CompoundLiteralObject getLiteralObject();
 
+	/**
+	 * Sets the value of this compound initializer to the given object.
+	 * 
+	 * @param object
+	 *            the value of this compound initializer
+	 * @see #getLiteralObject()
+	 */
 	void setLiteralObject(CompoundLiteralObject object);
 
 }

@@ -18,6 +18,12 @@ public interface ArrayDesignatorNode extends DesignatorNode {
 	 */
 	ExpressionNode getIndex();
 
+	/**
+	 * Sets the index expression.
+	 * 
+	 * @param expression
+	 *            a constant expression
+	 */
 	void setIndex(ExpressionNode expression);
 
 	@Override

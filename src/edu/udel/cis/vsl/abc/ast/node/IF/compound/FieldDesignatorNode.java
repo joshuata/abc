@@ -3,7 +3,8 @@ package edu.udel.cis.vsl.abc.ast.node.IF.compound;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 
 /**
- * A field designation is used in an initializer for a struct or union.
+ * A field designator is used in an initializer for a struct or union. It is a
+ * reference to a particular member (field) of that struct or union.
  * 
  * @author siegel
  * 
@@ -11,12 +12,20 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 public interface FieldDesignatorNode extends DesignatorNode {
 
 	/**
-	 * The name of field being designated for initialization.
+	 * The name of the field being designated for initialization.
 	 * 
 	 * @return the field name
+	 * @see #setField(IdentifierNode)
 	 */
 	IdentifierNode getField();
 
+	/**
+	 * Sets the name of the field being designated for initialization.
+	 * 
+	 * @param name
+	 *            the field name
+	 * @see #getField()
+	 */
 	void setField(IdentifierNode name);
 
 	@Override
