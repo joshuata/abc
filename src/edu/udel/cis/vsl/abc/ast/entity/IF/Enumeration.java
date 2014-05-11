@@ -14,6 +14,8 @@ public interface Enumeration extends TaggedEntity {
 
 	/**
 	 * Returns the enumeration type wrapped by this Enumeration.
+	 * 
+	 * @return the enumeration type
 	 */
 	@Override
 	EnumerationType getType();

@@ -149,11 +149,6 @@ public abstract class CommonASTNode implements ASTNode {
 		return childIndex;
 	}
 
-	public void setParent(ASTNode parent) {
-		checkModifiable();
-		this.parent = parent;
-	}
-
 	@Override
 	public int numChildren() {
 		return children.size();
@@ -312,9 +307,9 @@ public abstract class CommonASTNode implements ASTNode {
 
 			if (child != null) {
 				if (keep.holds(child)) {
-//					// add the file name to the file name map
-//					TokenUtils.addFileName(TokenUtils.getShortFilename(this
-//							.getSource().getFirstToken(), false));
+					// // add the file name to the file name map
+					// TokenUtils.addFileName(TokenUtils.getShortFilename(this
+					// .getSource().getFirstToken(), false));
 					child.keepOnly(keep);
 				} else
 					removeChild(i);
