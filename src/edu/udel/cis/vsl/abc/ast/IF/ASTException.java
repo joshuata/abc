@@ -15,10 +15,17 @@ public class ASTException extends ABCRuntimeException {
 	 */
 	private static final long serialVersionUID = 2671174559513915757L;
 
+	/**
+	 * Constructs new ASTException with given message, which will be shown to
+	 * the user.
+	 * 
+	 * @param msg
+	 *            the error message
+	 */
 	public ASTException(String msg) {
 		super(msg);
 	}
-	
+
 	// TODO: add method with sourceable thing like AST node?
 
 }
