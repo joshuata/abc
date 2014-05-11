@@ -12,6 +12,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
  * expressions of the form "join(scope1,scope2)".
  * 
  * @author siegel
+ * @deprecated
  * 
  */
 public interface ScopeValue extends Value {

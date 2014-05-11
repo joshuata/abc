@@ -22,6 +22,7 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
  * @author siegel
  * 
  */
+@SuppressWarnings("deprecation")
 public interface ASTFactory {
 
 	/**
@@ -98,6 +99,8 @@ public interface ASTFactory {
 	 * @param map
 	 *            map from scope variables to scope values
 	 * @return type after substitutions performed
+	 * 
+	 * @deprecated
 	 */
 	Type substituteScopes(Type type, Map<ScopeVariable, ScopeValue> map);
 
