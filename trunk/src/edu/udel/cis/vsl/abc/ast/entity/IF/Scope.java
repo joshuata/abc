@@ -68,6 +68,7 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * distinct from all other names.
  * </p>
  */
+@SuppressWarnings("deprecation")
 public interface Scope extends ScopeValue {
 
 	/**
