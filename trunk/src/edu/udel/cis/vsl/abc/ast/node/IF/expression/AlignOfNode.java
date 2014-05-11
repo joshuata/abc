@@ -11,8 +11,22 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
  */
 public interface AlignOfNode extends ExpressionNode {
 
+	/**
+	 * Gets node representing the argument of the <code>_Alignof</code>
+	 * operator.
+	 * 
+	 * @return the node representing the type name which is the argument of this
+	 *         operator
+	 */
 	TypeNode getArgument();
 
+	/**
+	 * Sets the argument that will be returned by {@link #getArgument()}.
+	 * 
+	 * @param type
+	 *            the type node representing the type name argument of this
+	 *            operator
+	 */
 	void setArgument(TypeNode type);
 
 	@Override

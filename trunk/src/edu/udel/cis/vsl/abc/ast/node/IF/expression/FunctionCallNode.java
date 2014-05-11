@@ -2,15 +2,32 @@ package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 
+/**
+ * Node representing a function call. The children node include the expression
+ * of function type and the sequence of actual arguments.
+ * 
+ * @author siegel
+ * 
+ */
 public interface FunctionCallNode extends ExpressionNode {
 
 	/**
 	 * The function being called.
 	 * 
-	 * @return function name
+	 * @return the expression of function type which evaluates to the function
+	 *         being called; the most common case is an identifier expression
+	 *         giving the name of a function
 	 */
 	ExpressionNode getFunction();
 
+	/**
+	 * Sets the value returned by {@link #getFunction()}.
+	 * 
+	 * @param function
+	 *            the expression of function type which evaluates to the
+	 *            function being called; the most common case is an identifier
+	 *            expression giving the name of a function
+	 */
 	void setFunction(ExpressionNode function);
 
 	/**
@@ -21,12 +38,20 @@ public interface FunctionCallNode extends ExpressionNode {
 	int getNumberOfArguments();
 
 	/**
-	 * Returns the index-th argument, indexed from 0. Beware: the argument index
-	 * and the child index are off by one! So, argument 0 is child 1. That is
-	 * because child 0 is the function name.
+	 * Returns the index-th argument, indexed from 0.
+	 * 
+	 * @return the index-th actual argument
 	 */
 	ExpressionNode getArgument(int index);
 
+	/**
+	 * Sets the index-th argument.
+	 * 
+	 * @param index
+	 *            nonnegative integer
+	 * @param value
+	 *            expression node to use as index-th actual argument
+	 */
 	void setArgument(int index, ExpressionNode value);
 
 	@Override
@@ -39,6 +64,8 @@ public interface FunctionCallNode extends ExpressionNode {
 	 * <code>
 	 * f<s1,s2>(...)
 	 * </code>
+	 * 
+	 * This will be deprecated soon.
 	 * 
 	 * @return the scope parameters
 	 */

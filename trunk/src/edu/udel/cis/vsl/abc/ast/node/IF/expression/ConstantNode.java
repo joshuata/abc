@@ -20,8 +20,21 @@ public interface ConstantNode extends ExpressionNode {
 	 */
 	String getStringRepresentation();
 
+	/**
+	 * Sets the value returned by {@link #getStringRepresentation}.
+	 * 
+	 * @param representation
+	 *            the original representation of this constant in the source
+	 *            code
+	 */
 	void setStringRepresentation(String representation);
 
+	/**
+	 * Returns the actual constant value, obtained by evaluating this constant
+	 * expression.
+	 * 
+	 * @return the value of this constant expression
+	 */
 	Value getConstantValue();
 
 	@Override
