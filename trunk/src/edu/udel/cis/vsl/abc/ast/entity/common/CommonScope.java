@@ -94,7 +94,7 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public AST getTranslationUnit() {
+	public AST getAST() {
 		return translationUnit;
 	}
 

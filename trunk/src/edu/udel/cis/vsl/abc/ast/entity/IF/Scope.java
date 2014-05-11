@@ -74,7 +74,27 @@ public interface Scope extends ScopeValue {
 	 * These are the four different kinds of scopes.
 	 */
 	public enum ScopeKind {
-		FILE, BLOCK, FUNCTION, FUNCTION_PROTOTYPE, CONTRACT
+		/**
+		 * File scope. This is the root scope.
+		 */
+		FILE,
+		/**
+		 * A block scope.
+		 */
+		BLOCK,
+		/**
+		 * A function scope.
+		 */
+		FUNCTION,
+		/**
+		 * A function prototype scope.
+		 */
+		FUNCTION_PROTOTYPE,
+		/**
+		 * The scope for a CIVL-C contract. The contract scope contains the
+		 * scope of the function signature and body.
+		 */
+		CONTRACT
 	};
 
 	// information about this scope in the scope tree...
@@ -104,15 +124,15 @@ public interface Scope extends ScopeValue {
 	void setId(int id);
 
 	/**
-	 * Returns the translation unit to which this scope belongs.
+	 * Returns the AST to which this scope belongs.
 	 * 
-	 * @return the translation unit to which this scope belongs
+	 * @return the AST to which this scope belongs
 	 * */
-	AST getTranslationUnit();
+	AST getAST();
 
 	/**
 	 * The parent scope, i.e., the scope directly containing this one. Null if
-	 * this is the shared scope.
+	 * this is the root scope.
 	 * 
 	 * @return the parent scope
 	 */
@@ -128,13 +148,13 @@ public interface Scope extends ScopeValue {
 	/**
 	 * Returns the child scope of this scope, indexed from 0.
 	 * 
-	 * @param scopeId
+	 * @param index
 	 *            integer between 0 and numChildrenScope-1, inclusive
 	 * @return child scope number index
 	 * @exception IllegalArgumentException
 	 *                if index is out of bounds
 	 */
-	Scope getChildScope(int scopeId);
+	Scope getChildScope(int index);
 
 	/**
 	 * Returns an iterator over the children scope of this scope.
@@ -153,17 +173,30 @@ public interface Scope extends ScopeValue {
 
 	// Ordinary entities...
 
+	/**
+	 * Adds an ordinary entity to this scope's collection of entities.
+	 * 
+	 * @param entity
+	 *            an ordinary entity to be added to this scope
+	 * @return the number of ordinary entities beloning to this scope before the
+	 *         new one was added; this number becomes the index of the ordinary
+	 *         entity
+	 * @throws UnsourcedException
+	 *             if the entity cannot be added to this scope for some reason,
+	 *             for example, because there is already an ordinary entity with
+	 *             that name in this scope
+	 */
 	int add(OrdinaryEntity entity) throws UnsourcedException;
 
 	/**
-	 * Returns the ordinary entity (variable/function/enumeration
-	 * constant/typedef) in this scope with the given name, or null if there is
-	 * not one. This does not look in ancestor or descendant scopes.
+	 * Gets the ordinary entity (variable/function/enumeration constant/typedef)
+	 * in this scope with the given name, or <code>null</code> if there is not
+	 * one. This does not look in ancestor or descendant scopes.
 	 * 
 	 * @param name
 	 *            the name of the ordinary entity
-	 * @return the ordinary entity in this scope with that name or null if none
-	 *         exists
+	 * @return the ordinary entity in this scope with that name or
+	 *         <code>null</code> if none exists
 	 */
 	OrdinaryEntity getOrdinaryEntity(String name);
 
@@ -172,7 +205,10 @@ public interface Scope extends ScopeValue {
 	 * scoping: if entity is not found in this scope, search the parent scope,
 	 * etc. Returns first occurrence of ordinary entity with this name,
 	 * searching in that order. If not found all the way up the scopes, returns
-	 * null.
+	 * <code>null</code>.
+	 * 
+	 * @return the first ordinary entity encountered with given name looking up
+	 *         the scope tree, or <code>null</code>
 	 */
 	OrdinaryEntity getLexicalOrdinaryEntity(String name);
 
@@ -196,6 +232,8 @@ public interface Scope extends ScopeValue {
 	 * ..., at completion time. This method returns the variable with the given
 	 * ID. Note that the variable ID is not necessarily the same as the entity
 	 * ID.
+	 * 
+	 * @return the index-th variable in this scope, indexed from 0
 	 */
 	Variable getVariable(int index);
 
@@ -211,37 +249,62 @@ public interface Scope extends ScopeValue {
 	 * Returns the number of functions in this scope. Note this does not include
 	 * functions in ancestors of this scope. The functions are of course a
 	 * subset of the set of Entities.
+	 * 
+	 * @return the number of functions in this scope
 	 */
 	int getNumFunctions();
 
 	/**
 	 * The functions in this scope are assigned ID numbers 0, 1, 2, ..., at
-	 * completion time. This method returns the function with the given ID.
+	 * completion time. This method returns the function with the given index.
+	 * 
+	 * @return the index-th function in this scope, counting from 0
 	 */
 	Function getFunction(int index);
 
 	/**
 	 * Returns an iterator over the functions defined in this scope, in order of
-	 * increasing function ID.
+	 * increasing function index.
+	 * 
+	 * @return iterator over functions in this scope
 	 */
 	Iterator<Function> getFunctions();
 
 	// Tagged entities (enumerations, structures, and unions)...
 
+	/**
+	 * Adds a tagged entity (an enumeration, structure, or union) to this scope.
+	 * Tagged entities occupy a separate name space from ordinary entities.
+	 * 
+	 * @param entity
+	 *            a tagged entity
+	 * @return the number of tagged entities belonging to this scope before the
+	 *         new one was added; this number is the index of the newly added
+	 *         tagged entity in the tagged entity list
+	 * @throws SyntaxException
+	 *             if the entity cannot be added to this scope for some reason,
+	 *             for example, because there is already a tagged entity with
+	 *             the same name in this scope
+	 */
 	int add(TaggedEntity entity) throws SyntaxException;
 
 	/**
-	 * Returns the tagged entity (struct/union/enumeration) in this scope with
-	 * the given tag, or null if there is not one. This does not look in parent
-	 * or descendant scopes.
+	 * <p>
+	 * Gets the tagged entity (struct/union/enumeration) in this scope with the
+	 * given tag, or null if there is not one. This does not look in parent or
+	 * descendant scopes.
+	 * </p>
 	 * 
+	 * <p>
 	 * Once you get the tagged entity, you can get its member entities
 	 * (enumeration constants or fields). Those member entities are also part of
 	 * this scope. The enumeration constants share the same name space as
 	 * ordinary identifiers in this scope, but the fields are in their own
 	 * entity-specific namespace.
+	 * </p>
 	 * 
 	 * @param tag
+	 *            the tag
 	 * @return the tagged entity in this scope with that name or null if none
 	 *         exists
 	 */
@@ -251,14 +314,37 @@ public interface Scope extends ScopeValue {
 	 * Performs search for struct/union/enumeration entity with given tag using
 	 * lexical scoping: if entity is not found in this scope, search the parent
 	 * scope, etc. Returns first occurrence of entity with this tag, searching
-	 * in that order. If not found in any ancestor, returns null.
+	 * in that order. If not found in any ancestor, returns <code>null</code>.
+	 * 
+	 * @return the first tagged entity encountered with the given tag, lookin up
+	 *         the scope tree
 	 */
 	TaggedEntity getLexicalTaggedEntity(String tag);
 
 	// Labels...
 
+	/**
+	 * Adds the given label to the list of labels occurring in this scope.
+	 * 
+	 * @param label
+	 *            a label
+	 * @return the number of labels belonging to this scope before the new one
+	 *         was added; this is the index of the new label in the list of
+	 *         labels
+	 * @throws UnsourcedException
+	 *             if the label cannot be added for some reasons, for example,
+	 *             because there is already a label with the same name
+	 */
 	int add(Label label) throws UnsourcedException;
 
+	/**
+	 * Does the given label already belong to this scope?
+	 * 
+	 * @param label
+	 *            a label
+	 * @return <code>true</code> iff the list of labels belonging to this scope
+	 *         contains the given label
+	 */
 	boolean contains(Label label);
 
 	/**
@@ -267,7 +353,8 @@ public interface Scope extends ScopeValue {
 	 * 
 	 * @param name
 	 *            the label name
-	 * @return the label in this scope with that name or null if none exists
+	 * @return the label in this scope with that name or <code>null</code> if
+	 *         none exists
 	 */
 	Label getLabel(String name);
 
@@ -336,8 +423,22 @@ public interface Scope extends ScopeValue {
 	 */
 	boolean isDescendantOf(Scope that);
 
+	/**
+	 * In CIVL-C, a scope can have a name, named by a scope variable. This sets
+	 * the name of this scope.
+	 * 
+	 * @param variable
+	 *            the scope variable serving as a name of this scope
+	 * @deprecated
+	 */
 	void setScopeName(ScopeVariable variable);
 
+	/**
+	 * Gets the CIVL-C scope name of this scope.
+	 * 
+	 * @return the scope name or <code>null</code> if none has been set
+	 * @deprecated
+	 */
 	ScopeVariable getScopeName();
 
 }

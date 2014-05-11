@@ -8,6 +8,7 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
  * <code><s1,s2> $double *<s1> f($double *<s2>)</code> *
  * 
  * @author siegel
+ * @deprecated
  * 
  */
 public interface ScopeVariable extends Variable, ScopeValue {
