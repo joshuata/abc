@@ -9,10 +9,10 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
  * is as follows:
  * 
  * <pre>
- * ￼￼￼￼￼￼￼￼reduction(reduction-identifier:list)
- * where reduction-identifier is either an identifier or 
+ * reduction(reduction-identifier:list)
+ * where reduction-identifier is either an identifier or
  * one of the following operators:
- * +, -, *, &,|, ^, && and ||.
+ * +, -, *, &, |, ^, && and ||.
  * </pre>
  * 
  * @author Manchun Zheng
@@ -23,8 +23,8 @@ public interface OmpReductionNode extends ASTNode {
 	/**
 	 * The kind of this reduction clause, either
 	 * <ul>
-	 * <li>OPERATOR if the reduction-identifier is one of the following: +, -,
-	 * *, &,|, ^, && and ||;</li> or
+	 * <li>OPERATOR if the reduction-identifier is one of the following:+, -, *,
+	 * &, |, ^, && and ||;</li> or
 	 * <li>FUNCTION if the reduction-identifier is an identifier.</li>
 	 * </ul>
 	 * 
