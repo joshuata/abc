@@ -1,8 +1,10 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 
 /**
- * Represents a "spawn" expression, which has the form "spawn f(e1,...,en)". It
- * is essentially a function call with "spawn" prepended.
+ * Represents a CIVL-C <code>$spawn</code> expression, which has the form
+ * <code>$spawn f(e1,...,en)</code>. It is essentially a function call with the
+ * keyword <code>$spawn</code> prepended. This is also how it is represented: a
+ * spawn node simply wraps a function call node.
  * 
  * @author siegel
  * 
@@ -10,9 +12,10 @@ package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 public interface SpawnNode extends ExpressionNode {
 
 	/**
-	 * Returns the function call node, which is like removing the "spawn".
+	 * Returns the function call node, which is like removing the
+	 * <code>$spawn</code>.
 	 * 
-	 * @return function call node
+	 * @return the function call node
 	 */
 	FunctionCallNode getCall();
 
