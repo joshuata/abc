@@ -1,7 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 
 /**
- * See C11 Sec. 6.5.1.1. Not yet implemented.
+ * Represents a C11 generic selection construct; see C11 Section 6.5.1.1. Not
+ * yet implemented.
  * 
  * @author siegel
  * 
