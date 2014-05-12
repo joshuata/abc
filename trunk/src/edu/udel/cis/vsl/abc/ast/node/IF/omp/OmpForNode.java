@@ -5,7 +5,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 
 /**
- * This interface implements the OpenMP loop construct. <br>
+ * This interface represents the OpenMP loop construct. <br>
  * The syntax of the loop construct is specified in Section 2.7.1, OpenMP 4.0.0,
  * as follows:
  * 
@@ -32,37 +32,61 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
  */
 public interface OmpForNode extends OmpWorksharingNode {
 
+	/**
+	 * The schedule kind of an OpenMP for pragma.
+	 * 
+	 * @author Manchun Zheng
+	 * 
+	 */
 	public enum OmpScheduleKind {
-		STATIC, DYNAMIC, GUIDED, AUTO, RUNTIME
+		AUTO, DYNAMIC, GUIDED, RUNTIME, STATIC
 	};
 
 	/**
-	 * Returns the schedule kind of the loop construct TODO The default schedule
-	 * is implementation defined,can we choose STATIC or DYNAMIC?
+	 * Returns the schedule kind of the loop construct. The default schedule is
+	 * implementation defined, in our case we choose <code>STATIC</code>.
 	 * 
-	 * @return
+	 * @return The schedule kind of the loop construct.
 	 */
 	OmpScheduleKind schedule();
 
+	/**
+	 * Updates the schedule kind of this loop construct.
+	 * 
+	 * @param ompScheduleKind
+	 *            The schedule kind to be used to update this loop construct.
+	 */
 	void setSchedule(OmpScheduleKind ompScheduleKind);
 
 	/**
-	 * Returns the number of loops associated with the loop construct. 1 by
-	 * default if there is no collapse clause.
+	 * Returns the number of loops associated with this loop construct. 1 by
+	 * default if there is no explicit collapse clause.
 	 * 
-	 * @return
+	 * @return The number of loops associated with this loop construct.
 	 */
 	int collapse();
 
+	/**
+	 * Updates the number of loops associated with this loop construct.
+	 * 
+	 * @param value
+	 *            The number to be used to update this loop construct.
+	 */
 	void setCollapse(int value);
 
 	/**
 	 * Returns true iff <code>ordered</code> clause is present.
 	 * 
-	 * @return
+	 * @return true iff <code>ordered</code> clause is present.
 	 */
 	boolean ordered();
 
+	/**
+	 * Updates the ordered flag of this loop construct.
+	 * 
+	 * @param value
+	 *            The value to be used to update this loop construct.
+	 */
 	void setOrdered(boolean value);
 
 	/**
@@ -72,23 +96,44 @@ public interface OmpForNode extends OmpWorksharingNode {
 	 */
 	ExpressionNode chunkSize();
 
+	/**
+	 * Updates the chunk size of this loop construct.
+	 * 
+	 * @param chunkSize
+	 *            The expression node representing the new chunk size.
+	 */
 	void setChunsize(ExpressionNode chunkSize);
 
 	/**
-	 * Returns the assertions to be checked before the entry of the loop.
+	 * Returns the assertions to be checked before the entry of this loop
+	 * construct.
 	 * 
-	 * @return
+	 * @return the assertions to be checked before the entry of this loop
+	 *         construct.
 	 */
 	SequenceNode<FunctionCallNode> assertions();
 
+	/**
+	 * Updates the assertions to be checked before the entry of this loop
+	 * construct.
+	 * 
+	 * @param assertions
+	 *            The assertions to be used to update this loop construct.
+	 */
 	void setAssertions(SequenceNode<FunctionCallNode> assertions);
 
 	/**
 	 * Returns the loop invariant.
 	 * 
-	 * @return
+	 * @return the loop invariant.
 	 */
 	FunctionCallNode invariant();
 
+	/**
+	 * Updates the loop invariant of this loop construct.
+	 * 
+	 * @param invariant
+	 *            The assertion to be used as the new invariant.
+	 */
 	void setInvariant(FunctionCallNode invariant);
 }

@@ -5,6 +5,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 
 /**
+ * Represents an OpenMP executable Construct.<br>
  * An OpenMP Children of an OmpStatementNode are:
  * <ul>
  * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "sharedList", the list of
@@ -27,6 +28,18 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
  * 
  */
 public interface OmpStatementNode extends OmpNode, StatementNode {
+	
+	/**
+	 * The kind of this OpenMP construct:
+	 * <ul>
+	 * <li></li>
+	 * <li></li>
+	 * <li></li>
+	 * </ul>
+	 * 
+	 * @author Manchun Zheng
+	 *
+	 */
 	public enum OmpStatementNodeKind {
 		PARALLEL, SYNCHRONIZATION, WORKSHARE
 	}
