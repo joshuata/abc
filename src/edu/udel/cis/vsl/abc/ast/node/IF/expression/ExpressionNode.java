@@ -49,8 +49,8 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		ForLoopInitializerNode {
 
 	/**
-	 * The different kind of nodes. Not yet using this, but could if it turns
-	 * out to be useful.
+	 * An enumerated type used to categorize the different kinds of expression
+	 * nodes. Every expression node belongs to exactly one of these categories.
 	 * 
 	 * @author siegel
 	 * 

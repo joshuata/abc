@@ -3,19 +3,29 @@ package edu.udel.cis.vsl.abc.ast.node.IF.label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 
 /**
+ * <p>
+ * Represents an ordinary label (i.e., a label which is not a <code>case</code>
+ * or <code>default</code> label).
+ * </p>
  * 
- * A label may precede a statement, as in "l1: x=1;". An instance of this class
- * is used to represent the "l1". It contains a reference to the statement which
- * it precedes.
+ * <p>
+ * A label may precede a statement, as in <code>l1: x=1;</code>. An instance of
+ * this class is used to represent the <code>l1</code>. It contains a reference
+ * to the statement which it precedes.
+ * </p>
  * 
  * @author siegel
  * 
  */
 public interface OrdinaryLabelNode extends LabelNode, DeclarationNode {
 
+	/**
+	 * Returns the Label entity defined by this label node.
+	 * 
+	 * @return the Label entity corresponding to this label node
+	 */
 	@Override
 	Label getEntity();
 
@@ -26,15 +36,13 @@ public interface OrdinaryLabelNode extends LabelNode, DeclarationNode {
 	 */
 	Function getFunction();
 
-	void setFunction(Function function);
-
 	/**
-	 * The statement this label precedes (this may be null at first). Note that
-	 * this is not a child, else the AST would not be a tree.
+	 * Sets the value returned by {@link #getFunction()}.
+	 * 
+	 * @param function
+	 *            the function in which this label occurs
 	 */
-	StatementNode getStatement();
-
-	void setStatement(StatementNode statement);
+	void setFunction(Function function);
 
 	@Override
 	OrdinaryLabelNode copy();
