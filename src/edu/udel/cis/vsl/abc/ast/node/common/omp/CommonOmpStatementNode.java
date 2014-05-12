@@ -88,7 +88,7 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 
 	@Override
 	public OmpNodeKind ompNodeKind() {
-		return OmpNodeKind.STATEMENT;
+		return OmpNodeKind.EXECUTABLE;
 	}
 
 	@Override

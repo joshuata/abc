@@ -23,7 +23,7 @@ public class CommonOmpSymbolReductionNode extends CommonOmpReductionNode
 
 	@Override
 	public OmpReductionNodeKind ompReductionOperatorNodeKind() {
-		return OmpReductionNodeKind.SYMBOL;
+		return OmpReductionNodeKind.OPERATOR;
 	}
 
 	@Override
