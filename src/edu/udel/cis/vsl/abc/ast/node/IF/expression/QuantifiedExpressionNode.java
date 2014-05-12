@@ -6,25 +6,55 @@ package edu.udel.cis.vsl.abc.ast.node.IF.expression;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 
 /**
- * A quantified expression (e.g. forall {int x | x > 0} x > -1;).
+ * A CIVL-C quantified expression, e.g.,
+ * 
+ * <pre>
+ * forall {int x | x > 0} x > -1
+ * </pre>
+ * 
+ * which means "for all ints x for which x&gt;0, x&gt;-1". As can be seen in
+ * this example, the CIVL-C syntax allows one to restrict the domain of x to a
+ * subset of the domain of its type. It is equivalent to "for all ints x, x&gt;0
+ * implies x&gt;-1" but can be more convenient and also enable optimizations.
  * 
  * @author zirkel
  * 
  */
 public interface QuantifiedExpressionNode extends ExpressionNode {
 
+	/**
+	 * An enumerated type for the different quantifiers.
+	 * 
+	 * @author siegel
+	 * 
+	 */
 	enum Quantifier {
-		FORALL, EXISTS, UNIFORM;
+		/**
+		 * The universal quantifier "for all".
+		 */
+		FORALL,
+		/**
+		 * The existential quantifier "there exists".
+		 */
+		EXISTS,
+		/**
+		 * A special case of the universal quantifier for expression uniform
+		 * continuity.
+		 */
+		UNIFORM;
 	}
 
 	/**
+	 * Returns the quantifier.
+	 * 
 	 * @return The quantifier used by this quantifier expression.
 	 */
 	Quantifier quantifier();
 
 	/**
+	 * Returns the declaration of the bound variable.
 	 * 
-	 * @return The quantified variable.
+	 * @return The bound variable declaration
 	 */
 	VariableDeclarationNode variable();
 
