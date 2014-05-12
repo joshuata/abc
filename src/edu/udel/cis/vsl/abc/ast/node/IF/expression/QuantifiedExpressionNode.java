@@ -38,7 +38,7 @@ public interface QuantifiedExpressionNode extends ExpressionNode {
 		 */
 		EXISTS,
 		/**
-		 * A special case of the universal quantifier for expression uniform
+		 * A special case of the universal quantifier for expression of uniform
 		 * continuity.
 		 */
 		UNIFORM;
@@ -59,36 +59,50 @@ public interface QuantifiedExpressionNode extends ExpressionNode {
 	VariableDeclarationNode variable();
 
 	/**
+	 * Determines if this quantifier expression has the following alternative
+	 * form: the quantified variable has integer type, and the restriction has
+	 * the form " <code>i=lo..hi</code>", a special notation indicating
+	 * <code>lo</code>&le; <code>i</code>&le;<code>hi</code>.
 	 * 
-	 * @return True iff the quantified variable in this expression is specified
-	 *         to have a range (e.g. i=0..n).
+	 * 
+	 * @return <code>true</code> iff the bound variable in this expression is
+	 *         specified to have a range (e.g. i=0..n).
 	 */
 	boolean isRange();
 
 	/**
+	 * Returns the predicate which specifies the restriction on the domain of
+	 * the bound variable.
 	 * 
-	 * @return An expression involving the quantified variable which is expected
-	 *         to be true. Null iff isRange()==true.
+	 * @return the boolean expression involving the bound variable which
+	 *         restricts the domain of that variable, or <code>null</code> if
+	 *         {@link #isRange()} is <code>true</code>
 	 */
 	ExpressionNode restriction();
 
 	/**
+	 * If this expression has an integer range restriction, returns the lower
+	 * bound of the range, else returns <code>null</code>
 	 * 
-	 * @return If the quantified variable in this expression is specified to
-	 *         have a range, the lower end of the range (e.g. 0 in i=0..n). Null
-	 *         iff isRange() == false.
+	 * @return If the bound variable in this expression is specified to have a
+	 *         range, the lower end of the range (e.g., 0 in i=0..n). Returns
+	 *         <code>null</code> iff {@link #isRange()} is <code>false</code>
 	 */
 	ExpressionNode lower();
 
 	/**
+	 * If this expression has an integer range restriction, returns the upper
+	 * bound of the range, else returns <code>null</code>
 	 * 
-	 * @return If the quantified variable in this expression is specified to
-	 *         have a range, the upper end of the range (e.g. n in i=0..n). Null
-	 *         iff isRange() == false.
+	 * @return If the bound variable in this expression is specified to have a
+	 *         range, the upper bound of the range (e.g., n in i=0..n). Returns
+	 *         <code>null</code> iff {@link #isRange()} is <code>false</code>
 	 */
 	ExpressionNode upper();
 
 	/**
+	 * The quantified expression.
+	 * 
 	 * @return The quantified expression.
 	 */
 	ExpressionNode expression();
