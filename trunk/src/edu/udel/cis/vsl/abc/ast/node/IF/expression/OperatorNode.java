@@ -87,7 +87,7 @@ public interface OperatorNode extends ExpressionNode {
 		 * The comma operator <code>,</code>, as in <code>e,f</code> which
 		 * evaluates <code>e</code> and then <code>f</code>, and returns the
 		 * result of evaluating <code>f</code>. Useful only if <code>e</code>
-		 * has side-effsects.
+		 * has side-effects.
 		 */
 		COMMA,
 		/**
