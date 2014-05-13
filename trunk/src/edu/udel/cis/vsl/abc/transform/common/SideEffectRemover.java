@@ -834,13 +834,11 @@ public class SideEffectRemover extends BaseTransformer {
 			// We wrap the incrementer as an expression statement, then remove
 			// side effects.
 			// If it's a "simple" incrementer, the result will also be an
-			// expression statement,
-			// otherwise the result will be some kind of compound statement.
-			// This
-			// removes ++, +=, etc. from the AST and also provides the
-			// opportunity to modify
-			// this for loop into a while loop if necessary for a complex
-			// incrementer.
+			// expression statement, otherwise the result will be some kind of
+			// compound statement.
+			// This removes ++, +=, etc. from the AST and also provides the
+			// opportunity to modify this for loop into a while loop if
+			// necessary for a complex incrementer.
 			StatementNode modifiedIncrementer = expressionStatement(nodeFactory
 					.newExpressionStatementNode(incrementer));
 
@@ -986,6 +984,49 @@ public class SideEffectRemover extends BaseTransformer {
 				after.addAll(leftTriple.getAfter());
 				after.addAll(rightTriple.getAfter());
 				result = new SideEffectFreeTriple(before, left.copy(), after);
+				break;
+			case COMMA:
+				right = ((OperatorNode) expression).getArgument(1);
+				// Note that we consider errors as side effects for a comma
+				// operation left hand side, because if there are no possible
+				// side effects we'll just remove the left hand argument.
+				if (left.isSideEffectFree(true)) {
+					if (right.isSideEffectFree(false)) {
+						// If neither operand had possible side effects, just
+						// use the right hand operand.
+						result = new SideEffectFreeTriple(
+								new Vector<BlockItemNode>(), right,
+								new Vector<BlockItemNode>());
+					} else {
+						// Right hand operand might have side effects, so
+						// process it.
+						result = processExpression(right);
+					}
+				} else {
+					leftTriple = processExpression(left);
+					before.addAll(leftTriple.getBefore());
+					// In case there is a possible error side effect, add an
+					// expression statement for the LHS. Normally this will
+					// essentially be a noop.
+					before.add(nodeFactory
+							.newExpressionStatementNode(leftTriple
+									.getExpression()));
+					// All side effects from the left operand must be evaluated
+					// before the right operand since there is a sequence point
+					// between evaluations of left and right operands (per C11
+					// standard Sec. 6.5.17)
+					before.addAll(leftTriple.getAfter());
+					if (right.isSideEffectFree(false)) {
+						result = new SideEffectFreeTriple(before, right,
+								new Vector<BlockItemNode>());
+					} else {
+						rightTriple = processExpression(right);
+						before.addAll(rightTriple.getBefore());
+						result = new SideEffectFreeTriple(before,
+								rightTriple.getExpression(),
+								rightTriple.getAfter());
+					}
+				}
 				break;
 			default:
 				throw new ABCUnsupportedException(
