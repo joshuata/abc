@@ -764,6 +764,20 @@ public class SideEffectRemover extends BaseTransformer {
 								expression.getSource(), statements);
 					}
 					break;
+				case COMMA:
+					SideEffectFreeTriple triple = processExpression(expression);
+					List<BlockItemNode> commaStatements = new ArrayList<BlockItemNode>();
+
+					commaStatements.addAll(triple.getBefore());
+					if (!triple.getExpression().isSideEffectFree(true)) {
+						commaStatements.add(nodeFactory
+								.newExpressionStatementNode(triple
+										.getExpression()));
+					}
+					commaStatements.addAll(triple.getAfter());
+					result = nodeFactory.newCompoundStatementNode(
+							expression.getSource(), commaStatements);
+					break;
 				default:
 					throw new ABCUnsupportedException("this operation: "
 							+ statement, statement.getSource()
@@ -864,8 +878,7 @@ public class SideEffectRemover extends BaseTransformer {
 						statement.getSource(),
 						condition.copy(),
 						nodeFactory.newCompoundStatementNode(
-								newBody.getSource(), bodyItems),
-						invariant.copy());
+								newBody.getSource(), bodyItems), invariant);
 				if (initializer instanceof ExpressionNode) {
 					allItems.add(nodeFactory
 							.newExpressionStatementNode((ExpressionNode) initializer));
@@ -1008,9 +1021,11 @@ public class SideEffectRemover extends BaseTransformer {
 					// In case there is a possible error side effect, add an
 					// expression statement for the LHS. Normally this will
 					// essentially be a noop.
-					before.add(nodeFactory
-							.newExpressionStatementNode(leftTriple
-									.getExpression()));
+					if (!leftTriple.getExpression().isSideEffectFree(true)) {
+						before.add(nodeFactory
+								.newExpressionStatementNode(leftTriple
+										.getExpression()));
+					}
 					// All side effects from the left operand must be evaluated
 					// before the right operand since there is a sequence point
 					// between evaluations of left and right operands (per C11
