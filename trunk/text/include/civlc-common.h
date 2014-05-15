@@ -161,16 +161,27 @@ typedef struct __int_iter__ {
  * The new object will be allocated in the given scope. */
 $gbarrier $gbarrier_create($scope scope, int size);
 
+/* Destroys the gbarrier */
 void $gbarrier_destroy($gbarrier barrier);
 
+/* Creates a new local barrier object and returns a handle to it.
+ * The new barrier will be affiliated with the specified global
+ * barrier.   This local barrier handle will be used as an
+ * argument in most barrier functions.  The place must be in
+ * [0,size-1] and specifies the place in the global barrier
+ * that will be occupied by the local barrier.  
+ * Only one call to $barrier_create may occur for each barrier-place pair.
+ * The new object will be allocated in the given scope. */
 $barrier $barrier_create($scope scope, $gbarrier gbarrier, int place);
 
 void $barrier_enter($barrier barrier);
 
 void $barrier_exit($barrier barrier);
 
+/* Calls the barrier associated with this local barrier object.*/
 void $barrier_call($barrier barrier);
 
+/* Destroys the barrier. */
 void $barrier_destroy($barrier barrier);
 
 /* This version of gcomm_create should only be called if size is concrete. */ 
