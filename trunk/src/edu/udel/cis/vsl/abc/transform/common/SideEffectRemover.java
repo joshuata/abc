@@ -464,6 +464,7 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode result;
 		ExpressionNode guard = statement.getGuard().copy();
 
+		// TODO: throw error if guard has side effects
 		// guard.parent().removeChild(guard.childIndex());
 		result = nodeFactory.newWhenNode(statement.getSource(), guard,
 				processStatement(statement.getBody()));
@@ -1080,8 +1081,14 @@ public class SideEffectRemover extends BaseTransformer {
 				if (!((FunctionCallNode) expression).getArgument(i)
 						.isSideEffectFree(false))
 					throw new ABCRuntimeException(
-							"arguments with possible side-effect: prohibited to avoid undefined behavior",
-							expression.getSource().getSummary(false));
+							"Arguments with possible side-effects may not "
+									+ "be used, since they might lead to "
+									+ "unspecified behavior.  To correct this, "
+									+ "evaluate the argument first and store "
+									+ "the result in a variable, then use the "
+									+ "variable in the function call.",
+							((FunctionCallNode) expression).getArgument(i)
+									.getSource().getSummary(false));
 			}
 			returnTypeNode = typeNode(functionEntity.getFirstDeclaration()
 					.getSource(), ((Function) functionEntity).getType()
