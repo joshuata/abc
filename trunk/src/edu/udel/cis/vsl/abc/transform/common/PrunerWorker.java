@@ -126,7 +126,6 @@ public class PrunerWorker {
 	/**
 	 * Searches AST, marking reachable nodes as REACHABLE.
 	 * 
-	 * @return list of reachable nodes
 	 * @throws SyntaxException
 	 */
 	private void search() throws SyntaxException {

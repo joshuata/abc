@@ -319,7 +319,7 @@ public abstract class CommonASTNode implements ASTNode {
 
 	/**
 	 * Removes children and shifts down to remove the gaps; also applies
-	 * keepOnly to children not removed. This method is mean to be applied to
+	 * keepOnly to children not removed. This method is meant to be applied to
 	 * sequence nodes.
 	 * 
 	 * @param keep
