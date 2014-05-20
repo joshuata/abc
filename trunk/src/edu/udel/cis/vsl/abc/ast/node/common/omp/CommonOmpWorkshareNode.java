@@ -25,7 +25,7 @@ public class CommonOmpWorkshareNode extends CommonOmpStatementNode implements
 	public CommonOmpWorkshareNode(Source source, OmpWorksharingNodeKind kind,
 			StatementNode statement) {
 		super(source, statement);
-		this.ompStatementKind = OmpStatementNodeKind.WORKSHARE;
+		this.ompStatementKind = OmpStatementNodeKind.WORKSHARING;
 		this.ompWorkshareKind = kind;
 	}
 

@@ -92,7 +92,7 @@ public interface OmpForNode extends OmpWorksharingNode {
 	/**
 	 * Returns the chunk size. NULL if there is no schedule clause.
 	 * 
-	 * @return
+	 * @return the chunk size, NULL if there is no schedule clause.
 	 */
 	ExpressionNode chunkSize();
 

@@ -6,7 +6,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 
 /**
  * Represents an OpenMP executable Construct.<br>
- * An OpenMP Children of an OmpStatementNode are:
+ * The children of an OmpStatementNode are:
  * <ul>
  * <li>SequenceNode&lt;IdentifierExpressionNode&gt; "sharedList", the list of
  * identifiers declared by <code>shared</code></li>
@@ -28,39 +28,52 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
  * 
  */
 public interface OmpStatementNode extends OmpNode, StatementNode {
-	
+
 	/**
-	 * The kind of this OpenMP construct:
+	 * The kind of this OpenMP statement:
 	 * <ul>
-	 * <li></li>
-	 * <li></li>
-	 * <li></li>
+	 * <li>PARALLEL: the parallel constuct</li>
+	 * <li>SYNCHRONIZATION: synchronization constructs such as master, critical,
+	 * barrier, taskwait, taskgroup, atomic, flush, ordered, etc.</li>
+	 * <li>WORKSHARING: worksharing constructs such as sections (section) and
+	 * single.</li>
 	 * </ul>
 	 * 
 	 * @author Manchun Zheng
-	 *
+	 * 
 	 */
 	public enum OmpStatementNodeKind {
-		PARALLEL, SYNCHRONIZATION, WORKSHARE
+		PARALLEL, SYNCHRONIZATION, WORKSHARING
 	}
 
-	boolean completed();
+	/**
+	 * Checks if this node already has its statement sub-node.
+	 * 
+	 * @return true iff the statement sub-node is not null.
+	 */
+	boolean isComplete();
 
 	/**
 	 * Returns the OpenMP statement kind of this node, i.e., either it is a
-	 * parallel, workshare or synchronization node.
+	 * parallel, worksharing or synchronization node.
 	 * 
-	 * @return
+	 * @return the OpenMP statement kind of this node.
 	 */
 	OmpStatementNodeKind ompStatementNodeKind();
 
 	/**
 	 * Returns true iff nowait is applied.
 	 * 
-	 * @return
+	 * @return true iff nowait is applied.
 	 */
 	boolean nowait();
 
+	/**
+	 * Updates the nowait flag.
+	 * 
+	 * @param value
+	 *            The value to be used to update the nowait flag.
+	 */
 	void setNowait(boolean value);
 
 	/**
@@ -74,10 +87,16 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * }
 	 * </code>
 	 * 
-	 * @return
+	 * @return  the statement node affected by this OpenMP pragma.
 	 */
 	StatementNode statementNode();
 
+	/**
+	 * Updates the statement sub-node.
+	 * 
+	 * @param statementNode
+	 *            The node to be used as the statement sub-node.
+	 */
 	void setStatementNode(StatementNode statementNode);
 
 	/**
@@ -89,10 +108,17 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * <li>no <code>shared</code> clause: null.</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of identifier nodes declared by <code>shared</code>
+	 * clause.
 	 */
 	SequenceNode<IdentifierExpressionNode> sharedList();
 
+	/**
+	 * Updates the shared list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the shared list.
+	 */
 	void setSharedList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
@@ -104,10 +130,17 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * <li>no <code>private</code> clause: null.</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of identifier nodes declared by <code>private</code>
+	 * clause.
 	 */
 	SequenceNode<IdentifierExpressionNode> privateList();
 
+	/**
+	 * Updates the private list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the private list.
+	 */
 	void setPrivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
@@ -119,10 +152,17 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * <li>no <code>firstprivate</code> clause: null.</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of identifier nodes declared by
+	 * <code>firstprivate</code> clause.
 	 */
 	SequenceNode<IdentifierExpressionNode> firstprivateList();
 
+	/**
+	 * Updates the firstprivate list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the firstprivate list.
+	 */
 	void setFirstprivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
@@ -134,10 +174,17 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * <li>no <code>lastprivate</code> clause: null.</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of identifier nodes declared by <code>lastprivate</code>
+	 * clause.
 	 */
 	SequenceNode<IdentifierExpressionNode> lastprivateList();
 
+	/**
+	 * Updates the lastprivate list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the lastprivate list.
+	 */
 	void setLastprivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
@@ -153,6 +200,12 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 */
 	SequenceNode<IdentifierExpressionNode> copyinList();
 
+	/**
+	 * Updates the copyin list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the copyin list.
+	 */
 	void setCopyinList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
@@ -164,10 +217,17 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * <li>no <code>copyprivate</code> clause: null.</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of identifier nodes declared by <code>copyprivate</code>
+	 * clause.
 	 */
 	SequenceNode<IdentifierExpressionNode> copyprivateList();
 
+	/**
+	 * Updates the copyprivate list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the copyprivate list.
+	 */
 	void setCopyprivateList(SequenceNode<IdentifierExpressionNode> list);
 
 	/**
@@ -181,9 +241,16 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * <li>no <code>reduction</code> clause: null.</li>
 	 * </ul>
 	 * 
-	 * @return
+	 * @return the list of identifier nodes declared by <code>reduction</code>
+	 * clause.
 	 */
 	SequenceNode<OmpReductionNode> reductionList();
 
+	/**
+	 * Updates the reduction list of this node.
+	 * 
+	 * @param list
+	 *            The list to be used as the reduction list.
+	 */
 	void setReductionList(SequenceNode<OmpReductionNode> list);
 }

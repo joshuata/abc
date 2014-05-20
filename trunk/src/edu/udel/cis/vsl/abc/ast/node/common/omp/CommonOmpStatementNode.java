@@ -65,12 +65,12 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 	}
 
 	@Override
-	public boolean completed() {
+	public boolean isComplete() {
 		StatementNode statementNode = (StatementNode) this.child(7);
 
 		if (statementNode != null) {
 			if (statementNode instanceof OmpStatementNode)
-				return ((OmpStatementNode) statementNode).completed();
+				return ((OmpStatementNode) statementNode).isComplete();
 			return true;
 		} else
 			return false;
