@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
@@ -33,6 +34,11 @@ public class CTranslationTest {
 	}
 
 	private void check(String filenameRoot) throws ABCException, IOException {
+		checkDebug(filenameRoot, false);
+	}
+
+	private void checkDebug(String filenameRoot, boolean debug)
+			throws ABCException, IOException {
 		Activator a;
 		List<String> codes = new LinkedList<String>();
 
@@ -42,7 +48,13 @@ public class CTranslationTest {
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
 				userIncludes);
-		a.showTranslation(out);
+		if (debug)
+			a.showTranslation(out);
+		else {
+			Program program = a.getProgram();
+
+			a.printProgram(out, program);
+		}
 	}
 
 	@Test
@@ -104,7 +116,7 @@ public class CTranslationTest {
 	public void tagGood1() throws ABCException, IOException {
 		check("tagGood1");
 	}
-	
+
 	@Test
 	public void a2d() throws ABCException, IOException {
 		check("a2d");
