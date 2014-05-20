@@ -368,7 +368,7 @@ public class StatementAnalyzer {
 			if (parallel.numThreads() != null)
 				processExpression(parallel.numThreads());
 			break;
-		case WORKSHARE:
+		case WORKSHARING:
 			OmpWorksharingNode workshare = (OmpWorksharingNode) statement;
 
 			switch (workshare.ompWorkshareNodeKind()) {

@@ -2070,7 +2070,7 @@ public class CommonASTBuilder implements ASTBuilder {
 					items.add(statementNode);
 					if (statementNode.statementKind() == StatementKind.OMP_STATEMENT) {
 						ompStatementNode = (OmpStatementNode) statementNode;
-						if (ompStatementNode.completed())
+						if (ompStatementNode.isComplete())
 							ompStatementNode = null;
 					}
 				}

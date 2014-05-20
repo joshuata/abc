@@ -13,11 +13,8 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		OmpSyncNode {
+
 	private OmpSyncNodeKind ompSyncNodeKind;
-
-	// private IdentifierNode criticalName;
-
-	// private SequenceNode<IdentifierNode> flushedList;
 
 	/**
 	 * Children
@@ -44,13 +41,13 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	}
 
 	@Override
-	public boolean completed() {
+	public boolean isComplete() {
 		switch (this.ompSyncNodeKind) {
 		case BARRIER:
 		case FLUSH:
 			return true;
 		default:
-			return super.completed();
+			return super.isComplete();
 		}
 	}
 
@@ -105,30 +102,6 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		assert this.ompSyncNodeKind == OmpSyncNodeKind.FLUSH;
 		this.setChild(8, list);
 	}
-
-	// @SuppressWarnings("unchecked")
-	// @Override
-	// protected void printExtras(String prefix, PrintStream out) {
-	// int count;
-	// SequenceNode<IdentifierExpressionNode> flushedList =
-	// (SequenceNode<IdentifierExpressionNode>) this
-	// .child(8);
-	//
-	// if (flushedList != null) {
-	// count = flushedList.numChildren();
-	// if (count > 0) {
-	// out.println();
-	// out.print(prefix + "flush(");
-	// for (int i = 0; i < count; i++) {
-	// out.print(flushedList.getSequenceChild(i).getIdentifier()
-	// .name());
-	// if (i < count - 1)
-	// out.print(",");
-	// }
-	// out.print(")");
-	// }
-	// }
-	// }
 
 	@Override
 	public OmpSyncNode copy() {
