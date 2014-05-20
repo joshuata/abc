@@ -11,14 +11,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 public class CIVLTranslationTest {
 
 	private File[] systemIncludes, userIncludes;
-
-	// private static boolean debug = true;
 
 	private PrintStream out = System.out;
 
@@ -33,6 +32,11 @@ public class CIVLTranslationTest {
 	}
 
 	private void check(String filenameRoot) throws ABCException, IOException {
+		checkDebug(filenameRoot, false);
+	}
+
+	private void checkDebug(String filenameRoot, boolean debug)
+			throws ABCException, IOException {
 		Activator a;
 		List<String> codes = new LinkedList<>();
 
@@ -42,7 +46,13 @@ public class CIVLTranslationTest {
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".cvl"),
 				systemIncludes, userIncludes);
-		a.showTranslation(out, codes);
+		if (debug)
+			a.showTranslation(out, codes);
+		else {
+			Program program = a.getProgram();
+
+			a.printProgram(out, program);
+		}
 	}
 
 	@Test
