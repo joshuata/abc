@@ -91,9 +91,17 @@ to create a build.properties file by copying the content from
 build_default.properties and modifying the value of entry "root"
 to be the path to your VSL dependencies folder.
 
-9. Do a clean build.  Everything should compile.  To build the jar,
-right click (or ctrl-click on Mac) on build.xml and select
-Run As->Ant Build.
+9. Right click (or ctrl-click on Mac) on build.xml and select
+Run As->Ant Build.  This runs the ant script, which invokes ANTLR
+to build the Java source files from the grammar files.  It also
+compiles all the Java source files and builds the jar.  (The jar
+is not used from within Eclipse, but is used when packaging
+and releasing ABC.)  You may have to "Refresh" the entire project
+after this completes, and/or "Clean" the project.
+
+This step only has to be done once, unless the grammar files change,
+or you want to create an up-to-date jar.   Otherwise, Eclipse
+automatically compiles the Java source whenever it changes.  
 
 10. To run the JUnit tests through Eclipse: Select Run->Run Configurations...
 Create a new JUnit configuration called "ABC Tests".  Select
