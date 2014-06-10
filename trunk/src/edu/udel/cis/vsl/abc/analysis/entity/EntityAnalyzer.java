@@ -202,6 +202,8 @@ public class EntityAnalyzer implements Analyzer {
 	 */
 	private void processExternalDefinitions(ExternalDefinitionNode node)
 			throws SyntaxException {
+		if (node == null)
+			return;
 		if (node instanceof VariableDeclarationNode) {
 			declarationAnalyzer
 					.processVariableDeclaration((VariableDeclarationNode) node);

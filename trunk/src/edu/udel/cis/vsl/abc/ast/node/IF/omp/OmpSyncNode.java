@@ -27,7 +27,7 @@ public interface OmpSyncNode extends OmpStatementNode {
 	 * <li>CRITICAL: the critical construct</li>
 	 * <li>BARRIER: the barrier construct</li>
 	 * <li>FLUSH: the flush construct</li>
-	 * <li>ORDERED: the barrier construct</li>
+	 * <li>ORDERED: the ordered construct</li>
 	 * </ul>
 	 * 
 	 * @author Manchun Zheng

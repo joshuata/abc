@@ -44,7 +44,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.NullStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
@@ -324,8 +323,6 @@ public class StatementAnalyzer {
 
 			for (StatementNode child : chooseStatement)
 				processStatement(child);
-		} else if (statement instanceof WaitNode) {
-			processExpression(((WaitNode) statement).getExpression());
 		} else if (statement instanceof AtomicNode) {
 			processStatement(((AtomicNode) statement).getBody());
 		} else

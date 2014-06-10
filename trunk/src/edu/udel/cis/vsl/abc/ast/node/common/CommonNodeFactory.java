@@ -85,7 +85,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode.LoopKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
@@ -158,7 +157,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonLoopNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonNullStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonSwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonWaitNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonWhenNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonAtomicTypeNode;
@@ -674,17 +672,6 @@ public class CommonNodeFactory implements NodeFactory {
 			IdentifierExpressionNode variableExpression) {
 		return new CommonScopeOfNode(source, variableExpression);
 	}
-
-	@Override
-	public WaitNode newWaitNode(Source source, ExpressionNode expression) {
-		return new CommonWaitNode(source, expression);
-	}
-
-	// @Override
-	// public AssertNode newAssertNode(Source source, ExpressionNode expression)
-	// {
-	// return new CommonAssertNode(source, expression);
-	// }
 
 	@Override
 	public AssumeNode newAssumeNode(Source source, ExpressionNode expression) {

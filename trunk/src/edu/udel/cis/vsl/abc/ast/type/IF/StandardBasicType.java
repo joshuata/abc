@@ -50,25 +50,25 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 public interface StandardBasicType extends ArithmeticType {
 
 	public static enum BasicTypeKind {
-		CHAR,
-		SIGNED_CHAR,
-		UNSIGNED_CHAR,
-		SHORT,
-		UNSIGNED_SHORT,
-		INT,
-		UNSIGNED,
-		LONG,
-		UNSIGNED_LONG,
-		LONG_LONG,
-		UNSIGNED_LONG_LONG,
-		FLOAT,
-		DOUBLE,
-		LONG_DOUBLE,
-		REAL,
 		BOOL,
-		FLOAT_COMPLEX,
+		CHAR,
+		DOUBLE,
 		DOUBLE_COMPLEX,
-		LONG_DOUBLE_COMPLEX
+		FLOAT,
+		FLOAT_COMPLEX,
+		INT,
+		LONG,
+		LONG_DOUBLE,
+		LONG_DOUBLE_COMPLEX,
+		LONG_LONG,
+		REAL,
+		SHORT,
+		SIGNED_CHAR,
+		UNSIGNED,
+		UNSIGNED_CHAR,
+		UNSIGNED_LONG,
+		UNSIGNED_LONG_LONG,
+		UNSIGNED_SHORT
 	};
 
 	/**
