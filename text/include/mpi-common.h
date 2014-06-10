@@ -42,6 +42,7 @@ typedef struct __MPI_Comm_record *MPI_Request;
 #define MPI_ANY_SOURCE -1
 #define MPI_ANY_TAG -2
 #define MPI_PROC_NULL -3
+#define MPI_SUCCESS 0
 
 #define BCAST_TAG 999
 #define REDUCE_TAG 998
