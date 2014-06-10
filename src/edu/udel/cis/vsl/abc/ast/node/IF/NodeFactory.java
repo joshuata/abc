@@ -76,7 +76,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
@@ -921,8 +920,6 @@ public interface NodeFactory {
 
 	SwitchNode newSwitchNode(Source source, ExpressionNode condition,
 			StatementNode body);
-
-	WaitNode newWaitNode(Source source, ExpressionNode expression);
 
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 

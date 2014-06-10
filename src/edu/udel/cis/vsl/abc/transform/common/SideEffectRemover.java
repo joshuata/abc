@@ -43,7 +43,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.WaitNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -221,8 +220,6 @@ public class SideEffectRemover extends BaseTransformer {
 			result = returnStatement((ReturnNode) statement);
 		} else if (statement instanceof SwitchNode) {
 			result = switchStatement((SwitchNode) statement);
-		} else if (statement instanceof WaitNode) {
-			result = waitStatement((WaitNode) statement);
 		} else if (statement instanceof WhenNode) {
 			result = whenStatement((WhenNode) statement);
 		} else if (statement instanceof AtomicNode) {
@@ -391,27 +388,6 @@ public class SideEffectRemover extends BaseTransformer {
 			throw new ABCUnsupportedException("converting type " + type
 					+ " to a type node.", source.getSummary(false));
 		}
-	}
-
-	private StatementNode waitStatement(WaitNode statement)
-			throws SyntaxException {
-		StatementNode result;
-
-		if (statement.getExpression().isSideEffectFree(false)) {
-			result = statement;
-		} else {
-			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
-			SideEffectFreeTriple triple = processExpression(statement
-					.getExpression());
-
-			newStatements.addAll(triple.getBefore());
-			newStatements.add(nodeFactory.newWaitNode(statement.getSource(),
-					triple.getExpression()));
-			newStatements.addAll(triple.getAfter());
-			result = nodeFactory.newCompoundStatementNode(
-					statement.getSource(), newStatements);
-		}
-		return result;
 	}
 
 	private StatementNode labeledStatement(LabeledStatementNode statement)
