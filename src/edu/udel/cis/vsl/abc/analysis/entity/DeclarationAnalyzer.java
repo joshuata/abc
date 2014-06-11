@@ -345,6 +345,12 @@ public class DeclarationAnalyzer {
 	 * declaration. It just does the stuff that is common to both an object and
 	 * function declaration.
 	 * 
+	 * Note that an entity can belong to multiple scopes! It is added to every
+	 * scope in which it is declared. An entity with no linkage can belong to
+	 * only one scope. An Entity with internal or external linkage can belong to
+	 * multiple scopes.
+	 * 
+	 * 
 	 * @param node
 	 *            the declaration node
 	 * @param isParameter
@@ -355,7 +361,7 @@ public class DeclarationAnalyzer {
 	private OrdinaryEntity processOrdinaryDeclaration(
 			OrdinaryDeclarationNode node, boolean isParameter)
 			throws SyntaxException {
-		AST unit = node.getOwner();
+		AST ast = node.getOwner();
 		IdentifierNode identifier = node.getIdentifier();
 		TypeNode typeNode = node.getTypeNode();
 		Type type = entityAnalyzer.typeAnalyzer.processTypeNode(typeNode,
@@ -368,23 +374,18 @@ public class DeclarationAnalyzer {
 
 		if (identifier == null)
 			return null;
-		// the scope to which this entity belong is the scope in which
+		// the scope to which this entity belongs is the scope in which
 		// the Identifier in the declaration occurs:
 		scope = identifier.getScope();
 		isFunction = node instanceof FunctionDeclarationNode;
 		linkage = computeLinkage(node);
 		name = identifier.name();
 		entity = scope.getOrdinaryEntity(name);
-		if (entity != null) {
-			if (linkage == LinkageKind.NONE) {
+		if (linkage == LinkageKind.NONE) {
+			if (entity != null)
 				throw error("Redeclaration of identifier with no linkage. "
 						+ "Original declaration was at "
 						+ entity.getDeclaration(0).getSource(), identifier);
-			} else if (entity.getLinkage() != linkage)
-				throw error(
-						"Disagreement on internal/external linkage between two declarations",
-						node);
-		} else {
 			entity = isFunction ? entityAnalyzer.entityFactory.newFunction(
 					name, linkage, type) : entityAnalyzer.entityFactory
 					.newVariable(name, linkage, type);
@@ -393,8 +394,32 @@ public class DeclarationAnalyzer {
 			} catch (UnsourcedException e) {
 				throw error(e, identifier);
 			}
-			if (linkage != LinkageKind.NONE)
-				unit.add(entity);
+		} else {
+			if (entity != null) {
+				if (entity.getLinkage() != linkage)
+					throw error(
+							"Disagreement on internal/external linkage between two declarations",
+							node);
+			} else {
+				entity = ast.getInternalOrExternalEntity(name);
+				if (entity != null) {
+					if (entity.getLinkage() != linkage)
+						throw error(
+								"Disagreement on internal/external linkage between two declarations",
+								node);
+				} else {
+					entity = isFunction ? entityAnalyzer.entityFactory
+							.newFunction(name, linkage, type)
+							: entityAnalyzer.entityFactory.newVariable(name,
+									linkage, type);
+					ast.add(entity);
+				}
+				try {
+					scope.add(entity);
+				} catch (UnsourcedException e) {
+					throw error(e, identifier);
+				}
+			}
 		}
 		node.setEntity(entity);
 		identifier.setEntity(entity);
