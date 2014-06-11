@@ -30,4 +30,14 @@ public interface ExecutionCharacter {
 	 */
 	char[] getCharacters();
 
+	/**
+	 * A string representation of the character without any surrounding
+	 * quotation marks. Typically one character, but for special characters
+	 * (like newlines, tabs, etc.) this string will be an escape sequence like
+	 * "\n" (without the quotes).
+	 * 
+	 * @return string representation, stripped down
+	 */
+	String rawString();
+
 }

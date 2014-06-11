@@ -42,8 +42,8 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public CToken newCToken(int type, Formation formation) {
-		return new CommonCToken(type, formation);
+	public CToken newCToken(int type, String text, Formation formation) {
+		return new CommonCToken(type, text, formation);
 	}
 
 	@Override
@@ -52,7 +52,8 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public Inclusion newInclusion(File file, Token includeToken, String shortName) {
+	public Inclusion newInclusion(File file, Token includeToken,
+			String shortName) {
 		return new CommonInclusion(file, includeToken, shortName);
 	}
 
@@ -148,12 +149,14 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public ObjectMacro newObjectMacro(Tree definitionNode, File file, String shortFileName) {
+	public ObjectMacro newObjectMacro(Tree definitionNode, File file,
+			String shortFileName) {
 		return new CommonObjectMacro(definitionNode, file, shortFileName);
 	}
 
 	@Override
-	public FunctionMacro newFunctionMacro(Tree definitionNode, File file, String shortFileName) {
+	public FunctionMacro newFunctionMacro(Tree definitionNode, File file,
+			String shortFileName) {
 		return new CommonFunctionMacro(definitionNode, file, shortFileName);
 	}
 

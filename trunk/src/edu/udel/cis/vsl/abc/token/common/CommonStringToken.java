@@ -16,7 +16,7 @@ public class CommonStringToken extends CommonCToken implements StringToken {
 
 	public CommonStringToken(int type, Formation formation,
 			StringLiteral literal) {
-		super(type, formation);
+		super(type, literal.toString(), formation);
 		this.literal = literal;
 	}
 

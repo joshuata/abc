@@ -75,8 +75,8 @@ public class CommonCToken extends CommonToken implements CToken {
 		this.formation = formation;
 	}
 
-	public CommonCToken(int type, Formation formation) {
-		super(type);
+	public CommonCToken(int type, String text, Formation formation) {
+		super(type, text);
 		this.formation = formation;
 	}
 
