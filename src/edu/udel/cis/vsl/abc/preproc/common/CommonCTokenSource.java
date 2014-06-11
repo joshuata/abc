@@ -118,7 +118,7 @@ public class CommonCTokenSource implements CTokenSource {
 	 * being added to the output stream because adjacent string literal must be
 	 * concatenated to form one token.
 	 */
-	private List<CToken> stringLiteralBuffer = new LinkedList<CToken>();
+	private LinkedList<CToken> stringLiteralBuffer = new LinkedList<CToken>();
 
 	/**
 	 * The last token, which will be the EOF token, once it is reached.
@@ -1569,37 +1569,37 @@ public class CommonCTokenSource implements CTokenSource {
 
 	// Methods modifying the output list...
 
-	/**
-	 * Prereq: stringLiteralBuffer is not empty.
-	 * 
-	 * @return
-	 */
-	private StringToken processStringLiteralBuffer()
-			throws PreprocessorException {
-		int size = stringLiteralBuffer.size();
-
-		if (size == 1) {
-			CToken token = stringLiteralBuffer.remove(0);
-
-			try {
-				return tokenFactory.newStringToken(token);
-			} catch (SyntaxException e) {
-				throw new PreprocessorException(e.getMessage(), token);
-			}
-		} else if (size > 1) {
-			try {
-				StringToken result = tokenFactory
-						.newStringToken(stringLiteralBuffer);
-
-				stringLiteralBuffer.clear();
-				return result;
-			} catch (SyntaxException e) {
-				throw new PreprocessorException(e.getMessage(),
-						stringLiteralBuffer.get(0));
-			}
-		} else
-			throw new RuntimeException("unreachable");
-	}
+	// /**
+	// * Prereq: stringLiteralBuffer is not empty.
+	// *
+	// * @return
+	// */
+	// private StringToken processStringLiteralBuffer()
+	// throws PreprocessorException {
+	// int size = stringLiteralBuffer.size();
+	//
+	// if (size == 1) {
+	// CToken token = stringLiteralBuffer.remove(0);
+	//
+	// try {
+	// return tokenFactory.newStringToken(token);
+	// } catch (SyntaxException e) {
+	// throw new PreprocessorException(e.getMessage(), token);
+	// }
+	// } else if (size > 1) {
+	// try {
+	// StringToken result = tokenFactory
+	// .newStringToken(stringLiteralBuffer);
+	//
+	// stringLiteralBuffer.clear();
+	// return result;
+	// } catch (SyntaxException e) {
+	// throw new PreprocessorException(e.getMessage(),
+	// stringLiteralBuffer.get(0));
+	// }
+	// } else
+	// throw new RuntimeException("unreachable");
+	// }
 
 	/**
 	 * Adds a single token to output buffer.
@@ -1611,12 +1611,58 @@ public class CommonCTokenSource implements CTokenSource {
 	private void addOutput(CToken token) throws PreprocessorException {
 		int type = token.getType();
 
+		// TODO: BUG: the string literals will be separated by some white
+		// space tokens, and this will break the concatenation here....
+
+		// if this is white space (other than \n at end of #pragma)
+		// and stringLiteralBuffer is not empty, add the token
+		// to the string literal buffer and return.
+
+		// string literal buffer will consists of string literal token
+		// followed by sequence of white space and string literal tokens.
+
+		// process string literal buffer: result will be a single
+		// string literal token and a sequence of white space tokens
+		// which must be added to the output stream in that order.
+
 		if (type == PreprocessorParser.STRING_LITERAL) {
+			// first remove any white space tokens at the end of the list
+			while (!stringLiteralBuffer.isEmpty()
+					&& PreprocessorUtils.isWhiteSpace(stringLiteralBuffer
+							.getLast()))
+				stringLiteralBuffer.removeLast();
 			stringLiteralBuffer.add(token);
 			return;
 		}
-		if (!stringLiteralBuffer.isEmpty())
-			addOutputHelper(processStringLiteralBuffer());
+		if (!stringLiteralBuffer.isEmpty()) {
+			if (PreprocessorUtils.isWhiteSpace(token)
+					&& !(inPragma && type == PreprocessorParser.NEWLINE)) {
+				stringLiteralBuffer.add(token);
+				return;
+			} else {
+				List<CToken> pureStringTokens = new LinkedList<>();
+				List<CToken> extraWhiteSpaces = new LinkedList<>();
+
+				for (CToken stringToken : stringLiteralBuffer) {
+					if (PreprocessorUtils.isWhiteSpace(stringToken))
+						extraWhiteSpaces.add(stringToken);
+					else
+						pureStringTokens.add(stringToken);
+				}
+				stringLiteralBuffer.clear();
+				try {
+					StringToken result = tokenFactory
+							.newStringToken(pureStringTokens);
+
+					addOutputHelper(result);
+				} catch (SyntaxException e) {
+					throw new PreprocessorException(e.getMessage(),
+							pureStringTokens.get(0));
+				}
+				for (CToken ws : extraWhiteSpaces)
+					addOutputHelper(ws);
+			}
+		}
 		addOutputHelper(token);
 	}
 

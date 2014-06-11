@@ -7,7 +7,7 @@ import org.antlr.runtime.Token;
 public interface Inclusion extends Formation {
 
 	/**
-	 * Returns the file which was #include-ed.
+	 * Returns the file which was #include-d.
 	 * 
 	 * @return the included file
 	 */

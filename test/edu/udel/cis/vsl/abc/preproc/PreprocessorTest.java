@@ -333,7 +333,7 @@ public class PreprocessorTest {
 	}
 
 	/**
-	 * Checks that "#if 1" followed immediated by "#endif" yields nothing--when
+	 * Checks that "#if 1" followed immediately by "#endif" yields nothing--when
 	 * all alone.
 	 * 
 	 * @throws PreprocessorException
@@ -345,7 +345,7 @@ public class PreprocessorTest {
 	}
 
 	/**
-	 * Checks that "#if 1" followed immediated by "#endif" yields nothing--when
+	 * Checks that "#if 1" followed immediately by "#endif" yields nothing--when
 	 * inserted in the middle of some lines.
 	 * 
 	 * @throws PreprocessorException
@@ -354,5 +354,15 @@ public class PreprocessorTest {
 	@Test
 	public void trivialConditional2() throws PreprocessorException {
 		checkPair("trivialConditional2");
+	}
+
+	/**
+	 * Checks that two adjacent string literals are concatenated.
+	 * 
+	 * @throws PreprocessorException
+	 */
+	@Test
+	public void concat() throws PreprocessorException {
+		checkPair("concat");
 	}
 }

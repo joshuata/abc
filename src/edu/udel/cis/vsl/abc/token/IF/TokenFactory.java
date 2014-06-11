@@ -33,7 +33,7 @@ public interface TokenFactory {
 
 	CToken newCToken(Token token, Formation formation);
 
-	CToken newCToken(int type, Formation formation);
+	CToken newCToken(int type, String text, Formation formation);
 
 	// Characters and Strings...
 

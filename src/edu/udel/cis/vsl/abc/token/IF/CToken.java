@@ -48,7 +48,7 @@ public interface CToken extends Token {
 	CToken getNext();
 
 	/**
-	 * Sets the inex of this token.
+	 * Sets the index of this token.
 	 * 
 	 * @param index
 	 */

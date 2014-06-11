@@ -9,7 +9,7 @@ import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 /**
- * Extends ANTLR's TokenSource interface but adding some additional
+ * Extends ANTLR's TokenSource interface by adding some additional
  * functionality: getting the macro information, and methods to get the number
  * of tokens produced so far and to retrieve any token produced so far by index.
  * 

@@ -34,7 +34,15 @@ public class CommonStringLiteral implements StringLiteral {
 
 	@Override
 	public String toString() {
-		return characters.toString();
+		StringBuffer result = new StringBuffer();
+
+		result.append('"');
+		for (ExecutionCharacter ec : characters)
+			if (ec.getCodePoint() != 0)
+				result.append(ec.rawString());
+		result.append('"');
+		return result.toString();
+		// return characters.toString();
 	}
 
 }

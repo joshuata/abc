@@ -59,6 +59,42 @@ public class CommonExecutionCharacter implements ExecutionCharacter {
 	}
 
 	@Override
+	public String rawString() {
+		int length = characters.length;
+
+		if (length == 1) {
+			char c = characters[0];
+
+			switch (c) {
+			case 0:
+				return "\\0";
+			case '\'':
+				return "\\\'";
+			case '\b':
+				return "\\b";
+			case '\f':
+				return "\\f";
+			case '\n':
+				return "\\n";
+			case '\r':
+				return "\\r";
+			case '\t':
+				return "\\t";
+			case '\013':
+				return "\\v";
+			case ' ':
+				return " ";
+			case '\007':
+				return "\\a";
+			default:
+			}
+			return Character.toString(c);
+		} else {
+			return "'" + Integer.toHexString(codePoint) + "'";
+		}
+	}
+
+	@Override
 	public String toString() {
 		int length = characters.length;
 
