@@ -11,7 +11,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -84,11 +83,6 @@ public class DeclarationAnalyzer {
 	void setIgnoredTypes(Collection<String> ignoredTypes) {
 		this.ignoredTypes = ignoredTypes;
 	}
-
-	// TODO: for each decl, before processing, need to process
-	// scope list and treat same as scope declarations....
-	// is this a new kind of scope? You may need to create
-	// a scope around the decl.
 
 	/**
 	 * Processes a typedef declaration.
@@ -228,13 +222,6 @@ public class DeclarationAnalyzer {
 					result.setType(entityAnalyzer.typeFactory.compositeType(
 							type,
 							((CompoundInitializerNode) initializer).getType()));
-			}
-			// if this is a scope variable but not a scope parameter,
-			// it becomes the name of the scope:
-			if (!isParameter && result instanceof ScopeVariable) {
-				Scope scope = node.getIdentifier().getScope();
-
-				scope.setScopeName((ScopeVariable) result);
 			}
 		}
 		return result;

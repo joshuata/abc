@@ -21,7 +21,6 @@ import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 public class CommonEntityFactory implements EntityFactory {
@@ -33,10 +32,7 @@ public class CommonEntityFactory implements EntityFactory {
 
 	@Override
 	public Variable newVariable(String name, LinkageKind linkage, Type type) {
-		if (type.kind() == TypeKind.SCOPE)
-			return new CommonScopeVariable(name, linkage, type);
-		else
-			return new CommonVariable(name, linkage, type);
+		return new CommonVariable(name, linkage, type);
 	}
 
 	@Override

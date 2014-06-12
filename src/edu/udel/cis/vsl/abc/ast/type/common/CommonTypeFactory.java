@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -219,10 +218,8 @@ public class CommonTypeFactory implements TypeFactory {
 	}
 
 	@Override
-	public PointerType pointerType(Type referencedType,
-			ScopeValue scopeRestriction) {
-		return (PointerType) canonicalize(new CommonPointerType(referencedType,
-				scopeRestriction));
+	public PointerType pointerType(Type referencedType) {
+		return (PointerType) canonicalize(new CommonPointerType(referencedType));
 	}
 
 	@Override

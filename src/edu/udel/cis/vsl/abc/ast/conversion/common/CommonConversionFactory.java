@@ -11,8 +11,6 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.LvalueConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.NullPointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.PointerBoolConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.VoidPointerConversion;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
@@ -40,10 +38,6 @@ public class CommonConversionFactory implements ConversionFactory {
 	public CommonConversionFactory(TypeFactory typeFactory) {
 		this.typeFactory = typeFactory;
 	}
-
-	// private SyntaxException error(String message, ASTNode node) {
-	// return new SyntaxException(message, node.getSource());
-	// }
 
 	private UnsourcedException error(String message) {
 		return new UnsourcedException(message);
@@ -112,16 +106,15 @@ public class CommonConversionFactory implements ConversionFactory {
 	}
 
 	@Override
-	public ArrayConversion arrayConversion(ArrayType type, Scope scope) {
+	public ArrayConversion arrayConversion(ArrayType type) {
 		// get rid of $input/$output qualifiers on type.getElementType?
-		return new CommonArrayConversion(type, typeFactory.pointerType(
-				type.getElementType(), scope));
+		return new CommonArrayConversion(type, typeFactory.pointerType(type
+				.getElementType()));
 	}
 
 	@Override
 	public FunctionConversion functionConversion(FunctionType type) {
-		return new CommonFunctionConversion(type, typeFactory.pointerType(type,
-				null));
+		return new CommonFunctionConversion(type, typeFactory.pointerType(type));
 	}
 
 	private void checkQualifierConsistency(PointerType type1,
@@ -168,39 +161,6 @@ public class CommonConversionFactory implements ConversionFactory {
 				throw error("Type referenced by pointer on left-hand side of assignment "
 						+ "is incompatible with corresponding type on right-hand side");
 		}
-	}
-
-	/**
-	 * Checks that the scope of type1 is a descendant of that of type2.
-	 * 
-	 * @param type1
-	 *            right-hand side type
-	 * @param type2
-	 *            left-hand side type
-	 * @throws UnsourcedException
-	 *             if condition fails
-	 */
-	private void checkScopeConsistency(PointerType type1, PointerType type2)
-			throws UnsourcedException {
-		ScopeValue scopeValue1 = type1.scopeRestriction();
-		ScopeValue scopeValue2 = type2.scopeRestriction();
-
-		if (scopeValue2 == null) // scope2 is root
-			return;
-		if (scopeValue1 == null) { // scope1 is root
-			if (scopeValue2 instanceof Scope
-					&& ((Scope) scopeValue2).getParentScope() == null)
-				// both are root
-				return;
-		} else {// both non-null
-			if (scopeValue1.equals(scopeValue2))
-				return;
-			if (scopeValue1 instanceof Scope && scopeValue2 instanceof Scope) {
-				if (((Scope) scopeValue1).isDescendantOf((Scope) scopeValue2))
-					return;
-			}
-		}
-		throw error("Scope of pointer on right is not descendant of that on left");
 	}
 
 	@Override
@@ -273,7 +233,6 @@ public class CommonConversionFactory implements ConversionFactory {
 				return voidPointerConversion(type1, type2);
 			}
 			checkQualifierConsistency(type1, type2, true);
-			checkScopeConsistency(type1, type2);
 			return new CommonCompatiblePointerConversion(type1, type2);
 		}
 		if (oldType instanceof PointerType && isBool(newType))

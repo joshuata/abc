@@ -1,30 +1,18 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
-import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
@@ -43,8 +31,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.HereOrRootNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.ProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ResultNode;
@@ -427,91 +415,16 @@ public class ExpressionAnalyzer {
 
 	private void processScopeOf(ScopeOfNode node) throws SyntaxException {
 		ExpressionNode expressionNode = node.expression();
-		// IdentifierNode identifierNode = expressionNode.getIdentifier();
-		// Entity entity = identifierNode.getEntity();
-		// DeclarationNode decl;
-		// Scope scope;
 
-		// if (entity == null)
-		// processIdentifierExpression(expressionNode);
-		// entity = identifierNode.getEntity();
-		// decl = entity.getFirstDeclaration();
-		// scope = decl.getScope();
-		// nodeFactory.setConstantValue(node, scope);
 		processExpression(expressionNode);
 		node.setInitialType(typeFactory.scopeType());
-		// return scope;
-	}
-
-	private boolean isScopeParameter(ScopeVariable variable) {
-		DeclarationNode decl = variable.getFirstDeclaration();
-		ASTNode parent = decl.parent();
-
-		if (parent != null && parent instanceof SequenceNode<?>) {
-			ASTNode grandparent = parent.parent();
-
-			return grandparent != null
-					&& grandparent instanceof ScopeParameterizedDeclarationNode;
-		}
-		return false;
-	}
-
-	/**
-	 * Given an expression of scope type, evaluates that expression statically
-	 * to yield a {@link ScopeValue}. The given expression may or may not have
-	 * been processed already. If not, it will be processed in the course of
-	 * executing this method.
-	 * 
-	 * @param expr
-	 *            an expression node of type scope; may or may not have been
-	 *            processed
-	 * @return the scope value obtained by evaluating this expression
-	 * @throws SyntaxException
-	 *             if expression is not a kind of expression that could be a
-	 *             scope
-	 */
-	public ScopeValue evaluateScopeExpression(ExpressionNode expr)
-			throws SyntaxException {
-		ScopeValue result = (ScopeValue) nodeFactory.getConstantValue(expr);
-
-		if (result == null) {
-			if (expr instanceof IdentifierExpressionNode) {
-				// identifier must be a scope variable
-				IdentifierExpressionNode identifierExprNode = (IdentifierExpressionNode) expr;
-				IdentifierNode identifierNode = identifierExprNode
-						.getIdentifier();
-				Entity entity = identifierNode.getEntity();
-
-				if (entity == null) {
-					processIdentifierExpression(identifierExprNode);
-					entity = identifierNode.getEntity();
-				}
-				if (entity instanceof ScopeVariable) {
-					ScopeVariable variable = (ScopeVariable) entity;
-
-					if (isScopeParameter(variable))
-						result = variable;
-					else
-						result = variable.getFirstDeclaration().getScope();
-				} else {
-					throw error("Expected scope variable, saw " + entity, expr);
-				}
-				// } else if (expr instanceof ScopeOfNode) {
-				// result = processScopeOf((ScopeOfNode) expr);
-			} else
-				throw error("Unknown kind of scope expression", expr);
-			nodeFactory.setConstantValue(expr, result);
-		}
-		return result;
 	}
 
 	private void processFunctionCall(FunctionCallNode node)
 			throws SyntaxException {
 		ExpressionNode functionNode = node.getFunction();
 		int numArgs = node.getNumberOfArguments();
-		SequenceNode<ExpressionNode> actualScopes = node.getScopeList();
 		FunctionType functionType;
-		boolean isScopeParameterized = false;
 		int expectedNumArgs;
 		boolean hasVariableNumArgs;
 
@@ -532,56 +445,6 @@ public class ExpressionAnalyzer {
 								+ "type or pointer to function type",
 						functionNode);
 		}
-		if (functionNode instanceof IdentifierExpressionNode) {
-			IdentifierNode identifierNode = ((IdentifierExpressionNode) functionNode)
-					.getIdentifier();
-			Entity entity = identifierNode.getEntity();
-
-			if (entity instanceof Function) {
-				Function function = (Function) entity;
-				DeclarationNode declarationNode = function
-						.getFirstDeclaration();
-
-				if (declarationNode.parent() instanceof ScopeParameterizedDeclarationNode) {
-					// this is a scope-parameterized procedure call
-					// DeclarationNode baseDeclarationNode =
-					// ((ScopeParameterizedDeclarationNode) declarationNode)
-					// .baseDeclaration();
-					SequenceNode<VariableDeclarationNode> formalScopes = ((ScopeParameterizedDeclarationNode) declarationNode
-							.parent()).parameters();
-					int numFormalScopes, numActualScopes;
-					Map<ScopeVariable, ScopeValue> scopeMap = new HashMap<>();
-
-					if (actualScopes == null)
-						throw error(
-								"Function call is missing scope parameters",
-								node);
-					numFormalScopes = formalScopes.numChildren();
-					numActualScopes = actualScopes.numChildren();
-					if (numFormalScopes != numActualScopes)
-						throw error(
-								"Expected " + numFormalScopes
-										+ " scope arguments but saw "
-										+ numActualScopes, node);
-					for (int i = 0; i < numFormalScopes; i++) {
-						VariableDeclarationNode decl = formalScopes
-								.getSequenceChild(i);
-						ScopeVariable scopeVariable = (ScopeVariable) decl
-								.getEntity();
-						ExpressionNode scopeExpression = actualScopes
-								.getSequenceChild(i);
-						ScopeValue scopeValue = evaluateScopeExpression(scopeExpression);
-
-						scopeMap.put(scopeVariable, scopeValue);
-					}
-					functionType = (FunctionType) astFactory.substituteScopes(
-							functionType, scopeMap);
-					isScopeParameterized = true;
-				}
-			}
-		}
-		if (actualScopes != null && !isScopeParameterized)
-			throw error("Scope parameters used where none expected", node);
 		expectedNumArgs = functionType.getNumParameters();
 		hasVariableNumArgs = functionType.hasVariableArgs();
 		if (hasVariableNumArgs) {
@@ -830,76 +693,71 @@ public class ExpressionAnalyzer {
 
 	// Operators...
 
-	/**
-	 * Given a left hand side expression, try to find the scope in which the
-	 * memory object referred to by that expression is stored.
-	 * 
-	 * @param node
-	 *            a LHS expression node
-	 * @return a non-null Scope, in the worst case, the root scope
-	 * @throws SyntaxException
-	 *             if node is not a LHS expression
-	 */
-	private Scope scopeOf(ExpressionNode node) throws SyntaxException {
-		Scope result;
-
-		if (node instanceof IdentifierExpressionNode) {
-			Variable variable = (Variable) ((IdentifierExpressionNode) node)
-					.getIdentifier().getEntity();
-
-			result = variable.getFirstDeclaration().getScope();
-		} else if (node instanceof OperatorNode) {
-			OperatorNode opNode = (OperatorNode) node;
-			Operator operator = opNode.getOperator();
-
-			switch (operator) {
-			case DEREFERENCE: {
-				PointerType pointerType = (PointerType) opNode.getArgument(0)
-						.getType();
-				ScopeValue scopeValue = pointerType.scopeRestriction();
-
-				if (scopeValue instanceof Scope)
-					result = (Scope) scopeValue;
-				else
-					result = entityAnalyzer.rootScope;
-				break;
-			}
-			case SUBSCRIPT:
-				result = scopeOf(((OperatorNode) node).getArgument(0));
-				break;
-			default:
-				throw error("Illegal left-hand side expression", node);
-			}
-		} else if (node instanceof ArrowNode) {
-			// &(e->f) = &((*e).f)
-			ArrowNode arrowNode = (ArrowNode) node;
-			PointerType pointerType = (PointerType) arrowNode
-					.getStructurePointer().getType();
-			ScopeValue scopeValue = pointerType.scopeRestriction();
-
-			if (scopeValue instanceof Scope)
-				result = (Scope) scopeValue;
-			else
-				result = entityAnalyzer.rootScope;
-		} else if (node instanceof DotNode) { // &(e.f)
-			DotNode dotNode = (DotNode) node;
-			ExpressionNode expr = dotNode.getStructure();
-
-			result = scopeOf(expr);
-		} else if (node instanceof CompoundLiteralNode) {
-			result = node.getScope();
-		} else if (node instanceof StringLiteralNode) {
-			result = node.getScope();
-		} else
-			throw error("Illegal left-hand side expression", node);
-		return result;
-	}
+	// /**
+	// * Given a left hand side expression, try to find the scope in which the
+	// * memory object referred to by that expression is stored.
+	// *
+	// * @param node
+	// * a LHS expression node
+	// * @return a non-null Scope, in the worst case, the root scope
+	// * @throws SyntaxException
+	// * if node is not a LHS expression
+	// */
+	// private Scope scopeOf(ExpressionNode node) throws SyntaxException {
+	// Scope result;
+	//
+	// if (node instanceof IdentifierExpressionNode) {
+	// Variable variable = (Variable) ((IdentifierExpressionNode) node)
+	// .getIdentifier().getEntity();
+	//
+	// result = variable.getFirstDeclaration().getScope();
+	// } else if (node instanceof OperatorNode) {
+	// OperatorNode opNode = (OperatorNode) node;
+	// Operator operator = opNode.getOperator();
+	//
+	// switch (operator) {
+	// case DEREFERENCE: {
+	// PointerType pointerType = (PointerType) opNode.getArgument(0)
+	// .getType();
+	//
+	// result = entityAnalyzer.rootScope;
+	// break;
+	// }
+	// case SUBSCRIPT:
+	// result = scopeOf(((OperatorNode) node).getArgument(0));
+	// break;
+	// default:
+	// throw error("Illegal left-hand side expression", node);
+	// }
+	// } else if (node instanceof ArrowNode) {
+	// // &(e->f) = &((*e).f)
+	// ArrowNode arrowNode = (ArrowNode) node;
+	// PointerType pointerType = (PointerType) arrowNode
+	// .getStructurePointer().getType();
+	// ScopeValue scopeValue = pointerType.scopeRestriction();
+	//
+	// if (scopeValue instanceof Scope)
+	// result = (Scope) scopeValue;
+	// else
+	// result = entityAnalyzer.rootScope;
+	// } else if (node instanceof DotNode) { // &(e.f)
+	// DotNode dotNode = (DotNode) node;
+	// ExpressionNode expr = dotNode.getStructure();
+	//
+	// result = scopeOf(expr);
+	// } else if (node instanceof CompoundLiteralNode) {
+	// result = node.getScope();
+	// } else if (node instanceof StringLiteralNode) {
+	// result = node.getScope();
+	// } else
+	// throw error("Illegal left-hand side expression", node);
+	// return result;
+	// }
 
 	private void processADDRESSOF(OperatorNode node) throws SyntaxException {
 		ExpressionNode arg0 = node.getArgument(0);
-		Scope scope = scopeOf(arg0);
 
-		node.setInitialType(typeFactory.pointerType(arg0.getType(), scope));
+		node.setInitialType(typeFactory.pointerType(arg0.getType()));
 	}
 
 	/**
@@ -969,22 +827,6 @@ public class ExpressionAnalyzer {
 	private void processCOMMA(OperatorNode node) throws SyntaxException {
 		node.setInitialType(addStandardConversions(node.getArgument(1)));
 	}
-
-	private ScopeValue joinScopeValue(ScopeValue s1, ScopeValue s2) {
-		if (s1 == null || s2 == null)
-			return entityAnalyzer.rootScope;
-		if (s1.equals(s2))
-			return s1;
-		if (s1 instanceof Scope && s2 instanceof Scope)
-			return entityAnalyzer.entityFactory.join((Scope) s1, (Scope) s2);
-		return entityAnalyzer.rootScope;
-	}
-
-	// private Scope join(Scope s1, Scope s2) {
-	// if (s1 == null || s2 == null)
-	// return entityAnalyzer.rootScope;
-	// return entityAnalyzer.entityFactory.join(s1, s2);
-	// }
 
 	/**
 	 * From C11 Sec. 6.5.15:
@@ -1064,9 +906,6 @@ public class ExpressionAnalyzer {
 		} else if (type1 instanceof PointerType && type2 instanceof PointerType) {
 			PointerType p0 = (PointerType) type1;
 			PointerType p1 = (PointerType) type2;
-			ScopeValue s0 = p0.scopeRestriction();
-			ScopeValue s1 = p1.scopeRestriction();
-			ScopeValue joinScopeValue = joinScopeValue(s0, s1);
 			boolean atomicQ = false, constQ = false, volatileQ = false, restrictQ = false;
 			Type base0 = p0.referencedType();
 			Type base1 = p1.referencedType();
@@ -1103,7 +942,7 @@ public class ExpressionAnalyzer {
 				throw error("Incompatible pointer types in conditional:\n"
 						+ type1 + "\n" + type2, node);
 
-			type = typeFactory.pointerType(type, joinScopeValue);
+			type = typeFactory.pointerType(type);
 			if (atomicQ)
 				type = typeFactory.atomicType((PointerType) type);
 			type = typeFactory.qualify((ObjectType) type, constQ, volatileQ,
@@ -1681,9 +1520,8 @@ public class ExpressionAnalyzer {
 		Type oldType = node.getConvertedType();
 
 		if (oldType instanceof ArrayType) {
-			Scope scope = scopeOf(node);
-			Conversion conversion = conversionFactory.arrayConversion(
-					(ArrayType) oldType, scope);
+			Conversion conversion = conversionFactory
+					.arrayConversion((ArrayType) oldType);
 
 			node.addConversion(conversion);
 		}
