@@ -272,8 +272,8 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public PointerTypeNode newPointerTypeNode(Source source,
-			TypeNode referencedType, ExpressionNode scopeModifier) {
-		return new CommonPointerTypeNode(source, referencedType, scopeModifier);
+			TypeNode referencedType) {
+		return new CommonPointerTypeNode(source, referencedType);
 	}
 
 	@Override

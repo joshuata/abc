@@ -11,7 +11,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
@@ -173,8 +172,7 @@ public class TypeAnalyzer {
 			throw error("Use of restrict qualifier with non-pointer type", node);
 		if (isParameter) {
 			// no scope restriction on pointer given, so use null...
-			PointerType pointerType = typeFactory
-					.pointerType(elementType, null);
+			PointerType pointerType = typeFactory.pointerType(elementType);
 			UnqualifiedObjectType unqualifiedType = (node.hasAtomicInBrackets() ? typeFactory
 					.atomicType(pointerType) : pointerType);
 
@@ -226,54 +224,12 @@ public class TypeAnalyzer {
 		return result;
 	}
 
-	// /**
-	// * Processes a scope modifier in a pointer type declaration, as in double
-	// * *<s> p.
-	// *
-	// * @param expressionNode
-	// * the expression s occurring in the pointer type node
-	// * @return not yet clear
-	// * @throws SyntaxException
-	// */
-	// private ScopeVariable processScopeModifier(ExpressionNode expressionNode)
-	// throws SyntaxException {
-	// if (expressionNode instanceof IdentifierExpressionNode) {
-	// IdentifierNode identifierNode = ((IdentifierExpressionNode)
-	// expressionNode)
-	// .getIdentifier();
-	// String name = identifierNode.name();
-	// OrdinaryEntity entity = identifierNode.getScope()
-	// .getLexicalOrdinaryEntity(name);
-	// EntityKind kind;
-	//
-	// if (entity == null)
-	// throw error("Undeclared identifier " + name, identifierNode);
-	// kind = entity.getEntityKind();
-	// switch (kind) {
-	// case VARIABLE:
-	// break;
-	// default:
-	// throw error("Use of " + kind + " " + name + " as scope name",
-	// identifierNode);
-	// }
-	// identifierNode.setEntity(entity);
-	// expressionNode.setInitialType(entity.getType());
-	// return (ScopeVariable) entity;
-	// } else
-	// throw new SyntaxException("Unknown kind of scope expression",
-	// expressionNode.getSource());
-	// }
-
 	private Type processPointerType(PointerTypeNode node)
 			throws SyntaxException {
 		TypeNode referencedTypeNode = node.referencedType();
 		Type referencedType = processTypeNode(referencedTypeNode);
-		ExpressionNode scopeModifier = node.scopeModifier();
-		ScopeValue pointerScope = scopeModifier == null ? null
-				: entityAnalyzer.expressionAnalyzer
-						.evaluateScopeExpression(scopeModifier);
-		UnqualifiedObjectType unqualifiedType = typeFactory.pointerType(
-				referencedType, pointerScope);
+		UnqualifiedObjectType unqualifiedType = typeFactory
+				.pointerType(referencedType);
 
 		if (node.isAtomicQualified())
 			unqualifiedType = typeFactory.atomicType(unqualifiedType);
@@ -424,7 +380,7 @@ public class TypeAnalyzer {
 					parameterTypes, hasVariableArgs);
 		}
 		if (isParameter)
-			result = typeFactory.pointerType(result, null);
+			result = typeFactory.pointerType(result);
 		return result;
 	}
 

@@ -4,7 +4,6 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -181,11 +180,9 @@ public interface TypeFactory {
 	 * 
 	 * @param referencedType
 	 *            the base type of the pointer type
-	 * @param scopeRestriction
-	 *            scope restriction or null
 	 * @return a pointer type as specified
 	 */
-	PointerType pointerType(Type referencedType, ScopeValue scopeRestriction);
+	PointerType pointerType(Type referencedType);
 
 	/**
 	 * The atomic type associated to a base type. This type may be denoted
@@ -676,24 +673,4 @@ public interface TypeFactory {
 			boolean constQualified, boolean volatileQualified,
 			boolean restrictQualified, boolean inputQualified,
 			boolean outputQualified);
-
-	/*
-	 * TODO maybe add "low-level" operations that expose symbolic expressions:
-	 * 
-	 * SymbolicExpression inRange(int value, IntegerType type);
-	 * 
-	 * SymbolicExpression max(IntegerType type);
-	 * 
-	 * SymbolicExpression min(IntegerType type);
-	 * 
-	 * SymbolicExpression rank(IntegerType type);
-	 * 
-	 * SymbolicExpression lte(SymbolicExpression, SymbolicExpression)
-	 * 
-	 * ...
-	 * 
-	 * SymbolicExpression ifThenElse(SymolicExpression, SymbolicExpression,
-	 * SymbolicExpression);
-	 */
-
 }

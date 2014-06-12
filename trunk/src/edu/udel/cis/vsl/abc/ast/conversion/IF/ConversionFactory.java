@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.conversion.IF;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -108,7 +107,7 @@ public interface ConversionFactory {
 	 * @return array conversion with old type the given array type and new type
 	 *         the pointer type to the element type of the array type
 	 */
-	ArrayConversion arrayConversion(ArrayType type, Scope scope);
+	ArrayConversion arrayConversion(ArrayType type);
 
 	/**
 	 * Returns the function conversion object with old type equal to the given

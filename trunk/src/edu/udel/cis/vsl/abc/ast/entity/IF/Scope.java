@@ -68,7 +68,6 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * distinct from all other names.
  * </p>
  */
-@SuppressWarnings("deprecation")
 public interface Scope extends ScopeValue {
 
 	/**
@@ -423,23 +422,5 @@ public interface Scope extends ScopeValue {
 	 * @return true iff this scope is a descendant (or equal to) that scope
 	 */
 	boolean isDescendantOf(Scope that);
-
-	/**
-	 * In CIVL-C, a scope can have a name, named by a scope variable. This sets
-	 * the name of this scope.
-	 * 
-	 * @param variable
-	 *            the scope variable serving as a name of this scope
-	 * @deprecated
-	 */
-	void setScopeName(ScopeVariable variable);
-
-	/**
-	 * Gets the CIVL-C scope name of this scope.
-	 * 
-	 * @return the scope name or <code>null</code> if none has been set
-	 * @deprecated
-	 */
-	ScopeVariable getScopeName();
 
 }

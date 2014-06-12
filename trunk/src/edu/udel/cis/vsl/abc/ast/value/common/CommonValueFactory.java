@@ -9,7 +9,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -362,17 +361,14 @@ public class CommonValueFactory implements ValueFactory {
 	}
 
 	public VariableReference variableReference(Variable variable) {
-		Scope scope = variable.getFirstDeclaration().getScope();
-		PointerType pointerType = typeFactory.pointerType(variable.getType(),
-				scope);
+		PointerType pointerType = typeFactory.pointerType(variable.getType());
 
 		return (VariableReference) canonic(new CommonVariableReference(
 				pointerType, variable));
 	}
 
 	public FunctionReference functionReference(Function function) {
-		PointerType pointerType = typeFactory.pointerType(function.getType(),
-				null);
+		PointerType pointerType = typeFactory.pointerType(function.getType());
 
 		return (FunctionReference) canonic(new CommonFunctionReference(
 				pointerType, function));
@@ -384,8 +380,7 @@ public class CommonValueFactory implements ValueFactory {
 		ArrayType arrayType = (ArrayType) arrayReferenceType.referencedType();
 		// might need to strip qualifiers?
 		ObjectType elementType = arrayType.getElementType();
-		PointerType elementReferenceType = typeFactory.pointerType(elementType,
-				arrayReference.getType().scopeRestriction());
+		PointerType elementReferenceType = typeFactory.pointerType(elementType);
 
 		return (ArrayElementReference) canonic(new CommonArrayElementReference(
 				elementReferenceType, arrayReference, index));
@@ -394,8 +389,7 @@ public class CommonValueFactory implements ValueFactory {
 	public MemberReference memberReference(
 			AddressValue structureOrUnionReference, Field field) {
 		ObjectType memberType = field.getType();
-		PointerType memberReferenceType = typeFactory.pointerType(memberType,
-				structureOrUnionReference.getType().scopeRestriction());
+		PointerType memberReferenceType = typeFactory.pointerType(memberType);
 
 		return (MemberReference) canonic(new CommonMemberReference(
 				memberReferenceType, structureOrUnionReference, field));
@@ -625,13 +619,13 @@ public class CommonValueFactory implements ValueFactory {
 		return castValue(newType, value);
 	}
 
-//	private Value evaluateAndorOr(Operator operator, ExpressionNode expr1,
-//			ExpressionNode expr2) throws SyntaxException {
-//		boolean isAnd = operator == Operator.LAND;
-//		Value v1 = evaluate(expr1);
-//
-//		return null;
-//	}
+	// private Value evaluateAndorOr(Operator operator, ExpressionNode expr1,
+	// ExpressionNode expr2) throws SyntaxException {
+	// boolean isAnd = operator == Operator.LAND;
+	// Value v1 = evaluate(expr1);
+	//
+	// return null;
+	// }
 
 	/**
 	 * Evaluates plus in case where both types are integers. NOTE types of these

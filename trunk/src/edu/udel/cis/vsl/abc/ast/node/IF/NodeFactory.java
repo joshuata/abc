@@ -265,12 +265,9 @@ public interface NodeFactory {
 	 *            source information for the occurrence of the pointer type
 	 * @param referencedType
 	 *            the type pointed to
-	 * @param scopeModifier
-	 *            optional scope modifier expression (a CIVL-C construct)
 	 * @return the new pointer type node
 	 */
-	PointerTypeNode newPointerTypeNode(Source source, TypeNode referencedType,
-			ExpressionNode scopeModifier);
+	PointerTypeNode newPointerTypeNode(Source source, TypeNode referencedType);
 
 	/**
 	 * Constructs and returns a new structure or union type node.

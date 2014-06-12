@@ -5,15 +5,10 @@ import java.util.List;
 import java.util.Vector;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
-import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeValue;
-import edu.udel.cis.vsl.abc.ast.entity.IF.ScopeVariable;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
@@ -332,48 +327,9 @@ public class SideEffectRemover extends BaseTransformer {
 					basicType.getBasicTypeKind());
 		case POINTER: {
 			PointerType pointerType = (PointerType) type;
-			ScopeValue oldScopeValue = pointerType.scopeRestriction();
-			ExpressionNode scopeNode;
 
-			if (oldScopeValue == null)
-				scopeNode = null;
-			else if (oldScopeValue instanceof ScopeVariable) {
-				scopeNode = nodeFactory.newIdentifierExpressionNode(source,
-						nodeFactory.newIdentifierNode(source,
-								((ScopeVariable) oldScopeValue).getName()));
-			} else if (oldScopeValue instanceof Scope) {
-				Scope scope = (Scope) oldScopeValue;
-				Variable scopeVariable = scope.getScopeName();
-
-				// does this scope have a scope variable?
-				if (scopeVariable != null)
-					scopeNode = nodeFactory.newIdentifierExpressionNode(
-							source,
-							nodeFactory.newIdentifierNode(source,
-									scopeVariable.getName()));
-				else { // is there anything declared in that scope?
-					int numVars = scope.getNumVariables();
-
-					if (numVars == 0)
-						// should create a new scope variable and insert it
-						// into this scope
-						throw new ASTException(
-								"Unable to find any variables in scope: "
-										+ scope + " at " + source);
-					else {
-						Variable aVariable = scope.getScopeName();
-
-						scopeNode = nodeFactory.newScopeOfNode(source,
-								nodeFactory.newIdentifierExpressionNode(source,
-										nodeFactory.newIdentifierNode(source,
-												aVariable.getName())));
-					}
-				}
-			} else
-				throw new ASTException("Unknown kind of scopeValue: "
-						+ oldScopeValue + " at " + source);
 			return nodeFactory.newPointerTypeNode(source,
-					typeNode(source, pointerType.referencedType()), scopeNode);
+					typeNode(source, pointerType.referencedType()));
 		}
 		case VOID:
 			return nodeFactory.newVoidTypeNode(source);
