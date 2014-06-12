@@ -4,5 +4,15 @@
 
 int strcmp(const char *s1, const char *s2);
 
-/* Copies a region of memory, just as in standard C */
-void memcpy(void *p, void *q, size_t size);
+/* copies n characters from the object pointed to by s2 into the 
+   object pointed to by s1. If copying takes place between objects that overlap, 
+   the behavior is undefined. */
+void* memcpy(void *p, void *q, const size_t size);
+
+/* copies the string pointed to by s2 (including the terminating null character) 
+   into the array pointed to by s1. If copying takes place between objects that 
+   overlap, the behavior is undefined. */
+char *strcpy(char * restrict s1, const char * restrict s2);
+
+/* computes the length of the string pointed to by s. */
+size_t strlen(const char *s);
