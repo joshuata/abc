@@ -1,8 +1,7 @@
 /* ABC model of math.h */
 
-double sqrt(double x);
-
-double ceil(double x);
-
-double exp(double x);
-
+#ifdef __MATH__
+#else
+#include<math-common.h>
+#define __MATH__
+#endif
