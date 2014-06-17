@@ -81,6 +81,7 @@ public interface CParser {
 	public static final int DIV = CivlCParser.DIV;
 	public static final int DIVEQ = CivlCParser.DIVEQ;
 	public static final int DO = CivlCParser.DO;
+	public static final int DOMAIN = CivlCParser.DOMAIN;
 	public static final int DOT = CivlCParser.DOT;
 	public static final int DOTDOT = CivlCParser.DOTDOT;
 	public static final int DOUBLE = CivlCParser.DOUBLE;

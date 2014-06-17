@@ -12,6 +12,8 @@ parser grammar PreprocessorParser;
  *
  * This grammar uses the PreprocessorLexer, which has already
  * formed the preprocessor tokens.
+ *
+ * CIVL-C keywords are also included and treated the same as C keywords.
  */
 
 options {
@@ -197,9 +199,9 @@ c_keyword	:	AUTO | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
 		|	ASSUME | CHOOSE | COLLECTIVE
 		|	ENSURES | FALSE | INPUT | INVARIANT
 		|	OUTPUT | REQUIRES | RESULT | SELF | PROCNULL | HERE | ROOT
-		|	SPAWN | TRUE | /*WAIT |*/ WHEN | SCOPE | CIVLATOMIC | CIVLATOM
+		|	SPAWN | TRUE | WHEN | SCOPE | CIVLATOMIC | CIVLATOM
 		|	ABSTRACT | BIG_O | CONTIN | DERIV | FORALL | EXISTS | UNIFORM
-		|	REAL
+		|	REAL | CIVLFOR | PARFOR | DOMAIN
 		;
 
 punctuator	:	nonPoundPunctuator | HASH ;

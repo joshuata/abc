@@ -1,5 +1,39 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ABSTRACT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ALIGNAS;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ATOMIC;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.AUTO;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BOOL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CHAR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMPLEX;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CONST;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOMAIN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOUBLE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENUM;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXTERN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FLOAT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.INLINE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.INPUT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.INT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.LONG;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.NORETURN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.OUTPUT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.REAL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.REGISTER;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESTRICT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHORT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SIGNED;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATIC;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STRUCT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.THREADLOCAL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPEDEF;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPEDEF_NAME;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.UNION;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.UNSIGNED;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.VOID;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.VOLATILE;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,19 +79,6 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 public class SpecifierAnalysis {
 
 	// the basic type specifier keywords and VOID...
-
-	public final static int VOID = CParser.VOID;
-	public final static int CHAR = CParser.CHAR;
-	public final static int SHORT = CParser.SHORT;
-	public final static int INT = CParser.INT;
-	public final static int LONG = CParser.LONG;
-	public final static int FLOAT = CParser.FLOAT;
-	public final static int DOUBLE = CParser.DOUBLE;
-	public final static int REAL = CParser.REAL;
-	public final static int SIGNED = CParser.SIGNED;
-	public final static int UNSIGNED = CParser.UNSIGNED;
-	public final static int BOOL = CParser.BOOL;
-	public final static int COMPLEX = CParser.COMPLEX;
 
 	// Instance variables...
 
@@ -105,7 +126,6 @@ public class SpecifierAnalysis {
 	int unionTypeCount = 0;
 	int enumTypeCount = 0;
 	int typedefNameCount = 0;
-	// int processTypeCount = 0;
 	// qualifiers:
 	boolean constQualifier = false;
 	boolean restrictQualifier = false;
@@ -124,7 +144,11 @@ public class SpecifierAnalysis {
 	boolean inlineSpecifier = false;
 	boolean noreturnSpecifier = false;
 	boolean abstractSpecifier = false;
+	// CIVL-C continuity for abstract functions: can occur only once
 	int continuity = 0;
+	// CIVL-C domain specifier: can occur only once
+	int domainTypeCount = 0;
+	int domainDimension = -1;
 	// alignment specifiers
 	List<CommonTree> alignmentTypeNodes = new LinkedList<CommonTree>();
 	List<CommonTree> alignmentExpressionNodes = new LinkedList<CommonTree>();
@@ -179,7 +203,7 @@ public class SpecifierAnalysis {
 				setTypeNameKind(TypeNodeKind.VOID);
 				setTypeSpecifierNode(node);
 				break;
-			case CParser.ATOMIC:
+			case ATOMIC:
 				if (node.getChildCount() > 0) {
 					atomicTypeCount++;
 					setTypeNameKind(TypeNodeKind.ATOMIC);
@@ -188,66 +212,77 @@ public class SpecifierAnalysis {
 					atomicQualifier = true;
 				}
 				break;
-			case CParser.STRUCT:
+			case STRUCT:
 				structTypeCount++;
 				setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
 				setTypeSpecifierNode(node);
 				break;
-			case CParser.UNION:
+			case UNION:
 				unionTypeCount++;
 				setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
 				setTypeSpecifierNode(node);
 				break;
-			case CParser.ENUM:
+			case ENUM:
 				enumTypeCount++;
 				setTypeNameKind(TypeNodeKind.ENUMERATION);
 				setTypeSpecifierNode(node);
 				break;
-			case CParser.TYPEDEF_NAME:
+			case TYPEDEF_NAME:
 				typedefNameCount++;
 				setTypeNameKind(TypeNodeKind.TYPEDEF_NAME);
 				setTypeSpecifierNode(node);
 				break;
-			case CParser.CONST:
+			case DOMAIN:
+				domainTypeCount++;
+				setTypeNameKind(TypeNodeKind.DOMAIN);
+				setTypeSpecifierNode(node);
+				if (node.getChildCount() != 0) {
+					CommonTree child = (CommonTree) node.getChild(0);
+
+					if (child.getToken().getType() != CParser.ABSENT)
+						domainDimension = parseInt(child);
+				}
+				break;
+			case CONST:
 				constQualifier = true;
 				break;
-			case CParser.RESTRICT:
+			case RESTRICT:
 				restrictQualifier = true;
 				break;
-			case CParser.VOLATILE:
+			case VOLATILE:
 				volatileQualifier = true;
 				break;
-			case CParser.INPUT:
+			case INPUT:
 				inputQualifier = true;
 				break;
-			case CParser.OUTPUT:
+			case OUTPUT:
 				outputQualifier = true;
 				break;
-			case CParser.TYPEDEF:
+			case TYPEDEF:
 				typedefCount++;
 				break;
-			case CParser.EXTERN:
+			case EXTERN:
 				externCount++;
 				break;
-			case CParser.STATIC:
+			case STATIC:
 				staticCount++;
 				break;
-			case CParser.THREADLOCAL:
+			case THREADLOCAL:
 				threadLocalCount++;
 				break;
-			case CParser.AUTO:
+			case AUTO:
 				autoCount++;
 				break;
-			case CParser.REGISTER:
+			case REGISTER:
 				registerCount++;
 				break;
-			case CParser.INLINE:
+			case INLINE:
 				inlineSpecifier = true;
 				break;
-			case CParser.NORETURN:
+			case NORETURN:
 				noreturnSpecifier = true;
 				break;
-			case CParser.ALIGNAS: {
+			case ALIGNAS: {
 				int alignKind = ((CommonTree) node.getChild(0)).getType();
 				CommonTree argument = (CommonTree) node.getChild(1);
 
@@ -260,12 +295,12 @@ public class SpecifierAnalysis {
 				}
 				break;
 			}
-			case CParser.ABSTRACT:
+			case ABSTRACT:
 				abstractSpecifier = true;
 				if (node.getChildCount() == 0) {
 					continuity = 0;
 				} else {
-					continuity = Integer.parseInt(node.getChild(0).getText());
+					continuity = parseInt((CommonTree) node.getChild(0));
 				}
 				break;
 			default:
@@ -299,6 +334,25 @@ public class SpecifierAnalysis {
 					"Two type specifiers in declaration. Previous specifier was at "
 							+ error("", typeSpecifierNode).getSource(), node);
 		typeSpecifierNode = node;
+	}
+
+	/**
+	 * Parses a node expected to contain an integer constant.
+	 * 
+	 * @param node
+	 *            a CommonTree node expected to contain integer constant
+	 * @return the int value of that integer constant
+	 * @throws SyntaxException
+	 *             if the text of the node cannot be parsed to yield an integer
+	 */
+	private int parseInt(CommonTree node) throws SyntaxException {
+		try {
+			int result = Integer.parseInt(node.getText());
+
+			return result;
+		} catch (Exception e) {
+			throw error("Expected integer constant", node);
+		}
 	}
 
 }

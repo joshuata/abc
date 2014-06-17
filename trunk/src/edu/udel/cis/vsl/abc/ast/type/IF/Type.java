@@ -54,14 +54,34 @@ public interface Type {
 	 */
 	public static enum TypeKind {
 		/**
-		 * The <code>void</code> type, used to represent no type in places where
-		 * a type is syntactically required.
+		 * An array type; an instance of {@link ArrayType}
 		 */
-		VOID,
+		ARRAY,
+		/**
+		 * An atomic type; an instance of {@link AtomicType}
+		 */
+		ATOMIC,
 		/**
 		 * A "standard basic type"; an instance of {@link StandardBasicType}
 		 */
 		BASIC,
+		/**
+		 * The CIVL-C domain type, <code>$domain</code> or
+		 * <code>$domain(n)</code>.
+		 */
+		DOMAIN,
+		/**
+		 * An enumeration type; an instance of {@link EnumerationType}
+		 */
+		ENUMERATION,
+		/**
+		 * A function type; an instance of {@link FunctionType}
+		 */
+		FUNCTION,
+		/**
+		 * The CIVL-C heap type, represened by <code>$heap</code>
+		 */
+		HEAP,
 		/**
 		 * An integer type which is not a standard basic type. The C Standard
 		 * allows a C implementation to provide additional integer types beyond
@@ -69,82 +89,32 @@ public interface Type {
 		 */
 		OTHER_INTEGER,
 		/**
-		 * An enumeration type; an instance of {@link EnumerationType}
+		 * A pointer type; an instance of {@link PointerType}
 		 */
-		ENUMERATION,
+		POINTER,
 		/**
-		 * An array type; an instance of {@link ArrayType}
+		 * The CIVL-C process type, represented by <code>$proc</code>
 		 */
-		ARRAY,
+		PROCESS,
+		/**
+		 * A qualified object type; an instance of {@link QualifiedObjectType}
+		 */
+		QUALIFIED,
+		/**
+		 * The CIVL-C scope type, represented by <code>$scope</code>
+		 */
+		SCOPE,
 		/**
 		 * A structure or union type; an instance of
 		 * {@link StructureOrUnionType}
 		 */
 		STRUCTURE_OR_UNION,
 		/**
-		 * A function type; an instance of {@link FunctionType}
+		 * The <code>void</code> type, used to represent no type in places where
+		 * a type is syntactically required.
 		 */
-		FUNCTION,
-		/**
-		 * A pointer type; an instance of {@link PointerType}
-		 */
-		POINTER,
-		/**
-		 * An atomic type; an instance of {@link AtomicType}
-		 */
-		ATOMIC,
-		/**
-		 * A qualified object type; an instance of {@link QualifiedObjectType}
-		 */
-		QUALIFIED,
-		/**
-		 * The CIVL-C process type, represented by <code>$proc</code>
-		 */
-		PROCESS,
-		/**
-		 * The CIVL-C scope type, represented by <code>$scope</code>
-		 */
-		SCOPE,
-		/**
-		 * The CIVL-C heap type, represened by <code>$heap</code>
-		 */
-		HEAP
+		VOID
 	};
-
-	/**
-	 * The kind of type this is. See definition of the enumerated type
-	 * {@link TypeKind}. These kinds partition the set of all types.
-	 * 
-	 * @return the kind of this type
-	 */
-	TypeKind kind();
-
-	/**
-	 * Is this type a "VM" type (variable modified type)? This is defined in the
-	 * C11 Standard Sec. 6.7.6:
-	 * 
-	 * <blockquote> If, in the nested sequence of declarators in a full
-	 * declarator, there is a declarator specifying a variable length array
-	 * type, the type specified by the full declarator is said to be variably
-	 * modified. Furthermore, any type derived by declarator type derivation
-	 * from a variably modified type is itself variably modified. </blockquote>
-	 * 
-	 * The definition of "variable length array type" is given in Sec. 6.7.6.2:
-	 * 
-	 * <blockquote> If the size is not present, the array type is an incomplete
-	 * type. If the size is * instead of being an expression, the array type is
-	 * a variable length array type of unspecified size, which can only be used
-	 * in declarations or type names with function prototype scope;143) such
-	 * arrays are nonetheless complete types. If the size is an integer constant
-	 * expression and the element type has a known constant size, the array type
-	 * is not a variable length array type; otherwise, the array type is a
-	 * variable length array type. (Variable length arrays are a conditional
-	 * feature that implementations need not support; see 6.10.8.3.)
-	 * </blockquote>
-	 * 
-	 * @return true iff this type is a VM type
-	 */
-	boolean isVariablyModified();
 
 	/**
 	 * Is this type "compatible" with the given type? See C11 Sec. 6.2.7 for the
@@ -188,6 +158,50 @@ public interface Type {
 	int getId();
 
 	/**
+	 * C11 6.2.4(21):
+	 * 
+	 * "Arithmetic types and pointer types are collectively called scalar types."
+	 * 
+	 * @return true iff type is scalar
+	 */
+	boolean isScalar();
+
+	/**
+	 * Is this type a "VM" type (variable modified type)? This is defined in the
+	 * C11 Standard Sec. 6.7.6:
+	 * 
+	 * <blockquote> If, in the nested sequence of declarators in a full
+	 * declarator, there is a declarator specifying a variable length array
+	 * type, the type specified by the full declarator is said to be variably
+	 * modified. Furthermore, any type derived by declarator type derivation
+	 * from a variably modified type is itself variably modified. </blockquote>
+	 * 
+	 * The definition of "variable length array type" is given in Sec. 6.7.6.2:
+	 * 
+	 * <blockquote> If the size is not present, the array type is an incomplete
+	 * type. If the size is * instead of being an expression, the array type is
+	 * a variable length array type of unspecified size, which can only be used
+	 * in declarations or type names with function prototype scope;143) such
+	 * arrays are nonetheless complete types. If the size is an integer constant
+	 * expression and the element type has a known constant size, the array type
+	 * is not a variable length array type; otherwise, the array type is a
+	 * variable length array type. (Variable length arrays are a conditional
+	 * feature that implementations need not support; see 6.10.8.3.)
+	 * </blockquote>
+	 * 
+	 * @return true iff this type is a VM type
+	 */
+	boolean isVariablyModified();
+
+	/**
+	 * The kind of type this is. See definition of the enumerated type
+	 * {@link TypeKind}. These kinds partition the set of all types.
+	 * 
+	 * @return the kind of this type
+	 */
+	TypeKind kind();
+
+	/**
 	 * Prints the type in a tree-formatted style. The prefix string is prepended
 	 * to each line of output other than the first. Output for structure or
 	 * union types may leave out the fields by setting abbrv to true.
@@ -201,14 +215,5 @@ public interface Type {
 	 *            types by leaving out their fields
 	 */
 	void print(String prefix, PrintStream out, boolean abbrv);
-
-	/**
-	 * C11 6.2.4(21):
-	 * 
-	 * "Arithmetic types and pointer types are collectively called scalar types."
-	 * 
-	 * @return true iff type is scalar
-	 */
-	boolean isScalar();
 
 }

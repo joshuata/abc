@@ -164,18 +164,6 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 
 /* ****** CIVL-C Scopes ********* */
 
-/* Use of a CIVL-C scope name.   The scope name must have
- * been declared previously, and therefore entered into
- * the scope name set of the current scope or one of its
- * containing scopes. */
-//scopeName
-//	: {isScopeName(input.LT(1).getText())}? IDENTIFIER
-//	  -> ^(SCOPE_NAME IDENTIFIER)
-//	;
-
-
-// uses: double *<s>, f<s1,s2>, typedefName<s1,s2>
-
 
 /*
  * A scope modifier, a CIVL-C construct such as the "<s>"
@@ -706,15 +694,6 @@ scope DeclarationScope;
 	: scopeListDef_opt! declarationInScopeList[(CommonTree)$scopeListDef_opt.tree]
 	;
 
-/*
-	| SCOPE IDENTIFIER SEMI
-	  {
-		$Symbols::scopeNames.add($IDENTIFIER.text);
-	  }
-	  -> ^(SCOPE IDENTIFIER)
-	| staticAssertDeclaration
-*/
-
 declarationInScopeList[CommonTree scopes]
 	: SCOPE IDENTIFIER SEMI
 	  {
@@ -804,6 +783,7 @@ typeSpecifier
 	| structOrUnionSpecifier
 	| enumSpecifier
 	| typedefName
+	| domainSpecifier
 	;
 
 /* 6.7.2.1
@@ -945,8 +925,7 @@ atomicTypeSpecifier
 
 /* 6.7.3 */
 typeQualifier
-    : CONST | RESTRICT | VOLATILE | ATOMIC
-    | INPUT | OUTPUT
+    : CONST | RESTRICT | VOLATILE | ATOMIC | INPUT | OUTPUT
     ;
 
 /* 6.7.4 */
@@ -1339,6 +1318,14 @@ staticAssertDeclaration
       -> ^(STATICASSERT constantExpression STRING_LITERAL)
     ;
 
+/* CIVL-C $domain or $domain(n) type */
+domainSpecifier
+	: DOMAIN
+	  ( -> ^(DOMAIN)
+	  | LPAREN INTEGER_CONSTANT RPAREN -> ^(DOMAIN INTEGER_CONSTANT RPAREN)
+	  )
+	;
+
 
 /* ***** A.2.3: Statements ***** */
 
@@ -1351,9 +1338,7 @@ statement
     | iterationStatement
     | jumpStatement
     | pragma
-    //| assertStatement
     | assumeStatement
-   // | waitStatement
     | whenStatement
     | chooseStatement
     | atomicStatement
@@ -1424,15 +1409,6 @@ blockItemList
     ;
 
 /* 6.8.2 */
-
-/*
-blockItemOLD
-    : (declarationSpecifiers declarator declarationList_opt LCURLY)=>
-      functionDefinition
-    | declaration
-    | statement
-    ;
-*/
 
 // Overkill: create new DeclarationScope for every little
 // statement???
@@ -1535,6 +1511,10 @@ scope Symbols;
 	    s=statementWithScope
 	    -> ^(FOR $e0 $e1 $e2 $s $i)
 	  )
+	| f=(CIVLFOR | PARFOR) LPAREN
+	    t=typeName_opt v=identifierList COLON e=expression RPAREN
+	    i=invariant_opt s=statementWithScope
+	    -> ^($f $t $v $e $s $i)
 	;
 
 expression_opt
@@ -1548,6 +1528,10 @@ invariant_opt
 		-> ^(INVARIANT expression)
 	;
 
+typeName_opt
+	:	typeName
+	|	-> ABSENT
+	;
 
 /* 6.8.6
  * Four possible trees:
@@ -1586,18 +1570,10 @@ pragma	:	PRAGMA IDENTIFIER pragmaBody NEWLINE
 pragmaBody
 	:	(~ NEWLINE)*
 	;
-/*
-assertStatement
-	:	ASSERT expression SEMI -> ^(ASSERT expression)
-	;*/
 
 assumeStatement
 	:	ASSUME expression SEMI -> ^(ASSUME expression)
 	;
-
-/*waitStatement
-	:	WAIT expression SEMI -> ^(WAIT expression)
-	;*/
 
 whenStatement
 	:	WHEN LPAREN expression RPAREN statement
@@ -1609,13 +1585,13 @@ chooseStatement
 		-> ^(CHOOSE statement+)
 	;
 
-// general atomic block "$atomic{...} or $atomic statement;"
+// general atomic block $atomic{...}
 atomicStatement
 	:	CIVLATOMIC s=statementWithScope
 		-> ^(CIVLATOMIC $s)
 	;
 
-// deterministic atomic block "$datomic{...} or $datomic statement;"
+// deterministic atomic block $atom{...}
 datomicStatement
 	:	CIVLATOM s=statementWithScope
 		-> ^(CIVLATOM $s)

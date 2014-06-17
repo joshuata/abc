@@ -71,6 +71,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
@@ -89,6 +90,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.DomainTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
@@ -145,6 +147,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpWorkshareNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonCivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonCompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonDeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonExpressionStatementNode;
@@ -161,6 +164,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonWhenNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonAtomicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonBasicTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.common.type.CommonDomainTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonEnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonPointerTypeNode;
@@ -295,6 +299,17 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public TypeNode newScopeTypeNode(Source source) {
 		return new CommonScopeTypeNode(source);
+	}
+
+	@Override
+	public DomainTypeNode newDomainTypeNode(Source source) {
+		return new CommonDomainTypeNode(source, null);
+	}
+
+	@Override
+	public DomainTypeNode newDomainTypeNode(Source source,
+			ExpressionNode dimension) {
+		return new CommonDomainTypeNode(source, dimension);
 	}
 
 	@Override
@@ -596,6 +611,14 @@ public class CommonNodeFactory implements NodeFactory {
 				body);
 
 		return switchNode;
+	}
+
+	@Override
+	public CivlForNode newCivlForNode(Source source, boolean isParallel,
+			SequenceNode<ForLoopInitializerNode> variables,
+			ExpressionNode domain, StatementNode body, ExpressionNode invariant) {
+		return new CommonCivlForNode(source, isParallel, variables, domain,
+				body, invariant);
 	}
 
 	@Override

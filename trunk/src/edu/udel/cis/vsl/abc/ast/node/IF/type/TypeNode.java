@@ -9,14 +9,68 @@ public interface TypeNode extends SizeableNode {
 	 * The different kinds of type names.
 	 */
 	public static enum TypeNodeKind {
-		VOID, BASIC, ENUMERATION, ARRAY, STRUCTURE_OR_UNION, FUNCTION, POINTER, ATOMIC, TYPEDEF_NAME, SCOPE
+		ARRAY,
+		ATOMIC,
+		BASIC,
+		DOMAIN,
+		ENUMERATION,
+		FUNCTION,
+		POINTER,
+		SCOPE,
+		STRUCTURE_OR_UNION,
+		TYPEDEF_NAME,
+		VOID
 	};
+
+	@Override
+	TypeNode copy();
+
+	/**
+	 * Returns the conceptual C type associated to this type node.
+	 * 
+	 * @return the C type defined by this type node
+	 */
+	Type getType();
+
+	/**
+	 * Is this an "_Atomic" qualified type?
+	 * 
+	 * @return true iff this is an "_Atomic" qualified type
+	 */
+	boolean isAtomicQualified();
+
+	/**
+	 * Is this a "const" qualified type?
+	 * 
+	 * @return true iff this is a const qualified type.
+	 */
+	boolean isConstQualified();
+
+	boolean isInputQualified();
+
+	boolean isOutputQualified();
+
+	/**
+	 * Is this a "restrict" qualified type?
+	 * 
+	 * @return true iff this is a "restrict" qualified type.
+	 */
+	boolean isRestrictQualified();
+
+	/**
+	 * Is this a "volatile" qualified type?
+	 * 
+	 * @return true iff this is a volatile qualified type.
+	 */
+	boolean isVolatileQualified();
 
 	/**
 	 * The kind of type name this is. See definition of the enumerated type
 	 * TypeNameKind. These kinds partition the set of all type names.
 	 * 
 	 * If the kind is BASIC, this object can be safely cast to BasicType.
+	 * 
+	 * If the kind is DOMAIN, the object can be safely cast to DomainType.
 	 * 
 	 * If the kind is ENUMERATION, this object can be safely cast to
 	 * EnumerationType.
@@ -36,56 +90,15 @@ public interface TypeNode extends SizeableNode {
 	 */
 	TypeNodeKind kind();
 
-	/**
-	 * Is this a "const" qualified type?
-	 * 
-	 * @return true iff this is a const qualified type.
-	 */
-	boolean isConstQualified();
+	void setAtomicQualified(boolean value);
 
 	void setConstQualified(boolean value);
 
-	/**
-	 * Is this a "volatile" qualified type?
-	 * 
-	 * @return true iff this is a volatile qualified type.
-	 */
-	boolean isVolatileQualified();
-
-	void setVolatileQualified(boolean value);
-
-	/**
-	 * Is this a "restrict" qualified type?
-	 * 
-	 * @return true iff this is a "restrict" qualified type.
-	 */
-	boolean isRestrictQualified();
-
-	void setRestrictQualified(boolean value);
-
-	/**
-	 * Is this an "_Atomic" qualified type?
-	 * 
-	 * @return true iff this is an "_Atomic" qualified type
-	 */
-	boolean isAtomicQualified();
-
-	void setAtomicQualified(boolean value);
-
-	boolean isInputQualified();
-
 	void setInputQualified(boolean value);
-
-	boolean isOutputQualified();
 
 	void setOutputQualified(boolean value);
 
-	/**
-	 * Returns the conceptual C type associated to this type node.
-	 * 
-	 * @return the C type defined by this type node
-	 */
-	Type getType();
+	void setRestrictQualified(boolean value);
 
 	/**
 	 * Sets the type that will be returned by subsequent calls to getType().
@@ -95,8 +108,7 @@ public interface TypeNode extends SizeableNode {
 	 */
 	void setType(Type type);
 
-	@Override
-	TypeNode copy();
+	void setVolatileQualified(boolean value);
 
 	/**
 	 * 

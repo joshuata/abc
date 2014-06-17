@@ -3,7 +3,24 @@ package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 public interface StatementNode extends BlockItemNode {
 
 	public enum StatementKind {
-		PRAGMA, WHEN, ASSUME, EXPRESSION, COMPOUND, FOR, LOOP, IF, NULL, CHOOSE, GOTO, LABELED, RETURN, SWITCH, JUMP, ATOMIC, OMP_STATEMENT
+		ASSUME,
+		ATOMIC,
+		CHOOSE,
+		CIVL_FOR,
+		COMPOUND,
+		EXPRESSION,
+		FOR,
+		GOTO,
+		IF,
+		JUMP,
+		LABELED,
+		LOOP,
+		NULL,
+		OMP_STATEMENT,
+		PRAGMA,
+		RETURN,
+		SWITCH,
+		WHEN
 	}
 
 	@Override
