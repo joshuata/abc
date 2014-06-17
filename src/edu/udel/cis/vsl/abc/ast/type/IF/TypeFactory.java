@@ -583,6 +583,21 @@ public interface TypeFactory {
 	/** Returns the scope type */
 	ObjectType scopeType();
 
+	/** Returns the universal domain type <code>$domain</code>. */
+	DomainType domainType();
+
+	/**
+	 * Returns the domain type with specified dimension, <code>$domain(n)</code>
+	 * . This is a sub-type of <code>$domain</code>, which is the union over all
+	 * positive integers <code>n</code> <code>$domain(n)</code>.
+	 * 
+	 * @param dimension
+	 *            the dimension of the domain type, i.e., the arity of the
+	 *            tuples in the domain
+	 * @return the domain type of the given dimension
+	 */
+	DomainType domainType(int dimension);
+
 	/************************* Conversions *****************************/
 
 	/**
@@ -673,4 +688,5 @@ public interface TypeFactory {
 			boolean constQualified, boolean volatileQualified,
 			boolean restrictQualified, boolean inputQualified,
 			boolean outputQualified);
+
 }

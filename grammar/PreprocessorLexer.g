@@ -9,6 +9,9 @@ lexer grammar PreprocessorLexer;
  * that the stream of characters being scanned has already
  * gone through translation phases 1 and 2.  In particular
  * backslash followed by newline sequences have been removed.
+ *
+ * The grammar has been extended to include keywords for
+ * the CIVL-C extension of C.
  */
 
 @header
@@ -71,6 +74,10 @@ WS		:	(' ' | '\t')+;
 
 /****** C keywords, from C11 Sec. 6.4.1 ******/
 
+// These are listed in the order in which they are listed
+// in the C11 Standard.
+// Do NOT put CIVL-C keywords here.  They go below!
+
 AUTO		:	'auto';
 BREAK		:	'break';
 CASE		:	'case';
@@ -78,17 +85,17 @@ CHAR		:	'char';
 CONST		:	'const';
 CONTINUE	:	'continue';
 DEFAULT		:	'default';
-DO		:	'do';
+DO			:	'do';
 DOUBLE		:	'double';
 ELSE		:	'else';
 ENUM		:	'enum';
 EXTERN		:	'extern';
 FLOAT		:	'float';
-FOR		:	'for';
+FOR			:	'for';
 GOTO		:	'goto';
-IF		:	'if';
+IF			:	'if';
 INLINE		:	'inline';
-INT		:	'int';
+INT			:	'int';
 LONG		:	'long';
 REGISTER	:	'register';
 RESTRICT	:	'restrict';
@@ -96,7 +103,6 @@ RETURN		:	'return';
 SHORT		:	'short';
 SIGNED		:	'signed';
 SIZEOF		:	'sizeof';
-SCOPEOF		:	'$scopeof';
 STATIC		:	'static';
 STRUCT		:	'struct';
 SWITCH		:	'switch';
@@ -114,49 +120,51 @@ COMPLEX		:	'_Complex';
 GENERIC		:	'_Generic';
 IMAGINARY	:	'_Imaginary';
 NORETURN	:	'_Noreturn';
-STATICASSERT	:	'_Static_assert';
+STATICASSERT:	'_Static_assert';
 THREADLOCAL	:	'_Thread_local';
 
 
 /* Additional keywords and symbols used in CIVL-C */
 
-// be sure to add these to PreprocessorParser.g too!
+// Keep these in alphabetical order by token name.  Respect the formatting!
+// Be sure to add these to PreprocessorParser.g too, under c_keyword.
 
 ABSTRACT	:	'$abstract';
-//ASSERT		:	'$assert';
 ASSUME		:	'$assume';
-AT		:	'@';
-BIG_O	:	'$O';
+AT			:	'@';
+BIG_O		:	'$O';
 CHOOSE		:	'$choose';
+CIVLATOMIC	:	'$atomic';
+CIVLATOM	:	'$atom';
+CIVLFOR		:	'$for';
 COLLECTIVE	:	'$collective';
-CONTIN			:	'$contin';
-DERIV			: '$D';
+CONTIN		:	'$contin';
+DERIV		:	'$D';
+DOMAIN		:	'$domain';
 ENSURES		:	'$ensures';
-EXISTS			: 	'$exists';
+EXISTS		: 	'$exists';
 FALSE		:	'$false';
 FORALL		:	'$forall';
-IMPLIES		:	'=>'	|	NotLineStart;
+HERE		:	'$here';
+IMPLIES		:	'=>'	|	NotLineStart; // can the NotLineStart be removed?
 INPUT		:	'$input';
 INVARIANT	:	'$invariant';
 LSLIST		:	'<|';  // LSLIST and RSLIST enclose a scope list
 OUTPUT		:	'$output';
-//PROC		:	'$proc';
+PARFOR		:	'$parfor';
+PROCNULL	:	'$proc_null';
+REAL		:	'$real';
 REQUIRES	:	'$requires';
 RESULT		:	'$result';
 RSLIST		:	'|>';  // LSLIST and RSLIST enclose a scope list
+SCOPEOF		:	'$scopeof';
 SELF		:	'$self';
-PROCNULL	:	'$proc_null';
-HERE		:	'$here';
 ROOT		:	'$root';
-SCOPE		:	'$scopeDUPLICATE';
+SCOPE		:	'$scopeDUPLICATE'; // CAN THIS BE DELETED?
 SPAWN		:	'$spawn';
 TRUE		:	'$true';
-UNIFORM	:	'$uniform';
-//WAIT		:	'$wait'; $wait is implemented as a system function
+UNIFORM		:	'$uniform';
 WHEN		:	'$when';
-CIVLATOMIC	:	'$atomic';
-CIVLATOM	:	'$atom';
-REAL:	'$real';
 
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/

@@ -64,6 +64,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
@@ -80,6 +81,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.DomainTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
@@ -334,6 +336,31 @@ public interface NodeFactory {
 	 */
 	TypedefNameNode newTypedefNameNode(IdentifierNode name,
 			SequenceNode<ExpressionNode> scopeList);
+
+	/**
+	 * Returns a new instance of domain type node, with no dimension specified;
+	 * this is the CIVL-C type <code>$domain</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of <code>$domain</code>
+	 * @return the new domain type node instance
+	 */
+	DomainTypeNode newDomainTypeNode(Source source);
+
+	/**
+	 * Returns a new instance of the domain type node with given integer
+	 * dimension; this is the CIVL-C type <code>$domain(n)</code>, where
+	 * <code>n</code> is the domain dimension. This is a subtype of
+	 * <code>$domain</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of <code>$domain</code>
+	 * @param dimension
+	 *            the dimension of the domain, i.e., the arity of the tuples
+	 *            which comprise the domain
+	 * @return the new domain type node instance
+	 */
+	DomainTypeNode newDomainTypeNode(Source source, ExpressionNode dimension);
 
 	// Expressions...
 
@@ -917,6 +944,22 @@ public interface NodeFactory {
 
 	SwitchNode newSwitchNode(Source source, ExpressionNode condition,
 			StatementNode body);
+
+	/**
+	 * Returns a new instance of the CIVL <code>$for</code> or
+	 * <code>$parfor</code> node.
+	 * 
+	 * @param source
+	 * @param isParallel
+	 * @param variables
+	 * @param domain
+	 * @param body
+	 * @param invariant
+	 * @return
+	 */
+	CivlForNode newCivlForNode(Source source, boolean isParallel,
+			SequenceNode<ForLoopInitializerNode> variables,
+			ExpressionNode domain, StatementNode body, ExpressionNode invariant);
 
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 

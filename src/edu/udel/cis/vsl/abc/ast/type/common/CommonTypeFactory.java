@@ -13,6 +13,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
@@ -63,6 +64,8 @@ public class CommonTypeFactory implements TypeFactory {
 	private ObjectType heapType = null;
 
 	private ObjectType scopeType = null;
+
+	private DomainType domainType = null;
 
 	private UnsignedIntegerType size_t = null, char16_t = null,
 			char32_t = null;
@@ -264,6 +267,22 @@ public class CommonTypeFactory implements TypeFactory {
 		EnumerationType result = new CommonEnumerationType(key, tag);
 
 		return (EnumerationType) canonicalize(result);
+	}
+
+	@Override
+	public DomainType domainType() {
+		if (domainType == null) {
+			domainType = new CommonDomainType();
+			insert(domainType);
+		}
+		return domainType;
+	}
+
+	@Override
+	public DomainType domainType(int dimension) {
+		DomainType result = new CommonDomainType(dimension);
+
+		return (DomainType) canonicalize(result);
 	}
 
 	@Override

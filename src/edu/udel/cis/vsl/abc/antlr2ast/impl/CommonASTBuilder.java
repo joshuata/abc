@@ -1181,6 +1181,25 @@ public class CommonASTBuilder implements ASTBuilder {
 		case ATOMIC:
 			result = translateAtomicType(analysis.typeSpecifierNode, scope);
 			break;
+		case DOMAIN: {
+			CommonTree node = analysis.typeSpecifierNode;
+			Source source = newSource(node);
+
+			if (node.getChildCount() != 0) {
+				CommonTree child = (CommonTree) node.getChild(0);
+
+				if (child.getToken().getType() != CParser.ABSENT) {
+					ExpressionNode dimensionNode = translateExpression(child,
+							scope);
+
+					result = nodeFactory.newDomainTypeNode(source,
+							dimensionNode);
+					break;
+				}
+			}
+			result = nodeFactory.newDomainTypeNode(source);
+			break;
+		}
 		default:
 			throw new RuntimeException("Should not happen.");
 		}
