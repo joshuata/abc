@@ -6,10 +6,12 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 
 public class CommonFunction extends CommonOrdinaryEntity implements Function {
 
@@ -50,7 +52,17 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 
 	@Override
 	public Scope getScope() {
-		return getDefinition().getScope();
+		Scope result = getDefinition().getBody().getScope();
+
+		while (result != null) {
+			if (result.getScopeKind() == ScopeKind.FUNCTION)
+				break;
+			result = result.getParentScope();
+		}
+		if (result == null)
+			throw new ABCRuntimeException(
+					"Could not find function scope of function " + this);
+		return result;
 	}
 
 	@Override
