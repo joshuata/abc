@@ -48,9 +48,10 @@ public class CTranslationTest {
 		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
 				userIncludes);
-		if (debug)
+		if (debug) {
 			a.showTranslation(out);
-		else {
+			a.printProgram(out, a.getProgram());
+		} else {
 			Program program = a.getProgram();
 
 			a.printProgram(out, program);
@@ -120,5 +121,10 @@ public class CTranslationTest {
 	@Test
 	public void a2d() throws ABCException, IOException {
 		check("a2d");
+	}
+	
+	@Test
+	public void labels() throws ABCException, IOException {
+		check("labels");
 	}
 }
