@@ -13,6 +13,7 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
@@ -46,6 +47,8 @@ public class CompareCombiner implements Combiner {
 
 	private Source specSource;
 
+	private Source implSource;
+
 	@Override
 	public AST combine(AST unit0, AST unit1) throws SyntaxException {
 		ASTNode specRoot = unit0.getRootNode();
@@ -54,7 +57,6 @@ public class CompareCombiner implements Combiner {
 		Map<String, VariableDeclarationNode> inputVariables;
 		Map<String, VariableDeclarationNode> specOutputs;
 		Map<String, VariableDeclarationNode> implOutputs;
-		Map<String, FunctionDeclarationNode> systemFunctions;
 		FunctionDefinitionNode specSystem;
 		FunctionDefinitionNode implSystem;
 		FunctionDefinitionNode newMain;
@@ -62,7 +64,8 @@ public class CompareCombiner implements Combiner {
 		List<ASTNode> nodes = new ArrayList<ASTNode>();
 		Transformer nameTransformer;
 
-		specSource = specRoot.getSource();
+		specSource = this.getMainSource(specRoot);
+		implSource = this.getMainSource(implRoot);
 		astFactory = unit0.getASTFactory();
 		factory = astFactory.getNodeFactory();
 		inputVariables = combineInputs(specRoot, implRoot);
@@ -81,15 +84,15 @@ public class CompareCombiner implements Combiner {
 		specOutputs = outputs(specRoot);
 		implOutputs = outputs(implRoot);
 		checkOutputs(specOutputs, implOutputs);
-		systemFunctions = combineSystemFunctions(specRoot, implRoot);
-		nodes.addAll(systemFunctions.values());
+		// systemFunctions = combineSystemFunctions(specRoot, implRoot);
+		// nodes.addAll(systemFunctions.values());
 		nameTransformer = new NameTransformer(renameVariables(
 				specOutputs.values(), "_spec"), unit0.getASTFactory());
 		unit0 = nameTransformer.transform(unit0);
 		specRoot = unit0.getRootNode();
 		// TODO: Check consistency of assumptions
-		specSystem = wrapperFunction(specRoot, "system_spec");
-		implSystem = wrapperFunction(implRoot, "system_impl");
+		specSystem = wrapperFunction(specSource, specRoot, "system_spec");
+		implSystem = wrapperFunction(implSource, implRoot, "system_impl");
 		for (VariableDeclarationNode v : specOutputs.values()) {
 			v.getTypeNode().setOutputQualified(false);
 			nodes.add(v.copy());
@@ -101,16 +104,14 @@ public class CompareCombiner implements Combiner {
 		nodes.add(specSystem);
 		nodes.add(implSystem);
 		newMainBodyNodes.add(factory.newExpressionStatementNode(factory
-				.newFunctionCallNode(specRoot.getSource(), factory
-						.newIdentifierExpressionNode(specRoot.getSource(),
-								factory.newIdentifierNode(specRoot.getSource(),
-										"system_spec")),
+				.newFunctionCallNode(specSource, factory
+						.newIdentifierExpressionNode(specSource, factory
+								.newIdentifierNode(specSource, "system_spec")),
 						new ArrayList<ExpressionNode>(), null)));
 		newMainBodyNodes.add(factory.newExpressionStatementNode(factory
-				.newFunctionCallNode(implRoot.getSource(), factory
-						.newIdentifierExpressionNode(implRoot.getSource(),
-								factory.newIdentifierNode(implRoot.getSource(),
-										"system_impl")),
+				.newFunctionCallNode(implSource, factory
+						.newIdentifierExpressionNode(implSource, factory
+								.newIdentifierNode(implSource, "system_impl")),
 						new ArrayList<ExpressionNode>(), null)));
 		// TODO: spawn and join (but calls ok until joint assertions
 		// implemented)
@@ -132,8 +133,8 @@ public class CompareCombiner implements Combiner {
 								newMainBodyNodes));
 		nodes.add(newMain);
 		newRoot = factory.newSequenceNode(
-				astFactory.getTokenFactory().join(specRoot.getSource(),
-						implRoot.getSource()), "Composite System", nodes);
+				astFactory.getTokenFactory().join(specSource, implSource),
+				"Composite System", nodes);
 		return astFactory.newAST(newRoot);
 	}
 
@@ -216,8 +217,8 @@ public class CompareCombiner implements Combiner {
 	 * @return A function definition node with the appropriate name, void return
 	 *         type, and no parameters.
 	 */
-	private FunctionDefinitionNode wrapperFunction(ASTNode root, String name) {
-		Source source = root.getSource();
+	private FunctionDefinitionNode wrapperFunction(Source source, ASTNode root,
+			String name) {
 		FunctionTypeNode functionType = factory.newFunctionTypeNode(source,
 				factory.newVoidTypeNode(source), factory.newSequenceNode(
 						source, "Formals",
@@ -239,9 +240,9 @@ public class CompareCombiner implements Combiner {
 			} else if (child.nodeKind() == NodeKind.FUNCTION_DECLARATION) {
 				FunctionDeclarationNode function = (FunctionDeclarationNode) child;
 
-				if (function.getEntity().getDefinition() != null) {
-					items.add(function.copy());
-				}
+				// if (function.getEntity().getDefinition() != null) {
+				items.add(function.copy());
+				// }
 			} else if (child.nodeKind() == NodeKind.FUNCTION_DEFINITION) {
 				FunctionDefinitionNode function = (FunctionDefinitionNode) child;
 				if (function.getName() != null
@@ -260,7 +261,7 @@ public class CompareCombiner implements Combiner {
 			}
 		}
 		body = factory.newCompoundStatementNode(source, items);
-		result = factory.newFunctionDefinitionNode(root.getSource(), factory
+		result = factory.newFunctionDefinitionNode(source, factory
 				.newIdentifierNode(root.getSource(), name), functionType,
 				factory.newSequenceNode(source, "Contract",
 						new ArrayList<ContractNode>()), body);
@@ -313,51 +314,6 @@ public class CompareCombiner implements Combiner {
 	}
 
 	/**
-	 * For system and abstract functions, just have one copy of each and move to
-	 * the outermost scope.
-	 * 
-	 * @param specRoot
-	 *            The specification program root node.
-	 * @param implRoot
-	 *            The implementation program root node.
-	 * @return A map from the names of system/abstract functions to their
-	 *         declaration.
-	 */
-	private Map<String, FunctionDeclarationNode> combineSystemFunctions(
-			ASTNode specRoot, ASTNode implRoot) {
-		Map<String, FunctionDeclarationNode> functions = new LinkedHashMap<String, FunctionDeclarationNode>();
-
-		// Put all system or abstract functions from the implementation into the
-		// map.
-		for (int i = 0; i < implRoot.numChildren(); i++) {
-			ASTNode child = implRoot.child(i);
-
-			if (child.nodeKind() == NodeKind.FUNCTION_DECLARATION) {
-				FunctionDeclarationNode function = (FunctionDeclarationNode) child;
-
-				if (function.getEntity().getDefinition() == null) {
-					functions.put(function.getName(), function.copy());
-				}
-			}
-		}
-		// Check that all input variables from the spec were also in the impl.
-		for (int i = 0; i < specRoot.numChildren(); i++) {
-			ASTNode child = specRoot.child(i);
-
-			if (child.nodeKind() == NodeKind.FUNCTION_DECLARATION) {
-				FunctionDeclarationNode function = (FunctionDeclarationNode) child;
-
-				if (function.getEntity().getDefinition() == null) {
-					if (!functions.containsKey(function.getName())) {
-						functions.put(function.getName(), function.copy());
-					}
-				}
-			}
-		}
-		return functions;
-	}
-
-	/**
 	 * Create a mapping from Entity to String where the entities are variables
 	 * and the strings are those variable names with a suffix added.
 	 * 
@@ -375,5 +331,28 @@ public class CompareCombiner implements Combiner {
 			result.put(var.getEntity(), var.getName() + suffix);
 		}
 		return result;
+	}
+
+	private Source getMainSource(ASTNode node) {
+		if (node.nodeKind() == NodeKind.FUNCTION_DEFINITION) {
+			FunctionDefinitionNode functionNode = (FunctionDefinitionNode) node;
+			IdentifierNode functionName = (IdentifierNode) functionNode
+					.child(0);
+
+			if (functionName.name().equals("main")) {
+				return node.getSource();
+			}
+		}
+		for (ASTNode child : node.children()) {
+			if (child == null)
+				continue;
+			else {
+				Source childResult = getMainSource(child);
+
+				if (childResult != null)
+					return childResult;
+			}
+		}
+		return null;
 	}
 }
