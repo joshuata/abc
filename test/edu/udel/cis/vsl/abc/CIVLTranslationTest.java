@@ -104,4 +104,14 @@ public class CIVLTranslationTest {
 	public void domain() throws ABCException, IOException {
 		check("domain");
 	}
+	
+	@Test
+	public void dollarFor() throws ABCException, IOException {
+		check("dollarFor");
+	}
+	
+	@Test
+	public void parfor() throws ABCException, IOException {
+		check("parfor");
+	}
 }

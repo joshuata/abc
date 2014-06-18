@@ -1,0 +1,11 @@
+#include <civlc.h>
+
+void main(){
+  $range range = $range_regular(0, 5, 1);
+  $domain(1) dom = $domain_rectangular(range);
+  int sum = 0;
+  
+  $parfor(int i: dom){
+    sum += i;
+  }
+}
