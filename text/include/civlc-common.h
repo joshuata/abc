@@ -171,7 +171,10 @@ $range $range_regular(int lo, int hi, int step);
 // this is a var-args function; the number of arguments determines
 // the dimension of the domain returned.    The order is dictionary
 // order.
-$domain $domain_rectangular($range r1, ...);
+//$domain $domain_rectangular($range r1, ...);
+
+// returns the dimension of the domain
+//int $domain_get_dim($domain d);
 
 /* Creates a new barrier object and returns a handle to it.
  * The barrier has the specified size.
