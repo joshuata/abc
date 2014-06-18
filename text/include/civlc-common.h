@@ -156,6 +156,23 @@ typedef struct __int_iter__ {
   int index; //initialized as 0
 } * $int_iter;
  
+typedef struct __range__ {
+  int lo;
+  int hi;
+  int step;
+}  $range;
+
+// range consisting of lo, lo+step, lo+2*step, ...
+// the sequence stops just before the first number
+// greater than hi.
+$range $range_regular(int lo, int hi, int step);
+
+// domain which is the Cartesian products of the given ranges.
+// this is a var-args function; the number of arguments determines
+// the dimension of the domain returned.    The order is dictionary
+// order.
+$domain $domain_rectangular($range r1, ...);
+
 /* Creates a new barrier object and returns a handle to it.
  * The barrier has the specified size.
  * The new object will be allocated in the given scope. */
