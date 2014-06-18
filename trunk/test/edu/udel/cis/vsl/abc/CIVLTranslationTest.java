@@ -99,4 +99,9 @@ public class CIVLTranslationTest {
 	public void nestedFunctions() throws ABCException, IOException {
 		check("nestedFunctions");
 	}
+	
+	@Test
+	public void domain() throws ABCException, IOException {
+		check("domain");
+	}
 }
