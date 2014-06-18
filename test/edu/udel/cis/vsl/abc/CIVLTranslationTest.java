@@ -94,4 +94,9 @@ public class CIVLTranslationTest {
 	public void potentialBug() throws ABCException, IOException {
 		check("potentialBug");
 	}
+	
+	@Test
+	public void nestedFunctions() throws ABCException, IOException {
+		check("nestedFunctions");
+	}
 }
