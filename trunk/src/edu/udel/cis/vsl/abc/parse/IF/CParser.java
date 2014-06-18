@@ -292,6 +292,10 @@ public interface CParser {
 	public static final int TYPE_NAME = CivlCParser.TYPE_NAME;
 	public static final int TYPE_QUALIFIER_LIST = CivlCParser.TYPE_QUALIFIER_LIST;
 
+	public enum RuleKind {
+		EXTERNAL_DEF, BLOCK_ITEM
+	}
+
 	/**
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some
 	 * "post-processing" has been done to the tree to fill in some fields.
@@ -323,5 +327,17 @@ public interface CParser {
 	 * @return the new syntax exception
 	 */
 	SyntaxException newSyntaxException(String message, CommonTree tree);
+
+	/**
+	 * Parses the token stream associated with this parser into a tree,
+	 * according to the specified type.
+	 * 
+	 * @param type
+	 *            The type of the rule to use to parse the token stream of this
+	 *            parser.
+	 * @return The parsed tree.
+	 * @throws ParseException
+	 */
+	CommonTree parse(RuleKind type) throws ParseException;
 
 }

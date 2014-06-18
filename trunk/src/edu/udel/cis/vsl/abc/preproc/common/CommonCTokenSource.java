@@ -215,10 +215,10 @@ public class CommonCTokenSource implements CTokenSource {
 
 	public CommonCTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
-			TokenFactory tokenFactory, Preprocessor preprocessor)
-			throws PreprocessorException {
+			Preprocessor preprocessor) throws PreprocessorException {
 		this(source, parser, systemIncludePaths, userIncludePaths,
-				new HashMap<String, Macro>(), tokenFactory, preprocessor);
+				new HashMap<String, Macro>(), preprocessor.getTokenFactory(),
+				preprocessor);
 	}
 
 	// Implementation of methods from CTokenSource...

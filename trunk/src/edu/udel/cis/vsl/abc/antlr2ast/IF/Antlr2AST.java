@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonASTBuilder;
+import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonCIVLPragmaBuilder;
 import edu.udel.cis.vsl.abc.antlr2ast.impl.CommonOmpBuilder;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -50,6 +51,17 @@ public class Antlr2AST {
 	public static OmpBuilder newOmpBuilder(ASTFactory astFactory,
 			ASTBuilder astBuilder) {
 		return new CommonOmpBuilder(astFactory, astBuilder);
+	}
+
+	/**
+	 * Returns a new CIVLPragmaBuilder.
+	 * 
+	 * @param astBuilder
+	 *            the AST builder to be reused.
+	 * @return the new OmpBuilder
+	 */
+	public static CIVLPragmaBuilder newCIVLPragmaBuilder(ASTBuilder astBuilder) {
+		return new CommonCIVLPragmaBuilder(astBuilder);
 	}
 
 	/**
