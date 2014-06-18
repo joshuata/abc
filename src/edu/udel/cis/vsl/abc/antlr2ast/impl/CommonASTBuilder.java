@@ -2203,6 +2203,32 @@ public class CommonASTBuilder implements ASTBuilder {
 		return nodeFactory.newCompoundStatementNode(source, items);
 	}
 
+	@Override
+	public List<BlockItemNode> translateBlockItemNode(
+			CommonTree blockItemTree, SimpleScope scope) throws SyntaxException {
+		int kind = blockItemTree.getType();
+		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
+
+		if (kind == DECLARATION) {
+			for (ExternalDefinitionNode declaration : translateDeclaration(
+					blockItemTree, scope))
+				items.add((BlockItemNode) declaration);
+		} else if (kind == SCOPE) {
+			items.add(translateScopeDeclaration(blockItemTree, scope));
+		} else if (kind == STATICASSERT) {
+			items.add(translateStaticAssertion(blockItemTree, scope));
+		} else if (kind == FUNCTION_DEFINITION) {
+			items.add((BlockItemNode) translateFunctionDefinition(
+					blockItemTree, scope));
+		} else {
+			StatementNode statementNode = translateStatement(blockItemTree,
+					scope);
+
+			items.add(statementNode);
+		}
+		return items;
+	}
+
 	private ChooseStatementNode translateChooseStatement(
 			CommonTree chooseStatementTree, SimpleScope scope)
 			throws SyntaxException {

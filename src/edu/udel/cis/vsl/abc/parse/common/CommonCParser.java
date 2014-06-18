@@ -165,4 +165,30 @@ public class CommonCParser implements CParser {
 		return tokenFactory.newSyntaxException(message, source(tree));
 	}
 
+	@Override
+	public CommonTree parse(RuleKind type) throws ParseException {
+		CommonTree tree;
+
+		try {
+			switch (type) {
+			case EXTERNAL_DEF:
+				tree = (CommonTree) parser.externalDeclaration().getTree();
+				break;
+			case BLOCK_ITEM:
+				tree = (CommonTree) parser.blockItem().getTree();
+				break;
+			default:
+				return null;
+			}
+		} catch (RecognitionException e) {
+			throw new ParseException(e.getMessage(), e.token);
+		} catch (RuntimeParseException e) {
+			// throw new ParseException(e.getMessage(), e.getToken());
+			// RuntimeParseException e already contains the token information in
+			// its getMessage()
+			throw new ParseException(e.getMessage());
+		}
+		return tree;
+	}
+
 }

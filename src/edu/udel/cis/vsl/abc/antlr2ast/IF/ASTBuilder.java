@@ -1,9 +1,12 @@
 package edu.udel.cis.vsl.abc.antlr2ast.IF;
 
+import java.util.List;
+
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -37,6 +40,9 @@ public interface ASTBuilder {
 	 *             if there is a syntax error in the expression
 	 */
 	ExpressionNode translateExpression(CommonTree expressionTree,
+			SimpleScope scope) throws SyntaxException;
+
+	List<BlockItemNode> translateBlockItemNode(CommonTree blockItemTree,
 			SimpleScope scope) throws SyntaxException;
 
 }
