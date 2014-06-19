@@ -858,6 +858,7 @@ public class SideEffectRemover extends BaseTransformer {
 				break;
 			case ADDRESSOF:
 			case DEREFERENCE:
+			case NOT:
 				if (left.isSideEffectFree(false)) {
 					result = new SideEffectFreeTriple(
 							new Vector<BlockItemNode>(), expression,
