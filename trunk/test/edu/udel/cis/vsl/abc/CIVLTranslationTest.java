@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
@@ -94,22 +95,25 @@ public class CIVLTranslationTest {
 	public void potentialBug() throws ABCException, IOException {
 		check("potentialBug");
 	}
-	
+
+	// ignoring because for now CIVL follows the C11 Standard
+	// in that all functions have internal or external linkage
+	@Ignore
 	@Test
 	public void nestedFunctions() throws ABCException, IOException {
 		check("nestedFunctions");
 	}
-	
+
 	@Test
 	public void domain() throws ABCException, IOException {
 		check("domain");
 	}
-	
+
 	@Test
 	public void dollarFor() throws ABCException, IOException {
 		check("dollarFor");
 	}
-	
+
 	@Test
 	public void parfor() throws ABCException, IOException {
 		check("parfor");

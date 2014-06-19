@@ -2,8 +2,10 @@
 #include <stdio.h>
 
 void main(){
-  $range range = $range_regular(0, 5, 1);
-  $domain(1) dom = $domain_rectangular(range);
+//  $range range = $range_regular(0, 5, 1);
+//  $domain(1) dom = $domain_rectangular(range);
+  $range range = 0 .. 5;
+  $domain(1) dom = ($domain){range};
   
   printf("%s\n", dom);
 }
