@@ -7,6 +7,7 @@ import org.antlr.runtime.tree.CommonTree;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -44,5 +45,7 @@ public interface ASTBuilder {
 
 	List<BlockItemNode> translateBlockItemNode(CommonTree blockItemTree,
 			SimpleScope scope) throws SyntaxException;
+
+	CParser getCParser();
 
 }
