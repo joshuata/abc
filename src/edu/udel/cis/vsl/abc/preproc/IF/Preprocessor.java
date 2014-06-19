@@ -8,6 +8,7 @@ import java.util.Set;
 import org.antlr.runtime.Lexer;
 import org.antlr.runtime.Parser;
 
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public interface Preprocessor {

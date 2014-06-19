@@ -94,7 +94,7 @@ public class CommonPreprocessor implements Preprocessor {
 			throws PreprocessorException {
 		this.implicitMacros = new HashMap<String, Macro>();
 		for (File file : implicitIncludes) {
-			CommonCTokenSource tokenSource = outputTokenSource(file,
+			PreprocessorTokenSource tokenSource = outputTokenSource(file,
 					implicitMacros, tokenFactory);
 			Token token;
 
@@ -257,11 +257,11 @@ public class CommonPreprocessor implements Preprocessor {
 		}
 	}
 
-	private CommonCTokenSource outputTokenSource(File file,
+	private PreprocessorTokenSource outputTokenSource(File file,
 			Map<String, Macro> macroMap, TokenFactory tokenFactory)
 			throws PreprocessorException {
 		PreprocessorParser parser = parser(file);
-		CommonCTokenSource tokenSource = new CommonCTokenSource(file, parser,
+		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file, parser,
 				systemIncludePaths, userIncludePaths, macroMap, tokenFactory,
 				this);
 
@@ -279,7 +279,7 @@ public class CommonPreprocessor implements Preprocessor {
 	 *             if an I/O error occurs
 	 */
 	@Override
-	public CommonCTokenSource outputTokenSource(File file)
+	public PreprocessorTokenSource outputTokenSource(File file)
 			throws PreprocessorException {
 		Map<String, Macro> macroMap = new HashMap<String, Macro>();
 
@@ -304,7 +304,7 @@ public class CommonPreprocessor implements Preprocessor {
 	@Override
 	public void printOutputTokens(PrintStream out, File file)
 			throws PreprocessorException {
-		CommonCTokenSource source = outputTokenSource(file);
+		PreprocessorTokenSource source = outputTokenSource(file);
 
 		out.println("Post-preprocessing token stream for " + file + ":\n");
 		PreprocessorUtils.printTokenSource(out, source);
@@ -325,7 +325,7 @@ public class CommonPreprocessor implements Preprocessor {
 	@Override
 	public void printOutput(PrintStream out, File file)
 			throws PreprocessorException {
-		CommonCTokenSource source = outputTokenSource(file);
+		PreprocessorTokenSource source = outputTokenSource(file);
 
 		PreprocessorUtils.sourceTokenSource(out, source);
 		out.flush();

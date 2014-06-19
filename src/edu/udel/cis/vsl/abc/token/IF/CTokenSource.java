@@ -1,12 +1,8 @@
-package edu.udel.cis.vsl.abc.preproc.IF;
+package edu.udel.cis.vsl.abc.token.IF;
 
 import java.util.Map;
 
 import org.antlr.runtime.TokenSource;
-
-import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
-import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 /**
  * Extends ANTLR's TokenSource interface by adding some additional
