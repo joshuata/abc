@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.antlr2ast.impl;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -16,7 +15,6 @@ import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 public class CommonCIVLPragmaBuilder implements CIVLPragmaBuilder {
 
@@ -47,20 +45,19 @@ public class CommonCIVLPragmaBuilder implements CIVLPragmaBuilder {
 
 	private CommonTree getTree(Iterator<CToken> ctokens, RuleKind type)
 			throws ParseException {
-		List<CToken> tokenList = new ArrayList<>();
-		CTokenSource tokenSource;
+		CTokenSource tokenSource = astBuilder.getCParser().getTokenSource();
 		CParser cparser;
+		int start = -1, end = -1;
 
 		while (ctokens.hasNext()) {
-			tokenList.add(ctokens.next());
-		}
-		tokenSource = (CTokenSource) TokenUtils
-				.makeTokenSourceFromList(tokenList.get(0));
-		cparser = Parse.newCParser(tokenSource);
-		// return cparser.parse(type);
+			CToken current = ctokens.next();
 
-		// TODO
-		return null;
+			if (start == -1)
+				start = current.getIndex();
+			end = current.getIndex();
+		}
+		cparser = Parse.newCParser(type, tokenSource, start, end);
+		return cparser.getTree();
 	}
 
 }

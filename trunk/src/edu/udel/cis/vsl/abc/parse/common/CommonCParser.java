@@ -68,7 +68,7 @@ public class CommonCParser implements CParser {
 		this.tokenSource = new SubTokenSource(tokenSource, startTokenIndex,
 				lastTokenIndex);
 		this.tokenFactory = tokenSource.getTokenFactory();
-		this.stream = new CommonTokenStream(tokenSource);
+		this.stream = new CommonTokenStream(this.tokenSource);
 		this.parser = new CivlCParser(stream);
 	}
 
