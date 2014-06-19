@@ -1,7 +1,7 @@
 package edu.udel.cis.vsl.abc.parse.IF;
 
 import edu.udel.cis.vsl.abc.parse.common.CommonCParser;
-import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 
 public class Parse {
 

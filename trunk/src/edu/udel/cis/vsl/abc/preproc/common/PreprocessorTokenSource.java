@@ -21,13 +21,13 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
-import edu.udel.cis.vsl.abc.preproc.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.preproc.IF.IllegalMacroArgumentException;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.FunctionMacro;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
@@ -40,10 +40,10 @@ import edu.udel.cis.vsl.abc.util.IF.Pair;
 import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
 
 /**
- * A CTokenSource is created by opening a file, scanning that file and executing
- * the preprocessor directives to produce a stream of (output) tokens. The
- * directives may include #include directives, which cause additional files to
- * be opened and scanned.
+ * A PreprocessorTokenSource is created by opening a file, scanning that file
+ * and executing the preprocessor directives to produce a stream of (output)
+ * tokens. The directives may include #include directives, which cause
+ * additional files to be opened and scanned.
  * 
  * The tokens produced are instances of CToken.
  * 
@@ -62,7 +62,7 @@ import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
  * 
  * @author Stephen F. Siegel
  */
-public class CommonCTokenSource implements CTokenSource {
+public class PreprocessorTokenSource implements CTokenSource {
 
 	// Fields...
 
@@ -177,7 +177,7 @@ public class CommonCTokenSource implements CTokenSource {
 	 *             if and IOException or RecognitionException occurs while
 	 *             scanning and parsing the source file
 	 */
-	public CommonCTokenSource(File source, PreprocessorParser parser,
+	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macroMap, TokenFactory tokenFactory,
 			Preprocessor preprocessor) throws PreprocessorException {
@@ -213,7 +213,7 @@ public class CommonCTokenSource implements CTokenSource {
 			theTokens = new ArrayList<CToken>();
 	}
 
-	public CommonCTokenSource(File source, PreprocessorParser parser,
+	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Preprocessor preprocessor) throws PreprocessorException {
 		this(source, parser, systemIncludePaths, userIncludePaths,
