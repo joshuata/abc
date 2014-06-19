@@ -5,10 +5,13 @@ import java.util.Map;
 import org.antlr.runtime.TokenSource;
 
 /**
+ * <p>
  * Extends ANTLR's TokenSource interface by adding some additional
  * functionality: getting the macro information, and methods to get the number
  * of tokens produced so far and to retrieve any token produced so far by index.
+ * </p>
  * 
+ * <p>
  * Here are the methods specified in ANTLR's TokenSource interface:
  * 
  * <pre>
@@ -21,6 +24,8 @@ import org.antlr.runtime.TokenSource;
  *  * ask lexers input stream.
  * 	public String getSourceName();
  * </pre>
+ * 
+ * </p>
  * 
  * @author siegel
  * 
@@ -51,6 +56,11 @@ public interface CTokenSource extends TokenSource {
 	 */
 	CToken getToken(int index);
 
+	/**
+	 * Returns the token factory used by this token source object.
+	 * 
+	 * @return the token factory used by this token source object
+	 */
 	TokenFactory getTokenFactory();
 
 }

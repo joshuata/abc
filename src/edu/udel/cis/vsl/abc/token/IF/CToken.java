@@ -5,9 +5,16 @@ import java.io.File;
 import org.antlr.runtime.Token;
 
 /**
- * A post-preprocessor token.
+ * <p>
+ * A post-preprocessor token. Each token belongs to at most one token source. A
+ * token source is essentially an abstraction for a sequence of tokens. The
+ * token has some index (position) in this sequence, and there are methods to
+ * get the index of this token, and to get the next element in the sequence.
+ * </p>
  * 
- * 
+ * <p>
+ * A token also carries detailed information about its formation history.
+ * </p>
  * 
  * @author siegel
  * 
@@ -28,7 +35,7 @@ public interface CToken extends Token {
 	 * @return the source file
 	 */
 	File getSourceFile();
-	
+
 	String getFileShortName();
 
 	/**

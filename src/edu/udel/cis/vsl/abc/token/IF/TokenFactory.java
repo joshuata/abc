@@ -8,9 +8,25 @@ import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter.CharacterKind;
 
+/**
+ * A factory for producing all the objects under the control of the token
+ * module. These includes instances of the following types (and their subtypes):
+ * <ul>
+ * <li>{@link CToken}</li>
+ * <li>{@link Formation}</li>
+ * <li>{@link ExecutionCharacter}</li>
+ * <li>{@link Source}</li>
+ * <li>{@link SyntaxException}</li>
+ * <li>{@link UnsourcedException}</li>
+ * <li>{@link Macro}</li>
+ * </ul>
+ * 
+ * @author siegel
+ * 
+ */
 public interface TokenFactory {
 
-	// History creation...
+	// Formations (records of history of token creation)...
 
 	MacroExpansion newMacroExpansion(CToken startToken, Macro macro, int index);
 
@@ -75,12 +91,5 @@ public interface TokenFactory {
 
 	FunctionMacro newFunctionMacro(Tree definitionNode, File file,
 			String shotFileName);
-
-	// Deprecated...
-
-	// Source newSource(CommonTree tree, CTokenSource tokenSource);
-
-	// SyntaxException newSyntaxException(String message, CommonTree tree,
-	// CTokenSource tokenSource);
 
 }

@@ -18,10 +18,21 @@ import edu.udel.cis.vsl.abc.token.common.CommonCToken;
 
 public class CommonCParser implements CParser {
 
+	/**
+	 * The token source provides the sequence of tokens which are to be parsed.
+	 * 
+	 */
 	private CTokenSource tokenSource;
 
+	/**
+	 * The ANTLR token stream, which is formed from the token source, and which
+	 * is used as input to the ANTLR parer.
+	 */
 	private TokenStream stream;
 
+	/**
+	 * The ANTLR-generated parser used by this CParser to do the real work.
+	 */
 	private CivlCParser parser;
 
 	private TokenFactory tokenFactory;
@@ -189,6 +200,11 @@ public class CommonCParser implements CParser {
 			throw new ParseException(e.getMessage());
 		}
 		return tree;
+	}
+
+	@Override
+	public CTokenSource getTokenSource() {
+		return tokenSource;
 	}
 
 }

@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.parse.IF;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
@@ -295,6 +296,13 @@ public interface CParser {
 	public enum RuleKind {
 		EXTERNAL_DEF, BLOCK_ITEM
 	}
+
+	/**
+	 * Returns the token source used by this C parser.
+	 * 
+	 * @return the token source
+	 */
+	CTokenSource getTokenSource();
 
 	/**
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some
