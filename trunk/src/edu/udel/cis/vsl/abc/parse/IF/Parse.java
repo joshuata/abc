@@ -14,6 +14,10 @@ import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
  */
 public class Parse {
 
+	public static enum RuleKind {
+		TRANSLATION_UNIT, EXTERNAL_DEFINITION, BLOCK_ITEM
+	}
+
 	/**
 	 * Creates a new instance of a {@link CParser} using the given source of
 	 * tokens. It is unspecified whether the parsing process will begin
@@ -27,5 +31,10 @@ public class Parse {
 	 */
 	public static CParser newCParser(CTokenSource source) {
 		return new CommonCParser(source);
+	}
+
+	public static CParser newCParser(RuleKind rule, CTokenSource source,
+			int startTokenIndex, int lastTokenIndex) {
+		return new CommonCParser(rule, source, startTokenIndex, lastTokenIndex);
 	}
 }

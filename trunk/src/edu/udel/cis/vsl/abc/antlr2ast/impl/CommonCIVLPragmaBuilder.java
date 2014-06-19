@@ -10,8 +10,8 @@ import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.CIVLPragmaBuilder;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
-import edu.udel.cis.vsl.abc.parse.IF.CParser.RuleKind;
 import edu.udel.cis.vsl.abc.parse.IF.Parse;
+import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
@@ -57,7 +57,10 @@ public class CommonCIVLPragmaBuilder implements CIVLPragmaBuilder {
 		tokenSource = (CTokenSource) TokenUtils
 				.makeTokenSourceFromList(tokenList.get(0));
 		cparser = Parse.newCParser(tokenSource);
-		return cparser.parse(type);
+		// return cparser.parse(type);
+
+		// TODO
+		return null;
 	}
 
 }
