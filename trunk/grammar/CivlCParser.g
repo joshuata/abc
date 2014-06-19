@@ -445,10 +445,12 @@ multiplicativeExpression
 	  -> ^(OPERATOR STAR ^(ARGUMENT_LIST $multiplicativeExpression $y))
 	| DIV y=castExpression
 	  -> ^(OPERATOR DIV ^(ARGUMENT_LIST $multiplicativeExpression $y))
-        | MOD y=castExpression
+    | MOD y=castExpression
 	  -> ^(OPERATOR MOD ^(ARGUMENT_LIST $multiplicativeExpression $y))
-        )*
+    )*
 	;
+
+
 
 /* 6.5.6 */
 additiveExpression
@@ -460,12 +462,25 @@ additiveExpression
         )*
 	;
 
+/* CIVL-C range expression "lo .. hi" or "lo .. hi # step" */
+// a + b .. c + d is equivalent to (a + b) .. (c + d)
+rangeExpression
+	: (additiveExpression -> additiveExpression)
+      ( DOTDOT y=additiveExpression
+        ( -> ^(DOTDOT $rangeExpression $y)
+        | HASH z=additiveExpression
+          -> ^(DOTDOT $rangeExpression $y $z)
+        )
+      )?
+    ;
+
+
 /* 6.5.7 */
 shiftExpression
-	: (additiveExpression -> additiveExpression)
-        ( SHIFTLEFT y=additiveExpression
+	: (rangeExpression -> rangeExpression)
+        ( SHIFTLEFT y=rangeExpression
           -> ^(OPERATOR SHIFTLEFT ^(ARGUMENT_LIST $shiftExpression $y))
-        | SHIFTRIGHT y=additiveExpression
+        | SHIFTRIGHT y=rangeExpression
           -> ^(OPERATOR SHIFTRIGHT ^(ARGUMENT_LIST $shiftExpression $y))
         )*
 	;
@@ -626,9 +641,14 @@ quantifierExpression
 	  BITOR restrict=conditionalExpression RCURLY 
 	  cond=assignmentExpression
 	  -> ^(quantifier $type $id $restrict $cond)
-	| quantifier LCURLY id=IDENTIFIER ASSIGN lower=assignmentExpression DOTDOT upper=assignmentExpression
-	  RCURLY cond=assignmentExpression
+	| quantifier LCURLY id=IDENTIFIER ASSIGN
+      lower=additiveExpression DOTDOT upper=additiveExpression
+      RCURLY cond=assignmentExpression
 	  -> ^(quantifier $id $lower $upper $cond)
+// eventually change to the following:
+//	| quantifier LCURLY id=IDENTIFIER ASSIGN rangeExpression
+//	  RCURLY cond=assignmentExpression
+//	  -> ^(quantifier $id rangeExpression $cond)
 	;
 	
 quantifier
@@ -1511,7 +1531,7 @@ scope Symbols;
 	    s=statementWithScope
 	    -> ^(FOR $e0 $e1 $e2 $s $i)
 	  )
-	| f=(CIVLFOR | PARFOR) LPAREN
+	| (f=CIVLFOR | f=PARFOR) LPAREN
 	    t=typeName_opt v=identifierList COLON e=expression RPAREN
 	    i=invariant_opt s=statementWithScope
 	    -> ^($f $t $v $e $s $i)

@@ -548,6 +548,7 @@ public class CommonASTBuilder implements ASTBuilder {
 								(CommonTree) expressionTree.getChild(3),
 								newScope));
 			} else {
+				
 				ExpressionNode lower, upper;
 
 				lower = translateExpression(

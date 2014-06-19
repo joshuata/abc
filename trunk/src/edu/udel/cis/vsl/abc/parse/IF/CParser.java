@@ -8,7 +8,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * <p>
- * Simple interfacer for a parser of C programs. It includes a bunch of integer
+ * Simple interface for a parser of C programs. It includes a bunch of integer
  * constants which are ID numbers of each kind of token (real or fake) that can
  * occur in a C parse tree.
  * </p>
