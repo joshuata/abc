@@ -168,6 +168,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.type.CommonDomainTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonEnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonFunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonPointerTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.common.type.CommonRangeTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonScopeTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonStructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonTypedefNameNode;
@@ -299,6 +300,11 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public TypeNode newScopeTypeNode(Source source) {
 		return new CommonScopeTypeNode(source);
+	}
+
+	@Override
+	public TypeNode newRangeTypeNode(Source source) {
+		return new CommonRangeTypeNode(source);
 	}
 
 	@Override

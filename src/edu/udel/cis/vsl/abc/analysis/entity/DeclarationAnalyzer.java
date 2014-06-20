@@ -33,8 +33,10 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.GotoNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonCompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -242,8 +244,16 @@ public class DeclarationAnalyzer {
 				throw error(e, initializer);
 			}
 		} else if (initializer instanceof CompoundInitializerNode) {
-			entityAnalyzer.compoundLiteralAnalyzer.processCompoundInitializer(
-					(CommonCompoundInitializerNode) initializer, currentType);
+			if (currentType.kind() == TypeKind.DOMAIN)
+				entityAnalyzer.expressionAnalyzer
+						.processCartesianDomainInitializer(
+								(CompoundInitializerNode) initializer,
+								(DomainType) currentType);
+			else
+				entityAnalyzer.compoundLiteralAnalyzer
+						.processCompoundInitializer(
+								(CommonCompoundInitializerNode) initializer,
+								currentType);
 		}
 	}
 

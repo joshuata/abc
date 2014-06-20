@@ -5,7 +5,7 @@ import java.io.PrintStream;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
-public class CommonDomainType extends CommonType implements DomainType {
+public class CommonDomainType extends CommonObjectType implements DomainType {
 
 	private final static int classCode = CommonDomainType.class.hashCode();
 
@@ -87,6 +87,11 @@ public class CommonDomainType extends CommonType implements DomainType {
 		if (hasDimension())
 			result += "(" + dimension + ")";
 		return result;
+	}
+
+	@Override
+	public boolean isComplete() {
+		return true;
 	}
 
 }

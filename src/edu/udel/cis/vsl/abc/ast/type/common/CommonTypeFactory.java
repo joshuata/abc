@@ -67,6 +67,8 @@ public class CommonTypeFactory implements TypeFactory {
 
 	private DomainType domainType = null;
 
+	private ObjectType rangeType = null;
+
 	private UnsignedIntegerType size_t = null, char16_t = null,
 			char32_t = null;
 
@@ -267,6 +269,15 @@ public class CommonTypeFactory implements TypeFactory {
 		EnumerationType result = new CommonEnumerationType(key, tag);
 
 		return (EnumerationType) canonicalize(result);
+	}
+
+	@Override
+	public ObjectType rangeType() {
+		if (rangeType == null) {
+			rangeType = new CommonRangeType();
+			insert(rangeType);
+		}
+		return rangeType;
 	}
 
 	@Override

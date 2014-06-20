@@ -7,11 +7,35 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 
 /**
+ * <p>
  * A compound initializer (written with curly braces in C) is used to initialize
  * an array, struct, or union. It is specified as a sequence of
- * designation-initializer pairs.
+ * designation-initializer pairs. In any such pair, the designation is optional;
+ * if it is absent, it is represented here by <code>null</code>. The initializer
+ * node can never be <code>null</code>.
+ * </p>
  * 
- * It is also used to represent a compound literal.
+ * <p>
+ * This class is also used in the representation of a compound literal. A
+ * {@link CompoundLiteralNode} has a reference to a
+ * {@link CompoundInitializerNode}. This is because the two structures are
+ * essentially identical. The only difference is that a compound literal
+ * expression begins with a type name in parentheses, which specifies the type
+ * of the compound literal, while a compound initializer does not have that
+ * component because the type is taken from the type of the variable being
+ * initialized.
+ * </p>
+ * 
+ * <p>
+ * This class is also used to represent a CIVL-C Cartesian domain literal. A
+ * Cartesian domain is the Cartesian product of a sequence of ranges. Each range
+ * represents an (ordered) set of integers. The domain is an (ordered) set of
+ * tuples of integers. All tuples in a domain have the same arity, say n, called
+ * the dimension of the domain. For a Cartesian domain, n is the number of
+ * ranges used to form the domain. The order on the domain is the dictionary
+ * order. In a Caretesian domain literal, all the designation nodes are null,
+ * each initializer node is an expression of range type.
+ * </p>
  * 
  * @see CompoundLiteralNode
  * 

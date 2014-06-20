@@ -101,6 +101,10 @@ public interface Type {
 		 */
 		QUALIFIED,
 		/**
+		 * The CIVL-C range type, denoted <code>$range</code>
+		 */
+		RANGE,
+		/**
 		 * The CIVL-C scope type, represented by <code>$scope</code>
 		 */
 		SCOPE,

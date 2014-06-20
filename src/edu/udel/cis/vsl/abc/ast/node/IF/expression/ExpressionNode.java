@@ -81,7 +81,8 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		 */
 		COMPOUND_LITERAL,
 		/**
-		 * A constant node; can be cast to {@link ConstantNode}.
+		 * A constant node; can be cast to {@link ConstantNode}. Note there are
+		 * many subtypes.
 		 */
 		CONSTANT,
 		/**
@@ -98,6 +99,11 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		 * A function call; can be cast to {@link FunctionCallNode}.
 		 */
 		FUNCTION_CALL,
+		/**
+		 * Generic selection expression; can be cast to
+		 * {@link GenericSelectionNode}.
+		 */
+		GENERIC_SELECTION,
 		/**
 		 * An identifier used as an expression (e.g., a variable name or
 		 * function name). Can be cast to {@link IdentifierExpressionNode}.
@@ -119,6 +125,12 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		 */
 		QUANTIFIED_EXPRESSION,
 		/**
+		 * A CIVL-C "regular range expression", which has the form
+		 * <code>lo .. hi</code> or <code>lo .. hi # step</code>; can be cast to
+		 * {@link RegularRangeNode}.
+		 */
+		REGULAR_RANGE,
+		/**
 		 * A CIVL-C remote reference expression, which refers to a variable in a
 		 * different process. Can be cast to {@link RemoteExpressionNode}.
 		 */
@@ -133,11 +145,6 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		 * {@link ScopeOfNode}.
 		 */
 		SCOPEOF,
-		/**
-		 * The CIVL-C <code>$self</code> built-in variable; can be cast to
-		 * {@link SelfNode}.
-		 */
-		SELF,
 		/**
 		 * An expression built from the C <code>sizeof</code> operator; can be
 		 * cast to {@link SizeofNode}.

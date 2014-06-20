@@ -26,6 +26,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.ArrayTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.AtomicTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.DomainTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
@@ -34,6 +35,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
@@ -528,8 +530,41 @@ public class TypeAnalyzer {
 		return structureOrUnion;
 	}
 
+	private DomainType processDomainType(DomainTypeNode node)
+			throws SyntaxException {
+		ExpressionNode dimensionNode = node.getDimension();
+		DomainType result;
+
+		if (dimensionNode != null) {
+			Value value;
+
+			entityAnalyzer.expressionAnalyzer.processExpression(dimensionNode);
+			value = nodeFactory.getConstantValue(dimensionNode);
+			if (value == null || !(value instanceof IntegerValue))
+				throw error("$domain requires constant integer argument", node);
+			else {
+				IntegerValue integerValue = (IntegerValue) value;
+				int dimension = integerValue.getIntegerValue().intValue();
+
+				result = typeFactory.domainType(dimension);
+			}
+		} else
+			result = typeFactory.domainType();
+		return result;
+	}
+
 	// ************************* Exported Methods **************************
 
+	/**
+	 * Processes a type node and sets the type field of that type node to the
+	 * type computed from the type node.
+	 * 
+	 * @param typeNode
+	 *            a type node which may or may not have been processed already
+	 * @return the type computed from the type node
+	 * @throws SyntaxException
+	 *             if there is a syntax problem with the type node
+	 */
 	Type processTypeNode(TypeNode typeNode) throws SyntaxException {
 		return processTypeNode(typeNode, false);
 	}
@@ -582,6 +617,12 @@ public class TypeAnalyzer {
 			break;
 		case SCOPE:
 			type = typeFactory.scopeType();
+			break;
+		case DOMAIN:
+			type = processDomainType((DomainTypeNode) typeNode);
+			break;
+		case RANGE:
+			type = typeFactory.rangeType();
 			break;
 		default:
 			throw new RuntimeException("Unreachable");

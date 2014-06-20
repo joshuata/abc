@@ -122,8 +122,4 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 		return BlockItemKind.STRUCT_OR_UNION;
 	}
 
-	@Override
-	public TypeNodeKind typeNodeKind() {
-		return TypeNodeKind.STRUCTURE_OR_UNION;
-	}
 }
