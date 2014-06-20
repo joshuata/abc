@@ -39,10 +39,4 @@ public class CommonBasicTypeNode extends CommonTypeNode implements
 		copyData(result);
 		return result;
 	}
-
-	@Override
-	public TypeNodeKind typeNodeKind() {
-		return TypeNodeKind.BASIC;
-	}
-
 }

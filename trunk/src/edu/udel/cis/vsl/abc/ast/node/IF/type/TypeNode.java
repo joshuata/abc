@@ -16,6 +16,7 @@ public interface TypeNode extends SizeableNode {
 		ENUMERATION,
 		FUNCTION,
 		POINTER,
+		RANGE,
 		SCOPE,
 		STRUCTURE_OR_UNION,
 		TYPEDEF_NAME,

@@ -332,16 +332,4 @@ public interface CParser {
 	 */
 	SyntaxException newSyntaxException(String message, CommonTree tree);
 
-	// /**
-	// * Parses the token stream associated with this parser into a tree,
-	// * according to the specified type.
-	// *
-	// * @param type
-	// * The type of the rule to use to parse the token stream of this
-	// * parser.
-	// * @return The parsed tree.
-	// * @throws ParseException
-	// */
-	// CommonTree parse(RuleKind type) throws ParseException;
-
 }

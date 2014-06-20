@@ -583,7 +583,18 @@ public interface TypeFactory {
 	/** Returns the scope type */
 	ObjectType scopeType();
 
-	/** Returns the universal domain type <code>$domain</code>. */
+	/**
+	 * Returns the CIVL-C range type, denoted <code>$range</code>, which
+	 * represents a sequence of integers.
+	 * 
+	 * @return the range type
+	 */
+	ObjectType rangeType();
+
+	/**
+	 * Returns the universal domain type <code>$domain</code>. The domain type
+	 * consists of all finite tuples of integers.
+	 */
 	DomainType domainType();
 
 	/**

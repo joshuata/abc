@@ -12,7 +12,10 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
@@ -34,6 +37,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ResultNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
@@ -46,6 +50,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
@@ -60,6 +65,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -139,53 +145,74 @@ public class ExpressionAnalyzer {
 	 */
 	void processExpression(ExpressionNode node) throws SyntaxException {
 		try {
-			if (node instanceof AlignOfNode)
+			switch (node.expressionKind()) {
+			case ALIGNOF:
 				processAlignOf((AlignOfNode) node);
-			else if (node instanceof ArrowNode)
+				break;
+			case ARROW:
 				processArrow((ArrowNode) node);
-			else if (node instanceof CastNode)
+				break;
+			case CAST:
 				processCast((CastNode) node);
-			else if (node instanceof CompoundLiteralNode)
-				processCompoundLiteral((CompoundLiteralNode) node);
-			else if (node instanceof ConstantNode)
-				processConstant((ConstantNode) node);
-			else if (node instanceof DotNode)
-				processDot((DotNode) node);
-			else if (node instanceof FunctionCallNode)
-				processFunctionCall((FunctionCallNode) node);
-			else if (node instanceof GenericSelectionNode)
-				processGenericSelection((GenericSelectionNode) node);
-			else if (node instanceof IdentifierExpressionNode)
-				processIdentifierExpression((IdentifierExpressionNode) node);
-			else if (node instanceof OperatorNode)
-				processOperator((OperatorNode) node);
-			else if (node instanceof SizeofNode)
-				processSizeof((SizeofNode) node);
-			else if (node instanceof SpawnNode)
-				processSpawn((SpawnNode) node);
-			else if (node instanceof ScopeOfNode)
-				processScopeOf((ScopeOfNode) node);
-			// @ collective, result
-			else if (node instanceof RemoteExpressionNode) {
-				// need to find variable in scope
-				processRemoteExpression((RemoteExpressionNode) node);
-			} else if (node instanceof ResultNode) {
-				// type is same as type returned by function to
-				// which it belongs.
-				processResult((ResultNode) node);
-			} else if (node instanceof CollectiveExpressionNode) {
+				break;
+			case COLLECTIVE: {
 				CollectiveExpressionNode collective = (CollectiveExpressionNode) node;
 
 				processExpression(collective.getProcessPointerExpression());
 				processExpression(collective.getLengthExpression());
 				processExpression(collective.getBody());
 				node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
-			} else if (node instanceof QuantifiedExpressionNode) {
-				processQuantifiedExpression((QuantifiedExpressionNode) node);
-			} else if (node instanceof DerivativeExpressionNode) {
+				break;
+			}
+			case COMPOUND_LITERAL:
+				processCompoundLiteral((CompoundLiteralNode) node);
+				break;
+			case CONSTANT:
+				processConstant((ConstantNode) node);
+				break;
+			case DERIVATIVE_EXPRESSION:
 				processDerivativeExpression((DerivativeExpressionNode) node);
-			} else
-				throw error("Unknown expression kind", node);
+				break;
+			case DOT:
+				processDot((DotNode) node);
+				break;
+			case FUNCTION_CALL:
+				processFunctionCall((FunctionCallNode) node);
+				break;
+			case GENERIC_SELECTION:
+				processGenericSelection((GenericSelectionNode) node);
+				break;
+			case IDENTIFIER_EXPRESSION:
+				processIdentifierExpression((IdentifierExpressionNode) node);
+				break;
+			case OPERATOR:
+				processOperator((OperatorNode) node);
+				break;
+			case QUANTIFIED_EXPRESSION:
+				processQuantifiedExpression((QuantifiedExpressionNode) node);
+				break;
+			case REGULAR_RANGE:
+				processRegularRange((RegularRangeNode) node);
+				break;
+			case REMOTE_REFERENCE:
+				processRemoteExpression((RemoteExpressionNode) node);
+				break;
+			case RESULT:
+				processResult((ResultNode) node);
+				break;
+			case SCOPEOF:
+				processScopeOf((ScopeOfNode) node);
+				break;
+			case SIZEOF:
+				processSizeof((SizeofNode) node);
+				break;
+			case SPAWN:
+				processSpawn((SpawnNode) node);
+				break;
+			default:
+				throw new ABCRuntimeException("Unreachable");
+
+			}
 		} catch (ASTException e) {
 			throw new SyntaxException(e.getMessage(), node.getSource());
 		}
@@ -216,6 +243,81 @@ public class ExpressionAnalyzer {
 		addStandardConversions(rhs);
 		convertRHS(rhs, type);
 		return type;
+	}
+
+	/**
+	 * <p>
+	 * Processes a compound initializer node for which the type is a domain
+	 * type.
+	 * </p>
+	 * 
+	 * <p>
+	 * The following are checked: (1) if the domain type is domain(n), then the
+	 * length of the initializer list is n; (2) each of the pairs in the
+	 * initializer list will have a null designation; (3) each of the pairs in
+	 * the initializer list will have a non-null initializer which is an
+	 * expression of range type. If any of the checks fail, a syntax exception
+	 * is thrown.
+	 * </p>
+	 * 
+	 * <p>
+	 * Assuming all the checks pass, the following will be completed: each of
+	 * the range expressions will be processed; the type of this compound
+	 * initializer node will be set to the specific domain type, domain(n) (even
+	 * if the given type was just the universal domain type <code>$domain</code>
+	 * , without specifying n).
+	 * </p>
+	 * 
+	 * @param type
+	 *            the expected type of this compound initializer; must be a
+	 *            domain type
+	 * @param node
+	 *            a compound literal node with domain type
+	 * 
+	 * @throws SyntaxException
+	 *             if any of the above properties is violated, or there is a
+	 *             syntax exception generated when checking the range
+	 *             expressions
+	 */
+	void processCartesianDomainInitializer(CompoundInitializerNode initNode,
+			DomainType type) throws SyntaxException {
+		int numRanges = initNode.numChildren();
+
+		if (type.hasDimension()) {
+			int dimension = type.getDimension();
+
+			if (dimension != numRanges)
+				throw error("Expected " + dimension
+						+ " ranges in Cartesian domain initializer, but saw "
+						+ numRanges, initNode);
+		}
+		for (int i = 0; i < numRanges; i++) {
+			PairNode<DesignationNode, InitializerNode> pair = initNode
+					.getSequenceChild(i);
+			InitializerNode rangeNode = pair.getRight();
+			ExpressionNode rangeExpression;
+			Type rangeNodeType;
+
+			if (pair.getLeft() != null)
+				throw error(
+						"A designation may not be used in a Cartesian domain literal",
+						pair.getLeft());
+			if (rangeNode == null)
+				throw error("Missing range expression at position " + i
+						+ " in Cartesian domain literal", initNode);
+			if (!(rangeNode instanceof ExpressionNode))
+				throw error("Expected an expression", rangeNode);
+			rangeExpression = (ExpressionNode) rangeNode;
+			processExpression(rangeExpression);
+			rangeNodeType = rangeExpression.getConvertedType();
+			if (rangeNodeType.kind() != TypeKind.RANGE)
+				throw error(
+						"Expected expression of range type in Cartesian domain literal",
+						rangeExpression);
+		}
+		if (!type.hasDimension())
+			type = typeFactory.domainType(numRanges);
+		initNode.setType(type);
 	}
 
 	// ************************ Private Methods ***************************
@@ -311,8 +413,11 @@ public class ExpressionAnalyzer {
 
 		if (!(type instanceof ObjectType))
 			throw error("Compound literal has non-object type: " + type, node);
-		entityAnalyzer.compoundLiteralAnalyzer.processCompoundInitializer(
-				initNode, (ObjectType) type);
+		if (type.kind() == TypeKind.DOMAIN)
+			processCartesianDomainInitializer(initNode, (DomainType) type);
+		else
+			entityAnalyzer.compoundLiteralAnalyzer.processCompoundInitializer(
+					initNode, (ObjectType) type);
 		node.setInitialType(initNode.getType());
 	}
 
@@ -1492,6 +1597,23 @@ public class ExpressionAnalyzer {
 		if (!(type instanceof PointerType))
 			throw error("Argument to * has non-pointer type: " + type, node);
 		node.setInitialType(((PointerType) type).referencedType());
+	}
+
+	private void processRegularRange(RegularRangeNode node)
+			throws SyntaxException {
+		ExpressionNode low = node.getLow();
+		ExpressionNode high = node.getHigh();
+		ExpressionNode step = node.getStep();
+
+		processExpression(low);
+		doIntegerPromotion(low);
+		processExpression(high);
+		doIntegerPromotion(high);
+		if (step != null) {
+			processExpression(step);
+			doIntegerPromotion(step);
+		}
+		node.setInitialType(typeFactory.rangeType());
 	}
 
 	// Helper functions...

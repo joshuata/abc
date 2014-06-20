@@ -24,11 +24,6 @@ public class CommonDomainTypeNode extends CommonTypeNode implements
 	}
 
 	@Override
-	public TypeNodeKind typeNodeKind() {
-		return TypeNodeKind.DOMAIN;
-	}
-
-	@Override
 	public ExpressionNode getDimension() {
 		return (ExpressionNode) child(0);
 	}

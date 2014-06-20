@@ -338,6 +338,16 @@ public interface NodeFactory {
 			SequenceNode<ExpressionNode> scopeList);
 
 	/**
+	 * Returns a new instance of range type node; this is the CIVL-C type
+	 * <code>$range</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of <code>$domain</code>
+	 * @return the new range type node
+	 */
+	TypeNode newRangeTypeNode(Source source);
+
+	/**
 	 * Returns a new instance of domain type node, with no dimension specified;
 	 * this is the CIVL-C type <code>$domain</code>.
 	 * 

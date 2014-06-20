@@ -17,6 +17,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
@@ -210,6 +211,15 @@ public class ScopeAnalyzer implements Analyzer {
 			}
 		} else if (node instanceof LoopNode) {
 			ASTNode body = ((LoopNode) node).getBody();
+			Scope bodyScope;
+
+			parentScope = scopeFactory.newScope(ScopeKind.BLOCK, parentScope,
+					node);
+			bodyScope = scopeFactory.newScope(ScopeKind.BLOCK, parentScope,
+					body);
+			processRecursive(body, bodyScope, functionScope);
+		} else if (node instanceof CivlForNode) {
+			ASTNode body = ((CivlForNode) node).getBody();
 			Scope bodyScope;
 
 			parentScope = scopeFactory.newScope(ScopeKind.BLOCK, parentScope,
