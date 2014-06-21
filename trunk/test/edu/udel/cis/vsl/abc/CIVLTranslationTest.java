@@ -3,56 +3,36 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
-import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.transform.common.Pruner;
-import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 public class CIVLTranslationTest {
 
-	private File[] systemIncludes, userIncludes;
+	private static boolean debug = false;
 
-	private PrintStream out = System.out;
+	private static File[] systemIncludes = new File[0];
+
+	private static File[] userIncludes = new File[0];
+
+	private static PrintStream out = System.out;
+
+	private static List<String> codes = Arrays.asList("prune", "sef");
 
 	private File root = new File(new File("examples"), "civl");
 
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	private void check(String filenameRoot) throws ABCException, IOException {
-		checkDebug(filenameRoot, false);
-	}
-
-	private void checkDebug(String filenameRoot, boolean debug)
-			throws ABCException, IOException {
-		Activator a;
-		List<String> codes = new LinkedList<>();
-
-		codes.add(Pruner.CODE);
-		codes.add(SideEffectRemover.CODE);
-		this.systemIncludes = new File[0];
-		this.userIncludes = new File[0];
-		a = ABC.activator(new File(root, filenameRoot + ".cvl"),
+		Activator a = ABC.activator(new File(root, filenameRoot + ".cvl"),
 				systemIncludes, userIncludes);
+
 		if (debug)
 			a.showTranslation(out, codes);
 		else {
-			Program program = a.getProgram();
-
-			a.printProgram(out, program);
+			a.getProgram().applyTransformers(codes);
 		}
 	}
 
@@ -81,6 +61,8 @@ public class CIVLTranslationTest {
 		check("malloc");
 	}
 
+	// Ignoring because scope-qualified pointers are going away
+	@Ignore
 	@Test
 	public void pointerScopes() throws ABCException, IOException {
 		check("pointerScopes");
@@ -116,6 +98,6 @@ public class CIVLTranslationTest {
 
 	@Test
 	public void parfor() throws ABCException, IOException {
-		checkDebug("parfor",true);
+		check("parfor");
 	}
 }

@@ -17,20 +17,24 @@ import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
 
 public class PreprocessorTest {
 
+	private static boolean debug = false;
+
+	private static File root = new File(new File("examples"), "preproc");
+
+	private static File dir1 = new File(root, "dir1");
+
+	private static File dir11 = new File(dir1, "dir1.1");
+
+	private static File dir2 = new File(root, "dir2");
+
+	private static File[] systemIncludes = new File[] { dir2 };
+
+	private static File[] userIncludes = new File[] { dir1, dir11 };
+
 	private CommonPreprocessor p;
-
-	static boolean debug = true;
-
-	private File root = new File(new File("examples"), "preproc");
 
 	@Before
 	public void setUp() throws Exception {
-		File dir1 = new File(root, "dir1");
-		File dir11 = new File(dir1, "dir1.1");
-		File dir2 = new File(root, "dir2");
-		File[] systemIncludes = new File[] { dir2 };
-		File[] userIncludes = new File[] { dir1, dir11 };
-
 		p = new CommonPreprocessor(systemIncludes, userIncludes);
 	}
 

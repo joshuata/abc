@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.PrintStream;
 
 import org.antlr.runtime.tree.CommonTree;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
@@ -18,22 +16,14 @@ import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 public class CParserTest {
 
+	private static boolean debug = false;
+
 	private static Preprocessor preprocessor = Preprocess
 			.newPreprocessorFactory().newPreprocessor();
 
-	static boolean debug = true;
+	private static PrintStream out = System.out;
 
-	private PrintStream out = System.out;
-
-	private File root = new File(new File("examples"), "parse");
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
+	private static File root = new File(new File("examples"), "parse");
 
 	private void check(String filenameRoot) throws PreprocessorException,
 			ParseException {
@@ -41,7 +31,8 @@ public class CParserTest {
 		CParser parser = Parse.newCParser(preprocessor.outputTokenSource(file));
 		CommonTree tree = parser.getTree();
 
-		ANTLRUtils.printTree(out, tree);
+		if (debug)
+			ANTLRUtils.printTree(out, tree);
 	}
 
 	@Test

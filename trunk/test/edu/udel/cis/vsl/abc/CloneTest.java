@@ -23,13 +23,11 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  */
 public class CloneTest {
 
-	private File[] systemIncludes, userIncludes;
+	private static File[] systemIncludes = new File[0];
 
-	// private static boolean debug = true;
+	private static File[] userIncludes = new File[0];
 
-	// private PrintStream out = System.out;
-
-	private File root = new File("examples");
+	private static File root = new File("examples");
 
 	@Before
 	public void setUp() throws Exception {
@@ -45,8 +43,6 @@ public class CloneTest {
 		AST ast1, ast2;
 		ASTNode root1, root2;
 
-		this.systemIncludes = new File[0];
-		this.userIncludes = new File[0];
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
 				userIncludes);
 		ast1 = a.getTranslationUnit();

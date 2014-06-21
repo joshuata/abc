@@ -14,6 +14,8 @@ import static org.junit.Assert.*;
 
 public class FilteredCharStreamTest {
 
+	private static boolean debug = false;
+
 	private static PrintStream out = System.out;
 
 	@Before
@@ -25,30 +27,32 @@ public class FilteredCharStreamTest {
 	}
 
 	private String filter(String original) {
-		out.print("Input---->" + original + "<--");
+		if (debug)
+			out.print("Input---->" + original + "<--");
 
 		CharStream input = new ANTLRStringStream(original);
 		CharStream output = new FilteredCharStream(input);
 		String result = "";
 		int index0 = 0;
 
-		out.println(" (size=" + input.size() + ")");
+		if (debug)
+			out.println(" (size=" + input.size() + ")");
 
 		while (index0 == output.index()) {
 			int number = output.LA(1);
 			char c = (char) number;
 
-			// out.println("LA(1): " + number + "(" + c + ")");
 			if (number == CharStream.EOF)
 				break;
 			result += c;
 			output.consume();
 			index0++;
-			// out.println("output.index(): "+output.index());
 		}
-		out.print("Output--->" + result + "<--");
-		out.println(" (size="+output.size()+")");
-		out.println();
+		if (debug) {
+			out.print("Output--->" + result + "<--");
+			out.println(" (size=" + output.size() + ")");
+			out.println();
+		}
 		return result;
 	}
 

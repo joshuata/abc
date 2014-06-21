@@ -8,8 +8,6 @@ import java.io.PrintStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
@@ -18,6 +16,14 @@ import edu.udel.cis.vsl.abc.preproc.common.PreprocessorExpressionAnalyzer;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorExpressionParser;
 import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
 
+/**
+ * As the name suggests, these tests check the preprocessor expression analyzer,
+ * used by the preprocessor to determine conditional values in conditional
+ * directives.
+ * 
+ * @author siegel
+ * 
+ */
 public class PreprocessorExpressionAnalyzerTest {
 
 	/**
@@ -35,14 +41,6 @@ public class PreprocessorExpressionAnalyzerTest {
 					return "M1".equals(string) || "M2".equals(string);
 				}
 			});
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
 
 	/**
 	 * Tests binary "+" is addition.
@@ -306,7 +304,7 @@ public class PreprocessorExpressionAnalyzerTest {
 
 		a1.parse(badSource1);
 	}
-	
+
 	@Test(expected = PreprocessorException.class)
 	public void testParseError2() throws PreprocessorException {
 		a1.parse("\"x");
