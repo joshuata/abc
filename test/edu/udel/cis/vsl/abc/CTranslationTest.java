@@ -3,7 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.After;
@@ -11,19 +11,28 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
-import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.transform.common.Pruner;
-import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
+/**
+ * Checks a number of simple C programs to make sure they pass on the parsing
+ * and analysis stages, while also applying the prune and side-effect-free
+ * transformations.
+ * 
+ * @author siegel
+ * 
+ */
 public class CTranslationTest {
 
-	private File[] systemIncludes, userIncludes;
+	private static boolean debug = false;
 
-	// private static boolean debug = true;
+	private static File[] systemIncludes = new File[0];
 
-	private PrintStream out = System.out;
+	private static File[] userIncludes = new File[0];
 
-	private File root = new File("examples");
+	private static PrintStream out = System.out;
+
+	private static File root = new File("examples");
+
+	private static List<String> codes = Arrays.asList("prune", "sef");
 
 	@Before
 	public void setUp() throws Exception {
@@ -34,27 +43,13 @@ public class CTranslationTest {
 	}
 
 	private void check(String filenameRoot) throws ABCException, IOException {
-		checkDebug(filenameRoot, false);
-	}
+		Activator a = ABC.activator(new File(root, filenameRoot + ".c"),
+				systemIncludes, userIncludes);
 
-	private void checkDebug(String filenameRoot, boolean debug)
-			throws ABCException, IOException {
-		Activator a;
-		List<String> codes = new LinkedList<String>();
-
-		codes.add(Pruner.CODE);
-		codes.add(SideEffectRemover.CODE);
-		this.systemIncludes = new File[0];
-		this.userIncludes = new File[0];
-		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
-				userIncludes);
 		if (debug) {
-			a.showTranslation(out);
-			a.printProgram(out, a.getProgram());
+			a.showTranslation(out, codes);
 		} else {
-			Program program = a.getProgram();
-
-			a.printProgram(out, program);
+			a.getProgram().applyTransformers(codes);
 		}
 	}
 
@@ -122,7 +117,7 @@ public class CTranslationTest {
 	public void a2d() throws ABCException, IOException {
 		check("a2d");
 	}
-	
+
 	@Test
 	public void labels() throws ABCException, IOException {
 		check("labels");
