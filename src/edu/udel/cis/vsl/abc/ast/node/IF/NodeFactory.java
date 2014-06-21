@@ -643,29 +643,141 @@ public interface NodeFactory {
 	 */
 	CastNode newCastNode(Source source, TypeNode type, ExpressionNode argument);
 
+	/**
+	 * Constructs a new function call node. A function call in C is an
+	 * expression (with side effects) that has the form
+	 * <code>f(arg0, arg1, ...)</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire function
+	 *            call expression
+	 * @param function
+	 *            the expression of function type which evaluates to the
+	 *            function being called. Typically this is just an identifier
+	 *            expression (naming the function), but it can be a function
+	 *            pointer or any expression evaluating to a function type or
+	 *            pointer to function type
+	 * @param arguments
+	 *            the list of actual arguments to be evaluated and passed to the
+	 *            function in this function call
+	 * @param scopeList
+	 *            the optional scope list (to be deprecated)
+	 * @return the new function call node
+	 */
 	FunctionCallNode newFunctionCallNode(Source source,
 			ExpressionNode function, List<ExpressionNode> arguments,
 			SequenceNode<ExpressionNode> scopeList);
 
+	/**
+	 * Constructs a new node for a "dot" expression, used in C for structure or
+	 * union field navigation, as in <code>myStruct.field</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire dot
+	 *            expression
+	 * @param structure
+	 *            the expression of either structure or union type
+	 * @param fieldName
+	 *            an identifier which is the name of a field in the structure or
+	 *            union
+	 * @return the new dot expression node
+	 */
 	DotNode newDotNode(Source source, ExpressionNode structure,
 			IdentifierNode fieldName);
 
+	/**
+	 * Constructs a new node for an "arrow" expression, used in C for structure
+	 * or union field navigation starting from a pointer, as in
+	 * <code>myStructPtr->field</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire arrow
+	 *            expression
+	 * @param structurePointer
+	 *            the expression which has type of the form pointer-to-structure
+	 *            or pointer-to-union
+	 * @param fieldName
+	 *            an identifier which is the name of a field in the structure or
+	 *            union
+	 * @return the new arrow expression node
+	 */
 	ArrowNode newArrowNode(Source source, ExpressionNode structurePointer,
 			IdentifierNode fieldName);
 
+	/**
+	 * <p>
+	 * Constructs a new operator expression node using one of the standard
+	 * operators provided in the enumerated type {@link Operator}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Some operators are not included in the enuemrated type, and instead have
+	 * their own special class, because they either need to implement an
+	 * interface that not all operator expressions should implement (e.g.,
+	 * because they are left-hand-side expressions) or because they need to
+	 * implement some methods that do not apply to all operator expressions.
+	 * Hence the operator enumerated type includes only those operators that can
+	 * be treated in a single, generic way.
+	 * </p>
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire operator
+	 *            expression, including the operator itself and its arguments
+	 * @param operator
+	 *            the operator
+	 * @param arguments
+	 *            the ordered list of arguments to the operator. For binary
+	 *            operators, the left operand comes first, followed by the right
+	 *            operator
+	 * @return the new operator expression node
+	 */
 	OperatorNode newOperatorNode(Source source, Operator operator,
 			List<ExpressionNode> arguments);
 
+	/**
+	 * Constrcts a new <code>sizeof</code> expression. This takes one argument,
+	 * which can be either a type name or an expression.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire
+	 *            <code>sizeof</code> expression, including the argument
+	 * @param argument
+	 *            the argument to the <code>sizeof</code> operator
+	 * @return the new expression node
+	 */
 	SizeofNode newSizeofNode(Source source, SizeableNode argument);
 
+	/**
+	 * Constructs a new CIVL-C spawn expression. A spawn expression has the form
+	 * <code>$spawn</code> followed by a function call expression. Hence a spawn
+	 * node has one argument, which is a function call node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire
+	 *            <code>$spawn</code> expression, including the entire function
+	 *            call
+	 * @param callNode
+	 *            the function call node
+	 * @return the new spawn expression node
+	 */
 	SpawnNode newSpawnNode(Source source, FunctionCallNode callNode);
 
 	/**
-	 * A remote expression node, representing an expression of the form
-	 * "proc_expr@x". This refers to a variable in the process p referenced by
-	 * the expression proc_expr. The static variable x can be determined
-	 * statically now. Later it will be evaluated in a dynamic state in p's
-	 * context.
+	 * Constructs a remote expression node, representing an expression of the
+	 * form <code>proc_expr@x</code>. This refers to a variable in the process
+	 * <code>p</code> referenced by the expression <code>proc_expr</code>. The
+	 * static variable <code>x</code> can be determined statically now. Later it
+	 * will be evaluated in a dynamic state in <code>p</code>'s context.
+	 * 
+	 * @param source
+	 *            source information for the entire remove expression, including
+	 *            both arguments
+	 * @param left
+	 *            the left argument, which is an expression of
+	 *            <code>$proc</code> type
+	 * @param right
+	 *            the right argument, which is an identifier which is the name
+	 *            of a variable
 	 */
 	RemoteExpressionNode newRemoteExpressionNode(Source source,
 			ExpressionNode left, IdentifierExpressionNode right);
@@ -693,15 +805,34 @@ public interface NodeFactory {
 			ExpressionNode processPointerExpression,
 			ExpressionNode lengthExpression, ExpressionNode body);
 
+	/**
+	 * Constructs a new CIVL-C <code>$scopeof</code> expression node. This is an
+	 * expression which takes one argument, which is a variable expression. It
+	 * returns a reference to the dynamic scope (a value of type
+	 * <code>$scope</code>) containing the memory unit identified by that
+	 * variable.
+	 * 
+	 * @param source
+	 *            source information for the entire <code>$scopeof</code>
+	 *            expression
+	 * @param variableExpression
+	 *            the variable argument
+	 * @return the new <code>$scopeof</code> expression
+	 */
 	ScopeOfNode newScopeOfNode(Source source,
 			IdentifierExpressionNode variableExpression);
 
 	/**
+	 * Constructs a new quantified expression.
 	 * 
 	 * @param source
-	 *            The source code elements.
+	 *            The source code information for the entire expression
 	 * @param quantifier
-	 *            The quantifier. One of {EXISTS, FORALL, UNIFORM}.
+	 *            The quantifier, one of (1) {@link Quantifier#EXISTS}, the
+	 *            standard existential quantifier, (2) {@link Quantifier#FORALL}
+	 *            , the standard universal quantifier, or (3)
+	 *            {@link Quantifier#UNIFORM}, the CIVL-C quantifier representing
+	 *            a uniform universal condition
 	 * @param variable
 	 *            The quantified variable.
 	 * @param restriction
@@ -739,6 +870,9 @@ public interface NodeFactory {
 			ExpressionNode expression);
 
 	/**
+	 * Constructs a new CIVL-C derivative expression, used to represent the
+	 * (partial) derivative of a function with respect to any number of
+	 * variables, evaluated at a point.
 	 * 
 	 * @param source
 	 *            The source code elements.
@@ -756,16 +890,75 @@ public interface NodeFactory {
 			SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials,
 			SequenceNode<ExpressionNode> arguments);
 
+	/**
+	 * <p>
+	 * Constructs a new CIVL-C regular range expression, which has the form
+	 * <code>lo .. hi</code>, where <code>lo</code> and <code>hi</code> are
+	 * integer expressions. A range expression represents an (ordered) set of
+	 * integers. This expression represents the set of integers that are greater
+	 * than or equal to <code>lo</code> and less than or equal to
+	 * <code>hi</code>. The order is from lowest to highest.
+	 * </p>
+	 * 
+	 * <p>
+	 * See
+	 * {@link #newRegularRangeNode(Source, ExpressionNode, ExpressionNode, ExpressionNode)}
+	 * for the more general expression which permits a "step" to be specified.
+	 * The expression returned by this method is equivalent to using a step of
+	 * 1.
+	 * </p>
+	 * 
+	 * @param source
+	 *            source information for the entire expression
+	 * @param low
+	 *            the lower bound of the range (inclusive)
+	 * @param high
+	 *            the upper bound of the range (inclusive)
+	 * @return the new range expression
+	 */
 	RegularRangeNode newRegularRangeNode(Source source, ExpressionNode low,
 			ExpressionNode high);
 
+	/**
+	 * <p>
+	 * Constructs a new CIVL-C regular range expression, which has the form
+	 * <code>lo .. hi # step</code>, where <code>lo</code>, <code>hi</code>, and
+	 * <code>step</code> are all integer expressions.
+	 * </p>
+	 * 
+	 * <p>
+	 * A range expression represents an (ordered) set of integers. If
+	 * <code>step</code> is positive, this expression represents the set of
+	 * integers <code>lo</code>, <code>lo+step</code>, <code>lo+2*step</code>,
+	 * and so on, up to and possibly including <code>hi</code>. That is also the
+	 * order.
+	 * </p>
+	 * 
+	 * <p>
+	 * If <code>step</code> is negative, this represents the ordered set of
+	 * integers <code>hi</code>, <code>hi+step</code>, <code>hi+2*step</code>,
+	 * and so on, down to and possibly including <code>lo</code>. That is also
+	 * the order.
+	 * </p>
+	 * 
+	 * @param source
+	 *            source information for the entire expression
+	 * @param low
+	 *            the lower bound of the range (inclusive)
+	 * @param high
+	 *            the upper bound of the range (inclusive)
+	 * @param step
+	 *            the step, i.e., the (positive or negative) distance between
+	 *            two consecutive elements in the range
+	 * @return the new range expression
+	 */
 	RegularRangeNode newRegularRangeNode(Source source, ExpressionNode low,
 			ExpressionNode high, ExpressionNode step);
 
 	// Declarations...
 
 	/**
-	 * Returns a new declaration of an "object" variable with no initializer.
+	 * Creates a new declaration of an "object" variable with no initializer.
 	 * 
 	 * @param source
 	 *            the source information for the variable declaration
@@ -780,7 +973,7 @@ public interface NodeFactory {
 			IdentifierNode name, TypeNode type);
 
 	/**
-	 * Returns a new declaration for an "object" variable with an initializer.
+	 * Creates a new declaration for an "object" variable with an initializer.
 	 * 
 	 * @param name
 	 *            identifier being declared
@@ -794,7 +987,7 @@ public interface NodeFactory {
 			IdentifierNode name, TypeNode type, InitializerNode initializer);
 
 	/**
-	 * Returns a new function declaration with no body (so it is not a function
+	 * Creates a new function declaration with no body (so it is not a function
 	 * "definition").
 	 * 
 	 * @param source
@@ -811,27 +1004,142 @@ public interface NodeFactory {
 			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract);
 
+	/**
+	 * Creates new declaration of an enumerator, which is an element inside of a
+	 * C <code>enum</code> definition. An enumerator declaration always contains
+	 * an identifier, and may or may not contain an optional integer value.
+	 * 
+	 * @param source
+	 *            source information for the entire enumerator declaration,
+	 *            including the value node if present
+	 * @param name
+	 *            the identifier which is the name of the enumerator
+	 * @param value
+	 *            the (optional) value to be assigned to this enumerator; if
+	 *            absent, use <code>null</code>
+	 * @return the new enumerator declaration
+	 */
 	EnumeratorDeclarationNode newEnumeratorDeclarationNode(Source source,
 			IdentifierNode name, ExpressionNode value);
 
+	/**
+	 * Consructs a new field declaration node. A field declaration occurs inside
+	 * a <code>struct</code> or <code>union</code> definition in C. This
+	 * declaration is similar to an ordinary variable declaration.
+	 * 
+	 * @param source
+	 *            source information for the entire field declaration
+	 * @param name
+	 *            the identifier which is the name of the field being declared
+	 * @param type
+	 *            the type of the field
+	 * @return the new field declaration node
+	 * 
+	 * @see {@link #newFieldDeclarationNode(Source, IdentifierNode, TypeNode, ExpressionNode)
+	 *      for the more general method which also permits a "bit width"
+	 *      argument, an optional C construct
+	 */
 	FieldDeclarationNode newFieldDeclarationNode(Source source,
 			IdentifierNode name, TypeNode type);
 
+	/**
+	 * Consructs a new field declaration node which also includes a "bit width"
+	 * argument. A field declaration occurs inside a <code>struct</code> or
+	 * <code>union</code> definition in C. This declaration is similar to an
+	 * ordinary variable declaration, but may include a bit width parameter.
+	 * 
+	 * @param source
+	 *            source information for the entire field declaration
+	 * @param name
+	 *            the identifier which is the name of the field being declared
+	 * @param type
+	 *            the type of the field
+	 * @param bitFieldWidth
+	 *            the constant expression of integer type which specifies the
+	 *            number of bits in the field
+	 * @return the new field declaration node
+	 */
 	FieldDeclarationNode newFieldDeclarationNode(Source source,
 			IdentifierNode name, TypeNode type, ExpressionNode bitFieldWidth);
 
+	/**
+	 * <p>
+	 * Creates a new node representing a standard C label. An ordinary label is
+	 * an identifier preceding a colon then a statement. It can be used as the
+	 * target of a <code>goto</code> statement.
+	 * </p>
+	 * 
+	 * <p>
+	 * A label declaration node has one child: an identifier node which is the
+	 * name of the label. Note in particular that the statement (following the
+	 * colon) is <strong>not</strong> a child of the label declaration node. The
+	 * declaration node does contain a reference to that statement, but it is
+	 * not a child, since both the label declaration and the statement will be
+	 * children of a {@link LabeledStatementNode}. If the statement were a child
+	 * of the label declaration node, the AST would not be a tree.
+	 * </p>
+	 * 
+	 * <p>
+	 * The standard protocol for constructing a labled statement is as follows:
+	 * first, construct the ordinary statement <code>S</code>. Then construct
+	 * the label declaration node <code>L</code> using this method, using
+	 * <code>S</code> as the <code>statement</code> argument. Finally, create a
+	 * new {@link LabeledStatementNode} using method
+	 * {@link #newLabeledStatementNode(Source, LabelNode, StatementNode)} with
+	 * arguments <code>L</code> and <code>S</code>.
+	 * </p>
+	 * 
+	 * @param source
+	 *            source information for the label only (not the statement that
+	 *            follows)
+	 * @param name
+	 *            the name of the label
+	 * @param statement
+	 *            the statement that follows the label and colon
+	 * @return the new label declaration node
+	 */
 	OrdinaryLabelNode newStandardLabelDeclarationNode(Source source,
 			IdentifierNode name, StatementNode statement);
 
+	/**
+	 * Constructs a new case-labeled declaration node. This node represents a C
+	 * construct of the form <code>case expr :</code> which precedes a statement
+	 * inside a <code>switch</code> statement body.
+	 * 
+	 * @param source
+	 *            source information spanning the <code>case</code> and
+	 *            <code>expr</code> tokens
+	 * @param constantExpression
+	 *            the expression <code>expr</code> following <code>case</code>;
+	 *            must be a constant expression whose type is consistent with
+	 *            that of the argument to <code>switch</code>
+	 * @param statement
+	 *            the statement following the colon; that statement is
+	 *            <strong>not</strong> made a child of this node
+	 * @return the new case-labeled declaration node
+	 */
 	SwitchLabelNode newCaseLabelDeclarationNode(Source source,
 			ExpressionNode constantExpression, StatementNode statement);
 
+	/**
+	 * Constructs a new node representing the occurence of a
+	 * <code>default :</code> label inside of a <code>switch</code> statement
+	 * body.
+	 * 
+	 * @param source
+	 *            the source information spanning the <code>default</code> token
+	 * @param statement
+	 *            the statement following the colon; this is
+	 *            <strong>not</strong> made a child of the new switch label node
+	 * @return the new switch label node
+	 */
 	SwitchLabelNode newDefaultLabelDeclarationNode(Source source,
 			StatementNode statement);
 
 	/**
-	 * Returns a new typedef declaration. If the typedef was scope
-	 * parameterized, the type argument will be a ScopeParameterizedTypeNode.
+	 * Constructs a new <code>typedef</code> declaration node. If the typedef
+	 * was scope parameterized, the type argument will be a
+	 * ScopeParameterizedTypeNode.
 	 * 
 	 * @param source
 	 *            source code reference
@@ -845,18 +1153,86 @@ public interface NodeFactory {
 	TypedefDeclarationNode newTypedefDeclarationNode(Source source,
 			IdentifierNode name, TypeNode type);
 
+	/**
+	 * <p>
+	 * Constructs new compound initializer node. A compound initializer in C is
+	 * used to initialize an array or structure. It occurrs inside curly braces.
+	 * It consists of a list of designation-initializer pairs; each designation
+	 * represents a "point" inside the structure or array; the initializer
+	 * specifies a value to assign to that point. The definition is recursive,
+	 * since the initializer in a pair may be a compound initializer.
+	 * </p>
+	 * 
+	 * <p>
+	 * A designation in pair may be <code>null</code>. In this case the "point"
+	 * is obtained by rules specified in the C Standard, essentially by
+	 * increment one past the last point.
+	 * </p>
+	 * 
+	 * @param source
+	 *            source information spanning the entire compound initializer,
+	 *            from the opening curly brace to the closing curly brace
+	 * @param initList
+	 *            the list of designation-initializer pairs.
+	 * @return the new compound initializer nodes
+	 */
 	CompoundInitializerNode newCompoundInitializerNode(Source source,
 			List<PairNode<DesignationNode, InitializerNode>> initList);
 
+	/**
+	 * Creates a new designation node, which can be used as part of a compound
+	 * initializer. A designation consists of a sequence of
+	 * <strong>designators</strong>. The designator sequence describes how to
+	 * navigate to a particular point inside a complex structure or array.
+	 * 
+	 * @param source
+	 *            source information spanning the entire designation
+	 * @param designators
+	 *            the sequence of designators
+	 * @return the new designation node
+	 */
 	DesignationNode newDesignationNode(Source source,
 			List<DesignatorNode> designators);
 
+	/**
+	 * Constructs a new field designator node. A field designator is a
+	 * designator (used as part of a designation, which is part of a compound
+	 * initializer) which represents navigation to a particular field in a
+	 * structure or union. It essentially wraps a field name.
+	 * 
+	 * @param source
+	 *            source information spanning this field designator
+	 * @param name
+	 *            the identifier which is the name of the field
+	 * @return the new field designator node
+	 */
 	FieldDesignatorNode newFieldDesignatorNode(Source source,
 			IdentifierNode name);
 
+	/**
+	 * Constructs a new array designator node. An array designator is a
+	 * designator (used as part of a designation, which is part of a compound
+	 * initializer) which represents navigation to a particular element of an
+	 * array. It essentially wraps an integer expression, which specifies an
+	 * index.
+	 * 
+	 * @param source
+	 *            source information spanning the array designator
+	 * @param index
+	 *            the integer expression specifying an index into the array
+	 * @return the new array designator node
+	 */
 	ArrayDesignatorNode newArrayDesignatorNode(Source source,
 			ExpressionNode index);
 
+	/**
+	 * Deprecated soon, since we are removing scope parameters.
+	 * 
+	 * @param source
+	 * @param scopeList
+	 * @param baseDeclaration
+	 * @return
+	 */
 	ScopeParameterizedDeclarationNode newScopeParameterizedDeclarationNode(
 			Source source, SequenceNode<VariableDeclarationNode> scopeList,
 			DeclarationNode baseDeclaration);

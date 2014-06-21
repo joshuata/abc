@@ -17,7 +17,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF.expression;
  * 
  * <p>
  * If <code>step</code> is negative</code>, it represents the sequence
- * <code>hi</code>, <code>hi</code>-<code>step</code>, <code>hi</code>-2*
+ * <code>hi</code>, <code>hi</code>+<code>step</code>, <code>hi</code>+2*
  * <code>step</code>, ..., which is truncated so that all entries are greater
  * than or equal to <code>lo</code>.
  * </p>
