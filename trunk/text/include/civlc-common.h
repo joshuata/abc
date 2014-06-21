@@ -155,12 +155,14 @@ typedef struct __int_iter__ {
   int content[];
   int index; //initialized as 0
 } * $int_iter;
- 
+
+/* 
 typedef struct __range__ {
   int lo;
   int hi;
   int step;
 }  $range;
+*/
 
 // range consisting of lo, lo+step, lo+2*step, ...
 // the sequence stops just before the first number

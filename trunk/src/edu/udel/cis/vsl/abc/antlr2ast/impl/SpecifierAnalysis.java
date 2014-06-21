@@ -19,6 +19,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.INT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.LONG;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.NORETURN;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.OUTPUT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.RANGE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.REAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.REGISTER;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESTRICT;
@@ -148,7 +149,8 @@ public class SpecifierAnalysis {
 	int continuity = 0;
 	// CIVL-C domain specifier: can occur only once
 	int domainTypeCount = 0;
-	int domainDimension = -1;
+	// int domainDimension = -1;
+	int rangeTypeCount = 0;
 	// alignment specifiers
 	List<CommonTree> alignmentTypeNodes = new LinkedList<CommonTree>();
 	List<CommonTree> alignmentExpressionNodes = new LinkedList<CommonTree>();
@@ -236,12 +238,17 @@ public class SpecifierAnalysis {
 				domainTypeCount++;
 				setTypeNameKind(TypeNodeKind.DOMAIN);
 				setTypeSpecifierNode(node);
-				if (node.getChildCount() != 0) {
-					CommonTree child = (CommonTree) node.getChild(0);
-
-					if (child.getToken().getType() != CParser.ABSENT)
-						domainDimension = parseInt(child);
-				}
+				// if (node.getChildCount() != 0) {
+				// CommonTree child = (CommonTree) node.getChild(0);
+				//
+				// if (child.getToken().getType() != CParser.ABSENT)
+				// domainDimension = parseInt(child);
+				// }
+				break;
+			case RANGE:
+				rangeTypeCount++;
+				setTypeNameKind(TypeNodeKind.RANGE);
+				setTypeSpecifierNode(node);
 				break;
 			case CONST:
 				constQualifier = true;

@@ -2,10 +2,9 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -15,8 +14,8 @@ public class CommonCivlForNode extends CommonStatementNode implements
 	private boolean isParallel;
 
 	public CommonCivlForNode(Source source, boolean isParallel,
-			SequenceNode<ForLoopInitializerNode> variables,
-			ExpressionNode domain, StatementNode body, ExpressionNode invariant) {
+			DeclarationListNode variables, ExpressionNode domain,
+			StatementNode body, ExpressionNode invariant) {
 		super(source, variables, domain, body);
 		addChild(invariant);
 		this.isParallel = isParallel;
@@ -47,10 +46,9 @@ public class CommonCivlForNode extends CommonStatementNode implements
 		return (ExpressionNode) child(3);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public SequenceNode<ForLoopInitializerNode> getVariables() {
-		return (SequenceNode<ForLoopInitializerNode>) child(0);
+	public DeclarationListNode getVariables() {
+		return (DeclarationListNode) child(0);
 	}
 
 	@Override

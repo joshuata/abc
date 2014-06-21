@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
 /**
@@ -9,19 +8,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
  * syntax for <code>$for</code> is
  * 
  * <pre>
- * $for (i1, i2, ... : expr) stmt
+ * $for (int i1, i2, ... : expr) stmt
  * </pre>
  * 
  * where <code>i1</code>, <code>i2</code>, etc., are the loop variables,
  * <code>expr</code> is an expression of type <code>$domain(n)</code>, where
  * <code>n</code> is the number of loop variables, and <code>stmt</code> is a
- * statement. The <code>int</code> type name may be inserted before the first
- * variable, in which case all of the variables are being declared:
- * 
- * <pre>
- * $for (int i1, i2, ... : expr) stmt
- * </pre>
- * 
+ * statement.
  * </p>
  * 
  * <p>
@@ -65,13 +58,13 @@ public interface CivlForNode extends StatementNode {
 	ExpressionNode getInvariant();
 
 	/**
-	 * Returns the sequence of loop variables. Each element in the sequence is
-	 * either a declaration of an integer variable, or an identifier expression
-	 * node representing a previously-declared integer variable.
+	 * Returns the sequence of loop variable delcarations. Each element in the
+	 * sequence is a declaration of a variable of integer type. The declarations
+	 * will not have initializers.
 	 * 
-	 * @return the sequence of loop variables
+	 * @return the sequence of loop variable declarations
 	 */
-	SequenceNode<ForLoopInitializerNode> getVariables();
+	DeclarationListNode getVariables();
 
 	@Override
 	CivlForNode copy();

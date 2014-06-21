@@ -116,6 +116,6 @@ public class CIVLTranslationTest {
 
 	@Test
 	public void parfor() throws ABCException, IOException {
-		check("parfor");
+		checkDebug("parfor",true);
 	}
 }

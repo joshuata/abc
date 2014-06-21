@@ -42,6 +42,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode.Quantifier;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
@@ -66,6 +67,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
@@ -754,6 +756,12 @@ public interface NodeFactory {
 			SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials,
 			SequenceNode<ExpressionNode> arguments);
 
+	RegularRangeNode newRegularRangeNode(Source source, ExpressionNode low,
+			ExpressionNode high);
+
+	RegularRangeNode newRegularRangeNode(Source source, ExpressionNode low,
+			ExpressionNode high, ExpressionNode step);
+
 	// Declarations...
 
 	/**
@@ -873,6 +881,9 @@ public interface NodeFactory {
 	/**
 	 * Constructs a new <code>for</code> loop node.
 	 * 
+	 * @param source
+	 *            source information for the entire loop construct (including
+	 *            body)
 	 * @param initializer
 	 *            the initializer part of the <code>for</code> loop, an
 	 *            {@link Expression} or another instance of
@@ -893,7 +904,7 @@ public interface NodeFactory {
 			ExpressionNode incrementer, StatementNode body,
 			ExpressionNode invariant);
 
-	ForLoopInitializerNode newForLoopInitializerNode(Source source,
+	DeclarationListNode newForLoopInitializerNode(Source source,
 			List<VariableDeclarationNode> declarations);
 
 	LoopNode newWhileLoopNode(Source source, ExpressionNode condition,
@@ -956,20 +967,30 @@ public interface NodeFactory {
 			StatementNode body);
 
 	/**
-	 * Returns a new instance of the CIVL <code>$for</code> or
+	 * Creates a new instance of the CIVL <code>$for</code> or
 	 * <code>$parfor</code> node.
 	 * 
 	 * @param source
+	 *            source information for the entire loop construct (including
+	 *            body)
 	 * @param isParallel
+	 *            if <code>true</code> create a <code>$parfor</code> statement,
+	 *            else create a <code>$for</code> statement
 	 * @param variables
+	 *            the list of loop variables or variable decls
 	 * @param domain
+	 *            the expression of domain type defining the iteration domain;
+	 *            the dimension of the domain must equal the number of loop
+	 *            variables
 	 * @param body
+	 *            the body of the loop statement
 	 * @param invariant
-	 * @return
+	 *            optional loop invariant expression
+	 * @return the new node
 	 */
 	CivlForNode newCivlForNode(Source source, boolean isParallel,
-			SequenceNode<ForLoopInitializerNode> variables,
-			ExpressionNode domain, StatementNode body, ExpressionNode invariant);
+			DeclarationListNode variables, ExpressionNode domain,
+			StatementNode body, ExpressionNode invariant);
 
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 

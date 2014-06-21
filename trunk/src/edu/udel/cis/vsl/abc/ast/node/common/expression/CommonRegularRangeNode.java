@@ -21,8 +21,14 @@ public class CommonRegularRangeNode extends CommonExpressionNode implements
 
 	@Override
 	public ExpressionNode copy() {
-		// TODO Auto-generated method stub
-		return null;
+		ExpressionNode stepNode = getStep();
+
+		if (stepNode == null)
+			return new CommonRegularRangeNode(getSource(), getLow().copy(),
+					getHigh().copy());
+		else
+			return new CommonRegularRangeNode(getSource(), getLow().copy(),
+					getHigh().copy(), stepNode.copy());
 	}
 
 	@Override
@@ -32,38 +38,37 @@ public class CommonRegularRangeNode extends CommonExpressionNode implements
 
 	@Override
 	public boolean isConstantExpression() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
-		// TODO Auto-generated method stub
-		return false;
+		ExpressionNode stepNode = getStep();
+
+		return getLow().isSideEffectFree(errorsAreSideEffects)
+				&& getHigh().isSideEffectFree(errorsAreSideEffects)
+				&& (stepNode == null || stepNode
+						.isSideEffectFree(errorsAreSideEffects));
 	}
 
 	@Override
 	public ExpressionNode getLow() {
-		// TODO Auto-generated method stub
-		return null;
+		return (ExpressionNode) child(0);
 	}
 
 	@Override
 	public ExpressionNode getHigh() {
-		// TODO Auto-generated method stub
-		return null;
+		return (ExpressionNode) child(1);
 	}
 
 	@Override
 	public ExpressionNode getStep() {
-		// TODO Auto-generated method stub
-		return null;
+		return numChildren() < 3 ? null : (ExpressionNode) child(2);
 	}
 
 	@Override
 	protected void printBody(PrintStream out) {
-		// TODO Auto-generated method stub
-
+		out.print("RegularRange");
 	}
 
 }

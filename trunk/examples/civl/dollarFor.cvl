@@ -1,11 +1,13 @@
 #include <civlc.h>
+#include <stdio.h>
 
-void main(){
-  $range range = $range_regular(0, 5, 1);
-  $domain(1) dom = $domain_rectangular(range);
+void main() {
   int sum = 0;
   
-  $for(int i: dom){
+  $for (int i: ($domain){0 .. 5}) {
     sum += i;
+  }
+  $for (int i1, i2, i3 : ($domain){ 0 .. 3, 0 .. 4, 0 .. 9 # 3}) {
+    printf("%d %d %d\n", i1, i2, i3);
   }
 }

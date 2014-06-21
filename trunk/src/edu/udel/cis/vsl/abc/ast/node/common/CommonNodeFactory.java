@@ -48,6 +48,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode.Quantifier;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
@@ -73,6 +74,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
@@ -128,6 +130,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonQuantifiedExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonRegularRangeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonRemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonResultNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonScopeOfNode;
@@ -553,7 +556,7 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public ForLoopInitializerNode newForLoopInitializerNode(Source source,
+	public DeclarationListNode newForLoopInitializerNode(Source source,
 			List<VariableDeclarationNode> declarations) {
 		return new CommonDeclarationListNode(source, declarations);
 	}
@@ -621,8 +624,8 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public CivlForNode newCivlForNode(Source source, boolean isParallel,
-			SequenceNode<ForLoopInitializerNode> variables,
-			ExpressionNode domain, StatementNode body, ExpressionNode invariant) {
+			DeclarationListNode variables, ExpressionNode domain,
+			StatementNode body, ExpressionNode invariant) {
 		return new CommonCivlForNode(source, isParallel, variables, domain,
 				body, invariant);
 	}
@@ -913,6 +916,18 @@ public class CommonNodeFactory implements NodeFactory {
 	public OmpWorksharingNode newWorksharingNode(Source source,
 			OmpWorksharingNodeKind kind) {
 		return new CommonOmpWorkshareNode(source, kind, null);
+	}
+
+	@Override
+	public RegularRangeNode newRegularRangeNode(Source source,
+			ExpressionNode low, ExpressionNode high) {
+		return new CommonRegularRangeNode(source, low, high);
+	}
+
+	@Override
+	public RegularRangeNode newRegularRangeNode(Source source,
+			ExpressionNode low, ExpressionNode high, ExpressionNode step) {
+		return new CommonRegularRangeNode(source, low, high, step);
 	}
 
 }
