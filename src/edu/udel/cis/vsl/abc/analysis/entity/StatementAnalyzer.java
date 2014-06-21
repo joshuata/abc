@@ -31,6 +31,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
@@ -47,6 +48,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
+import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
@@ -281,6 +284,33 @@ public class StatementAnalyzer {
 		}
 	}
 
+	private void processCivlFor(CivlForNode node) throws SyntaxException {
+		ExpressionNode domainNode = node.getDomain();
+
+		for (VariableDeclarationNode child : node.getVariables()) {
+			Type type;
+
+			entityAnalyzer.declarationAnalyzer
+					.processVariableDeclaration(child);
+			if (child.getInitializer() != null)
+				throw error(
+						"Loop variable in $for/$parfor statement has initializer",
+						child);
+			type = child.getTypeNode().getType();
+			if (!(type instanceof IntegerType))
+				throw error(
+						"Loop variable(s) in $for/$parfor have non-integer type: "
+								+ type, child.getTypeNode());
+		}
+		expressionAnalyzer.processExpression(domainNode);
+		if (!(domainNode.getConvertedType() instanceof DomainType))
+			throw error(
+					"Domain expression in $for/$parfor does not have $domain type",
+					domainNode);
+		processStatement(node.getBody());
+		processExpression(node.getInvariant());
+	}
+
 	// ************************* Exported Methods **************************
 
 	void processStatement(StatementNode statement) throws SyntaxException {
@@ -325,6 +355,8 @@ public class StatementAnalyzer {
 				processStatement(child);
 		} else if (statement instanceof AtomicNode) {
 			processStatement(((AtomicNode) statement).getBody());
+		} else if (statement instanceof CivlForNode) {
+			processCivlFor((CivlForNode) statement);
 		} else
 			throw error("Unknown kind of statement", statement);
 	}

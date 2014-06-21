@@ -68,6 +68,7 @@ public interface CParser {
 	public static final int CHOOSE = CivlCParser.CHOOSE;
 	public static final int CIVLATOM = CivlCParser.CIVLATOM;
 	public static final int CIVLATOMIC = CivlCParser.CIVLATOMIC;
+	public static final int CIVLFOR = CivlCParser.CIVLFOR;
 	public static final int COLLECTIVE = CivlCParser.COLLECTIVE;
 	public static final int COLON = CivlCParser.COLON;
 	public static final int COMMA = CivlCParser.COMMA;
@@ -157,6 +158,7 @@ public interface CParser {
 	public static final int OctalConstant = CivlCParser.OctalConstant;
 	public static final int OctalDigit = CivlCParser.OctalDigit;
 	public static final int OctalEscape = CivlCParser.OctalEscape;
+	public static final int PARFOR = CivlCParser.PARFOR;
 	public static final int PDEFINE = CivlCParser.PDEFINE;
 	public static final int PELIF = CivlCParser.PELIF;
 	public static final int PELSE = CivlCParser.PELSE;
@@ -176,6 +178,7 @@ public interface CParser {
 	public static final int PUNDEF = CivlCParser.PUNDEF;
 	public static final int QMARK = CivlCParser.QMARK;
 	public static final int RCURLY = CivlCParser.RCURLY;
+	public static final int RANGE = CivlCParser.RANGE;
 	public static final int REAL = CivlCParser.REAL;
 	public static final int REGISTER = CivlCParser.REGISTER;
 	public static final int REQUIRES = CivlCParser.REQUIRES;

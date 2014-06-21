@@ -6,7 +6,7 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
  * @author siegel
  * 
  */
-public interface DomainType extends ObjectType {
+public interface DomainType extends UnqualifiedObjectType {
 
 	/**
 	 * Does this domain type have a specified dimension?
