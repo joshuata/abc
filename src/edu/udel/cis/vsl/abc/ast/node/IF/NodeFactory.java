@@ -1239,6 +1239,19 @@ public interface NodeFactory {
 
 	// Statements...
 
+	/**
+	 * Constructs a new compound statement node. This is designated in C as
+	 * <code>{ s1; s2; ...}</code>, where each <code>s</code>i is a block item
+	 * (e.g., a statement, a declaration, or any other instance of
+	 * {@link BlockItermNode}.
+	 * 
+	 * @param source
+	 *            source information encompassing the entire compound statement,
+	 *            from the opening curly brace to the closing curly brace
+	 * @param items
+	 *            the list of block items comprising the compound statement
+	 * @return the new compound statement node
+	 */
 	CompoundStatementNode newCompoundStatementNode(Source source,
 			List<BlockItemNode> items);
 
@@ -1252,6 +1265,15 @@ public interface NodeFactory {
 	 */
 	ExpressionStatementNode newExpressionStatementNode(ExpressionNode expression);
 
+	/**
+	 * Constructs a new node representing a C "null" statement, also known as a
+	 * "no-op" statement, and written as just a semicolon.
+	 * 
+	 * @param source
+	 *            source specification encompassing the single semicolon
+	 *            character
+	 * @return the new null statement node
+	 */
 	StatementNode newNullStatementNode(Source source);
 
 	/**
@@ -1280,15 +1302,79 @@ public interface NodeFactory {
 			ExpressionNode incrementer, StatementNode body,
 			ExpressionNode invariant);
 
+	/**
+	 * Construcs a new declaration list node, which is comprised of a sequence
+	 * of variable declarations. Such a node can be used as the initializer part
+	 * of a <code>for</code> loop, or as the variable list part of a CIVL-C
+	 * <code>$for</code> or <code>$parfor</code> statement.
+	 * 
+	 * @param source
+	 *            source specification encompassing the entire list of
+	 *            declarations
+	 * @param declarations
+	 *            list of variable declarations
+	 * @return the new declaration list node
+	 */
 	DeclarationListNode newForLoopInitializerNode(Source source,
 			List<VariableDeclarationNode> declarations);
 
+	/**
+	 * Constructs a new node representing a <code>while</code> loop. This is
+	 * represented <code>while (cond) body</code> in C, but may also have an
+	 * optional CIVL-C loop invariant.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire loop and all its
+	 *            components, including the invariant (if present) and the body
+	 * @param condition
+	 *            the boolean expression which determines whether control stays
+	 *            in the loop
+	 * @param body
+	 *            the loop body, a statement
+	 * @param invariant
+	 *            a boolean expression which is a loop invariant; may be
+	 *            <code>null</code>
+	 * @return the new <code>while</code> loop node
+	 */
 	LoopNode newWhileLoopNode(Source source, ExpressionNode condition,
 			StatementNode body, ExpressionNode invariant);
 
+	/**
+	 * Constructs a new node representing a <code>do...while</code> loop. This
+	 * is represented in C as <code>do body while (cond)</code>. This kind of
+	 * loop guarantees that the body will be executed at least once, as the
+	 * condition is checked after each execution of the body, rather than
+	 * before. Otherwise it is the same as a <code>while</code> loop.
+	 * 
+	 * @see #newWhileLoopNode(Source, ExpressionNode, StatementNode,
+	 *      ExpressionNode)
+	 * @param source
+	 *            source specification spanning the entire loop, including the
+	 *            body, the invariant, and the condition
+	 * @param condition
+	 *            the boolean condition which determines whether control should
+	 *            return to the top of the loop body
+	 * @param body
+	 *            the loop body
+	 * @param invariant
+	 *            an optional boolean expression loop invariant which may be
+	 *            associated to this node; may be <code>null</code>
+	 * @return the new <code>do</code> loop node
+	 */
 	LoopNode newDoLoopNode(Source source, ExpressionNode condition,
 			StatementNode body, ExpressionNode invariant);
 
+	/**
+	 * Constructs a new node representing a <code>goto</code> statement.
+	 * 
+	 * @param source
+	 *            source specification spanning the whole <code>goto</code>
+	 *            statement, including the label
+	 * @param label
+	 *            identifier which is the name of the label to which control
+	 *            should "go"
+	 * @return the new <code>goto</code> node
+	 */
 	GotoNode newGotoNode(Source source, IdentifierNode label);
 
 	/**
@@ -1296,7 +1382,8 @@ public interface NodeFactory {
 	 * ("else") branch.
 	 * 
 	 * @param source
-	 *            source information for the statement
+	 *            source specification spanning the entire statement, including
+	 *            the entire "true" branch
 	 * @param condition
 	 *            the condition expression
 	 * @param trueBranch
@@ -1310,6 +1397,9 @@ public interface NodeFactory {
 	 * Creates a new <code>if</code> statement node. False branch may be null if
 	 * there is no "else" clause.
 	 * 
+	 * @param source
+	 *            source specification spanning the entire statement, including
+	 *            both branches in their entirety
 	 * @param condition
 	 *            the branch condition
 	 * @param trueBranch
@@ -1321,8 +1411,25 @@ public interface NodeFactory {
 	IfNode newIfNode(Source source, ExpressionNode condition,
 			StatementNode trueBranch, StatementNode falseBranch);
 
+	/**
+	 * Creates a new node representing the C <code>continue</code> statement,
+	 * used in a loop body to direct control to the next loop iteration.
+	 * 
+	 * @param source
+	 *            source specification for the <code>continue</code> token
+	 * @return the new new <code>continue</code> node
+	 */
 	JumpNode newContinueNode(Source source);
 
+	/**
+	 * Creates a new node representing the C <code>break</code> statement, used
+	 * in a loop or <code>switch</code> body to direct control to the location
+	 * just after the loop or <code>switch</code> construct.
+	 * 
+	 * @param source
+	 *            source specification for the <code>break</code> token
+	 * @return the new new <code>break</code> node
+	 */
 	JumpNode newBreakNode(Source source);
 
 	/**
@@ -1336,9 +1443,45 @@ public interface NodeFactory {
 	 */
 	ReturnNode newReturnNode(Source source, ExpressionNode argument);
 
+	/**
+	 * Constructs new node representing a labeled statement. The label and the
+	 * statement being labeled must be constructed first, then used as arguments
+	 * to this method.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire labeled statement,
+	 *            including the label and the statement being labeled
+	 * @param label
+	 *            the node representing the label
+	 * @param statement
+	 *            the statement to be labeled
+	 * @return the new labeled statement node
+	 * 
+	 * @see #newStandardLabelDeclarationNode(Source, IdentifierNode,
+	 *      StatementNode)
+	 * @see #newCaseLabelDeclarationNode(Source, ExpressionNode, StatementNode)
+	 * @see #newDefaultLabelDeclarationNode(Source, StatementNode)
+	 */
 	LabeledStatementNode newLabeledStatementNode(Source source,
 			LabelNode label, StatementNode statement);
 
+	/**
+	 * Constructs a new node representing a C <code>switch</code> statement. The
+	 * <code>switch</code> body must be created first, and this body includes
+	 * all the case-labeled statements (and <code>break</code> statements)
+	 * required. The <code>condition</code> must have a type appropriate for a
+	 * <code>swich</code> statement, such as an integer type.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>switch</code>
+	 *            statement, including the entire body
+	 * @param condition
+	 *            the expression that is evaluated to determine which case to
+	 *            switch to
+	 * @param body
+	 *            the body of the <code>switch</code> statement
+	 * @return the new <code>switch</code> statement node
+	 */
 	SwitchNode newSwitchNode(Source source, ExpressionNode condition,
 			StatementNode body);
 
@@ -1368,33 +1511,184 @@ public interface NodeFactory {
 			DeclarationListNode variables, ExpressionNode domain,
 			StatementNode body, ExpressionNode invariant);
 
+	/**
+	 * Creates a new node representing a CIVL-C <code>$assume</code> statement.
+	 * This statement adds an assumption to the current context during execution
+	 * or verification of the CIVL model.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$assume</code>
+	 *            statement, including the expression argument
+	 * @param expression
+	 *            a boolean expression which is to be evaluated and added to the
+	 *            current context
+	 * @return the new <code>$assume</code> statement node
+	 */
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 
+	/**
+	 * Creates a new node representing a CIVL-C <code>$when</code> node, used to
+	 * represent a guarded command. Such a statement blocks until the guard is
+	 * <code>true</code>. Note that only the first atomic sub-statement of the
+	 * statement body is guaranteed to execute atomically with the evaluation to
+	 * <code>true</code> of the guard.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$when</code>
+	 *            statement, including the guard and the entire body
+	 * @param guard
+	 *            a boolean expression which determines when the statement is
+	 *            enabled
+	 * @param body
+	 *            a statement that may be executed once the guard holds
+	 * @return the new <code>$when</code> statement node
+	 */
 	WhenNode newWhenNode(Source source, ExpressionNode guard, StatementNode body);
 
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$choose</code>
+	 * statement. This statement has the form
+	 * 
+	 * <pre>
+	 * $choose {
+	 *   $when (g1) s1
+	 *   $when (g2) s2
+	 *   ...
+	 * }
+	 * </pre>
+	 * 
+	 * The statement is used to specify a nondeterministic choice. Whenever
+	 * control is at the <code>$choose</code> location, the guards
+	 * <code>g1</code>, <code>g2</code>, etc., are evaluated. Each that
+	 * evaluates to true specifies one enabled transition. If none are enabled,
+	 * the entire statement blocks. The order of these clauses is irrelevant.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$choose</code>
+	 *            statement, including the entire body
+	 * @param statements
+	 *            the guarded commands which form the clauses of the
+	 *            <code>$choose</code> statement
+	 * @return the new <code>$choose</code> statement node
+	 */
 	ChooseStatementNode newChooseStatementNode(Source source,
 			List<StatementNode> statements);
 
 	// misc. nodes ...
 
+	/**
+	 * Creates a new C11 static assertion node. A static assertion is an
+	 * assertion which is checked at compile time. The syntax is
+	 * 
+	 * <pre>
+	 * _Static_assert(expr, message)
+	 * </pre>
+	 * 
+	 * @param source
+	 *            source specification spanning the entire static assertion
+	 *            statement
+	 * @param expression
+	 *            the integer constant expression which, if it evaluates to 0,
+	 *            yields an assertion violation. Note that the boolean type
+	 *            <code>_Bool</code> is an integer type in C, so a value of this
+	 *            type may be used.
+	 * @param message
+	 *            the message to be printed if the assertion is violated
+	 * @return the new static assertion node
+	 */
 	StaticAssertionNode newStaticAssertionNode(Source source,
 			ExpressionNode expression, StringLiteralNode message);
 
+	/**
+	 * Constructs a new pragma node, representing a C <code>#pragma</code>
+	 * directive. The pragma is left uninterpreted in this representation. The
+	 * first token following the <code>#pragma</code> must be an identifier,
+	 * this identifier has a special role as it specifies a pragma domain, such
+	 * as <code>omp</code> (for OpenMP). The remainder of the pragma is
+	 * represented as a sequence of raw tokens. These can be parsed interpreted
+	 * at a later stage of processing. Finally, every pragma must be terminated
+	 * by the first newline character encountered, and the token for that
+	 * newline is also specified.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire pragma line, from the
+	 *            <code>#pragma</code> up to and including the
+	 *            <code>newline</code>.
+	 * 
+	 * @param identifier
+	 *            the first token after the <code>#pragma</code> token
+	 *            specifying the pragma domain (e.g., <code>omp</code>)
+	 * @param body
+	 *            the sequence of tokens comprising the rest of the pragma body
+	 *            after the identifier, and not including the newline
+	 * @param newlineToken
+	 *            the newlinen token at the end of the pragma
+	 * @return the new pragma node
+	 */
 	PragmaNode newPragmaNode(Source source, IdentifierNode identifier,
 			List<CToken> body, CToken newlineToken);
 
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$requires</code>
+	 * contract clause. This is used to specify a pre-condition for a function.
+	 * It is currently not used.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire
+	 *            <code>$requires</code> clause, including the entire expression
+	 * @param expression
+	 *            the boolean expression which specifies a pre-condition
+	 * @return the new <code>$requires</code> clause node
+	 */
 	RequiresNode newRequiresNode(Source source, ExpressionNode expression);
 
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$ensures</code>
+	 * contract clause. This is used to specify a post-condition for a function.
+	 * It is currently not used.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$ensures</code>
+	 *            clause, including the entire expression
+	 * @param expression
+	 *            the boolean expression which specifies a post-condition
+	 * @return the new <code>$ensures</code> clause node
+	 */
 	EnsuresNode newEnsuresNode(Source source, ExpressionNode expression);
 
 	// external definitions...
 
+	/**
+	 * Constructs a new node representing a function definition, i.e., a
+	 * function declaration with body.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire function definition,
+	 *            including the entire function body
+	 * @param name
+	 *            the identifier which is the name of the function being defined
+	 * @param type
+	 *            the type of the function; note that a function type comprises
+	 *            a return type and some sequence of input types
+	 * @param contract
+	 *            the (optional) function contract; may be <code>null</code>
+	 * @param body
+	 *            the function body
+	 * @return the new function definition node
+	 */
 	FunctionDefinitionNode newFunctionDefinitionNode(Source source,
 			IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract, CompoundStatementNode body);
 
 	/**
-	 * Creates a new abstract function definition.
+	 * Creates a new CIVL abstract function definition. An abstract function is
+	 * an unspecified mathematical function. In particular, if x1=y1 and ... and
+	 * xn=yn then f(x1,...,xn)=f(y1,...,yn). In other words, the value
+	 * "returned" by f is a deterministic function of its inputs. In cannot
+	 * depent on any other variables values in the program, or other parts of
+	 * the state. As a special case, note that if n=0, then f() is essentially a
+	 * constant. In fact, the case n=0 is not allowed: if you want a constant,
+	 * create instead an input variable (<code>$input</code>).
 	 * 
 	 * @param source
 	 *            The source information for the abstract function definition.
@@ -1406,25 +1700,49 @@ public interface NodeFactory {
 	 * @param contract
 	 *            Any code contract associated with the function.
 	 * @param continuity
-	 *            The number of derivatives that may be taken.
+	 *            The number of derivatives that may be taken; this applies to
+	 *            real valued functions of real variables only
 	 * @return An abstract function definition with the specified properties.
 	 */
 	AbstractFunctionDefinitionNode newAbstractFunctionDefinitionNode(
 			Source source, IdentifierNode name, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract, int continuity);
 
+	/**
+	 * Creates a new node representing an entire translation unit. The children
+	 * of this node will be external definitions.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire translation unit,
+	 *            which is typically the entire token sequence emanating from
+	 *            the preprocessor
+	 * @param definitions
+	 *            the list of external definitions which form the children of
+	 *            the translation unit
+	 * @return the new tranlation unit node
+	 */
 	ASTNode newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions);
 
+	/**
+	 * Returns the value factory associated to this node factory. The value
+	 * factory is used to reason about constants and constant expressions in a
+	 * program.
+	 * 
+	 * @return the value factory
+	 */
 	ValueFactory getValueFactory();
 
 	/**
-	 * Creates a new atomic statement node with the data provided.
+	 * Creates a new <code>$atomic</code> or <code>$atom</code> statement node.
+	 * These are the two varieties of atomic statements in CIVL-C.
 	 * 
 	 * @param statementSource
-	 *            The source information of the node
+	 *            source specification spanning the entire statement, including
+	 *            the body
 	 * @param deterministic
-	 *            The flag to denote whether the atomic node is $atom or $atomic
+	 *            if <code>true</code>, creates an <code>$atom</code> statement
+	 *            node, else creates an <code>$atomic</code> statement node
 	 * @param body
 	 *            The body statement node of the atomic node
 	 * @return The new atomic statement node
