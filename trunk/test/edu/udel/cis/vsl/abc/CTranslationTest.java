@@ -22,6 +22,10 @@ import edu.udel.cis.vsl.abc.err.IF.ABCException;
  */
 public class CTranslationTest {
 
+	/**
+	 * Turn on a lot of output for debugging? Set this to true only in your
+	 * local copy. Be sure to set it back to false before committing!
+	 */
 	private static boolean debug = false;
 
 	private static File[] systemIncludes = new File[0];
@@ -121,5 +125,10 @@ public class CTranslationTest {
 	@Test
 	public void labels() throws ABCException, IOException {
 		check("labels");
+	}
+
+	@Test
+	public void completeStruct() throws ABCException, IOException {
+		check("completeStruct");
 	}
 }
