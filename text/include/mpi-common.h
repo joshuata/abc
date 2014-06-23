@@ -55,17 +55,9 @@ typedef enum __MPI_Status__ {
   __FINALIZED
 } __MPI_Status__;
 
-/* Definition of CMPI_Gcomm and MPI_Comm */
-typedef struct CMPI_Gcomm {
-  $gcomm p2p; // point-to-point communication
-  $gcomm col; // collective communication
-} CMPI_Gcomm;
+typedef struct CMPI_Gcomm CMPI_Gcomm;
 
-typedef struct MPI_Comm {
-  $comm p2p; // point-to-point communication
-  $comm col; // collective communication
-  __MPI_Status__ status;
-} MPI_Comm;
+typedef struct MPI_Comm MPI_Comm;
 
 MPI_Comm MPI_COMM_WORLD;
 
