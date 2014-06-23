@@ -45,8 +45,7 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 		if (object instanceof CommonPointerType) {
 			CommonPointerType that = (CommonPointerType) object;
 
-			if (!referencedType.equals(that.referencedType))
-				return false;
+			return referencedType.equals(that.referencedType);
 		}
 		return false;
 	}
