@@ -1,7 +1,5 @@
+#ifdef __ASSERT__
+#else
+#define __ASSERT__
 void assert(_Bool expr);
-
-//void __assert__();
-
-//#define assert(expression) ((expression) ? (void)0 : __assert__())
-
-//#define static_assert _Static_assert
+#endif

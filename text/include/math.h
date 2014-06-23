@@ -2,6 +2,6 @@
 
 #ifdef __MATH__
 #else
-#include<math-common.h>
 #define __MATH__
+#include<math-common.h>
 #endif

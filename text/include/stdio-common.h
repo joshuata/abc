@@ -5,7 +5,6 @@
  #else
  #define __STDIO_COMMON__
  
-
 /* Functions */
 
 int remove(const char *filename);

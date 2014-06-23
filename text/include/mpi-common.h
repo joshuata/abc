@@ -1,10 +1,7 @@
 #ifdef __MPI_COMMON__
 #else
-  #define __MPI_COMMON__  
-  #ifdef __CIVLC__
-  #else
-    #include<civlc.h>
-  #endif
+#define __MPI_COMMON__  
+#include<civlc.h>
 
 /********************************* Types **********************************************/
 /* Datatypes (type MPI_Datatype) */

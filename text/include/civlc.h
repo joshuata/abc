@@ -4,6 +4,6 @@
 
 #ifdef __CIVLC__
 #else
-#include<civlc-common.h>
 #define __CIVLC__
+#include<civlc-common.h>
 #endif

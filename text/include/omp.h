@@ -1,5 +1,5 @@
 #ifdef __OMP__
 #else
-#include<omp-common.h>
 #define __OMP__
+#include<omp-common.h>
 #endif
