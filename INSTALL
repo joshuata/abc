@@ -39,10 +39,18 @@ openjdk-7-jdk.
 
 5. cd abc
 
-6. If your VSL dependencies path is not in /opt/vsl, then you need
-to create a build.properties file by copying the content from
-build_default.properties and modifying the value of entry "root"
-to be the path to your VSL dependencies folder.
+6.  Look at build_default.properties and see if the paths
+are correct for your system.  If they are not, you will have
+to create a file called build.properties (in the same directory),
+copying the content of build_default.properties, but correcting
+values as necessary.  For example, if your VSL dependencies path
+is not in /opt/vsl, then you need to do this,
+modifying the value of entry "root" to be the path to your
+VSL dependencies folder.  Similarly, if the location of sarl.jar
+is not as specified in build_default.properties (the assumption
+is it will be found in directory
+Users/${user.name}/Documents/workspace) then you will
+have to do this,  correcting the value of workspace or sarl.jar.
 
 7. Type "ant" and everything should build without warnings or errors
 and produce abc.jar.  Type "ant test" to run a JUnit test suite.  All
@@ -86,10 +94,8 @@ and specify its value to be /opt/vsl. Navigate to Preferences ->
 Run/Debug -> String Substitution -> New, and then define an entry 
 vsl_lib and set its value to be /opt/vsl/lib.
 
-8. If your VSL dependencies path is not in /opt/vsl, then you need
-to create a build.properties file by copying the content from
-build_default.properties and modifying the value of entry "root"
-to be the path to your VSL dependencies folder.
+8. Perform Step 6 from the "Installation from Source"
+instructions above.
 
 9. Right click (or ctrl-click on Mac) on build.xml and select
 Run As->Ant Build.  This runs the ant script, which invokes ANTLR
