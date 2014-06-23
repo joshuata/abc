@@ -76,14 +76,12 @@ void $free(void *p);
 /* Like $COMM_ANY_SOURCE above, except for tags */
 #define $COMM_ANY_TAG -2
 
-/* A message formed by $message_pack */ 
-typedef struct __message__ {
-  int source;
-  int dest;
-  int tag;
-  $bundle data;
-  int size;
-} $message;
+/* The message type, declared here as an incomplete
+ * struct type, which is all you need for constructing
+ * the AST.  For the complete version, see the CIVL
+ * project.
+ */
+typedef struct __message__ $message;
 
 /* creates a new message, copying data from the specified buffer */ 
 $message $message_pack(int source, int dest, int tag, void *data, int size);
@@ -107,54 +105,32 @@ void $message_unpack($message message, void *buf, int size);
 /* A datatype representing a queue of messages.  All message
  * data is encapsulated inside this value; no external allocation
  * is used. */ 
-typedef struct __queue__ {
-  int length;
-  $message messages[];
-} $queue;
+typedef struct __queue__ $queue;
  
 /* A global communicator datatype which must be operated by local communicators.
  * This communicator type has the same meaning as the communicator type in MPI
  * standards*/
-typedef struct __gcomm__ {
-  int nprocs; // number of processes
-  _Bool isInit[]; // if the local comm has been initiated
-  $queue buf[][]; // message buffers
-} * $gcomm;
+typedef struct __gcomm__ * $gcomm;
 
 /* A datatype representing a local communicator which is used for 
  * operating global communicators. The local communicator type has 
  * a handle of a global communicator. This type represents for 
  * a set of processes which have ranks in common.
  */
-typedef struct __comm__ {
-  int place;
-  $gcomm gcomm;
- } * $comm;
+typedef struct __comm__ * $comm;
 
 /* A datatype representing a global barrier which must be operated by local
  * barriers. 
  */
-typedef struct __gbarrier__ {
-  int nprocs;
-  $proc proc_map[]; // initialized as all $proc_null.
-  _Bool in_barrier[]; // initialized as all false.
-  int num_in_barrier; // initialized as 0.
- } * $gbarrier;
+typedef struct __gbarrier__ * $gbarrier;
  
 /* A datatype representing a global barrier which used for 
  * operating global barriers. The local barrier type has 
  * a handle of a global barrier.
  */
-typedef struct __barrier__ {
-  int place;
-  $gbarrier gbarrier; // initialized as 0.
- } * $barrier;
+typedef struct __barrier__ * $barrier;
  
-typedef struct __int_iter__ {
-  int size;
-  int content[];
-  int index; //initialized as 0
-} * $int_iter;
+typedef struct __int_iter__ * $int_iter;
 
 
 /* Creates a new barrier object and returns a handle to it.

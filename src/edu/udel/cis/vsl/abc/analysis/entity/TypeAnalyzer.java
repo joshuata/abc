@@ -482,54 +482,138 @@ public class TypeAnalyzer {
 		structureOrUnionType.clear();
 		structureOrUnion = entityFactory
 				.newStructureOrUnion(structureOrUnionType);
-		structureOrUnion.addDeclaration(node);
+		// structureOrUnion.addDeclaration(node);
 		scope.add(structureOrUnion);
 		if (identifier != null)
 			identifier.setEntity(structureOrUnion);
-		structureOrUnion.addDeclaration(node);
+		// structureOrUnion.addDeclaration(node);
 		if (fieldDecls != null) {
-			List<Field> fieldList = new LinkedList<>();
-
-			structureOrUnion.setDefinition(node);
-			for (FieldDeclarationNode decl : fieldDecls) {
-				TypeNode fieldTypeNode = decl.getTypeNode();
-				ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
-				Value bitWidth;
-				ObjectType fieldType;
-				Field field;
-
-				if (fieldTypeNode == null)
-					fieldType = null;
-				else {
-					Type tempType = processTypeNode(fieldTypeNode);
-
-					if (!(tempType instanceof ObjectType))
-						throw error(
-								"Non-object type for structure or union member",
-								fieldTypeNode);
-					fieldType = (ObjectType) tempType;
-				}
-				if (bitWidthExpression == null) {
-					bitWidth = null;
-				} else {
-					if (!bitWidthExpression.isConstantExpression())
-						throw error(
-								"Non-constant expression used for bit width in field declaration",
-								bitWidthExpression);
-					bitWidth = nodeFactory.getConstantValue(bitWidthExpression);
-				}
-				field = entityFactory.newField(decl, fieldType, bitWidth,
-						structureOrUnion);
-				decl.setEntity(field);
-				if (decl.getIdentifier() != null)
-					decl.getIdentifier().setEntity(field);
-				fieldList.add(field);
-			}
-			structureOrUnionType.complete(fieldList);
+			completeStructOrUnion(structureOrUnion, node);
 		}
 		return structureOrUnion;
 	}
 
+	/**
+	 * Checks that an existing tagged entity <code>old</code> is consistent with
+	 * one defined by a given structure or union type node <code>node</code>.
+	 * Consistency entails:
+	 * <ul>
+	 * <li>if <code>node</code> defines a struct, <code>old</code> is a struct;
+	 * if <code>node</code> defines a union, <code>old</code> is a union</li>
+	 * <li>at least one of <code>old</code> and <code>node</code> is incomplete,
+	 * i.e., does not contain the field declarations</li>
+	 * </ul>
+	 * 
+	 * @param old
+	 *            an existing tagged entity (non-<code>null</code>)
+	 * @param node
+	 *            a structure or union type node (non-<code>null</code>)
+	 * @throws SyntaxException
+	 *             if the existing entity and the node are inconsistent
+	 */
+	private void checkConsistency(TaggedEntity old,
+			StructureOrUnionTypeNode node) throws SyntaxException {
+		String tag = node.getName();
+		StructureOrUnion su;
+
+		if (old.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
+			throw error("Re-use of tag " + tag
+					+ " for structure or union.  Previous use was at "
+					+ old.getFirstDeclaration().getSource(), node);
+		su = (StructureOrUnion) old;
+		if (su.getType().isStruct()) {
+			if (!node.isStruct())
+				throw error("Previous use of tag " + tag
+						+ " was for structure, current use for union. "
+						+ "Previous use was at "
+						+ old.getFirstDeclaration().getSource(), node);
+		} else {
+			if (node.isStruct())
+				throw error("Previous use of tag " + tag
+						+ " was for union, current use for structure. "
+						+ "Previous use was at "
+						+ old.getFirstDeclaration().getSource(), node);
+		}
+		if (su.getType().isComplete() && node.getStructDeclList() != null)
+			throw error(
+					"Re-definition of structure or union.  Previous definition at "
+							+ old.getFirstDeclaration().getSource(), node);
+	}
+
+	/**
+	 * Given an incomplete structure or union entity and a consistent, complete
+	 * structure or union type node, completes the entity using the information
+	 * provided by the node.
+	 * 
+	 * @param structureOrUnion
+	 *            an incomplete structure or union entity (non-<code>null</code>
+	 *            )
+	 * @param node
+	 *            a complete structure or union type node consistent with the
+	 *            <code>structureOrUnion</code> (non-<code>null</code>)
+	 * @throws SyntaxException
+	 *             if a field is declared with a non-object type or bit width is
+	 *             specified with a non-constant expression
+	 * @see {@link #checkConsistency(TaggedEntity, StructureOrUnionTypeNode)}
+	 */
+	private void completeStructOrUnion(StructureOrUnion structureOrUnion,
+			StructureOrUnionTypeNode node) throws SyntaxException {
+		StructureOrUnionType structureOrUnionType = structureOrUnion.getType();
+		SequenceNode<FieldDeclarationNode> fieldDecls = node
+				.getStructDeclList();
+		List<Field> fieldList = new LinkedList<>();
+
+		structureOrUnion.setDefinition(node);
+		// structureOrUnion.addDeclaration(node);
+		for (FieldDeclarationNode decl : fieldDecls) {
+			TypeNode fieldTypeNode = decl.getTypeNode();
+			ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
+			Value bitWidth;
+			ObjectType fieldType;
+			Field field;
+
+			if (fieldTypeNode == null)
+				fieldType = null;
+			else {
+				Type tempType = processTypeNode(fieldTypeNode);
+
+				if (!(tempType instanceof ObjectType))
+					throw error(
+							"Non-object type for structure or union member",
+							fieldTypeNode);
+				fieldType = (ObjectType) tempType;
+			}
+			if (bitWidthExpression == null) {
+				bitWidth = null;
+			} else {
+				if (!bitWidthExpression.isConstantExpression())
+					throw error(
+							"Non-constant expression used for bit width in field declaration",
+							bitWidthExpression);
+				bitWidth = nodeFactory.getConstantValue(bitWidthExpression);
+			}
+			field = entityFactory.newField(decl, fieldType, bitWidth,
+					structureOrUnion);
+			decl.setEntity(field);
+			if (decl.getIdentifier() != null)
+				decl.getIdentifier().setEntity(field);
+			fieldList.add(field);
+		}
+		structureOrUnionType.complete(fieldList);
+	}
+
+	/**
+	 * Processes a domain type node. Such a node is specified in source form by
+	 * <code>$domain</code> or <code>$domain(expr)</code>, where
+	 * <code>expr</code> is a constant expression of integer type
+	 * 
+	 * @param node
+	 *            a domain type node (non-<code>null</code>)
+	 * @return the domain type specified by the node
+	 * @throws SyntaxException
+	 *             if the dimension expression is present but does not have
+	 *             integer type or is not a constant expression
+	 */
 	private DomainType processDomainType(DomainTypeNode node)
 			throws SyntaxException {
 		ExpressionNode dimensionNode = node.getDimension();
@@ -570,17 +654,24 @@ public class TypeAnalyzer {
 	}
 
 	/**
-	 * Process a TypeNode. The Type defined by that type node is computed and
-	 * associated to the TypeNode.
+	 * <p>
+	 * Processes a {@link TypeNode}. The Type defined by that type node is
+	 * computed and associated to the TypeNode.
+	 * </p>
 	 * 
+	 * <p>
 	 * This method may also entail the creation and/or modification of entities.
 	 * For example, if the type node defines a strucuture or union type, or
 	 * enumeration type, then the corresponding entities may be created or
 	 * completed.
+	 * </p>
 	 * 
 	 * @param typeNode
-	 * @return
+	 *            a non-<code>null</code> type node
+	 * @return the type specified by that node
 	 * @throws SyntaxException
+	 *             if any static errors are detected in the processing of the
+	 *             type node
 	 */
 	Type processTypeNode(TypeNode typeNode, boolean isParameter)
 			throws SyntaxException {
@@ -633,21 +724,37 @@ public class TypeAnalyzer {
 	}
 
 	/**
+	 * <p>
 	 * See C11 6.7.2.2 and 6.7.2.3. The procedure is as follows:
+	 * </p>
 	 * 
+	 * <p>
 	 * If there is no tag: there has to be an enumerator list, and this defines
 	 * a new unnamed entity and enumeration type in the current scope.
+	 * </p>
 	 * 
+	 * <p>
 	 * If there is a tag, proceed as follows:
-	 * 
+	 * <ul>
+	 * <li>
 	 * If there is an enumerator list: check that there is no tagged entity with
 	 * the same tag in the current scope. If this check fails, syntax error.
-	 * Create a new enumeration entity and type, add it to the current scope.
-	 * 
+	 * Create a new enumeration entity and type, add it to the current scope.</li>
+	 * <li>
 	 * If there is not an enumerator list: check (1) there is a visible tagged
 	 * entity with the same tag; (2) that tagged entity is an enum; and (3) that
 	 * previous enum is complete. If any of these fails: syntax error. Else, use
-	 * the old entity and type.
+	 * the old entity and type.</li>
+	 * </ul>
+	 * </p>
+	 * 
+	 * <p>
+	 * Note that the situation is slightly different than that for structures or
+	 * unions. An incomplete structure or union declaration may occur before the
+	 * structure or union is complete. In contrast, an enumeration must be
+	 * complete the first time it is declared, and an incomplete version may
+	 * occur only after that point.
+	 * </p>
 	 * 
 	 * @param node
 	 * @return
@@ -723,27 +830,46 @@ public class TypeAnalyzer {
 	}
 
 	/**
+	 * <p>
 	 * See C11 6.7.2.1 and 6.7.2.3. The procedure is as follows:
+	 * </p>
 	 * 
+	 * <p>
 	 * If there is no tag, there has to be a declarator list, and this defines a
-	 * new unnamed struct or union entity and type in the current scope.
+	 * new unnamed struct or union entity and type in the current scope. If
+	 * there is no declarator list, a syntax exception is thrown.
+	 * </p>
 	 * 
+	 * <p>
 	 * If there is a tag, proceed as follows:
-	 * 
-	 * If there is a declarator list: check that there is no tagged entity with
-	 * same tag in the current scope. If this check fails, syntax error. Else,
-	 * create a new struct/union entity and type and add it to the current
-	 * scope.
-	 * 
+	 * <ul>
+	 * <li>
+	 * If there is a declarator list: see if there exists a tagged entity with
+	 * the same tag in current scope.
+	 * <ul>
+	 * <li>If there does, check it has the same kind (struct or union) as this
+	 * one, and check that it is incomplete. If either check fails, throw a
+	 * syntax exception. Then complete the old entity using the information from
+	 * the given node.</li>
+	 * <li>If there does not exist a tagged entity with the same tag in the
+	 * current scope, create a new complete struct/union entity and type and add
+	 * it to the current scope.</li>
+	 * </ul>
+	 * </li>
+	 * <li>
 	 * If there is no declarator list: see if there exists a visible tagged
-	 * entity with same tag. If there does exist such an entity, check it has
-	 * same kind as this one (struct or union), and use it. If there does not
-	 * exist such an entity, create a new incomplete struct or union entity and
-	 * type and add it to the current scope.
+	 * entity with the same tag. If there does exist such an entity, check it
+	 * has the same kind as this one (struct or union), and use it. If there
+	 * does not exist such an entity, create a new incomplete struct or union
+	 * entity and type and add it to the current scope.</li>
+	 * </ul>
+	 * </p>
 	 * 
 	 * @param node
-	 * @return
+	 *            a structure or union type node
+	 * @return the structure or union type obtained by processing the node
 	 * @throws SyntaxException
+	 *             if any of the consistency checks defined above fails
 	 */
 	Type processStructureOrUnionType(StructureOrUnionTypeNode node)
 			throws SyntaxException {
@@ -767,29 +893,25 @@ public class TypeAnalyzer {
 			if (fieldDecls != null) {
 				TaggedEntity oldEntity = scope.getTaggedEntity(tag);
 
-				if (oldEntity != null)
-					throw error(
-							"Previously declared entity with same tag and scope: "
-									+ oldEntity.getFirstDeclaration()
-											.getSource(), node);
-				structureOrUnion = createStructureOrUnion(node);
+				if (oldEntity != null) {
+					checkConsistency(oldEntity, node);
+					structureOrUnion = (StructureOrUnion) oldEntity;
+					completeStructOrUnion(structureOrUnion, node);
+				} else {
+					structureOrUnion = createStructureOrUnion(node);
+				}
 			} else {
 				TaggedEntity oldEntity = scope.getLexicalTaggedEntity(tag);
 
 				if (oldEntity != null) {
-					if (oldEntity.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
-						throw error(
-								"Re-use of tag "
-										+ tag
-										+ " for structure or union.  Previous use was at "
-										+ oldEntity.getFirstDeclaration()
-												.getSource(), node);
+					checkConsistency(oldEntity, node);
 					structureOrUnion = (StructureOrUnion) oldEntity;
 				} else {
 					structureOrUnion = createStructureOrUnion(node);
 				}
 			}
 		}
+		structureOrUnion.addDeclaration(node);
 		node.setEntity(structureOrUnion);
 		if (identifier != null)
 			identifier.setEntity(structureOrUnion);

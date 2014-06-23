@@ -490,6 +490,8 @@ public class Activator {
 			// analyzes ast
 			program = programFactory.newProgram(ast);
 			ast = program.getAST();
+			out.println("\n\n" + bar + " Analyzed AST " + bar);
+			printProgram(out, program);
 		} catch (Exception e) {
 			out.println("\n\n" + bar + " Translation Unit " + bar + "\n");
 			if (ast == null)
