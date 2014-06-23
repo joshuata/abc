@@ -18,6 +18,13 @@ public class UnsourcedException extends ABCException {
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a new unsourced exception wrapping the given message
+	 * 
+	 * @param message
+	 *            a message which will be incorporated into the final message
+	 *            printed to the user
+	 */
 	public UnsourcedException(String message) {
 		super(message);
 	}

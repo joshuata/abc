@@ -152,6 +152,9 @@ public class TokenUtils {
 		result = result + " " + excerpt;
 		return result;
 	}
+	
+	// what we want:
+	// 
 
 	/**
 	 * A utility function to return the text of a token surrounded by double

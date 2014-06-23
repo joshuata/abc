@@ -12,8 +12,9 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 /**
  * An ASTFactory is used to create all objects associated to an AST. It actually
  * encompasses a number of other factories which deal with specific kinds of
- * objects. For examples, there is a {#link NodeFactory} for creating {#link
- * ASTNode}s, a {#link TypeFactory} for creating {#link Type}s, and so on.
+ * objects. For examples, there is a {@link NodeFactory} for creating
+ * {@link ASTNode}s, a {@link TypeFactory} for creating {@link Type}s, and so
+ * on.
  * 
  * @author siegel
  * 
@@ -42,6 +43,7 @@ public interface ASTFactory {
 	 * Some of the interpretation that takes place:
 	 * 
 	 * <ul>
+	 * 
 	 * <li>when creating the abstract type of a formal function parameter, the
 	 * type "qualified array of T" is changed to "qualified pointer to T".</li>
 	 * 
@@ -49,7 +51,7 @@ public interface ASTFactory {
 	 * 
 	 * <li>determines and sets the cases in the switch statements</li>
 	 * 
-	 * <ul>
+	 * </ul>
 	 * 
 	 * @param root
 	 *            the root node of the new AST

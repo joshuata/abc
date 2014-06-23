@@ -69,11 +69,6 @@ public class CommonSource implements Source {
 	public String getSummary(boolean abbreviated) {
 		return TokenUtils.summarizeRange(firstToken, lastToken, abbreviated);
 	}
-
-	// @Override
-	// public void printShorterFileNameMap(PrintStream out) {
-	// TokenUtils.printShorterFileNameMap(out);
-	// }
 }
 
 class SourceTokenIterator implements Iterator<CToken> {
