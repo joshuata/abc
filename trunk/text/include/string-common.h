@@ -1,5 +1,9 @@
 /* ABC model of string.h */
 
+#ifdef __STRING_COMMON__
+#else
+#define __STRING_COMMON__
+
 #include <stddef.h>
 
 int strcmp(const char *s1, const char *s2);
@@ -16,3 +20,6 @@ char *strcpy(char * restrict s1, const char * restrict s2);
 
 /* computes the length of the string pointed to by s. */
 size_t strlen(const char *s);
+
+#endif
+

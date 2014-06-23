@@ -1,5 +1,5 @@
 #ifdef __MPI__
 #else
-#include<mpi-common.h>
 #define __MPI__
+#include <mpi-common.h>
 #endif

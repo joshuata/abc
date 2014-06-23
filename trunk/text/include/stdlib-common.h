@@ -1,7 +1,4 @@
-
 /* ABC model of stdlib.c */
-
-/* TODO: should not need a blank line here... */
 
 #ifdef __STDLIB_COMMON__
 #else
