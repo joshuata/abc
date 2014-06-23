@@ -6,7 +6,7 @@ import org.antlr.runtime.TokenSource;
 
 /**
  * <p>
- * Extends ANTLR's TokenSource interface by adding some additional
+ * Extends ANTLR's {@link TokenSource} interface by adding some additional
  * functionality: getting the macro information, and methods to get the number
  * of tokens produced so far and to retrieve any token produced so far by index.
  * </p>

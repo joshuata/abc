@@ -64,5 +64,11 @@ public interface Macro {
 	 */
 	File getFile();
 
+	/**
+	 * Returns a shorter version of the file name which removes any path
+	 * sequence prefix.
+	 * 
+	 * @return shorter version of file name
+	 */
 	String shortFileName();
 }
