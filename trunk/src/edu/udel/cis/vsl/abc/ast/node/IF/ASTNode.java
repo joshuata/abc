@@ -269,8 +269,9 @@ public interface ASTNode {
 	 * are ordered and numbered starting from 0.
 	 * 
 	 * @param index
-	 *            an integer in the range [0,n), where n is the number of
-	 *            children of this node
+	 *            an integer in the range [0,n-1], where n is the number of
+	 *            children of this node, i.e., the value returned by
+	 *            {@link #numChildren()}
 	 * @return the index-th child of this node; note that this may be
 	 *         <code>null</code>.
 	 * @throws NoSuchElementException
@@ -435,9 +436,10 @@ public interface ASTNode {
 	 * </p>
 	 * 
 	 * <p>
-	 * The index must be in the range [0,numChildren-1], where numChildren is
-	 * the value returned by {@link #numChildren()}. If there is no child at the
-	 * given index (i.e., child is <code>null</code>), this is a no-op.
+	 * The index must be in the range [0,n-1], where n is the value returned by
+	 * {@link #numChildren()} in the pre-state (i.e., before this method is
+	 * invoked). If there is no child at the given index (i.e., child is
+	 * <code>null</code>), this is a no-op.
 	 * </p>
 	 * 
 	 * <p>
@@ -446,11 +448,12 @@ public interface ASTNode {
 	 * </p>
 	 * 
 	 * @param index
-	 *            nonnegative integer in the range [0,numChildren-1]
+	 *            nonnegative integer in the range [0,n-1], where n is the
+	 *            number of children before executing this method
 	 * @return the child that was removed (may be <code>null</code>)
 	 * @throws ASTException
 	 *             if this node is not free, or <code>index</code> is not in the
-	 *             range [0,numChildren-1]
+	 *             range [0,n-1]
 	 */
 	ASTNode removeChild(int index);
 
@@ -514,7 +517,7 @@ public interface ASTNode {
 	 * </p>
 	 * 
 	 * @param index
-	 *            nonnegative integer
+	 *            any nonnegative integer
 	 * @param child
 	 *            a node (or null) to be made the index-th child of this node
 	 * @return the old child in position <code>index</code> (may be
