@@ -245,7 +245,7 @@ public abstract class CommonASTNode implements ASTNode {
 	}
 
 	@Override
-	public void setChild(int index, ASTNode child) {
+	public ASTNode setChild(int index, ASTNode child) {
 		int numChildren = children.size();
 		ASTNode oldChild;
 
@@ -274,6 +274,7 @@ public abstract class CommonASTNode implements ASTNode {
 			((CommonASTNode) child).parent = this;
 			((CommonASTNode) child).childIndex = index;
 		}
+		return oldChild;
 	}
 
 	@Override

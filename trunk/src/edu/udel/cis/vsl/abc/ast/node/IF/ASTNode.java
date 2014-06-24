@@ -517,12 +517,14 @@ public interface ASTNode {
 	 *            nonnegative integer
 	 * @param child
 	 *            a node (or null) to be made the index-th child of this node
+	 * @return the old child in position <code>index</code> (may be
+	 *         <code>null</code>)
 	 * @throws ASTException
 	 *             if any of the following hold: (1) this node is not free, (2)
 	 *             <code>index</code> is negative, or (3) <code>child</code> is
 	 *             not <code>null</code> and has a non-<code>null</code> parent.
 	 */
-	void setChild(int index, ASTNode child);
+	ASTNode setChild(int index, ASTNode child);
 
 	/**
 	 * Sets the ID number of this node.
