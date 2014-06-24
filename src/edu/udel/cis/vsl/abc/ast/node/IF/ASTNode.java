@@ -396,9 +396,10 @@ public interface ASTNode {
 	NodeKind nodeKind();
 
 	/**
-	 * Returns the number of children nodes of this AST node.
+	 * Returns the number of child nodes of this AST node. This includes
+	 * children which are <code>null</code>!
 	 * 
-	 * @return the number of children nodes of this node
+	 * @return the number of child nodes of this node
 	 */
 	int numChildren();
 
@@ -429,14 +430,29 @@ public interface ASTNode {
 	void print(String prefix, PrintStream out, boolean includeSource);
 
 	/**
-	 * Removes the child at given index from the node. The index must be in the
-	 * range [0,numChildren-1]. If there is no child at the given index (i.e.,
-	 * child is null), this is a no-op.
+	 * <p>
+	 * Removes the child at given <code>index</code> from this node.
+	 * </p>
+	 * 
+	 * <p>
+	 * The index must be in the range [0,numChildren-1], where numChildren is
+	 * the value returned by {@link #numChildren()}. If there is no child at the
+	 * given index (i.e., child is <code>null</code>), this is a no-op.
+	 * </p>
+	 * 
+	 * <p>
+	 * If the removed child is non-<code>null</code>, its parent is set to
+	 * <code>null</code>.
+	 * </p>
 	 * 
 	 * @param index
-	 *            nonnegative integer
+	 *            nonnegative integer in the range [0,numChildren-1]
+	 * @return the child that was removed (may be <code>null</code>)
+	 * @throws ASTException
+	 *             if this node is not free, or <code>index</code> is not in the
+	 *             range [0,numChildren-1]
 	 */
-	void removeChild(int index);
+	ASTNode removeChild(int index);
 
 	/**
 	 * Sets the attribute value associated to the given key. This method also
@@ -452,18 +468,59 @@ public interface ASTNode {
 	void setAttribute(AttributeKey key, Object value);
 
 	/**
-	 * Sets the child node at the given index. This ASTNode must be either null
-	 * or free (not owned by an AST) if this is called. A non-null child must
-	 * have a null parent, i.e., not be the child of another node. The caller is
-	 * responsible for ensuring that the child is of the appropriate kind and
-	 * type. The index can be any nonnegative integer. The list of children will
-	 * be expanded as necessary with null values in order to incorporate the
-	 * index.
+	 * <p>
+	 * Sets the child node at the given index. This node (i.e.,
+	 * <code>this</code>) must be free (not owned by an AST) when this method is
+	 * called.
+	 * </p>
+	 * 
+	 * <p>
+	 * The child may be <code>null</code> or non-<code>null</code>. A non-
+	 * <code>null</code> child must have a <code>null</code> parent, i.e., it
+	 * must not be the child of another node.
+	 * </p>
+	 * 
+	 * <p>
+	 * If there is already a non-<code>null</code> child of this node in
+	 * position <code>index</code>, the old child is removed, i.e., its parent
+	 * is set to <code>null</code>.
+	 * </p>
+	 * 
+	 * <p>
+	 * The caller is responsible for ensuring that the child is of the
+	 * appropriate kind and type.
+	 * </p>
+	 * 
+	 * <p>
+	 * The index can be any nonnegative integer. The list of children will be
+	 * expanded as necessary with <code>null</code> values in order to
+	 * incorporate the index.
+	 * </p>
+	 * 
+	 * <p>
+	 * To illustrate how this method could be used, consider the case of
+	 * swapping two nodes. Supposed <code>u1</code> and <code>u2</code> are
+	 * nodes, <code>u1</code> has a non-<code>null</code> child in position
+	 * <code>i1</code>, and <code>u2</code> has a non-<code>null</code> child in
+	 * position <code>i2</code>, and we wish to swap the two children. This
+	 * could be accomplished with the following code:
+	 * 
+	 * <pre>
+	 * ASTNode v1 = u1.removeChild(i1), v2 = u2.removeChild(i2);
+	 * u1.setChild(i1, v2);
+	 * u2.setChild(i2, v1);
+	 * </pre>
+	 * 
+	 * </p>
 	 * 
 	 * @param index
 	 *            nonnegative integer
 	 * @param child
 	 *            a node (or null) to be made the index-th child of this node
+	 * @throws ASTException
+	 *             if any of the following hold: (1) this node is not free, (2)
+	 *             <code>index</code> is negative, or (3) <code>child</code> is
+	 *             not <code>null</code> and has a non-<code>null</code> parent.
 	 */
 	void setChild(int index, ASTNode child);
 
