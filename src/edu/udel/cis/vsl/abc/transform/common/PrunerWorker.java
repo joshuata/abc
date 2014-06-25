@@ -22,6 +22,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -79,6 +80,12 @@ public class PrunerWorker {
 
 				for (VariableDeclarationNode formal : formals)
 					markReachable(formal);
+			} else if (node instanceof CivlForNode) {
+				// special case: cannot remove any loop variables
+				CivlForNode forNode = (CivlForNode) node;
+
+				for (VariableDeclarationNode decl : forNode.getVariables())
+					markReachable(decl);
 			}
 			for (ASTNode child : children) {
 				if (child != null) {
