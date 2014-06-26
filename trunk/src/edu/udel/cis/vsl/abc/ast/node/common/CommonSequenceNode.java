@@ -26,8 +26,8 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 	}
 
 	@Override
-	public void addSequenceChild(T child) {
-		addChild(child);
+	public int addSequenceChild(T child) {
+		return addChild(child);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -36,9 +36,10 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 		return (T) child(i);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void setSequenceChild(int i, T child) {
-		setChild(i, child);
+	public T setSequenceChild(int i, T child) {
+		return (T) setChild(i, child);
 	}
 
 	@SuppressWarnings("unchecked")
