@@ -404,18 +404,24 @@ public class DeclarationAnalyzer {
 		linkage = computeLinkage(node);
 		name = identifier.name();
 		entity = scope.getOrdinaryEntity(name);
+		// CIVL allows multiple function declarations in block
+		// scope with no linkage and same identifier, all signifying
+		// the same function
 		if (linkage == LinkageKind.NONE) {
-			if (entity != null)
-				throw error("Redeclaration of identifier with no linkage. "
-						+ "Original declaration was at "
-						+ entity.getDeclaration(0).getSource(), identifier);
-			entity = isFunction ? entityAnalyzer.entityFactory.newFunction(
-					name, linkage, type) : entityAnalyzer.entityFactory
-					.newVariable(name, linkage, type);
-			try {
-				scope.add(entity);
-			} catch (UnsourcedException e) {
-				throw error(e, identifier);
+			if (entity != null) {
+				if (!(civl && isFunction && scope.getScopeKind() == ScopeKind.BLOCK))
+					throw error("Redeclaration of identifier with no linkage. "
+							+ "Original declaration was at "
+							+ entity.getDeclaration(0).getSource(), identifier);
+			} else {
+				entity = isFunction ? entityAnalyzer.entityFactory.newFunction(
+						name, linkage, type) : entityAnalyzer.entityFactory
+						.newVariable(name, linkage, type);
+				try {
+					scope.add(entity);
+				} catch (UnsourcedException e) {
+					throw error(e, identifier);
+				}
 			}
 		} else {
 			if (entity != null) {
