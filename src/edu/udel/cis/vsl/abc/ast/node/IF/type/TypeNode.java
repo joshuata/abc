@@ -47,6 +47,11 @@ public interface TypeNode extends SizeableNode {
 	 */
 	boolean isConstQualified();
 
+	/**
+	 * Is the CIVL-C type qualifier <code>$input</code> used?
+	 * 
+	 * @return <code>true</code> if this type is <code>$input</code>-qualified
+	 */
 	boolean isInputQualified();
 
 	boolean isOutputQualified();

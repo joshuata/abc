@@ -13,8 +13,11 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode, Iterable<T> {
 	 * @param child
 	 *            a node of type <code>T</code> which does not currently have a
 	 *            parent
+	 * @return the index of the child after it is added, which equals the number
+	 *         of children of this node in the prestate (i.e., before the method
+	 *         executes)
 	 */
-	void addSequenceChild(T child);
+	int addSequenceChild(T child);
 
 	/**
 	 * Returns the child at position i, indexed from 0. This may be
@@ -41,8 +44,9 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode, Iterable<T> {
 	 * @param child
 	 *            a node of type <code>T</code> which does not currently have a
 	 *            parent
+	 * @return the old node in position i (could be <code>null</code>)
 	 */
-	void setSequenceChild(int i, T child);
+	T setSequenceChild(int i, T child);
 
 	@Override
 	SequenceNode<T> copy();

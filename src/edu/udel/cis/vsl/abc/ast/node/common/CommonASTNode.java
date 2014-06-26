@@ -228,7 +228,7 @@ public abstract class CommonASTNode implements ASTNode {
 		return source;
 	}
 
-	protected void addChild(ASTNode child) {
+	protected int addChild(ASTNode child) {
 		int index = numChildren();
 
 		checkModifiable();
@@ -242,6 +242,7 @@ public abstract class CommonASTNode implements ASTNode {
 			((CommonASTNode) child).parent = this;
 			((CommonASTNode) child).childIndex = index;
 		}
+		return index;
 	}
 
 	@Override
