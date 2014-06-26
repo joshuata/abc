@@ -17,6 +17,6 @@ void fun2(){
 }
 
 void main(){
-  func1();
-  func2();
+  fun1();
+  fun2();
 }

@@ -38,6 +38,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -57,6 +58,11 @@ public class DeclarationAnalyzer {
 	private EntityAnalyzer entityAnalyzer;
 
 	/**
+	 * Is the compilation mode CIVL-C?
+	 */
+	private boolean civl;
+
+	/**
 	 * Typedefs which name types in this set will be ignored in file scope.
 	 */
 	private Collection<String> ignoredTypes = null;
@@ -72,6 +78,7 @@ public class DeclarationAnalyzer {
 	 */
 	DeclarationAnalyzer(EntityAnalyzer entityAnalyzer) {
 		this.entityAnalyzer = entityAnalyzer;
+		civl = entityAnalyzer.configuration.getLanguage() == Language.CIVL_C;
 	}
 
 	// ************************* Exported Methods *************************
@@ -288,7 +295,19 @@ public class DeclarationAnalyzer {
 		return entityAnalyzer.error(e, node);
 	}
 
-	private LinkageKind computeLinkage(OrdinaryDeclarationNode node) {
+	/**
+	 * See C11 6.2.2 for the rules on determining linkage.
+	 * 
+	 * Note: "The declaration of an identifier for a function that has block
+	 * scope shall have no explicit storage-class specifier other than extern."
+	 * (C11 6.7.1(7))
+	 * 
+	 * @param node
+	 * @return
+	 * @throws SyntaxException
+	 */
+	private LinkageKind computeLinkage(OrdinaryDeclarationNode node)
+			throws SyntaxException {
 		boolean isFunction = node instanceof FunctionDeclarationNode;
 		IdentifierNode identifier = node.getIdentifier();
 		Scope scope = node.getScope();
@@ -303,7 +322,8 @@ public class DeclarationAnalyzer {
 			return LinkageKind.INTERNAL;
 		}
 		hasNoStorageClass = hasNoStorageClass(node);
-		if (node.hasExternStorage() || (isFunction && hasNoStorageClass)) {
+		if (node.hasExternStorage()
+				|| (isFunction && hasNoStorageClass && (isFileScope || !civl))) {
 			Entity previous = scope.getLexicalOrdinaryEntity(name);
 
 			if (previous == null) {
@@ -318,11 +338,19 @@ public class DeclarationAnalyzer {
 					return LinkageKind.EXTERNAL;
 			}
 		}
+		// if you are in C mode and this is a function, throw an
+		// exception.
+		if (isFunction && !civl)
+			throw error(
+					"C11 6.7.1(7) states: \"The declaration of an "
+							+ " identifier for a function that has block scope shall "
+							+ "have no explicit storage-class specifier other than extern.\"",
+					node);
 		if (isFileScope) {
 			if (!isFunction && hasNoStorageClass)
 				return LinkageKind.EXTERNAL;
-			if (node.hasStaticStorage())
-				return LinkageKind.INTERNAL;
+			// if (node.hasStaticStorage())
+			// return LinkageKind.INTERNAL;
 		}
 		return LinkageKind.NONE;
 	}
