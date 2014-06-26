@@ -349,8 +349,6 @@ public class DeclarationAnalyzer {
 		if (isFileScope) {
 			if (!isFunction && hasNoStorageClass)
 				return LinkageKind.EXTERNAL;
-			// if (node.hasStaticStorage())
-			// return LinkageKind.INTERNAL;
 		}
 		return LinkageKind.NONE;
 	}
