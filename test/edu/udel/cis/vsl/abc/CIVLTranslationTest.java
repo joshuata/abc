@@ -80,7 +80,6 @@ public class CIVLTranslationTest {
 
 	// ignoring because for now CIVL follows the C11 Standard
 	// in that all functions have internal or external linkage
-	@Ignore
 	@Test
 	public void nestedFunctions() throws ABCException, IOException {
 		check("nestedFunctions");
