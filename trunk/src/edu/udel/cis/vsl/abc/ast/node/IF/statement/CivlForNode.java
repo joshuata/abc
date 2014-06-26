@@ -58,7 +58,7 @@ public interface CivlForNode extends StatementNode {
 	ExpressionNode getInvariant();
 
 	/**
-	 * Returns the sequence of loop variable delcarations. Each element in the
+	 * Returns the sequence of loop variable declarations. Each element in the
 	 * sequence is a declaration of a variable of integer type. The declarations
 	 * will not have initializers.
 	 * 

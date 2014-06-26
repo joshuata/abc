@@ -27,6 +27,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
@@ -215,10 +216,23 @@ public class SideEffectRemover extends BaseTransformer {
 			result = whenStatement((WhenNode) statement);
 		} else if (statement instanceof AtomicNode) {
 			result = atomicStatement((AtomicNode) statement);
+		} else if (statement instanceof CivlForNode) {
+			result = civlForStatement((CivlForNode) statement);
 		} else {
 			result = statement;
 		}
 		return result;
+	}
+
+	private StatementNode civlForStatement(CivlForNode statement)
+			throws SyntaxException {
+		StatementNode bodyNode = processStatement(statement.getBody());
+
+		return nodeFactory.newCivlForNode(statement.getSource(), statement
+				.isParallel(), statement.getVariables().copy(), statement
+				.getDomain().copy(), bodyNode,
+				statement.getInvariant() == null ? null : statement
+						.getInvariant().copy());
 	}
 
 	private StatementNode atomicStatement(AtomicNode statement)
