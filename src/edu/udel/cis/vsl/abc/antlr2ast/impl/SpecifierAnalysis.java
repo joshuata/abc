@@ -177,7 +177,7 @@ public class SpecifierAnalysis {
 
 	private void analyze() throws SyntaxException {
 		int numChildren = specifierListNode.getChildCount();
-
+		
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree node = (CommonTree) specifierListNode.getChild(i);
 			int kind = node.getType();
