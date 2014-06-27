@@ -382,6 +382,10 @@ public class ExpressionAnalyzer {
 					"Left operand of arrow operator not pointer to structure or union",
 					pointerNode);
 		structureOrUnionType = (StructureOrUnionType) tempType;
+		if (!structureOrUnionType.isComplete())
+			throw error(
+					"Structure or union type " + structureOrUnionType.getTag()
+							+ " is incomplete", node);
 		field = structureOrUnionType.getField(fieldName);
 		if (field == null)
 			throw error(
@@ -505,6 +509,10 @@ public class ExpressionAnalyzer {
 			throw error("Left operand of dot operator not structure or union",
 					expression);
 		structureOrUnionType = (StructureOrUnionType) tempType;
+		if (!structureOrUnionType.isComplete())
+			throw error(
+					"Structure or union type " + structureOrUnionType.getTag()
+							+ " is incomplete", expression);
 		field = structureOrUnionType.getField(fieldName);
 		if (field == null)
 			throw error(
