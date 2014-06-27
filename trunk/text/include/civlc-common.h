@@ -246,4 +246,8 @@ $int_iter $int_iter_create($scope scope, int *array, int size);
 /* Deletes an $int_iter object from the heap. */
 void $int_iter_destroy($int_iter iter);
 
+/* Blocks until all processes referred to by the given 
+   array terminates. */
+void $waitall($proc *procs, int numProcs);
+
 #endif
