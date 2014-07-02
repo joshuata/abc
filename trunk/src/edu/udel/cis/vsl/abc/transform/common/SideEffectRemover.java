@@ -828,8 +828,15 @@ public class SideEffectRemover extends BaseTransformer {
 						nodeFactory.newCompoundStatementNode(
 								newBody.getSource(), bodyItems), invariant);
 				if (initializer instanceof ExpressionNode) {
-					allItems.add(nodeFactory
-							.newExpressionStatementNode((ExpressionNode) initializer));
+					if (((ExpressionNode) initializer).isSideEffectFree(false)) {
+						allItems.add(nodeFactory
+								.newExpressionStatementNode((ExpressionNode) initializer));
+					} else {
+						SideEffectFreeTriple initTriple = processExpression((ExpressionNode) initializer);
+
+						allItems.addAll(initTriple.getBefore());
+						allItems.addAll(initTriple.getAfter());
+					}
 				} else if (initializer instanceof DeclarationListNode) {
 					DeclarationListNode declarationList = (DeclarationListNode) initializer;
 
