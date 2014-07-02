@@ -829,6 +829,7 @@ public class SideEffectRemover extends BaseTransformer {
 					DeclarationListNode declarationList = (DeclarationListNode) initializer;
 
 					for (VariableDeclarationNode child : declarationList) {
+						child.parent().removeChild(child.childIndex());
 						allItems.add(child);
 					}
 				} else {
