@@ -439,9 +439,9 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode result = null;
 		ExpressionNode expression = statement.getExpression();
 
-		// if (statement.parent() != null) {
-		// statement.parent().removeChild(statement.childIndex());
-		// }
+		 if (statement.parent() != null) {
+		 statement.parent().removeChild(statement.childIndex());
+		 }
 		if (expression.isSideEffectFree(false)) {
 			result = statement;
 		} else {
@@ -733,7 +733,7 @@ public class SideEffectRemover extends BaseTransformer {
 				// cast and do a recursive call.
 				result = expressionStatement(nodeFactory
 						.newExpressionStatementNode(((CastNode) expression)
-								.getArgument().copy()));
+								.getArgument()));
 			} else {
 				throw new ABCUnsupportedException(
 						"removing side effects from this expression statement: "
@@ -787,7 +787,7 @@ public class SideEffectRemover extends BaseTransformer {
 			ForLoopInitializerNode initializer = ((ForLoopNode) statement)
 					.getInitializer();
 			ExpressionNode incrementer = ((ForLoopNode) statement)
-					.getIncrementer().copy();
+					.getIncrementer();
 			// We wrap the incrementer as an expression statement, then remove
 			// side effects.
 			// If it's a "simple" incrementer, the result will also be an
@@ -796,9 +796,11 @@ public class SideEffectRemover extends BaseTransformer {
 			// This removes ++, +=, etc. from the AST and also provides the
 			// opportunity to modify this for loop into a while loop if
 			// necessary for a complex incrementer.
-			StatementNode modifiedIncrementer = expressionStatement(nodeFactory
+			StatementNode modifiedIncrementer;
+			
+			incrementer.parent().removeChild(incrementer.childIndex());
+			modifiedIncrementer = expressionStatement(nodeFactory
 					.newExpressionStatementNode(incrementer));
-
 			// If initializer is not null, work on a copy to maintain tree
 			// structure.
 			if (initializer != null) {
