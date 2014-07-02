@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.transform.common;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -97,7 +96,7 @@ public class SideEffectRemover extends BaseTransformer {
 	private CompoundStatementNode processCompoundStatement(
 			CompoundStatementNode statement) throws SyntaxException {
 		CompoundStatementNode result;
-		List<BlockItemNode> items = new Vector<BlockItemNode>();
+		List<BlockItemNode> items = new ArrayList<>();
 
 		for (int i = 0; i < statement.numChildren(); i++) {
 			BlockItemNode item = statement.getSequenceChild(i);
@@ -134,7 +133,7 @@ public class SideEffectRemover extends BaseTransformer {
 					} else {
 						ExpressionNode initializer;
 						ExpressionNode initializerAssignment;
-						List<ExpressionNode> assignmentArguments = new Vector<ExpressionNode>();
+						List<ExpressionNode> assignmentArguments = new ArrayList<>();
 						IdentifierNode variable = ((VariableDeclarationNode) item)
 								.getIdentifier();
 						TypeNode type = ((VariableDeclarationNode) item)
@@ -247,7 +246,7 @@ public class SideEffectRemover extends BaseTransformer {
 			throws SyntaxException {
 		ChooseStatementNode result;
 		StatementNode defaultCase = statement.getDefaultCase();
-		Vector<StatementNode> statements = new Vector<StatementNode>();
+		List<StatementNode> statements = new ArrayList<>();
 
 		for (StatementNode child : statement) {
 			statements.add(processStatement(child));
@@ -287,7 +286,7 @@ public class SideEffectRemover extends BaseTransformer {
 				|| statement.getExpression().isSideEffectFree(false)) {
 			result = statement;
 		} else {
-			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
+			List<BlockItemNode> newStatements = new ArrayList<>();
 			SideEffectFreeTriple triple = processExpression(statement
 					.getExpression());
 			TypeNode expressionType = typeNode(statement.getExpression()
@@ -408,6 +407,10 @@ public class SideEffectRemover extends BaseTransformer {
 
 		// TODO: throw error if guard has side effects
 		// guard.parent().removeChild(guard.childIndex());
+		if (!guard.isSideEffectFree(false))
+			throw new SyntaxException(
+					"The guard of a $when statement must be side-effect free but "
+							+ guard + " is not.", guard.getSource());
 		result = nodeFactory.newWhenNode(statement.getSource(), guard,
 				processStatement(statement.getBody()));
 		return result;
@@ -420,7 +423,7 @@ public class SideEffectRemover extends BaseTransformer {
 		if (statement.getExpression().isSideEffectFree(false)) {
 			result = statement;
 		} else {
-			Vector<BlockItemNode> newStatements = new Vector<BlockItemNode>();
+			List<BlockItemNode> newStatements = new ArrayList<BlockItemNode>();
 			SideEffectFreeTriple triple = processExpression(statement
 					.getExpression());
 
@@ -439,9 +442,9 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode result = null;
 		ExpressionNode expression = statement.getExpression();
 
-		 if (statement.parent() != null) {
-		 statement.parent().removeChild(statement.childIndex());
-		 }
+		if (statement.parent() != null) {
+			statement.parent().removeChild(statement.childIndex());
+		}
 		if (expression.isSideEffectFree(false)) {
 			result = statement;
 		} else {
@@ -473,10 +476,10 @@ public class SideEffectRemover extends BaseTransformer {
 				if (sideEffectFree) {
 					result = statement;
 				} else {
-					Vector<BlockItemNode> before = new Vector<BlockItemNode>();
-					Vector<BlockItemNode> after = new Vector<BlockItemNode>();
-					Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
-					Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
+					List<BlockItemNode> before = new ArrayList<>();
+					List<BlockItemNode> after = new ArrayList<>();
+					List<ExpressionNode> arguments = new ArrayList<>();
+					List<BlockItemNode> blockItems = new ArrayList<>();
 
 					for (int i = 0; i < call.getNumberOfArguments(); i++) {
 						ExpressionNode originalArgument = call.getArgument(i);
@@ -512,8 +515,8 @@ public class SideEffectRemover extends BaseTransformer {
 				case PREINCREMENT:
 				case POSTINCREMENT:
 					ExpressionNode add;
-					Vector<ExpressionNode> addArguments = new Vector<ExpressionNode>();
-					Vector<ExpressionNode> incrementArguments = new Vector<ExpressionNode>();
+					List<ExpressionNode> addArguments = new ArrayList<>();
+					List<ExpressionNode> incrementArguments = new ArrayList<>();
 					ExpressionNode variableExpression = ((OperatorNode) expression)
 							.getArgument(0).copy();
 
@@ -533,8 +536,8 @@ public class SideEffectRemover extends BaseTransformer {
 				case PREDECREMENT:
 				case POSTDECREMENT:
 					ExpressionNode subtract;
-					Vector<ExpressionNode> subtractArguments = new Vector<ExpressionNode>();
-					Vector<ExpressionNode> decrementArguments = new Vector<ExpressionNode>();
+					List<ExpressionNode> subtractArguments = new ArrayList<>();
+					List<ExpressionNode> decrementArguments = new ArrayList<>();
 
 					subtractArguments.add(((OperatorNode) expression)
 							.getArgument(0).copy());
@@ -564,7 +567,7 @@ public class SideEffectRemover extends BaseTransformer {
 							result = statement;
 						} else {
 							SideEffectFreeTriple triple;
-							Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
+							List<BlockItemNode> blockItems = new ArrayList<>();
 
 							if (rhs instanceof FunctionCallNode) {
 								for (int i = 0; i < ((FunctionCallNode) rhs)
@@ -591,7 +594,7 @@ public class SideEffectRemover extends BaseTransformer {
 								}
 								result = statement;
 							} else {
-								Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
+								List<ExpressionNode> assignArguments = new ArrayList<>();
 								ExpressionNode assignRhs;
 
 								assignArguments.add(lhs.copy());
@@ -613,8 +616,8 @@ public class SideEffectRemover extends BaseTransformer {
 					} else {
 						// lhs is not SEF.
 						SideEffectFreeTriple lhsTriple = processExpression(lhs);
-						Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
-						Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
+						List<BlockItemNode> blockItems = new ArrayList<>();
+						List<ExpressionNode> assignArguments = new ArrayList<>();
 
 						assignArguments.add(lhsTriple.getExpression());
 						blockItems.addAll(lhsTriple.getBefore());
@@ -659,9 +662,9 @@ public class SideEffectRemover extends BaseTransformer {
 							.getArgument(1);
 					SideEffectFreeTriple leftTriple = processExpression(left);
 					SideEffectFreeTriple rightTriple = processExpression(right);
-					Vector<ExpressionNode> operands = new Vector<ExpressionNode>();
+					List<ExpressionNode> operands = new ArrayList<>();
 					StatementNode sideEffectFreeStatement;
-					Vector<BlockItemNode> blockItems = new Vector<BlockItemNode>();
+					List<BlockItemNode> blockItems = new ArrayList<>();
 
 					operands.add(leftTriple.getExpression());
 					operands.add(rightTriple.getExpression());
@@ -797,7 +800,7 @@ public class SideEffectRemover extends BaseTransformer {
 			// opportunity to modify this for loop into a while loop if
 			// necessary for a complex incrementer.
 			StatementNode modifiedIncrementer;
-			
+
 			incrementer.parent().removeChild(incrementer.childIndex());
 			modifiedIncrementer = expressionStatement(nodeFactory
 					.newExpressionStatementNode(incrementer));
@@ -866,8 +869,8 @@ public class SideEffectRemover extends BaseTransformer {
 			SideEffectFreeTriple leftTriple;
 			SideEffectFreeTriple rightTriple;
 			ExpressionNode sideEffectFreeExpression;
-			Vector<BlockItemNode> before = new Vector<BlockItemNode>();
-			Vector<BlockItemNode> after = new Vector<BlockItemNode>();
+			List<BlockItemNode> before = new ArrayList<>();
+			List<BlockItemNode> after = new ArrayList<>();
 
 			switch (((OperatorNode) expression).getOperator()) {
 			case ASSIGN:
@@ -876,10 +879,12 @@ public class SideEffectRemover extends BaseTransformer {
 			case ADDRESSOF:
 			case DEREFERENCE:
 			case NOT:
+			case UNARYMINUS:
+			case UNARYPLUS:
 				if (left.isSideEffectFree(false)) {
 					result = new SideEffectFreeTriple(
-							new Vector<BlockItemNode>(), expression,
-							new Vector<BlockItemNode>());
+							new ArrayList<BlockItemNode>(), expression,
+							new ArrayList<BlockItemNode>());
 				} else {
 					leftTriple = processExpression(left);
 					operands.add(leftTriple.getExpression());
@@ -895,6 +900,10 @@ public class SideEffectRemover extends BaseTransformer {
 			case POSTDECREMENT:
 				result = incrementOrDecrement((OperatorNode) expression);
 				break;
+			case BITAND:
+			case BITCOMPLEMENT:
+			case BITOR:
+			case BITXOR:
 			case PLUS:
 			case MINUS:
 			case DIV:
@@ -908,6 +917,10 @@ public class SideEffectRemover extends BaseTransformer {
 			case GT:
 			case LTE:
 			case GTE:
+			case IMPLIES:
+			case MOD:
+			case SHIFTLEFT:
+			case SHIFTRIGHT:
 				left = ((OperatorNode) expression).getArgument(0);
 				right = ((OperatorNode) expression).getArgument(1);
 				leftTriple = processExpression(left);
@@ -924,11 +937,16 @@ public class SideEffectRemover extends BaseTransformer {
 				result = new SideEffectFreeTriple(before,
 						sideEffectFreeExpression, after);
 				break;
+			case BITANDEQ:
+			case BITOREQ:
+			case BITXOREQ:
 			case PLUSEQ:
 			case MINUSEQ:
 			case TIMESEQ:
 			case DIVEQ:
 			case MODEQ:
+			case SHIFTLEFTEQ:
+			case SHIFTRIGHTEQ:
 				StatementNode assignment;
 
 				left = ((OperatorNode) expression).getArgument(0);
@@ -955,8 +973,8 @@ public class SideEffectRemover extends BaseTransformer {
 						// If neither operand had possible side effects, just
 						// use the right hand operand.
 						result = new SideEffectFreeTriple(
-								new Vector<BlockItemNode>(), right,
-								new Vector<BlockItemNode>());
+								new ArrayList<BlockItemNode>(), right,
+								new ArrayList<BlockItemNode>());
 					} else {
 						// Right hand operand might have side effects, so
 						// process it.
@@ -980,7 +998,7 @@ public class SideEffectRemover extends BaseTransformer {
 					before.addAll(leftTriple.getAfter());
 					if (right.isSideEffectFree(false)) {
 						result = new SideEffectFreeTriple(before, right,
-								new Vector<BlockItemNode>());
+								new ArrayList<BlockItemNode>());
 					} else {
 						rightTriple = processExpression(right);
 						before.addAll(rightTriple.getBefore());
@@ -990,38 +1008,28 @@ public class SideEffectRemover extends BaseTransformer {
 					}
 				}
 				break;
-			default:
+			default:// BIG_O, CONDITIONAL,
 				throw new ABCUnsupportedException(
-						"removing side effects from: " + expression, expression
-								.getSource().getSummary(false));
+						"removing side effects from an expression with the operator "
+								+ ((OperatorNode) expression).getOperator()
+								+ ": " + expression, expression.getSource()
+								.getSummary(false));
 			}
 		} else if (expression instanceof FunctionCallNode) {
-			Vector<BlockItemNode> before = new Vector<BlockItemNode>();
+			List<BlockItemNode> before = new ArrayList<>();
 			ExpressionNode functionExpression = ((FunctionCallNode) expression)
 					.getFunction();
 			Entity functionEntity;
 			TypeNode returnTypeNode;
 			VariableDeclarationNode tmpVariable;
-			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
+			List<ExpressionNode> arguments = new ArrayList<>();
 
 			assert functionExpression instanceof IdentifierExpressionNode;
 			functionEntity = ((IdentifierExpressionNode) functionExpression)
 					.getIdentifier().getEntity();
-			// functionEntity =
-			// expression.getScope().getLexicalOrdinaryEntity(((IdentifierExpressionNode)
-			// functionExpression).getIdentifier().name());
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
-
 			// siegel: another possible way is to clone, but
 			// may not have as much info. as type:
-			//
-			// FunctionDeclarationNode declNode = (FunctionDeclarationNode)
-			// functionEntity
-			// .getFirstDeclaration();
-			// TypeNode oldReturnTypeNode =
-			// declNode.getTypeNode().getReturnType();
-			//
-			// returnTypeNode = oldReturnTypeNode.copy();
 			for (int i = 0; i < ((FunctionCallNode) expression)
 					.getNumberOfArguments(); i++) {
 				if (!((FunctionCallNode) expression).getArgument(i)
@@ -1039,7 +1047,6 @@ public class SideEffectRemover extends BaseTransformer {
 			returnTypeNode = typeNode(functionEntity.getFirstDeclaration()
 					.getSource(), ((Function) functionEntity).getType()
 					.getReturnType());
-
 			tmpVariable = nodeFactory.newVariableDeclarationNode(expression
 					.getSource(), nodeFactory.newIdentifierNode(
 					expression.getSource(), tempVariablePrefix
@@ -1055,13 +1062,14 @@ public class SideEffectRemover extends BaseTransformer {
 			result = new SideEffectFreeTriple(before,
 					nodeFactory.newIdentifierExpressionNode(expression
 							.getSource(), tmpVariable.getIdentifier().copy()),
-					new Vector<BlockItemNode>());
+					new ArrayList<BlockItemNode>());
 		} else if (expression instanceof CastNode) {
 			ExpressionNode argument = ((CastNode) expression).getArgument();
 
 			if (argument.isSideEffectFree(false) || isMallocCall(argument)) {
-				result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
-						expression.copy(), new Vector<BlockItemNode>());
+				result = new SideEffectFreeTriple(
+						new ArrayList<BlockItemNode>(), expression.copy(),
+						new ArrayList<BlockItemNode>());
 			} else {
 				SideEffectFreeTriple sefArgument = processExpression(argument);
 
@@ -1074,8 +1082,8 @@ public class SideEffectRemover extends BaseTransformer {
 
 		} else if (expression.isSideEffectFree(false)) {
 			// expression.parent().removeChild(expression.childIndex());
-			result = new SideEffectFreeTriple(new Vector<BlockItemNode>(),
-					expression.copy(), new Vector<BlockItemNode>());
+			result = new SideEffectFreeTriple(new ArrayList<BlockItemNode>(),
+					expression.copy(), new ArrayList<BlockItemNode>());
 		} else {
 			throw new ABCUnsupportedException("removing side effects from:  "
 					+ expression, expression.getSource().getSummary(false));
@@ -1136,8 +1144,8 @@ public class SideEffectRemover extends BaseTransformer {
 
 	private SideEffectFreeTriple assign(OperatorNode assign)
 			throws SyntaxException {
-		Vector<BlockItemNode> before = new Vector<BlockItemNode>();
-		Vector<BlockItemNode> after = new Vector<BlockItemNode>();
+		List<BlockItemNode> before = new ArrayList<>();
+		List<BlockItemNode> after = new ArrayList<>();
 		ExpressionNode lhs;
 
 		assert assign.getOperator() == Operator.ASSIGN;
@@ -1157,7 +1165,7 @@ public class SideEffectRemover extends BaseTransformer {
 			before.add(nodeFactory.newExpressionStatementNode(assign.copy()));
 		} else {
 			SideEffectFreeTriple rhs = processExpression(assign.getArgument(1));
-			Vector<ExpressionNode> arguments = new Vector<ExpressionNode>();
+			List<ExpressionNode> arguments = new ArrayList<>();
 			ExpressionNode newRhs = rhs.getExpression().copy();
 
 			// lhs.parent().removeChild(lhs.childIndex());
@@ -1175,14 +1183,14 @@ public class SideEffectRemover extends BaseTransformer {
 
 	private SideEffectFreeTriple incrementOrDecrement(OperatorNode operator)
 			throws SyntaxException {
-		Vector<BlockItemNode> before = new Vector<BlockItemNode>();
-		Vector<BlockItemNode> after = new Vector<BlockItemNode>();
+		List<BlockItemNode> before = new ArrayList<>();
+		List<BlockItemNode> after = new ArrayList<>();
 		ExpressionNode base = operator.getArgument(0).copy();
 
 		OperatorNode.Operator operation = operator.getOperator();
 		ExpressionNode math, assignment;
-		Vector<ExpressionNode> assignArguments = new Vector<ExpressionNode>();
-		Vector<ExpressionNode> mathArguments = new Vector<ExpressionNode>();
+		List<ExpressionNode> assignArguments = new ArrayList<>();
+		List<ExpressionNode> mathArguments = new ArrayList<>();
 
 		// base.parent().removeChild(base.childIndex());
 		mathArguments.add(base.copy());
