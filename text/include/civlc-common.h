@@ -250,4 +250,16 @@ void $int_iter_destroy($int_iter iter);
    array terminates. */
 void $waitall($proc *procs, int numProcs);
 
+/* are the object pointed to equal? */
+_Bool $equals(void *x, void *y);
+
+/* Semantics: Does the object pointed to by obj1 contain that
+pointed to by obj1? */
+_Bool $contains(void *obj1, void *obj2);
+
+/* This function will initialize an array by assigning it an array value 
+   of given length and correct element type where every element has the given element value. 
+*/
+void $array_init(void *array, int length, void *elementValue);
+
 #endif
