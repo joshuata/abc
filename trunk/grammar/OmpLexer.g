@@ -32,5 +32,6 @@ SCHEDULE	:	'schedule'		NotLineStart;
 SECTIONS	:	'sections'		NotLineStart;
 SECTION		:	'section'		NotLineStart;
 SHARED		:	'shared'		NotLineStart;
+SINGLE		: 	'single'		NotLineStart;
 STATIC		:	'static'		NotLineStart;
 THD_PRIVATE	:	'threadprivate'	NotLineStart;
