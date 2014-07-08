@@ -810,11 +810,29 @@ public class SideEffectRemover extends BaseTransformer {
 				initializer = initializer.copy();
 			}
 			if (modifiedIncrementer instanceof ExpressionStatementNode) {
-				result = nodeFactory.newForLoopNode(statement.getSource(),
-						initializer, condition.copy(),
-						((ExpressionStatementNode) modifiedIncrementer)
-								.getExpression().copy(), newBody.copy(),
-						invariant);
+				if (initializer instanceof ExpressionNode
+						&& !((ExpressionNode) initializer)
+								.isSideEffectFree(false)) {
+					StatementNode newForLoop = nodeFactory.newForLoopNode(
+							statement.getSource(), null, condition.copy(),
+							((ExpressionStatementNode) modifiedIncrementer)
+									.getExpression().copy(), newBody.copy(),
+							invariant);
+
+					SideEffectFreeTriple initTriple = processExpression((ExpressionNode) initializer);
+					List<BlockItemNode> allItems = new ArrayList<BlockItemNode>();
+
+					allItems.addAll(initTriple.getBefore());
+					allItems.addAll(initTriple.getAfter());
+					allItems.add(newForLoop);
+					result = nodeFactory.newCompoundStatementNode(
+							statement.getSource(), allItems);
+				} else
+					result = nodeFactory.newForLoopNode(statement.getSource(),
+							initializer, condition.copy(),
+							((ExpressionStatementNode) modifiedIncrementer)
+									.getExpression().copy(), newBody.copy(),
+							invariant);
 			} else {
 				List<BlockItemNode> bodyItems = new ArrayList<BlockItemNode>();
 				List<BlockItemNode> allItems = new ArrayList<BlockItemNode>();
