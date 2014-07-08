@@ -124,7 +124,9 @@ single_directive
   ;
 
 single_clause
-  : data_clause
+  : private_clause
+  | firstprivate_clause
+  | copyprivate_clause
   | nowait_directive
   ;
 
