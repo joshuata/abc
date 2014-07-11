@@ -136,4 +136,9 @@ public class CTranslationTest {
 	public void forcomma() throws ABCException, IOException {
 		check("forcomma");
 	}
+	
+	@Test
+	public void funcPointer() throws ABCException, IOException {
+		check("funcPointer");
+	}
 }
