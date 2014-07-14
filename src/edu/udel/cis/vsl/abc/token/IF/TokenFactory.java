@@ -45,6 +45,19 @@ public interface TokenFactory {
 
 	Inclusion newInclusion(File file, Token includeToken, String shortName);
 
+	/**
+	 * Creates a new formation which represents some code added by the system
+	 * itself, as opposed to code that emanated from an actual source file. The
+	 * identifier should be a short string indicating what part of the system
+	 * created the code. Examples: "The CIVL-MPI Transformer".
+	 * 
+	 * @param identifier
+	 *            short string indicating what part of the system created this
+	 *            code; used in messages
+	 * @return a new system formation object
+	 */
+	Formation newSystemFormation(String identifier);
+
 	// Basic token creation...
 
 	CToken newCToken(Token token, Formation formation);

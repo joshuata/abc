@@ -63,6 +63,11 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
+	public Formation newSystemFormation(String identifier) {
+		return new SystemFormation(identifier);
+	}
+
+	@Override
 	public ExecutionCharacter executionCharacter(CharacterKind kind,
 			int codePoint, char[] characters) {
 		return characterFactory.executionCharacter(kind, codePoint, characters);
