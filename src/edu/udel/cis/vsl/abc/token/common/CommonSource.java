@@ -85,6 +85,8 @@ class SourceTokenIterator implements Iterator<CToken> {
 
 		if (nextToken == last)
 			nextToken = null;
+		else
+			nextToken = nextToken.getNext();
 		return result;
 	}
 
