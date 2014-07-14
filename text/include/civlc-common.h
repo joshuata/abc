@@ -5,6 +5,23 @@
 #ifdef __CIVLC_COMMON__
 #else
 #define __CIVLC_COMMON__
+// Operation for collective reductions or collective operations
+typedef enum {
+  CIVL_NO_OP,  // no operation
+  CIVL_MAX,    // maxinum
+  CIVL_MIN,    // minimun
+  CIVL_SUM,    // sum
+  CIVL_PROD,   // product
+  CIVL_LAND,   // logical and
+  CIVL_BAND,   // bit-wise and
+  CIVL_LOR,    // logical or
+  CIVL_BOR,    // bit-wise or
+  CIVL_LXOR,   // logical exclusive or
+  CIVL_BXOR,   // bit-wise exclusive or
+  CIVL_MINLOC, // min value and location
+  CIVL_MAXLOC, // max value and location
+  CIVL_REPLACE // replace ? TODO: Find definition for this operation
+}$operation;
 
 // Standard constants, typedefs:
 
@@ -261,5 +278,12 @@ _Bool $contains(void *obj1, void *obj2);
    of given length and correct element type where every element has the given element value. 
 */
 void $array_init(void *array, int length, void *elementValue);
+
+/* Unpacks the bundle type data and applays the specified operations on that data.
+   For every binary operarions defined in &operation, data will be used as the left operand and 
+   buf will be used as right operand and input and ouput argument. The value of buf as an input
+   argument will always be the result got from the very last operation. Finally buf is also an output argument.
+*/
+void $bundle_unpack_apply($bundle data, void *buf, int size, $operation op);
 
 #endif
