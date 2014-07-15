@@ -286,4 +286,8 @@ void $array_init(void *array, int length, void *elementValue);
 */
 void $bundle_unpack_apply($bundle data, void *buf, int size, $operation op);
 
+/* Translates a pointer into one object to a pointer
+ * into a different object with similar structure. */
+void * $translate_ptr(void *ptr, void *obj);
+
 #endif
