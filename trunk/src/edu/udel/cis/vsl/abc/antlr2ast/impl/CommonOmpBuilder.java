@@ -210,6 +210,9 @@ public class CommonOmpBuilder implements OmpBuilder {
 				case "shared":
 					token.setType(SHARED);
 					break;
+				case "single":
+					token.setType(SINGLE);
+					break;
 				case "static":
 					token.setType(STATIC);
 					break;
