@@ -6,6 +6,7 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
@@ -24,6 +25,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -87,6 +89,16 @@ public class PrunerWorker {
 				for (VariableDeclarationNode decl : forNode.getVariables())
 					markReachable(decl);
 			}
+			if (node instanceof TypeNode) {
+				// special case: if this is a type node under a
+				// typedef declaration node, the whole typedef declaration
+				// is reachable...
+				ASTNode parent = node.parent();
+
+				if (parent instanceof TypedefDeclarationNode) {
+					markReachable(parent);
+				}
+			}
 			for (ASTNode child : children) {
 				if (child != null) {
 					if (child instanceof IdentifierNode) {
@@ -124,10 +136,17 @@ public class PrunerWorker {
 	 *            an Entity occurring in the AST
 	 */
 	private void explore(Entity entity) {
+
 		Iterator<DeclarationNode> declIter = entity.getDeclarations();
 
 		while (declIter.hasNext())
 			markReachable(declIter.next());
+
+		// special case: if you use at least one enumerator
+		// in the enumeration, you use the whole enumeration...
+		if (entity instanceof Enumerator) {
+			explore(((Enumerator) entity).getEnumeration());
+		}
 	}
 
 	/**

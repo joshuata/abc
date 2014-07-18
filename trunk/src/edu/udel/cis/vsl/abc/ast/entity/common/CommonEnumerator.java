@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.entity.common;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
@@ -9,6 +10,11 @@ public class CommonEnumerator extends CommonOrdinaryEntity implements
 		Enumerator {
 
 	private Value value;
+
+	/**
+	 * The enumeration to which this enumerator belongs.
+	 */
+	private Enumeration enumeration;
 
 	/**
 	 * Constructs new Enumerator.
@@ -21,11 +27,12 @@ public class CommonEnumerator extends CommonOrdinaryEntity implements
 	 *            optional constant value; may be null
 	 */
 	public CommonEnumerator(EnumeratorDeclarationNode declaration,
-			EnumerationType type, Value value) {
+			Enumeration enumeration, Value value) {
 		super(EntityKind.ENUMERATOR, declaration.getName(), LinkageKind.NONE,
-				type);
+				enumeration.getType());
 		this.addDeclaration(declaration);
 		this.setDefinition(declaration);
+		this.enumeration = enumeration;
 		this.value = value;
 	}
 
@@ -42,6 +49,11 @@ public class CommonEnumerator extends CommonOrdinaryEntity implements
 	@Override
 	public Value getValue() {
 		return value;
+	}
+
+	@Override
+	public Enumeration getEnumeration() {
+		return enumeration;
 	}
 
 }

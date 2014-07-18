@@ -101,15 +101,14 @@ public interface EntityFactory {
 	 * 
 	 * @param declaration
 	 *            the declaration of the enumerator in the enuemrator list
-	 * @param type
-	 *            the type of the enumerator (always an integer type, according
-	 *            to C)
+	 * @param enumeration
+	 *            the enumeration of which this enumerator is a part
 	 * @param value
 	 *            the constant integer value associated to the enumerator
 	 * @return the new enumerator entity
 	 */
 	Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			EnumerationType type, Value value);
+			Enumeration enumeration, Value value);
 
 	/**
 	 * Creates a new field entity. These correspond to the field declarations in

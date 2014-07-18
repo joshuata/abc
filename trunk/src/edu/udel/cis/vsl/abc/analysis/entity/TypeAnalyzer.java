@@ -438,8 +438,7 @@ public class TypeAnalyzer {
 									+ tmpValue, constantNode);
 				value = (IntegerValue) tmpValue;
 			}
-			enumerator = entityFactory.newEnumerator(decl, enumerationType,
-					value);
+			enumerator = entityFactory.newEnumerator(decl, enumeration, value);
 			enumerator.addDeclaration(decl);
 			enumerator.setDefinition(decl);
 			decl.setEntity(enumerator);

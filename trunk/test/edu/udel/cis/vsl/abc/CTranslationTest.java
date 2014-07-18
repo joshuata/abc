@@ -26,7 +26,7 @@ public class CTranslationTest {
 	 * Turn on a lot of output for debugging? Set this to true only in your
 	 * local copy. Be sure to set it back to false before committing!
 	 */
-	private static boolean debug = true;
+	private static boolean debug = false;
 
 	private static File[] systemIncludes = new File[0];
 
@@ -107,6 +107,11 @@ public class CTranslationTest {
 		check("enum1");
 	}
 
+	@Test
+	public void enum2() throws ABCException, IOException {
+		check("enum2");
+	}
+
 	@Test(expected = ABCException.class)
 	public void tagBad1() throws ABCException, IOException {
 		check("tagBad1");
@@ -136,7 +141,7 @@ public class CTranslationTest {
 	public void forcomma() throws ABCException, IOException {
 		check("forcomma");
 	}
-	
+
 	@Test
 	public void funcPointer() throws ABCException, IOException {
 		check("funcPointer");

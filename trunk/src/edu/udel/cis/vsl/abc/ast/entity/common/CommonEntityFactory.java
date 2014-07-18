@@ -52,8 +52,8 @@ public class CommonEntityFactory implements EntityFactory {
 
 	@Override
 	public Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			EnumerationType type, Value value) {
-		return new CommonEnumerator(declaration, type, value);
+			Enumeration enumeration, Value value) {
+		return new CommonEnumerator(declaration, enumeration, value);
 	}
 
 	@Override
