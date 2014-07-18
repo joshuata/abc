@@ -33,7 +33,7 @@ public interface ASTFactory {
 	 * After this method returns, the nodes belonging to the new AST will be
 	 * essentially immutable (with exceptions for certain "harmless" fields that
 	 * cannot effect the correctness of the AST). If you want to modify the AST,
-	 * you have to invoke its {@link AST#release()} method, which disolves the
+	 * you have to invoke its {@link AST#release()} method, which dissolves the
 	 * AST but leaves the nodes untouched and free (so mutable again), and then
 	 * create a new AST once the modifications are complete. You may also invoke
 	 * {@link ASTNode#copy()} on the root node and use it to create a new AST
