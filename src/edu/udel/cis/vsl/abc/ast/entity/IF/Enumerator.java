@@ -26,4 +26,11 @@ public interface Enumerator extends OrdinaryEntity {
 	 * @return the integer value of this enumerator constant
 	 */
 	Value getValue();
+
+	/**
+	 * Returns the enumeration to which this enumerator belongs.
+	 * 
+	 * @return the enumeration
+	 */
+	Enumeration getEnumeration();
 }
