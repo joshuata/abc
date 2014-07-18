@@ -56,29 +56,13 @@ typedef struct MPI_File MPI_File;
 typedef struct MPI_Errhandler MPI_Errhandler;
 typedef struct MPI_Info MPI_Info;
 
-typedef enum {
-    MPI_MAX, 
-    MPI_MIN,     
-    MPI_SUM,
-    MPI_PROD,
-    MPI_LAND,   
-    MPI_BAND,   
-    MPI_LOR,     
-    MPI_BOR,     
-    MPI_LXOR,    
-    MPI_BXOR,    
-    MPI_MINLOC,  
-    MPI_MAXLOC,  
-    MPI_REPLACE,
-    MPIX_NO_OP
-} MPI_Op;
-
 #define MPI_SUCCESS     ( 0)
 #define MPI_ANY_SOURCE 	(-1)
 #define MPI_ANY_TAG     (-2)
 #define MPI_PROC_NULL   (-3)
 #define MPI_STATUS_IGNORE   NULL
 #define MPI_STATUSES_IGNORE NULL
+#define MPI_COMM_NULL       NULL
 
 
 /**************************** Communicators  ************************************/
@@ -397,3 +381,4 @@ int MPI_Dist_graph_create(MPI_Comm comm_old, int n,   int [],   int [],   int []
 int MPI_Dist_graph_neighbors_count(MPI_Comm comm, int *indegree, int *outdegree, int *weighted);
 int MPI_Dist_graph_neighbors(MPI_Comm comm, int maxindegree, int [], int [], int maxoutdegree, int [], int []);
 #endif
+
