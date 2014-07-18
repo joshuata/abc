@@ -6,6 +6,8 @@
 #else
 #define __CIVLC_COMMON__
 // Operation for collective reductions or collective operations
+// Note: The order of following operations are consistent with CIVL implementations,
+// it's not recommended to change the order. 
 typedef enum {
   CIVL_NO_OP,  // no operation
   CIVL_MAX,    // maxinum
@@ -282,7 +284,7 @@ void $array_init(void *array, int length, void *elementValue);
 /* Unpacks the bundle type data and applays the specified operations on that data.
    For every binary operarions defined in &operation, data will be used as the left operand and 
    buf will be used as right operand and input and ouput argument. The value of buf as an input
-   argument will always be the result got from the very last operation. Finally buf is also an output argument.
+   argument provides operands for the operation. Finally buf is also an output argument.
 */
 void $bundle_unpack_apply($bundle data, void *buf, int size, $operation op);
 
@@ -291,3 +293,5 @@ void $bundle_unpack_apply($bundle data, void *buf, int size, $operation op);
 void * $translate_ptr(void *ptr, void *obj);
 
 #endif
+
+
