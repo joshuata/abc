@@ -200,6 +200,7 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 				// what happens when the function is called?
 				if (this.hasVariableArgs)
 					return false;
+				return true;
 			} else if (!that.fromIdentifierList && !this.parametersKnown()) {
 				// symmetric situation
 				return that.compatibleWith(this);
