@@ -1896,7 +1896,7 @@ public class CommonASTBuilder implements ASTBuilder {
 				parameterDeclarations.add(declaration);
 			}
 			result = nodeFactory.newFunctionTypeNode(source, baseType,
-					nodeFactory.newSequenceNode(source, "FormalParameterList",
+					nodeFactory.newSequenceNode(source, "IdentifierList",
 							parameterDeclarations), true);
 		} else {
 			throw error("Unexpected kind of function suffix", child);

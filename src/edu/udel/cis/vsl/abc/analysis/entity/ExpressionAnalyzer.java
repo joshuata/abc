@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
+import java.util.Iterator;
+
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
@@ -15,6 +17,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
@@ -46,6 +50,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -601,6 +606,43 @@ public class ExpressionAnalyzer {
 		// TODO
 	}
 
+	/**
+	 * Apparently, special handling is required for functions which were
+	 * declared only with identifier lists. in this case, the type of the
+	 * identifier expression does not get the full type of the function, only
+	 * the return type. See <a href=
+	 * "http://stackoverflow.com/questions/24743887/are-these-compatible-function-types-in-c"
+	 * >here</a>.
+	 */
+	private FunctionType getFunctionExpressionType(
+			IdentifierExpressionNode node, Function function) {
+		FunctionType functionType = function.getType();
+		FunctionType result = null;
+
+		if (node.parent() instanceof FunctionCallNode) {
+			result = functionType;
+		} else {
+			Iterator<DeclarationNode> decls = function.getDeclarations();
+
+			while (decls.hasNext()) {
+				FunctionDeclarationNode decl = (FunctionDeclarationNode) decls
+						.next();
+				FunctionTypeNode typeNode = decl.getTypeNode();
+
+				if (!typeNode.hasIdentifierList()) {
+					result = functionType;
+					break;
+				}
+			}
+			if (result == null)
+				// if you've made it to this point, all declarations of the
+				// function
+				// have identifier lists; none has a parameter-type list
+				result = typeFactory.functionType(functionType.getReturnType());
+		}
+		return result;
+	}
+
 	private void processIdentifierExpression(IdentifierExpressionNode node)
 			throws SyntaxException {
 		IdentifierNode identifierNode = node.getIdentifier();
@@ -613,13 +655,17 @@ public class ExpressionAnalyzer {
 		kind = entity.getEntityKind();
 		switch (kind) {
 		case VARIABLE:
+			node.setInitialType(entity.getType());
+			break;
 		case FUNCTION:
+
+			node.setInitialType(getFunctionExpressionType(node,
+					(Function) entity));
 			break;
 		default:
 			throw error("Use of " + kind + " " + name + " as expression", node);
 		}
 		identifierNode.setEntity(entity);
-		node.setInitialType(entity.getType());
 	}
 
 	private void processOperator(OperatorNode node) throws SyntaxException {
