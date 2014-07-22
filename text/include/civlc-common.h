@@ -292,6 +292,22 @@ void $bundle_unpack_apply($bundle data, void *buf, int size, $operation op);
  * into a different object with similar structure. */
 void * $translate_ptr(void *ptr, void *obj);
 
+void $copy(void *ptr, void *value);
+
+/* Given a pointer to an object of type "array-of-T", returns the
+ * length of the array. */
+int $seq_length(void *array);
+
+/* Given a pointer to an object of type "incomplete-array-of-T",
+ * sets that object to be the array of length count in which every
+ * element has the same value, specified by the given pointer value.
+ * Parameters:
+ *   array: pointer-to-incomplete-array-of-T
+ *   count: any integer type, must be nonnegative
+ *   values: pointer-to-T
+ */
+void $seq_init(void *array, int count, void *value);
+
 #endif
 
 
