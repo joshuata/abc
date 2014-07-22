@@ -948,9 +948,12 @@ typeQualifier
     : CONST | RESTRICT | VOLATILE | ATOMIC | INPUT | OUTPUT
     ;
 
-/* 6.7.4 */
+/* 6.7.4.  Added CIVL $atomic and $atom as specifiers, indicating
+ * a function should be executed atomically or atom-ly.  CIVL's
+ * $abstract specifier also included for abstract functions.
+ */
 functionSpecifier
-    : INLINE | NORETURN 
+    : INLINE | NORETURN | CIVLATOMIC | CIVLATOM
     | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
       -> ^(ABSTRACT INTEGER_CONSTANT)
     | ABSTRACT -> ^(ABSTRACT)

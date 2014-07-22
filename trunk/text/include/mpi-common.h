@@ -13,7 +13,7 @@
 #define MPI_SIMILAR   2
 #define MPI_UNEQUAL   3
 
-typedef enum{
+typedef enum {
     MPI_CHAR,           
     MPI_SIGNED_CHAR,
     MPI_UNSIGNED_CHAR,
@@ -55,6 +55,9 @@ typedef struct MPIX_Message MPIX_Message;
 typedef struct MPI_File MPI_File;
 typedef struct MPI_Errhandler MPI_Errhandler;
 typedef struct MPI_Info MPI_Info;
+typedef struct MPI_User_function MPI_User_function;
+typedef struct MPI_Copy_function MPI_Copy_function;
+typedef struct MPI_Delete_function MPI_Delete_function;
 
 #define MPI_SUCCESS     ( 0)
 #define MPI_ANY_SOURCE 	(-1)
@@ -137,7 +140,7 @@ int MPI_Alltoall(void* , int, MPI_Datatype, void*, int, MPI_Datatype, MPI_Comm);
 int MPI_Alltoallv( void* ,  int *,  int *, MPI_Datatype,
 		   void*,  int *,  int *, MPI_Datatype, MPI_Comm);
 int MPI_Reduce( void* , void*, int, MPI_Datatype, MPI_Op, int, MPI_Comm);
-/* int MPI_Op_create(MPI_User_function *, int, MPI_Op *); */
+int MPI_Op_create(MPI_User_function *, int, MPI_Op *);
 int MPI_Op_free( MPI_Op *);
 int MPI_Allreduce( void*, void*, int, MPI_Datatype, MPI_Op, MPI_Comm);
 int MPI_Reduce_scatter(  void* , void*,   int *, MPI_Datatype, MPI_Op, MPI_Comm);
@@ -167,7 +170,7 @@ int MPI_Comm_remote_size(MPI_Comm, int *);
 int MPI_Comm_remote_group(MPI_Comm, MPI_Group *);
 int MPI_Intercomm_create(MPI_Comm, int, MPI_Comm, int, int, MPI_Comm * );
 int MPI_Intercomm_merge(MPI_Comm, int, MPI_Comm *);
-/* int MPI_Keyval_create(MPI_Copy_function *, MPI_Delete_function *, int *, void*); */
+int MPI_Keyval_create(MPI_Copy_function *, MPI_Delete_function *, int *, void*);
 int MPI_Keyval_free(int *);
 int MPI_Attr_put(MPI_Comm, int, void*);
 int MPI_Attr_get(MPI_Comm, int, void *, int *);
