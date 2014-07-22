@@ -953,7 +953,7 @@ typeQualifier
  * $abstract specifier also included for abstract functions.
  */
 functionSpecifier
-    : INLINE | NORETURN | CIVLATOMIC | CIVLATOM
+    : INLINE | NORETURN
     | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
       -> ^(ABSTRACT INTEGER_CONSTANT)
     | ABSTRACT -> ^(ABSTRACT)
