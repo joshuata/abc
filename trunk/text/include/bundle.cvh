@@ -1,0 +1,10 @@
+/* This header file contains the data types and function prototypes for bundle.
+ */
+
+#ifdef __BUNDLE__
+#else
+#define __BUNDLE__
+
+#include <bundle-common.cvh>
+
+#endif
