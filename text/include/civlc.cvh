@@ -1,0 +1,11 @@
+/* This header file contains the core definitions of the CIVL-C language,
+ * including standard types and function prototypes.
+ */
+
+#ifdef __CIVLC__
+#else
+#define __CIVLC__
+
+#include <civlc-common.cvh>
+
+#endif

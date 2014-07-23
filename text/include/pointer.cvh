@@ -1,0 +1,11 @@
+/* This header file contains the function prototypes for 
+ * pointer operations.
+ */
+
+#ifdef __POINTER__
+#else
+#define __POINTER__
+
+#include <pointer-common.cvh>
+
+#endif
