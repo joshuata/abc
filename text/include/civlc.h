@@ -2,8 +2,16 @@
  * function prototypes used in the CIVL-C language.
  */
 
-#ifdef __CIVLC__
+#ifdef __CIVLC_OLD__
 #else
-#define __CIVLC__
-#include<civlc-common.h>
+#define __CIVLC_OLD__
+
+#include <civlc.cvh>
+#include <bundle.cvh>
+#include <comm.cvh>
+#include <concurrency.cvh>
+#include <pointer.cvh>
+#include <scope.cvh>
+#include <seq.cvh>
+
 #endif
