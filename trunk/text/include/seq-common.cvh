@@ -15,6 +15,7 @@ int $seq_length(void *array);
 /* Given a pointer to an object of type "incomplete-array-of-T",
  * sets that object to be the array of length count in which every
  * element has the same value, specified by the given pointer value.
+ *
  * Parameters:
  *   array: pointer-to-incomplete-array-of-T
  *   count: any integer type, must be nonnegative
@@ -33,6 +34,7 @@ void $seq_init(void *array, int count, void *value);
  * to the end of the array.  If index=0, this inserts the elements
  * at the beginning of the array.  If count=0, this is a no-op
  * and values will not be evaluated (hence may be NULL).
+ *
  * Parameters:
  *   array: pointer-to-incomplete-array-of-T
  *   index: any integer type, 0<=index<=length
