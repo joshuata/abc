@@ -1,0 +1,11 @@
+/* This header file contains the function prototypes for 
+ * scope operations.
+ */
+
+#ifdef __SCOPE__
+#else
+#define __SCOPE__
+
+#include <scope-common.cvh>
+
+#endif
