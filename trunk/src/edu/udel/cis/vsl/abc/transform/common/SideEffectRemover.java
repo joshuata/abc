@@ -9,7 +9,9 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
@@ -69,7 +71,7 @@ public class SideEffectRemover extends BaseTransformer {
 	}
 
 	public AST transform(AST unit) throws SyntaxException {
-		ASTNode rootNode = unit.getRootNode();
+		SequenceNode<ExternalDefinitionNode> rootNode = unit.getRootNode();
 
 		assert this.astFactory == unit.getASTFactory();
 		assert this.nodeFactory == astFactory.getNodeFactory();

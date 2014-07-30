@@ -10,7 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -41,7 +42,7 @@ public class CloneTest {
 			ParseException, SyntaxException, IOException {
 		Activator a;
 		AST ast1, ast2;
-		ASTNode root1, root2;
+		SequenceNode<ExternalDefinitionNode> root1, root2;
 
 		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
 				userIncludes);

@@ -1,7 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.IF;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.token.IF.Inclusion;
@@ -60,7 +62,8 @@ public interface ASTFactory {
 	 *             if something violating the syntax rules is found while
 	 *             traversing this AST
 	 */
-	AST newAST(ASTNode root) throws SyntaxException;
+	AST newAST(SequenceNode<ExternalDefinitionNode> root)
+			throws SyntaxException;
 
 	/**
 	 * Returns the node factory used by this AST factory. The node factory is

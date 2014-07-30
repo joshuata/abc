@@ -35,7 +35,7 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * </p>
  * 
  * <p>
- * There are four kinds of name spaces in a scope: (1) the label namesapce,
+ * There are four kinds of name spaces in a scope: (1) the label namespace,
  * which consists of all the (standard) label names in the scope; (2) the tag
  * namespace, which consists of all the tags used in struct, union, and
  * enumeration definitions; (3) the "member" namespaces (one namespace for each
@@ -174,6 +174,14 @@ public interface Scope extends ScopeValue {
 	// Ordinary entities...
 
 	/**
+	 * Gets the set of all ordinary entities declared in this scope, represented
+	 * as an iterable object.
+	 * 
+	 * @return iterable over all ordinary entities declared in this scope
+	 */
+	Iterable<OrdinaryEntity> getOrdinaryEntities();
+
+	/**
 	 * Adds an ordinary entity to this scope's collection of entities.
 	 * 
 	 * @param entity
@@ -271,6 +279,14 @@ public interface Scope extends ScopeValue {
 	Iterator<Function> getFunctions();
 
 	// Tagged entities (enumerations, structures, and unions)...
+
+	/**
+	 * Gets the set of all tagged entities declared in this scope, represented
+	 * as an iterable object.
+	 * 
+	 * @return iterable over all tagged entities declared in this scope
+	 */
+	Iterable<TaggedEntity> getTaggedEntities();
 
 	/**
 	 * Adds a tagged entity (an enumeration, structure, or union) to this scope.

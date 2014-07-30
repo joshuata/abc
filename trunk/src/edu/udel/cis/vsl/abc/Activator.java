@@ -18,9 +18,10 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversions;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entities;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
@@ -367,7 +368,8 @@ public class Activator {
 	 * @throws SyntaxException
 	 *             if AST has a syntax error
 	 */
-	public AST newTranslationUnit(ASTNode root) throws SyntaxException {
+	public AST newTranslationUnit(SequenceNode<ExternalDefinitionNode> root)
+			throws SyntaxException {
 		AST ast = astFactory.newAST(root);
 
 		Analysis.performStandardAnalysis(configuration, ast);

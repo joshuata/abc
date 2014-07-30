@@ -175,6 +175,7 @@ public interface CParser {
 	public static final int PP_NUMBER = CivlCParser.PP_NUMBER;
 	public static final int PRAGMA = CivlCParser.PRAGMA;
 	public static final int PROCNULL = CivlCParser.PROCNULL;
+	public static final int PROGRAM = CivlCParser.PROGRAM;
 	public static final int PUNDEF = CivlCParser.PUNDEF;
 	public static final int QMARK = CivlCParser.QMARK;
 	public static final int RCURLY = CivlCParser.RCURLY;

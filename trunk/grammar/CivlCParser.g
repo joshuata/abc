@@ -88,6 +88,7 @@ tokens
 	PARTIAL;
 	PARTIAL_LIST;
 	DERIVATIVE_EXPRESSION;
+	PROGRAM;        // represents whole program (linking translation units)
 }
 
 scope Symbols {

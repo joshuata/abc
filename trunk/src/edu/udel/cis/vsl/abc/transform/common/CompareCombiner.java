@@ -13,8 +13,10 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
@@ -53,7 +55,7 @@ public class CompareCombiner implements Combiner {
 	public AST combine(AST unit0, AST unit1) throws SyntaxException {
 		ASTNode specRoot = unit0.getRootNode();
 		ASTNode implRoot = unit1.getRootNode();
-		ASTNode newRoot;
+		SequenceNode<ExternalDefinitionNode> newRoot;
 		Map<String, VariableDeclarationNode> inputVariables;
 		Map<String, VariableDeclarationNode> specOutputs;
 		Map<String, VariableDeclarationNode> implOutputs;
@@ -61,7 +63,7 @@ public class CompareCombiner implements Combiner {
 		FunctionDefinitionNode implSystem;
 		FunctionDefinitionNode newMain;
 		List<BlockItemNode> newMainBodyNodes = new ArrayList<BlockItemNode>();
-		List<ASTNode> nodes = new ArrayList<ASTNode>();
+		List<ExternalDefinitionNode> nodes = new ArrayList<ExternalDefinitionNode>();
 		Transformer nameTransformer;
 
 		specSource = this.getMainSource(specRoot);
