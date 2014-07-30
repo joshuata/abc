@@ -660,8 +660,8 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public ASTNode newTranslationUnitNode(Source source,
-			List<ExternalDefinitionNode> definitions) {
+	public SequenceNode<ExternalDefinitionNode> newTranslationUnitNode(
+			Source source, List<ExternalDefinitionNode> definitions) {
 		return newSequenceNode(source, "TranslationUnit", definitions);
 	}
 

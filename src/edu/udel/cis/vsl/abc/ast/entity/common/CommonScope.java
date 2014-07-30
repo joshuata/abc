@@ -368,4 +368,14 @@ public class CommonScope implements Scope {
 		return Answer.NO;
 	}
 
+	@Override
+	public Iterable<OrdinaryEntity> getOrdinaryEntities() {
+		return ordinaryEntityList;
+	}
+
+	@Override
+	public Iterable<TaggedEntity> getTaggedEntities() {
+		return taggedEntityList;
+	}
+
 }

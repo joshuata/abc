@@ -2539,8 +2539,8 @@ public class CommonASTBuilder implements ASTBuilder {
 	 * @return
 	 * @throws SyntaxException
 	 */
-	private ASTNode translateTranslationUnit(CommonTree translationUnit)
-			throws SyntaxException {
+	private SequenceNode<ExternalDefinitionNode> translateTranslationUnit(
+			CommonTree translationUnit) throws SyntaxException {
 		int numChildren = translationUnit.getChildCount();
 		ArrayList<ExternalDefinitionNode> definitions = new ArrayList<ExternalDefinitionNode>();
 		SimpleScope scope = new SimpleScope(null);
@@ -2598,7 +2598,7 @@ public class CommonASTBuilder implements ASTBuilder {
 	 */
 	@Override
 	public AST getTranslationUnit() throws SyntaxException {
-		ASTNode root = translateTranslationUnit(rootTree);
+		SequenceNode<ExternalDefinitionNode> root = translateTranslationUnit(rootTree);
 
 		return astFactory.newAST(root);
 	}

@@ -1712,6 +1712,9 @@ public interface NodeFactory {
 	 * Creates a new node representing an entire translation unit. The children
 	 * of this node will be external definitions.
 	 * 
+	 * TODO: thin about changing the name of this method, since it is also used
+	 * to represent a whole program, obtained by linking translation units
+	 * 
 	 * @param source
 	 *            source specification spanning the entire translation unit,
 	 *            which is typically the entire token sequence emanating from
@@ -1721,7 +1724,7 @@ public interface NodeFactory {
 	 *            the translation unit
 	 * @return the new tranlation unit node
 	 */
-	ASTNode newTranslationUnitNode(Source source,
+	SequenceNode<ExternalDefinitionNode> newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions);
 
 	/**

@@ -12,6 +12,8 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -24,7 +26,7 @@ public class CommonAST implements AST {
 
 	private ASTFactory astFactory;
 
-	private ASTNode root;
+	private SequenceNode<ExternalDefinitionNode> root;
 
 	private int nodeCount;
 
@@ -36,7 +38,8 @@ public class CommonAST implements AST {
 
 	private ArrayList<OrdinaryEntity> externalEntities = new ArrayList<OrdinaryEntity>();
 
-	public CommonAST(ASTFactory astFactory, ASTNode root, boolean hasOmpPragma)
+	public CommonAST(ASTFactory astFactory,
+			SequenceNode<ExternalDefinitionNode> root, boolean hasOmpPragma)
 			throws SyntaxException {
 		this.root = root;
 		this.astFactory = astFactory;
@@ -49,7 +52,7 @@ public class CommonAST implements AST {
 	}
 
 	@Override
-	public ASTNode getRootNode() {
+	public SequenceNode<ExternalDefinitionNode> getRootNode() {
 		return root;
 	}
 
