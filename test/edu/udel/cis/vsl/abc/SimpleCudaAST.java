@@ -1,19 +1,36 @@
 package edu.udel.cis.vsl.abc;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
-import edu.udel.cis.vsl.abc.ast.IF.*;
-import edu.udel.cis.vsl.abc.ast.node.IF.*;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.*;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.*;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.*;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.*;
+import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.IF.ASTs;
+import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Values;
-import edu.udel.cis.vsl.abc.token.IF.*;
-import edu.udel.cis.vsl.abc.token.common.*;
+import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.Formation;
+import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.token.IF.Tokens;
+import edu.udel.cis.vsl.abc.token.common.CommonCToken;
+import edu.udel.cis.vsl.abc.token.common.CommonSource;
+import edu.udel.cis.vsl.abc.token.common.SystemFormation;
 
 public class SimpleCudaAST {
 
@@ -34,16 +51,25 @@ public class SimpleCudaAST {
 	public static void main(String[] args) throws SyntaxException {
 
 		// build _thread definition
+		// SequenceNode<VariableDeclarationNode> threadFormals = nodeF
+		// .newSequenceNode(source, "threadFormals",
+		// new ArrayList<VariableDeclarationNode>() {
+		// {
+		// add(nodeF.newVariableDeclarationNode(source,
+		// newId("threadIdx"), nodeF
+		// .newTypedefNameNode(
+		// newId("uint3"), null)));
+		// }
+		// });
+
 		SequenceNode<VariableDeclarationNode> threadFormals = nodeF
-				.newSequenceNode(source, "threadFormals",
-						new ArrayList<VariableDeclarationNode>() {
-							{
-								add(nodeF.newVariableDeclarationNode(source,
-										newId("threadIdx"), nodeF
-												.newTypedefNameNode(
-														newId("uint3"), null)));
-							}
-						});
+				.newSequenceNode(
+						source,
+						"threadFormals",
+						Arrays.asList(nodeF.newVariableDeclarationNode(source,
+								newId("threadIdx"),
+								nodeF.newTypedefNameNode(newId("uint3"), null))));
+
 		FunctionTypeNode threadType = nodeF.newFunctionTypeNode(source,
 				nodeF.newVoidTypeNode(source), threadFormals, false);
 		CompoundStatementNode threadBody = nodeF.newCompoundStatementNode(
