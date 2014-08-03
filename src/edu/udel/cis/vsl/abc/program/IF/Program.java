@@ -8,8 +8,32 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
 /**
+ * <p>
  * An abstract representation of a program. This is the highest level
- * representation and the one typically used first in most cases.
+ * representation and the one typically used first in most cases. The program is
+ * represented by a single AST, which is obtained by merging a set of ASTs
+ * representing translation units.
+ * </p>
+ * 
+ * <p>
+ * Future work: change the representation of a program to consist of a set of
+ * entities and a set of ASTs, each representing one translation unit. There
+ * should be a a method to get the "outer" (file-scope) entities, and a method
+ * to get each AST. In this approach, there should not be any need for renaming
+ * different entities, i.e., it should be possible, for example, for two structs
+ * to have the same name but denote distinct entities because they come from
+ * distinct translation units.
+ * </p>
+ * 
+ * <p>
+ * It seems that all the constituent ASTs can be analyzed using the same
+ * analyzer, factories, etc.
+ * </p>
+ * 
+ * <p>
+ * Hence there wil be two ways to create a program: (1) from a collection of
+ * ASTs, or (2) from one merged AST (which requires renaming).
+ * </p>
  * 
  * @author siegel
  * 

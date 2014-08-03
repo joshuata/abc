@@ -1,8 +1,6 @@
 package edu.udel.cis.vsl.abc.program.common;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +8,16 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
@@ -26,295 +26,162 @@ import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.transform.IF.Transformer;
-import edu.udel.cis.vsl.abc.transform.common.NameTransformer;
-import edu.udel.cis.vsl.abc.util.IF.Pair;
 
 /**
  * <p>
- * This factory is used to produce whole Programs (instance of {@link Program})
- * from a set of ASTs representing translation units.
+ * This factory is used to produce a whole {@link Program} from a set of ASTs
+ * representing individual translation units. This is similar to the process of
+ * "linking". The resulting program is represented by a single AST that is
+ * obtained by carefully merging the given ASTs. In the process of merging, some
+ * entities may have to be re-named to avoid name conflicts, as described below.
  * </p>
+ * 
+ * <ol>
+ * 
+ * <li>For any entity that is renamed, the new name will be obtained by
+ * appending a string beginning with <code>$TU</code> to the original name.
+ * Hence the substring <code>$TU</code> should never be used in any identifier
+ * in the original program, as it is reserved for this use.</li>
+ * 
+ * <li>The determination of compatibility for two tagged types will first strip
+ * any suffix beginning with <code>$TU</code> from the tags. So, for example,
+ * structs with tags such as <code>foo</code>, <code>foo$TU1</code>, and
+ * <code>foo$TU2</code> may still be compatible, because all of them will be
+ * considered to have the tag <code>foo</code> for the purpose of compatibility
+ * checking.</li>
+ * 
+ * <li>After renaming, any two complete compatible tagged file-scope entities
+ * will have the same name. The (redundant) complete definitions after the first
+ * complete definition will be converted to incomplete declarations. That is, in
+ * any subtree of the form <code>struct S { ... }</code>, the node
+ * <code>{...}</code> will be replaced with <code>null</code>.</li>
+ * 
+ * <li>If all of the complete tagged file-scope entities with a given name are
+ * compatible, then all those entities will keep the original name (including
+ * the incomplete ones), and will therefore become one entity in the resulting
+ * merged AST.</li>
+ * 
+ * <li>If there exist two incompatible file-scope tagged entities with the same
+ * name from different translation units: the incompatible entities will be
+ * given different names. Furthermore, any incomplete file-scope tagged entity
+ * with that name will be given a name unique to its translation unit. However,
+ * an incomplete type may still be considered compatible to any of these types,
+ * due to the renaming scheme described above.</li>
+ * 
+ * <li>Given an ordinary file-scope entity E1 with internal or no linkage, if
+ * there is another file-scope entity with the same name as E1 in a different
+ * translation unit, the name of E1 will be modified to be unique in the whole
+ * program, e.g., by appending a string of the form <code>TU</code><i>i</i> to
+ * its name, where <i>i</i> is the ID of the translation unit to which E1
+ * belongs.</li>
+ * 
+ * </ol>
  * 
  * <p>
- * Strategy for linking n translation units TU_0,...,TU_(n-1).
- * </p>
- * 
- * <p>
- * For each namespace (ordinary, tags):
- * </p>
- * 
- * <p>
- * For each i in [0,n-1], let Rename[i] be an empty map of {@link Entity} to
- * {@link String} . The keys in this map will be the entities in TU_i that need
- * to be renamed. The value will be the new name.
- * </p>
- * 
- * <p>
- * For tag namespace only: let Tags[i] be initially an empty map of
- * {@link String} to {@link TaggedEntity}. This set will eventually contain all
- * tagged entities in file scope of TU_i which are also complete in TU_i.
- * 
- * NEED TO KNOW: given any tag (string): is there a TU that contains
- * a tagged entity with that tag in file scope?  If so, is there a TU
- * that contains a COMPLETE tagged entity with that tag in file scope?
- * 
- * TU_0: TAG:complete, TU_1: TAG: incomplete, TU_2:no, TU_3: TAG:complete, ...
- * 
- * Result: for each i, tags to be made incomplete, tags to be renamed.
- * Protocol: given tagged entity: is there an existing tagged entity with
- * that name in an earlier TU?  If so, are they compatible?  If yes, 
- * 
- * 
- * Break up into compatibility classes. Problem is that "compatible" is
- * not transitive.  "struct S {int x}" in TU_0 is compatible with "struct S"
- * in TU_1 is compatible with "struct S {int y}" in TU_2,
- * but "struct S {int x}" is not compatible with "struct S {double z}".  But 
- * "having the same tag" is transitive.  Therefore there is no way
- * to make one translation unit representing all 3.   However, it should
- * be OK to make them incompatible...example:
- * 
- * TU_0:
- * struct S {int x;};
- * void g(struct S x);
- * 
- * TU_1:
- * struct S;
- * void g(struct S x);
- * void h(struct S x);
- * void f(struct S x) {
- *   g(x);
- *   h(x);
- * }
- * 
- * TU_2:
- * struct s {double y;};
- * void h(struct S x);
+ * Possible further work:
+ * <ol>
+ * <li>A second analysis pass on the merged AST could be implemented to update
+ * the types of functions and objects. For example, the type of a function might
+ * change after its definition. This could happen for example if a parameter
+ * type had the form <code>struct S *p</code> and S was incomplete at the point
+ * at which the function was analyzed. If S is completed later, the type of that
+ * parameter (and the function) changes. Hence the analysis of the body of the
+ * function should be re-done with the updated type of p---this might lead to
+ * discovering an incompatibility. See example a0.c, a1.c, a2.c in
+ * examples/link.</li>
+ * <li>the Pruner could merge compatible typedefs. This has to happen after the
+ * merged AST is anaylzed, because the new type information is needed.</li>
+ * </ol>
  * 
  * </p>
  * 
- * <p>
- * Let S=empty map of {@link String} to {@link Integer}. This will map an
- * identifier to either a nonnegative integer which is the index of the sole TU
- * with an internal/global-no-linkage entity of that name, or -1 if more than
- * one TU is using that name (and therefore the name will have to be changed).
- * </p>
- * 
- * For i=0..n-1: forall entities E in TU_i with internal linkage or
- * file-scope-no-linkage: let name = E.name. if there is no entry with key name
- * in S, add to S a new entry (name,i) and continue. Otherwise: let j be the
- * value of the existing entry. Put (entity, newName(name, i)) in Rename[i]. If
- * j>=0, put (entity, newName(name, j)) in Rename[j] and put (name, -1) in S.
- * 
- * Now for each i: run the rename transformer on TU_i using map Rename[i].
- * 
- * Now release all the ASTs. Then form a new AST from a new root node whose
- * children are obtained by concatenating the children of the roots of all the
- * ASTs.
- * 
- * 
- * <p>
- * Collapsing compatible struct/union/enum declarations. If two tagged types
- * declared in file scope in two different translation units are compatible, all
- * complete definitions after the first are replaced by incomplete declarations;
- * this replacement must occur everywhere in the second translation unit, not
- * just in the file scope. If the two types have the same name but are
- * incompatible, at least one of them must be renamed; the renaming must occur
- * throughout the entire translation unit.
- * </p>
- * 
- * <p>
- * Collapsing typedefs: if two typedefs declared in file scope in two different
- * translation units have the same name and compatible types, keep only the
- * first one. (Note: I don't think this is strictly necessary, since C allows
- * multiple typedefs with the same name if the types are compatible.) If they
- * have the same name but the types are not compatible, at least one of the
- * typedefs must be renamed; the renaming must occur throughout the entire
- * translation unit.
- * </p>
- * 
- * <p>
- * Example 1:
- * 
- * TU1:
- * 
- * <pre>
- * struct S {int x;};
- * </pre>
- * 
- * TU2:
- * 
- * <pre>
- * typedef struct S {int x;} T;
- * </pre>
- * 
- * </p>
- * 
- * <p>
- * The two struct definitions are compatible, therefore the second one is
- * replaced by <code>typedef struct S T;</code>. Next, the two typedefs have the
- * same name (<code>T</code>) and bind to compatible types, so the code in TU2
- * is removed entirely.
- * </p>
- * 
- * 
- * <p>
- * Example 2:
- * 
- * TU1:
- * 
- * <pre>
- * struct S {int x;};
- * </pre>
- * 
- * TU2:
- * 
- * <pre>
- * typedef struct S {int y;} T;
- * </pre>
- * 
- * </p>
- * 
- * <p>
- * The two struct definitions are incompatible, therefore the second one must be
- * renamed and is transformed to something like:
- * 
- * <pre>
- * typedef struct _TU2_S {int y;} T;
- * </pre>
- * 
- * Next, the two typedefs have the same name, but bind to two incompatible
- * types, so the typedefs must also be renamed, to something like:
- * 
- * <pre>
- * typedef struct _TU2_S {int y;} _TU2_T;
- * </pre>
- * 
- * </p>
  */
 public class CommonProgramFactory implements ProgramFactory {
+
+	// Fields...
 
 	private ASTFactory astFactory;
 
 	private Analyzer standardAnalyzer;
+
+	// Constructors...
 
 	public CommonProgramFactory(ASTFactory factory, Analyzer standardAnalyzer) {
 		this.astFactory = factory;
 		this.standardAnalyzer = standardAnalyzer;
 	}
 
-	/**
-	 * 
-	 * @param ast
-	 *            an analyzed AST representing a single translation unit
-	 * @param namespace
-	 *            0=ordinary namespace (the namespace for function, variable,
-	 *            enumerator, and typedef identifiers); 1=tag namespace (for
-	 *            struct, union, and enum tags)
-	 * @return the set of entities E in the AST that are in the specified
-	 *         namespace and satisfy either (a) E has internal linkage, or (b) E
-	 *         has file scope and no linkage. The set is represented as an
-	 *         Iterable object.
-	 */
-	private Iterable<Entity> getRenameableEntities(AST translationUnit,
-			int namespace) {
-		List<Entity> result = new LinkedList<Entity>();
-		Scope fileScope = translationUnit.getRootNode().getScope();
+	// Supporting methods...
 
-		if (namespace == 0) {
-			Iterator<OrdinaryEntity> internalIter = translationUnit
-					.getInternalEntities();
+	private void transform(AST translationUnit, Plan plan) {
+		Renamer renamer = new Renamer(plan.getRenameMap());
 
-			while (internalIter.hasNext()) {
-				result.add(internalIter.next());
-			}
-			for (Entity entity : fileScope.getOrdinaryEntities()) {
-				if (entity.getLinkage() == LinkageKind.NONE)
-					result.add(entity);
-			}
-		} else {
-			for (Entity entity : fileScope.getTaggedEntities()) {
-				if (entity.getLinkage() == LinkageKind.NONE)
-					result.add(entity);
-			}
+		for (TaggedEntity entity : plan.getDeleteActions()) {
+			DeclarationNode def = entity.getDefinition();
+
+			if (def instanceof StructureOrUnionTypeNode) {
+				((StructureOrUnionTypeNode) def).makeIncomplete();
+			} else if (def instanceof EnumerationTypeNode) {
+				((EnumerationTypeNode) def).makeIncomplete();
+			} else
+				throw new ABCRuntimeException("unreachable");
 		}
-		return result;
-	}
-
-	private String newName(String oldName, int index) {
-		return "_TU" + index + "_" + oldName;
-	}
-
-	/**
-	 * Given a set of ASTs, each representing a translation unit, returns a
-	 * corresponding set of transformed ASTs in which identifiers have been
-	 * renamed as necessary to avoid naming collisions so that the the ASTs can
-	 * be merged.
-	 * 
-	 * @param translationUnits
-	 *            the ASTs for the translation units; each AST has been analyzed
-	 * @return the transformed ASTs
-	 * @throws SyntaxException
-	 */
-	private AST[] renameEntities(AST[] translationUnits) throws SyntaxException {
-		int n = translationUnits.length;
-		ArrayList<Map<Entity, String>> rename = new ArrayList<Map<Entity, String>>(
-				n);
-		AST[] result = new AST[n];
-
-		for (int namespace = 0; namespace < 2; namespace++) {
-			Map<String, Pair<Integer, Entity>> entityOwner = new HashMap<>();
-
-			for (int i = 0; i < n; i++)
-				rename.set(i, new HashMap<Entity, String>());
-			for (int i = 0; i < n; i++) {
-				for (Entity entity : getRenameableEntities(translationUnits[i],
-						namespace)) {
-					String name = entity.getName();
-
-					if (name != null) {
-						Pair<Integer, Entity> pair = entityOwner.get(name);
-
-						if (pair == null) {
-							entityOwner.put(name, new Pair<>(i, entity));
-						} else {
-							int owner = pair.left;
-
-							rename.get(i).put(entity, newName(name, i));
-							if (owner >= 0) {
-								rename.get(owner).put(pair.right,
-										newName(name, owner));
-								entityOwner.put(name, new Pair<>(-1,
-										(Entity) null));
-							}
-						}
-					}
-				}
-			}
-		}
-		for (int i = 0; i < n; i++) {
-			Transformer renamer = new NameTransformer(rename.get(i), astFactory);
-
-			result[i] = renamer.transform(translationUnits[i]);
-		}
-		return result;
+		renamer.renameFrom(translationUnit.getRootNode());
 	}
 
 	private AST link(AST[] translationUnits) throws SyntaxException {
+		int n = translationUnits.length;
 		NodeFactory nodeFactory = astFactory.getNodeFactory();
 		TokenFactory tokenFactory = astFactory.getTokenFactory();
 		Formation formation = tokenFactory.newSystemFormation("Program");
 		CToken fakeToken = tokenFactory.newCToken(CivlCParser.PROGRAM,
 				"Program", formation);
 		Source fakeSource = tokenFactory.newSource(fakeToken);
-		AST[] renamedTranslationUnits = renameEntities(translationUnits);
 		List<ExternalDefinitionNode> definitions = new LinkedList<>();
 		SequenceNode<ExternalDefinitionNode> newRoot;
+		Plan[] plans = new Plan[n];
+		Map<String, OrdinaryEntityInfo> ordinaryInfoMap = new HashMap<>();
+		Map<String, TaggedEntityInfo> taggedInfoMap = new HashMap<>();
 		AST result;
 
-		for (AST ast : renamedTranslationUnits)
+		for (int i = 0; i < n; i++) {
+			AST ast = translationUnits[i];
+			Scope scope = ast.getRootNode().getScope();
+
+			for (OrdinaryEntity entity : scope.getOrdinaryEntities()) {
+				String name = entity.getName();
+				OrdinaryEntityInfo info = ordinaryInfoMap.get(name);
+
+				if (info == null) {
+					info = new OrdinaryEntityInfo(name);
+					ordinaryInfoMap.put(name, info);
+				}
+				info.add(i, entity);
+			}
+			for (TaggedEntity entity : scope.getTaggedEntities()) {
+				String name = entity.getName();
+				TaggedEntityInfo info = taggedInfoMap.get(name);
+
+				if (info == null) {
+					info = new TaggedEntityInfo(name);
+					taggedInfoMap.put(name, info);
+				}
+				info.add(i, entity);
+			}
+			// TODO: what about external variables with multiple initializers?
+			// need to move the initializer up. Get rid of other decls?
+		}
+		for (TaggedEntityInfo info : taggedInfoMap.values())
+			info.computeActions(plans);
+		for (OrdinaryEntityInfo info : ordinaryInfoMap.values())
+			info.computeActions(plans);
+		for (int i = 0; i < n; i++) {
+			AST ast = translationUnits[i];
+
 			ast.release();
-		for (AST ast : renamedTranslationUnits)
+			transform(ast, plans[i]);
+		}
+		for (AST ast : translationUnits)
 			for (ExternalDefinitionNode def : ast.getRootNode())
 				definitions.add(def);
 		newRoot = nodeFactory.newTranslationUnitNode(fakeSource, definitions);
@@ -342,6 +209,8 @@ public class CommonProgramFactory implements ProgramFactory {
 		}
 		return link(astArray);
 	}
+
+	// Public methods from ProgramFactory...
 
 	@Override
 	public ASTFactory getASTFactory() {

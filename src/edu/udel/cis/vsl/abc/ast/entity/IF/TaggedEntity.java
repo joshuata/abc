@@ -12,4 +12,12 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
  */
 public interface TaggedEntity extends Entity {
 
+	/**
+	 * Is this tagged entity complete? That is, have the members inside curly
+	 * braces been specified?
+	 * 
+	 * @return <code>true</code> iff this is complete
+	 */
+	boolean isComplete();
+
 }

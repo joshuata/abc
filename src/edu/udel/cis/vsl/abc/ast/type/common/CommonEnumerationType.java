@@ -74,6 +74,26 @@ public class CommonEnumerationType extends CommonIntegerType implements
 		return true;
 	}
 
+	/**
+	 * Returns the string that is used to check compatibility of this tag with
+	 * another tag. This removes any suffix beginning with <code>$TU</code>. In
+	 * CIVL-C semantics, such a suffix is ignored for the purposes of checking
+	 * compatibility of two tags. It is used by CIVL to give unique names to
+	 * tagged entities in different translation units so they can be merged into
+	 * a single AST, but such entities should still be considered compatible.
+	 * 
+	 * @return the tag with any suffix beginning with '$' removed
+	 */
+	private String getCompatibilityString() {
+		if (tag == null)
+			return null;
+		else {
+			int dollarIndex = tag.indexOf("$TU");
+
+			return dollarIndex < 0 ? tag : tag.substring(0, dollarIndex);
+		}
+	}
+
 	@Override
 	public boolean compatibleWith(Type type) {
 		if (this == type)
@@ -84,7 +104,8 @@ public class CommonEnumerationType extends CommonIntegerType implements
 			if (tag == null) {
 				if (that.tag != null)
 					return false;
-			} else if (!tag.equals(that.tag))
+			} else if (!getCompatibilityString().equals(
+					that.getCompatibilityString()))
 				return false;
 			if (enumerators == null) {
 				if (that.enumerators != null)

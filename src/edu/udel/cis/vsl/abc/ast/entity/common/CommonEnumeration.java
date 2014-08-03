@@ -16,4 +16,9 @@ public class CommonEnumeration extends CommonTaggedEntity implements
 		return (EnumerationType) super.getType();
 	}
 
+	@Override
+	public boolean isComplete() {
+		return getType().isComplete();
+	}
+
 }
