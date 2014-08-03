@@ -4,6 +4,9 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -12,10 +15,12 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StandardUnsignedIntegerType.UnsignedIntK
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 
 /**
- * A factory for producing C types. C types are complicated. First, types have
- * state which may change during compile-time processing of the translation
- * unit. For example, at any point in the translation unit, an object type is
- * either complete or incomplete, and this may change. Example:
+ * <p>
+ * A factory for producing C types, which are represented as instances of
+ * {@link Type}. C types are complicated. First, types have state which may
+ * change during compile-time processing of the translation unit. For example,
+ * at any point in the translation unit, an object type is either complete or
+ * incomplete, and this may change. Example:
  * 
  * <pre>
  * typedef struct Node {
@@ -23,104 +28,143 @@ import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
  * } list;
  * </pre>
  * 
- * Immediately after the "struct Node" the structure type exists, but is
- * incomplete. It becomes complete immediately after the "}".
+ * Immediately after the <code>struct Node</code> the structure type exists, but
+ * is incomplete. It becomes complete immediately after the <code>}</code>.
+ * </p>
  * 
- * A Type may be associated to an Entity (any Entity except a Label). The type
- * associated to an Entity may change as declarations of that Entity are
+ * <p>
+ * A {@link Type} may be associated to an {@link Entity} (more precisely, to any
+ * {@link Entity} other than a {@link Label}). The type associated to an
+ * {@link Entity} may change as declarations of that {@link Entity} are
  * processed.
+ * </p>
  * 
- * Types are immutable, with the following exception: a tagged type (instance of
- * StructureOrUnionType or EnumerationType) may start off as incomplete and
- * later be completed. Hence any other types that have a reference to that
- * tagged type will also reflect the change. On the other hand, an array
- * declared with an incomplete type, such as "int a[]" and later declared with a
- * complete type such as "int a[5]" does NOT result in a modifcation to the
- * ArrayType object. Instead, the type associated to the Variable named "a" is
- * changed from the incomplete type int[] to the complete type int[5].
+ * <p>
+ * {@link Type}s are immutable, with the following exception: a tagged type
+ * (instance of {@link StructureOrUnionType} or {@link EnumerationType}) may
+ * start off as incomplete and later be completed. Hence any other types that
+ * have a reference to that tagged type will also reflect the change. On the
+ * other hand, an array declared with an incomplete type, such as
+ * <code>int a[]</code> and later declared with a complete type such as
+ * <code>int a[5]</code> does <strong>not</strong> result in a modifcation to
+ * the {@link ArrayType} object. Instead, the type associated to the
+ * {@link Variable} named <code>a</code> is changed from the incomplete type
+ * <code>int[]</code> to the complete type <code>int[5]</code>.
+ * </p>
  * 
+ * <p>
  * There are two kinds of types: function and object types. These are
- * represented by two interfaces, FunctionType and ObjectType, each of which
- * extends Type.
+ * represented by two interfaces, {@link FunctionType} and {@link ObjectType},
+ * each of which extends {@link Type}.
+ * </p>
  * 
+ * <p>
  * Detailed information on specified types:
+ * </p>
  * 
- * ArrayType: this is an object type specified by an element type and the
- * extent. The element type must be a complete object type. For the extent,
+ * <p>
+ * {@link ArrayType}: this is an object type specified by an element type and
+ * the extent. The element type must be a complete object type. For the extent,
  * there are 4 possibilities:
  * 
- * (0) the extent is not specified (i.e., is null): then the array type is an
- * "incomplete type". It becomes complete when the extent is specified in a
- * later declaration.
+ * <ol>
+ * <li>the extent is not specified (i.e., is <code>null</code>): then the array
+ * type is an <strong>incomplete type</strong>. It becomes complete when the
+ * extent is specified in a later declaration.</li>
  * 
- * (1) the extent is "*": this is a "VLA type of unspecified size". It is
- * nevertheless a complete type. This can only be used in declarations or type
- * names in function prototype scope (i.e., in a function declaration that is
- * not part of a function definition).
+ * <li>the extent is <code>*</code>: this is a <strong>VLA type of unspecified
+ * size</strong>. It is nevertheless a complete type. This can only be used in
+ * declarations or type names in function prototype scope (i.e., in a function
+ * declaration that is not part of a function definition).</li>
  * 
- * (2) the extent is an integer constant expression AND the element type has
- * known constant size: then the array type is "not a VLA" type. It is complete.
+ * <li>the extent is an integer constant expression <strong>and</strong> the
+ * element type has known constant size: then the array type is <strong>not a
+ * VLA</strong> type. It is complete.</li>
  * 
- * (3) otherwise, the extent is an expression which is not a constant expression
- * or the element type does not have known constant size. This is a VLA type. It
- * is complete. If it occurs in function prototype scope, it is replaced by "*"
- * (i.e., the expression is not used).
+ * <li>otherwise, the extent is an expression which is not a constant expression
+ * or the element type does not have known constant size. This is a <strong>VLA
+ * type</strong>. It is complete. If it occurs in function prototype scope, it
+ * is replaced by <code>*</code> (i.e., the expression is not used).</li>
+ * </ol>
+ * </p>
  * 
+ * <p>
  * Some vocabulary:
+ * <ul>
+ * <li>An object type has <strong>known constant size</strong> iff it is not
+ * incomplete <strong>and</strong> not a VLA (Variable Length Array) type.</li>
  * 
- * An object type has "known constant size" iff it is not incomplete AND not a
- * VLA (Variable Length Array) type.
+ * <li>A <strong>variably modified</strong> (VM) type is a declarator type which
+ * in the nested sequence of declarators has a VLA type, or any type derived
+ * from a VM type. I.e.: a VLA is a VM; a pointer to a VM is a VM; a function
+ * returning a VM is a VM; an array with a VM element type is a VM.</li>
+ * </ul>
+ * </p>
  * 
- * A "variably modified" (VM) type is a declarator type which in the nested
- * sequence of declarators has a VLA type, or any type derived from a VM type.
- * I.e.: a VLA is a VM; a pointer to a VM is a VM; a function returning a VM is
- * a VM; an array with a VM element type is a VM.
- * 
- * An identifier declared with a VM type must be an object, be an ordinary
+ * <p>
+ * Some restrictions:
+ * <ul>
+ * <li>An identifier declared with a VM type must be an object, be an ordinary
  * identifier, have no linkage, and have either block or function prototype
- * scope.
+ * scope.</li>
+ * <li>An object declared with static or thread storage duration shall not have
+ * a VLA type (but may have a VM type).</li>
+ * <li>Pointer types are always complete object types (even if the referenced
+ * type is not).</li>
+ * </ul>
+ * </p>
  * 
- * An object declared with static or thread storage duration shall not have a
- * VLA type (but may have a VM type).
- * 
- * Pointer types are always complete object types (even if the referenced type
- * is not).
- * 
+ * <p>
  * A structure or union type exists (come into scope) as soon as the tag name
- * first appears, but is incomplete until the "}" is reached, then it is
- * complete. The last member may be an incomplete array type. Members must have
- * object types and cannot have VM types.
+ * first appears, but is incomplete until the <code>}</code> is reached, then it
+ * is complete. The last member may be an incomplete array type. Members must
+ * have object types and cannot have VM types.
+ * </p>
  * 
- * Enumeration types: complete once "}" is reached.
+ * <p>
+ * Enumeration types: complete once <code>}</code> is reached.
+ * </p>
  * 
+ * <p>
  * Atomic types: the base type cannot be array, function, atomic, or qualified.
+ * </p>
  * 
- * void: is an incomplete object type that can never be completed
+ * <p>
+ * <code>void</code>: is an incomplete object type that can never be completed.
+ * </p>
  * 
+ * <p>
  * Function Types: a function type is specified by the return type and types of
- * the parameters. In function *definitions*: the parameter types (after
- * adjustment) cannot be incomplete. Hence once you get to the definition, all
- * parameter types must be complete (or an exception will be thrown). The
- * adjustments: a parameter of type qualified array of T is changed to qualified
- * pointer to T; qualified function returning T changed to qualified pointer to
- * function returning T.
+ * the parameters. In function <strong>definitions</strong>: the parameter types
+ * (after adjustment) cannot be incomplete. Hence once you get to the
+ * definition, all parameter types must be complete (or an exception will be
+ * thrown). The adjustments: a parameter of type qualified array of T is changed
+ * to qualified pointer to T; qualified function returning T changed to
+ * qualified pointer to function returning T.
+ * </p>
  * 
+ * <p>
  * Qualifiers:
+ * <ul>
+ * <li>A type can come with qualifiers: <code>const</code>,
+ * <code>restrict</code>, <code>volatile</code>, <code>_Atomic</code>.</li>
  * 
- * A type can come with qualifiers: const, restrict, volatile, _Atomic.
- * 
- * If the specification of an array type includes any type qualifiers, the
+ * <li>If the specification of an array type includes any type qualifiers, the
  * element type is so-qualified, not the array type. If the specification of a
  * function type includes any type qualifiers, the behavior is undefined. [Both
- * can happen through typedefs.] Moreover, restrict can only be used with
- * pointer types whose referenced type is an object type. _Atomic can not be
- * used with an array or function type.
+ * can happen through typedefs.] Moreover, <code>restrict</code> can only be
+ * used with pointer types whose referenced type is an object type.
+ * <code>_Atomic</code> can not be used with an array or function type.</li>
  * 
- * If the _Atomic qualifier occurs (possibly with other qualifiers), the result
- * is the so-qualified Atomic type.
+ * <li>If the <code>_Atomic</code> qualifier occurs (possibly with other
+ * qualifiers), the result is the so-qualified Atomic type.</li>
+ * </ul>
+ * </p>
  * 
- * See 5.2.4.2.1 for the minimum values of the bounds for each standard integer
- * type.
+ * <p>
+ * See C11 Sec. 5.2.4.2.1 for the minimum values of the bounds for each standard
+ * integer type.
+ * </p>
  * 
  * @author siegel
  * 

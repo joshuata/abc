@@ -94,8 +94,6 @@ public class EntityAnalyzer implements Analyzer {
 
 	Map<String, PragmaHandler> pragmaHandlerMap;
 
-	Scope rootScope;
-
 	Configuration configuration;
 
 	// Private fields...
@@ -135,8 +133,8 @@ public class EntityAnalyzer implements Analyzer {
 	public void analyze(AST ast) throws SyntaxException {
 		ASTNode root = ast.getRootNode();
 		Iterable<ASTNode> children = root.children();
+		Scope rootScope = root.getScope();
 
-		this.rootScope = root.getScope();
 		try {
 			standardTypes.addToScope(rootScope);
 		} catch (UnsourcedException e) {

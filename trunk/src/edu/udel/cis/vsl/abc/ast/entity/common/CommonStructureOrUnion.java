@@ -16,4 +16,9 @@ public class CommonStructureOrUnion extends CommonTaggedEntity implements
 		return (StructureOrUnionType) super.getType();
 	}
 
+	@Override
+	public boolean isComplete() {
+		return getType().isComplete();
+	}
+
 }
