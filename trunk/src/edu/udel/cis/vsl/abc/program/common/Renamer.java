@@ -25,7 +25,8 @@ public class Renamer {
 			}
 		} else {
 			for (ASTNode child : node.children())
-				renameFrom(child);
+				if (child != null)
+					renameFrom(child);
 		}
 	}
 }

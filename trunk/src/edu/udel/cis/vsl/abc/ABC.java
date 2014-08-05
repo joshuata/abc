@@ -10,7 +10,6 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
-import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
 /**
@@ -47,66 +46,33 @@ import edu.udel.cis.vsl.abc.transform.IF.Transform;
 public class ABC {
 
 	/**
-	 * The version number of this release of ABC: {@value}.
+	 * The version number of this release of ABC: {@value} .
 	 */
 	public final static String version = "0.2";
 
 	/**
-	 * The date of this release of ABC: {@value}.
+	 * The date of this release of ABC: {@value} .
 	 */
 	public final static String date = "31-mar-2014";
 
 	/**
-	 * Creates a new Activator for operating on the given file, using the given
-	 * include paths for preprocessing. Uses the default language.
+	 * Determines language from filename. If it ends in ".cvl" or ".cvh", it's
+	 * CIVL_C, else it's C.
 	 * 
-	 * @param file
-	 *            the file to be parsed
-	 * @param systemIncludes
-	 *            a list of directories into which to search for system header
-	 *            files
-	 * @param userIncludes
-	 *            a list of directories in which to search for user header files
-	 * @return an Activator, which can be used to preprocess, parse, and
-	 *         transform the file
+	 * @param name
+	 *            filename
+	 * @return CIVL_C or C
 	 */
-	public static Activator activator(File file, File[] systemIncludes,
-			File[] userIncludes) {
-		return new Activator(file, systemIncludes, userIncludes);
-	}
+	private static Language getLanguageFromName(String name) {
+		int dotIndex = name.lastIndexOf('.');
 
-	/**
-	 * Creates a new Activator for operating on the given file, using the
-	 * specified source language to guide the parsing and analysis.
-	 * 
-	 * @param file
-	 *            the file to be parsed
-	 * @param systemIncludes
-	 *            a list of directories into which to search for system header
-	 *            files
-	 * @param userIncludes
-	 *            a list of directories in which to search for user header files
-	 * @param kind
-	 *            the language in which the program contained in the file should
-	 *            be written; e.g. C or CIVL_C
-	 * @return an Activator, which can be used to preprocess, parse, and
-	 *         transform the file
-	 */
-	public static Activator activator(File file, File[] systemIncludes,
-			File[] userIncludes, Language kind) {
-		return new Activator(kind, file, systemIncludes, userIncludes);
-	}
+		if (dotIndex >= 0) {
+			String suffix = name.substring(dotIndex + 1, name.length());
 
-	/**
-	 * Creates a new Activator for operating on the given file, using empty
-	 * include paths and the language determined by the file name suffix.
-	 * 
-	 * @param file
-	 *            the file to be processes
-	 * @return the activator for processing that file
-	 */
-	public static Activator activator(File file) {
-		return new Activator(file);
+			if ("cvl".equals(suffix) || "cvh".equals(suffix))
+				return Language.CIVL_C;
+		}
+		return Language.C;
 	}
 
 	/**
@@ -116,7 +82,7 @@ public class ABC {
 	 *            the stream to which the output should be printed
 	 */
 	private static void help(PrintStream out) {
-		out.println("Usage: abc [options] filename");
+		out.println("Usage: abc [options] filename0 filename1 ...");
 		out.println("Options:");
 		out.println("-I <path>");
 		out.println("  add path to system include list");
@@ -148,21 +114,20 @@ public class ABC {
 		System.exit(1);
 	}
 
-	private static Config parseCommandLine(String[] args)
+	private static TranslationTask parseCommandLine(String[] args)
 			throws FileNotFoundException {
-		String infileName = null;
+		ArrayList<String> infileNames = new ArrayList<>();
 		String outfileName = null;
 		// the following are updated by -I
 		ArrayList<File> systemIncludeList = new ArrayList<File>();
 		// the following are updated by -iquote
 		ArrayList<File> userIncludeList = new ArrayList<File>();
-		File infile;
-		File[] systemIncludes, userIncludes;
 		boolean preprocOnly = false;
 		boolean verbose = false;
 		List<String> transformCodes = new LinkedList<>();
-		Language languageChoice = null;
-		Config result = new Config();
+		Language language = null;
+		TranslationTask result = new TranslationTask();
+		int nfiles;
 
 		for (int i = 0; i < args.length; i++) {
 			String arg = args[i];
@@ -212,9 +177,9 @@ public class ABC {
 				verbose = true;
 			} else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
-					languageChoice = Language.C;
+					language = Language.C;
 				else if (arg.equals("-lang=civlc"))
-					languageChoice = Language.CIVL_C;
+					language = Language.CIVL_C;
 				else
 					err("Unknown command line option: " + arg);
 			} else if (arg.startsWith("-")) {
@@ -226,28 +191,23 @@ public class ABC {
 				else
 					err("Unknown command line option: " + arg);
 			} else {
-				if (infileName == null)
-					infileName = arg;
-				else
-					err("More than one input file specified (previous was "
-							+ infileName + "): " + arg);
+				infileNames.add(arg);
 			}
 		}
-		if (infileName == null)
+		nfiles = infileNames.size();
+		if (nfiles == 0)
 			err("No input file specified");
-		infile = new File(infileName);
-		userIncludes = userIncludeList.toArray(new File[0]);
-		systemIncludes = systemIncludeList.toArray(new File[0]);
+		result.files = new File[nfiles];
+		for (int i = 0; i < nfiles; i++)
+			result.files[i] = new File(infileNames.get(i));
+		result.userIncludes = userIncludeList.toArray(new File[0]);
+		result.systemIncludes = systemIncludeList.toArray(new File[0]);
 		if (outfileName == null)
 			result.out = System.out;
 		else
 			result.out = new PrintStream(new File(outfileName));
-		if (languageChoice == null)
-			result.activator = new Activator(infile, systemIncludes,
-					userIncludes);
-		else
-			result.activator = new Activator(languageChoice, infile,
-					systemIncludes, userIncludes);
+		result.language = language == null ? getLanguageFromName(infileNames
+				.get(0)) : language;
 		result.verbose = verbose;
 		result.preprocOnly = preprocOnly;
 		result.transformCodes = transformCodes;
@@ -270,30 +230,15 @@ public class ABC {
 	 *             if the file cannot be opened
 	 */
 	public static void main(String[] args) throws ABCException, IOException {
-		Config config;
+		TranslationTask config;
+		FrontEnd frontEnd;
 
 		System.out.println("ABC v" + version + " of " + date
 				+ " -- http://vsl.cis.udel.edu\n");
 		System.out.flush();
 		config = parseCommandLine(args);
-		if (config.preprocOnly)
-			config.activator.preprocess(config.out);
-		else if (config.verbose)
-			config.activator.showTranslation(config.out, config.transformCodes);
-		else {
-			Program program = config.activator.getProgram();
-
-			program.applyTransformers(config.transformCodes);
-			program.print(config.out);
-		}
+		frontEnd = new FrontEnd();
+		frontEnd.showTranslation(config);
 		config.out.close();
 	}
-}
-
-class Config {
-	Activator activator;
-	boolean preprocOnly;
-	PrintStream out;
-	boolean verbose;
-	List<String> transformCodes;
 }

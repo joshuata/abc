@@ -50,4 +50,7 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode, Iterable<T> {
 
 	@Override
 	SequenceNode<T> copy();
+
+	@Override
+	T removeChild(int index);
 }

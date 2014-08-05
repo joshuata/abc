@@ -2,13 +2,13 @@ package edu.udel.cis.vsl.abc;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 
 public class CIVLTranslationTest {
@@ -19,20 +19,23 @@ public class CIVLTranslationTest {
 
 	private static File[] userIncludes = new File[0];
 
-	private static PrintStream out = System.out;
-
 	private static List<String> codes = Arrays.asList("prune", "sef");
 
 	private File root = new File(new File("examples"), "civl");
 
 	private void check(String filenameRoot) throws ABCException, IOException {
-		Activator a = ABC.activator(new File(root, filenameRoot + ".cvl"),
-				systemIncludes, userIncludes);
+		FrontEnd f = new FrontEnd();
+		File file = new File(root, filenameRoot + ".cvl");
 
-		if (debug)
-			a.showTranslation(out, codes);
-		else {
-			a.getProgram().applyTransformers(codes);
+		if (debug) {
+			TranslationTask config = new TranslationTask(Language.CIVL_C,
+					file);
+
+			config.transformCodes = codes;
+			f.showTranslation(config);
+		} else {
+			f.compileAndLink(new File[] { file }, Language.CIVL_C,
+					systemIncludes, userIncludes).applyTransformers(codes);
 		}
 	}
 

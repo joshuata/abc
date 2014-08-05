@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.program.common;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -134,7 +135,7 @@ public class CommonProgramFactory implements ProgramFactory {
 	 * @param plan
 	 *            a plan specifying actions that must be performed on this AST.
 	 */
-	private void transform(AST translationUnit, Plan plan) {
+	private void transform(SequenceNode<ExternalDefinitionNode> root, Plan plan) {
 		Renamer renamer = new Renamer(plan.getRenameMap());
 
 		for (TaggedEntity entity : plan.getDeleteActions()) {
@@ -147,7 +148,7 @@ public class CommonProgramFactory implements ProgramFactory {
 			} else
 				throw new ABCRuntimeException("unreachable");
 		}
-		renamer.renameFrom(translationUnit.getRootNode());
+		renamer.renameFrom(root);
 	}
 
 	/**
@@ -170,6 +171,8 @@ public class CommonProgramFactory implements ProgramFactory {
 	 */
 	private AST link(AST[] translationUnits) throws SyntaxException {
 		int n = translationUnits.length;
+		ArrayList<SequenceNode<ExternalDefinitionNode>> roots = new ArrayList<>(
+				n);
 		NodeFactory nodeFactory = astFactory.getNodeFactory();
 		TokenFactory tokenFactory = astFactory.getTokenFactory();
 		Formation formation = tokenFactory.newSystemFormation("Program");
@@ -183,6 +186,8 @@ public class CommonProgramFactory implements ProgramFactory {
 		Map<String, TaggedEntityInfo> taggedInfoMap = new HashMap<>();
 		AST result;
 
+		for (int i = 0; i < n; i++)
+			plans[i] = new Plan();
 		for (AST ast : translationUnits) {
 			standardAnalyzer.clear(ast);
 			standardAnalyzer.analyze(ast);
@@ -220,13 +225,20 @@ public class CommonProgramFactory implements ProgramFactory {
 			info.computeActions(plans);
 		for (int i = 0; i < n; i++) {
 			AST ast = translationUnits[i];
+			roots.add(ast.getRootNode());
 
 			ast.release();
-			transform(ast, plans[i]);
+			transform(roots.get(i), plans[i]);
 		}
-		for (AST ast : translationUnits)
-			for (ExternalDefinitionNode def : ast.getRootNode())
+		for (SequenceNode<ExternalDefinitionNode> root : roots) {
+			int numChildren = root.numChildren();
+
+			for (int i = 0; i < numChildren; i++) {
+				ExternalDefinitionNode def = root.removeChild(i);
+
 				definitions.add(def);
+			}
+		}
 		newRoot = nodeFactory.newTranslationUnitNode(fakeSource, definitions);
 		result = astFactory.newAST(newRoot);
 		return result;
