@@ -41,10 +41,46 @@ public interface ProgramFactory {
 
 	ASTFactory getASTFactory();
 
+	/**
+	 * Forms a new program from the given AST. The given AST is cleaned (i.e.,
+	 * any residual analysis information from some previous analysis is removed)
+	 * and analyzed in the process of creating the new program.
+	 * 
+	 * @param ast
+	 *            an AST
+	 * @return the program wrapping the given AST
+	 * @throws SyntaxException
+	 *             if any kind of static error is detected in the AST
+	 */
 	Program newProgram(AST ast) throws SyntaxException;
 
+	/**
+	 * Forms a new program by merging the given ASTs. Each AST represents a
+	 * single translation unit. The ASTs will be cleared and analyzed in the
+	 * process, so any existing analysis data will be discarded. In the process
+	 * of merging, entities may have to be renamed to avoid name conflicts.
+	 * 
+	 * @param asts
+	 *            a sequence of ASTs
+	 * @return the program obtained by merging the given ASTs
+	 * @throws SyntaxException
+	 *             if any kind of static error is detected in any AST, or any
+	 *             problem occurs in merging them
+	 */
 	Program newProgram(AST[] asts) throws SyntaxException;
 
+	/**
+	 * Forms a new program by merging the given ASTs. Exactly the same as
+	 * {@link #newProgram(AST[])}, but takes an iterable object instead of an
+	 * array.
+	 * 
+	 * @param asts
+	 *            a sequence of ASTs
+	 * @return the program obtained by merging the given ASTs
+	 * @throws SyntaxException
+	 *             if any kind of static error is detected in any AST, or any
+	 *             problem occurs in merging them
+	 */
 	Program newProgram(Iterable<AST> asts) throws SyntaxException;
 
 }

@@ -113,6 +113,27 @@ public class CommonProgramFactory implements ProgramFactory {
 
 	// Supporting methods...
 
+	/**
+	 * <p>
+	 * Transforms a translation unit AST in preparation for merging it with the
+	 * other translation units. The given plan specifies the transformation
+	 * actions.
+	 * </p>
+	 * 
+	 * <p>
+	 * <strong>Precondition:</strong> the given AST is analyzed.
+	 * </p>
+	 * 
+	 * <p>
+	 * <strong>Postcondition:</strong> the resulting transformed AST is
+	 * transformed according to the plan but is not yet analyzed.
+	 * </p>
+	 * 
+	 * @param translationUnit
+	 *            an AST representing a translation unit
+	 * @param plan
+	 *            a plan specifying actions that must be performed on this AST.
+	 */
 	private void transform(AST translationUnit, Plan plan) {
 		Renamer renamer = new Renamer(plan.getRenameMap());
 
@@ -129,6 +150,24 @@ public class CommonProgramFactory implements ProgramFactory {
 		renamer.renameFrom(translationUnit.getRootNode());
 	}
 
+	/**
+	 * First, analyzes the ASTs, then links them.
+	 * 
+	 * <p>
+	 * <strong>Precondition:</strong> each AST represents one translation unit.
+	 * It does not matter whether they have any analysis data as they will be
+	 * cleared and analyzed first.
+	 * </p>
+	 * 
+	 * <p>
+	 * <strong>Postcondition:</strong> the original ASTs are destroyed. The
+	 * resulting AST is not clean: it needs to be cleared and analyzed.
+	 * </p>
+	 * 
+	 * @param translationUnits
+	 * @return
+	 * @throws SyntaxException
+	 */
 	private AST link(AST[] translationUnits) throws SyntaxException {
 		int n = translationUnits.length;
 		NodeFactory nodeFactory = astFactory.getNodeFactory();
@@ -144,6 +183,10 @@ public class CommonProgramFactory implements ProgramFactory {
 		Map<String, TaggedEntityInfo> taggedInfoMap = new HashMap<>();
 		AST result;
 
+		for (AST ast : translationUnits) {
+			standardAnalyzer.clear(ast);
+			standardAnalyzer.analyze(ast);
+		}
 		for (int i = 0; i < n; i++) {
 			AST ast = translationUnits[i];
 			Scope scope = ast.getRootNode().getScope();
@@ -190,9 +233,16 @@ public class CommonProgramFactory implements ProgramFactory {
 	}
 
 	/**
+	 * Links the ASTs, just as in {@link #link(AST[])}, but takes an
+	 * {@link Iterable} instead of an array.
+	 * 
 	 * @param asts
-	 * @return
+	 *            an Iterable of ASTs, each representing one raw translation
+	 *            unit
+	 * @return the AST obtained by merging the given ones (unclean)
 	 * @throws SyntaxException
+	 *             if there is any kind of syntax error in any of the ASTs, or
+	 *             they cannot be merged for any reason
 	 */
 	private AST link(Iterable<AST> asts) throws SyntaxException {
 		int i, n = 0;

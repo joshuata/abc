@@ -11,6 +11,13 @@ import org.antlr.runtime.Parser;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
+/**
+ * A Preprocessor is used to preprocess source files. A single Preprocessor
+ * object can be used to preprocess multiple files.
+ * 
+ * @author siegel
+ * 
+ */
 public interface Preprocessor {
 
 	/**

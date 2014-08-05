@@ -10,29 +10,6 @@ import java.io.File;
  */
 public interface PreprocessorFactory {
 
-	// /**
-	// * Creates new instance by copying fields from old one. The two histories
-	// * are set to the given arguments. Both must be non-null.
-	// *
-	// * @param token
-	// * any kind of Token
-	// */
-	// CToken newCToken(Token token, ExpansionHistory expansionHistory,
-	// IncludeHistory includeHistory);
-	//
-	// /**
-	// * Makes a new CToken with trivial expansion history. The include history
-	// * must be non-null.
-	// *
-	// * @param token
-	// * any instance of Token whose fields are used to initialize the
-	// * new token's fields. The expansion and include histories of the
-	// * given token, if present, are ignored.
-	// * @param includeHistory
-	// * the include history to be used for the new token
-	// */
-	// CToken newCToken(Token token, IncludeHistory includeHistory);
-
 	/**
 	 * Produces a new Preprocessor with the given list of paths for the system
 	 * and user includes. The Preprocessor can be used to preprocess multiple
