@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 
 /**
@@ -32,8 +32,6 @@ public class CTranslationTest {
 
 	private static File[] userIncludes = new File[0];
 
-	private static PrintStream out = System.out;
-
 	private static File root = new File("examples");
 
 	private static List<String> codes = Arrays.asList("prune", "sef");
@@ -47,13 +45,19 @@ public class CTranslationTest {
 	}
 
 	private void check(String filenameRoot) throws ABCException, IOException {
-		Activator a = ABC.activator(new File(root, filenameRoot + ".c"),
-				systemIncludes, userIncludes);
+		FrontEnd fe = new FrontEnd();
+		File file = new File(root, filenameRoot + ".c");
 
 		if (debug) {
-			a.showTranslation(out, codes);
+			TranslationTask config = new TranslationTask(Language.C, file);
+
+			config.transformCodes = codes;
+			config.systemIncludes = systemIncludes;
+			config.userIncludes = userIncludes;
+			fe.showTranslation(config);
 		} else {
-			a.getProgram().applyTransformers(codes);
+			fe.compileAndLink(new File[] { file }, Language.CIVL_C,
+					systemIncludes, userIncludes).applyTransformers(codes);
 		}
 	}
 

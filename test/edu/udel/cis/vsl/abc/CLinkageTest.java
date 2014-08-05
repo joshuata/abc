@@ -47,8 +47,8 @@ public class CLinkageTest {
 
 	private AST getAST(File file) throws ParseException, SyntaxException,
 			PreprocessorException {
-		Activator a = new Activator(Language.C, file, new File[0], new File[0]);
-		AST ast = a.getTranslationUnit();
+		FrontEnd fe = new FrontEnd();
+		AST ast = fe.compile(file, Language.C, new File[0], new File[0]);
 
 		return ast;
 	}

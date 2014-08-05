@@ -1,6 +1,8 @@
 package edu.udel.cis.vsl.abc.program.common;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
@@ -18,12 +20,12 @@ public class Plan {
 	 * The set of entities in the translation unit whose definitions should be
 	 * nullified.
 	 */
-	private Collection<TaggedEntity> defDeleteSet;
+	private Collection<TaggedEntity> defDeleteSet = new LinkedList<>();
 
 	/**
 	 * Mapping from entity that must be renamed to its new name.
 	 */
-	private Map<Entity, String> renameMap;
+	private Map<Entity, String> renameMap = new HashMap<>();
 
 	public Plan() {
 	}

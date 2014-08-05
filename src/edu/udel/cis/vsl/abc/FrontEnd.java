@@ -1,6 +1,8 @@
 package edu.udel.cis.vsl.abc;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.PrintStream;
 
 import org.antlr.runtime.tree.CommonTree;
 
@@ -14,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTs;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversions;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entities;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
@@ -40,16 +43,18 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
+import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 /**
- * A FrontEnd provides a simple, high-level interface for accessing
- * all of the main functionality of ABC.  
+ * A FrontEnd provides a simple, high-level interface for accessing all of the
+ * main functionality of ABC.
+ * 
  * @author siegel
- *
+ * 
  */
 public class FrontEnd {
 
-	private static String bar = "===================";
+	private final static String bar = "===================";
 
 	private TokenFactory sourceFactory = Tokens.newTokenFactory();
 
@@ -92,6 +97,10 @@ public class FrontEnd {
 		return Parse.newCParser(tokens);
 	}
 
+	public ASTFactory getASTFactory() {
+		return astFactory;
+	}
+
 	public ASTBuilder getASTBuilder(CParser parser, CommonTree tree)
 			throws SyntaxException {
 		return Antlr2AST.newASTBuilder(parser, astFactory, tree);
@@ -102,7 +111,7 @@ public class FrontEnd {
 				: civl_config, astFactory, entityFactory, conversionFactory);
 	}
 
-	public Transformer getTransformer(String code) throws SyntaxException {
+	public Transformer getTransformer(String code) {
 		return Transform.newTransformer(code, astFactory);
 	}
 
@@ -251,8 +260,101 @@ public class FrontEnd {
 		return result;
 	}
 
-	public void showTranslation() {
-
+	/**
+	 * Prints the program, symbol table, and type information to the given
+	 * output stream in a plain-text, human-readable format.
+	 * 
+	 * @param out
+	 *            the output stream
+	 * @param program
+	 *            the program
+	 */
+	public void printProgram(PrintStream out, Program program) {
+		program.print(out);
+		out.println("\n\nSymbol Table:\n");
+		program.printSymbolTable(out);
+		out.println("\n\nTypes:\n");
+		typeFactory.printTypes(out);
+		out.println();
+		out.flush();
 	}
 
+	/**
+	 * Shows stages of translation.
+	 * 
+	 * @param config
+	 *            configuration object specifying options and files
+	 * @throws IOException
+	 * @throws PreprocessorException
+	 * @throws ParseException
+	 * @throws SyntaxException
+	 */
+	public void showTranslation(TranslationTask config) throws IOException,
+			PreprocessorException, ParseException, SyntaxException {
+		PrintStream out = config.out;
+		boolean verbose = config.verbose;
+		int nfiles = config.files.length;
+		FrontEnd frontEnd = new FrontEnd();
+		Preprocessor preprocessor = frontEnd.getPreprocessor(
+				config.systemIncludes, config.userIncludes);
+		AST[] asts = new AST[nfiles];
+
+		for (int i = 0; i < nfiles; i++) {
+			File file = config.files[i];
+			String filename = file.getName();
+			CTokenSource tokens;
+
+			if (verbose) {
+				// print the original source file...
+				out.println(bar + " File " + filename + " " + bar);
+				ANTLRUtils.source(out, file);
+				out.println();
+				out.flush();
+			}
+			tokens = preprocessor.outputTokenSource(file);
+			if (verbose) {
+				out.println(bar + " Preprocessor output for " + filename + " "
+						+ bar);
+				preprocessor.printOutputDebug(out, file);
+				out.println();
+				out.flush();
+			}
+			if (!config.preprocOnly) {
+				CParser parser = frontEnd.getParser(tokens);
+				CommonTree tree = parser.getTree();
+				ASTBuilder builder;
+
+				if (verbose) {
+					out.println(bar + " ANTLR Tree for " + filename + " " + bar);
+					ANTLRUtils.printTree(out, tree);
+					out.println();
+					out.flush();
+				}
+				builder = frontEnd.getASTBuilder(parser, tree);
+				asts[i] = builder.getTranslationUnit();
+				if (verbose) {
+					out.println(bar + " Raw Translation Unit for " + filename
+							+ " " + bar);
+					asts[i].print(out);
+					out.println();
+					out.flush();
+				}
+			}
+		}
+		if (!config.preprocOnly) {
+			Program program = frontEnd.link(asts, config.language);
+
+			if (config.transformCodes.isEmpty() || verbose) {
+				out.println(bar + " Program " + bar);
+				frontEnd.printProgram(out, program);
+			}
+			for (String code : config.transformCodes) {
+				Transformer transformer = frontEnd.getTransformer(code);
+
+				out.println("\n\n" + bar + " After " + transformer + " " + bar);
+				program.apply(transformer);
+				frontEnd.printProgram(out, program);
+			}
+		}
+	}
 }

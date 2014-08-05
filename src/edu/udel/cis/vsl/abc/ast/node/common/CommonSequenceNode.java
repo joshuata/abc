@@ -112,4 +112,10 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 		return NodeKind.SEQUENCE;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public T removeChild(int index) {
+		return (T) super.removeChild(index);
+	}
+
 }

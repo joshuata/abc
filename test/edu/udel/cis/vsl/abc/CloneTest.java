@@ -12,6 +12,7 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -40,16 +41,15 @@ public class CloneTest {
 
 	private void check(String filenameRoot) throws PreprocessorException,
 			ParseException, SyntaxException, IOException {
-		Activator a;
 		AST ast1, ast2;
 		SequenceNode<ExternalDefinitionNode> root1, root2;
+		FrontEnd fe = new FrontEnd();
 
-		a = ABC.activator(new File(root, filenameRoot + ".c"), systemIncludes,
-				userIncludes);
-		ast1 = a.getTranslationUnit();
+		ast1 = fe.compile(new File(root, filenameRoot + ".c"), Language.C,
+				systemIncludes, userIncludes);
 		root1 = ast1.getRootNode();
 		root2 = root1.copy();
-		ast2 = a.newTranslationUnit(root2);
+		ast2 = fe.getASTFactory().newAST(root2);
 		assertEquals(ast1.getNumberOfNodes(), ast2.getNumberOfNodes());
 	}
 
