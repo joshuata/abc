@@ -18,8 +18,11 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversions;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entities;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
@@ -46,8 +49,16 @@ import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 /**
+ * <p>
  * A FrontEnd provides a simple, high-level interface for accessing all of the
- * main functionality of ABC.
+ * main functionality of ABC. It provides two different families of methods: (1)
+ * methods to get or create individual components of the ABC tool chain, such as
+ * factories, {@link Preprocessor}s, {@link CParser}s, etc., and (2)
+ * higher-level methods which marshall together these different components in
+ * order to carry out a complete translation tasks, such as compiling a
+ * translation unit, or linking several translation units to form a complete
+ * {@link Program}.
+ * </p>
  * 
  * @author siegel
  * 
@@ -80,6 +91,13 @@ public class FrontEnd {
 
 	private Configuration civl_config;
 
+	/**
+	 * Constructs a new front end. The front end can be used repeatedly to
+	 * perform different translation tasks. The factories used by this front end
+	 * will persist throughout its lifetime, i.e., new factories are not created
+	 * for each task.
+	 * 
+	 */
 	public FrontEnd() {
 		c_config = Configurations.newMinimalConfiguration();
 		c_config.setLanguage(Language.C);
@@ -87,30 +105,95 @@ public class FrontEnd {
 		civl_config.setLanguage(Language.CIVL_C);
 	}
 
+	/**
+	 * Creates a {@link Preprocessor} based on the specified system and include
+	 * path lists. The new {@link Preprocessor} can be used to preprocess source
+	 * files repeatedly. The method {@link Preprocessor#outputTokenSource(File)}
+	 * is used to obtain the stream of tokens emanating from the preprocessor.
+	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
+	 * @return the new Preprocessor
+	 */
 	public Preprocessor getPreprocessor(File[] systemIncludePaths,
 			File[] userIncludePaths) {
 		return preprocessorFactory.newPreprocessor(systemIncludePaths,
 				userIncludePaths);
 	}
 
+	/**
+	 * Creates a new parser for parsing a specified token source. This parser is
+	 * not reusable, i.e., it can be used only once, to parse the specified
+	 * source. The token source can be obtained, for example, from a
+	 * {@link Preprocessor}. An ANTLR tree representation of the translation
+	 * unit can be obtained from the new parser.
+	 * 
+	 * @see CParser#getTree()
+	 * @see Preprocessor#outputTokenSource(File)
+	 * 
+	 * @param tokens
+	 *            a token source
+	 * @return a new parser for parsing that token source
+	 */
 	public CParser getParser(CTokenSource tokens) {
 		return Parse.newCParser(tokens);
 	}
 
+	/**
+	 * Returns the {@link ASTFactory} used by this front end. This factory (or
+	 * its subfactories) are used to create all components of an AST, including
+	 * new {@link ASTNode}s.
+	 * 
+	 * @return the AST factory
+	 */
 	public ASTFactory getASTFactory() {
 		return astFactory;
 	}
 
+	/**
+	 * Creates a new AST builder, an object which builds an AST from an ANTLR
+	 * tree. The builder actually requires the CParser used to create the tree,
+	 * as well as the tree itself.
+	 * 
+	 * @param parser
+	 *            the parser used to create the ANTLR tree
+	 * @param tree
+	 *            the root of the ANTLR tree created by the parser
+	 * @return the new AST builder
+	 * @throws SyntaxException
+	 *             if there is a statically detectable error in ths translation
+	 *             unit parsed
+	 */
 	public ASTBuilder getASTBuilder(CParser parser, CommonTree tree)
 			throws SyntaxException {
 		return Antlr2AST.newASTBuilder(parser, astFactory, tree);
 	}
 
+	/**
+	 * Returns a standard {@link Analyzer}, which is used to analyze an AST,
+	 * leaving behind information such as (1) the {@link Scope} of every node,
+	 * (2) the {@link Type} of every expression, (3) the {@link Entity}
+	 * asssociated to every identifier.
+	 * 
+	 * @param language
+	 *            the language of the AST being analyzed
+	 * @return a standard Analyzer for that language
+	 */
 	public Analyzer getStandardAnalyzer(Language language) {
 		return Analysis.newStandardAnalyzer(language == Language.C ? c_config
 				: civl_config, astFactory, entityFactory, conversionFactory);
 	}
 
+	/**
+	 * Creates a new {@link Transformer} specified by the given transformer
+	 * code.
+	 * 
+	 * @param code
+	 *            a string code which specifies a transformer
+	 * @return the new transformer
+	 */
 	public Transformer getTransformer(String code) {
 		return Transform.newTransformer(code, astFactory);
 	}
