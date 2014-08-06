@@ -396,7 +396,7 @@ public class CommonPreprocessor implements Preprocessor {
 
 	@Override
 	public void addHeaderFile(String fileName) {
-		if (fileName.endsWith(".h"))
+		if (fileName.endsWith(".h") || fileName.endsWith(".cvh"))
 			this.headers.add(fileName);
 	}
 
