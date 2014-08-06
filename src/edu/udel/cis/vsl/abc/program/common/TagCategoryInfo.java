@@ -74,7 +74,7 @@ public class TagCategoryInfo {
 			for (int i = 1; i < n; i++) {
 				Pair<Integer, TaggedEntity> pair = completeClass.get(i);
 
-				plans[pair.left].addDefDeleteAction(pair.right);
+				plans[pair.left].addMakeIncompleteAction(pair.right);
 			}
 		}
 	}
@@ -108,7 +108,7 @@ public class TagCategoryInfo {
 
 				plan.addRenameAction(pair.right, newName);
 				if (tuid > representative)
-					plan.addDefDeleteAction(pair.right);
+					plan.addMakeIncompleteAction(pair.right);
 			}
 		} else {
 			// more than one complete class: each complete class gets unique
@@ -127,7 +127,7 @@ public class TagCategoryInfo {
 
 					plan.addRenameAction(pair.right, newName);
 					if (tuid > representative)
-						plan.addDefDeleteAction(pair.right);
+						plan.addMakeIncompleteAction(pair.right);
 				}
 			}
 		}
