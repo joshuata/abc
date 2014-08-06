@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
@@ -26,7 +27,7 @@ public class ExpressionEvaluator {
 	
 	private static SymbolicUniverse universe = SARL.newStandardUniverse();
 
-	public static boolean isEqualIntExpr(ExpressionNode o1, ExpressionNode o2) {
+	public static boolean checkEqualityWithConditions(ExpressionNode o1, ExpressionNode o2, List<ExpressionNode> conditions) {
 		/*
 		 * Should check that operator nodes are of an integer type
 		 */
@@ -34,13 +35,21 @@ public class ExpressionEvaluator {
 		BooleanExpression context = universe.trueExpression();
 		Reasoner reasoner = universe.reasoner(context);
 		
-		NumericExpression n1 = toSarl(o1);
-		NumericExpression n2 = toSarl(o2);
+		translateID = new HashMap<Entity,NumericSymbolicConstant>();
+		
+		NumericExpression n1 = toSarlNumeric(o1);
+		NumericExpression n2 = toSarlNumeric(o2);
 		BooleanExpression equiv = universe.equals(n1, n2);
 		
-		System.out.println("ExpressionEvaluator translated "+equiv);
+		BooleanExpression current = equiv;
 		
-		return reasoner.isValid(equiv);
+		for(ExpressionNode e : conditions) {
+			current = universe.and(current, (BooleanExpression) toSarlBool(e));
+		}
+		
+		System.out.println("ExpressionEvaluator translated "+current);
+		
+		return reasoner.isValid(current);
 	}
 	
 	/*
@@ -49,25 +58,71 @@ public class ExpressionEvaluator {
 	 *   - function calls
 	 *   - array references
 	 */
-	private static NumericExpression toSarl(ExpressionNode o) {
-		translateID = new HashMap<Entity,NumericSymbolicConstant>();
-		return toSarlWorker(o);
-	}
-	
-	private static NumericExpression toSarlWorker(ExpressionNode o) {
+		
+	private static BooleanExpression toSarlBool(ExpressionNode o) {
 		if (o instanceof OperatorNode) {
+			OperatorNode op = (OperatorNode) o;
+			/*
+			 * Works with basic logical and relational operators now.  Could be extended to handle
+			 * arrays, etc. (not sure how well that will work, but ...)
+			 */
+			OperatorNode.Operator oper = op.getOperator();
+			if (oper == OperatorNode.Operator.NEQ) {
+				return universe.not(toSarlBool(op.getArgument(1)));
+			} else if (oper == OperatorNode.Operator.LAND || oper == OperatorNode.Operator.LOR) {
+				BooleanExpression op1 = toSarlBool(op.getArgument(1));
+				BooleanExpression op2 = toSarlBool(op.getArgument(2));
+				switch (oper) {
+				case LAND:
+					return universe.and(op1,op2);
+				case LOR:
+					return universe.or(op1,op2);
+				default: 
+					assert false : "ExpressionEvaluator : cannot translate "+oper+" to SARL";
+				}
+			} else {
+				NumericExpression op1 = toSarlNumeric(op.getArgument(1));
+				NumericExpression op2 = toSarlNumeric(op.getArgument(2));
+
+				switch (oper) {
+				case LT:
+					return universe.lessThan(op1,op2);
+				case LTE:
+					return universe.lessThanEquals(op1,op2);
+				case GT:
+					return universe.not(universe.lessThanEquals(op1,op2));
+				case GTE:
+					return universe.not(universe.lessThan(op1,op2));
+				case EQUALS: 
+					return universe.equals(op1,op2);
+				default: 
+					assert false : "ExpressionEvaluator : cannot translate "+oper+" to SARL";
+				}
+			}
+
+		} else {
+			assert false : "ExpressionEvaluator : cannot translate "+o+" to SARL";
+		}
+		return null;
+	}
+
+	
+	private static NumericExpression toSarlNumeric(ExpressionNode o) {
+		if (o instanceof OperatorNode) {
+			OperatorNode op = (OperatorNode) o;
+
 			/*
 			 * Works with basic integer operators now.  Could be extended to handle
 			 * arrays, etc. (not sure how well that will work, but ...)
 			 */
-			NumericExpression op1 = toSarlWorker(((OperatorNode) o).getArgument(1));
-			OperatorNode.Operator oper = ((OperatorNode) o).getOperator();
+			NumericExpression op1 = (NumericExpression) toSarlNumeric(op.getArgument(1));
+			OperatorNode.Operator oper = op.getOperator();
 			if (oper == OperatorNode.Operator.UNARYPLUS) {
 				return op1;
 			} else if (oper == OperatorNode.Operator.UNARYMINUS) {
 				return universe.minus(op1);
 			} else {
-				NumericExpression op2 = toSarlWorker(((OperatorNode) o).getArgument(1));
+				NumericExpression op2 = (NumericExpression) toSarlNumeric(op.getArgument(1));
 				switch (oper) {
 				case DIV:
 					return universe.divide(op1,op2);
