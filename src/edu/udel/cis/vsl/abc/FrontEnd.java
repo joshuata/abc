@@ -172,6 +172,24 @@ public class FrontEnd {
 	}
 
 	/**
+	 * Creates a new AST builder, an object which builds an AST from an ANTLR
+	 * tree. The builder actually requires the CParser used to create the tree,
+	 * which also contains a reference to the tree.
+	 * 
+	 * @param parser
+	 *            the parser used to create the ANTLR tree
+	 * @return the new AST builder
+	 * @throws SyntaxException
+	 *             if there is a statically detectable error in ths translation
+	 *             unit parsed
+	 * @throws ParseException
+	 */
+	public ASTBuilder getASTBuilder(CParser parser) throws SyntaxException,
+			ParseException {
+		return Antlr2AST.newASTBuilder(parser, astFactory, parser.getTree());
+	}
+
+	/**
 	 * Returns a standard {@link Analyzer}, which is used to analyze an AST,
 	 * leaving behind information such as (1) the {@link Scope} of every node,
 	 * (2) the {@link Type} of every expression, (3) the {@link Entity}
