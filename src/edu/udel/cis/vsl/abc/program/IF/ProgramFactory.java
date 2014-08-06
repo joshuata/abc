@@ -6,32 +6,70 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * <p>
- * This class will take a collection of ASTs, each representing one translation
- * unit, and produce one big AST representing the whole program. This big AST
- * will then be analyzed like any other AST.
+ * This factory is used to produce a whole {@link Program} from a set of ASTs
+ * representing individual translation units. This is similar to the process of
+ * "linking". The resulting program is represented by a single AST that is
+ * obtained by carefully merging the given ASTs. In the process of merging, some
+ * entities may have to be re-named to avoid name conflicts, as described below.
  * </p>
  * 
- * <p>
- * Identifiers/entities in file scope with internal or no linkage will be
- * renamed as necessary so that identifiers naming different entities have
- * different names. For example, if Translation Unit 1 has an entity with
- * internal linkage, or with no linkage in file scope, named "x", and so does
- * Translation Unit 2, the "x" in TU1 might be renamed _TU1_x and the "x" in TU2
- * might be renamed _TU2_x. The linkage kind (external, internal, or none) of
- * all entities (including these) will remain unchanged.
- * </p>
+ * <ol>
+ * 
+ * <li>For any entity that is renamed, the new name will be obtained by
+ * appending a string beginning with <code>$TU</code> to the original name.
+ * Hence the substring <code>$TU</code> should never be used in any identifier
+ * in the original program, as it is reserved for this use.</li>
+ * 
+ * <li>The determination of compatibility for two tagged types will first strip
+ * any suffix beginning with <code>$TU</code> from the tags. So, for example,
+ * structs with tags such as <code>foo</code>, <code>foo$TU1</code>, and
+ * <code>foo$TU2</code> may still be compatible, because all of them will be
+ * considered to have the tag <code>foo</code> for the purpose of compatibility
+ * checking.</li>
+ * 
+ * <li>After renaming, any two complete compatible tagged file-scope entities
+ * will have the same name. The (redundant) complete definitions after the first
+ * complete definition will be converted to incomplete declarations. That is, in
+ * any subtree of the form <code>struct S { ... }</code>, the node
+ * <code>{...}</code> will be replaced with <code>null</code>.</li>
+ * 
+ * <li>If all of the complete tagged file-scope entities with a given name are
+ * compatible, then all those entities will keep the original name (including
+ * the incomplete ones), and will therefore become one entity in the resulting
+ * merged AST.</li>
+ * 
+ * <li>If there exist two incompatible file-scope tagged entities with the same
+ * name from different translation units: the incompatible entities will be
+ * given different names. Furthermore, any incomplete file-scope tagged entity
+ * with that name will be given a name unique to its translation unit. However,
+ * an incomplete type may still be considered compatible to any of these types,
+ * due to the renaming scheme described above.</li>
+ * 
+ * <li>Given an ordinary file-scope entity E1 with internal or no linkage, if
+ * there is another file-scope entity with the same name as E1 in a different
+ * translation unit, the name of E1 will be modified to be unique in the whole
+ * program, e.g., by appending a string of the form <code>TU</code><i>i</i> to
+ * its name, where <i>i</i> is the ID of the translation unit to which E1
+ * belongs.</li>
+ * 
+ * </ol>
  * 
  * <p>
- * Entities with external linkage and same name will be merged into a single
- * entity. This will occur naturally because these entities will not be renamed,
- * yet they will be declared with external linkage in one AST. When the AST is
- * analyzed, they will create one Entity.
- * </p>
+ * Possible further work:
+ * <ol>
+ * <li>A second analysis pass on the merged AST could be implemented to update
+ * the types of functions and objects. For example, the type of a function might
+ * change after its definition. This could happen for example if a parameter
+ * type had the form <code>struct S *p</code> and S was incomplete at the point
+ * at which the function was analyzed. If S is completed later, the type of that
+ * parameter (and the function) changes. Hence the analysis of the body of the
+ * function should be re-done with the updated type of p---this might lead to
+ * discovering an incompatibility. See example a0.c, a1.c, a2.c in
+ * examples/link.</li>
+ * <li>the Pruner could merge compatible typedefs. This has to happen after the
+ * merged AST is anaylzed, because the new type information is needed.</li>
+ * </ol>
  * 
- * <p>
- * The new AST is formed by essentially concatenating the external definitions
- * of the ASTs of the individual translation units (after the renaming described
- * above). The new AST is then analyzed like any AST.
  * </p>
  * 
  * @author siegel
@@ -39,6 +77,13 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  */
 public interface ProgramFactory {
 
+	/**
+	 * Returns the AST factory associated to this program factory. This AST
+	 * factory is used, for example, to create the new merged AST from a set of
+	 * translation units.
+	 * 
+	 * @return the AST factory
+	 */
 	ASTFactory getASTFactory();
 
 	/**
@@ -68,19 +113,4 @@ public interface ProgramFactory {
 	 *             problem occurs in merging them
 	 */
 	Program newProgram(AST[] asts) throws SyntaxException;
-
-	/**
-	 * Forms a new program by merging the given ASTs. Exactly the same as
-	 * {@link #newProgram(AST[])}, but takes an iterable object instead of an
-	 * array.
-	 * 
-	 * @param asts
-	 *            a sequence of ASTs
-	 * @return the program obtained by merging the given ASTs
-	 * @throws SyntaxException
-	 *             if any kind of static error is detected in any AST, or any
-	 *             problem occurs in merging them
-	 */
-	Program newProgram(Iterable<AST> asts) throws SyntaxException;
-
 }

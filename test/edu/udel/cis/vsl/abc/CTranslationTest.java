@@ -51,9 +51,9 @@ public class CTranslationTest {
 		if (debug) {
 			TranslationTask config = new TranslationTask(Language.C, file);
 
-			config.transformCodes = codes;
-			config.systemIncludes = systemIncludes;
-			config.userIncludes = userIncludes;
+			config.addAllTransformCodes(codes);
+			config.setSystemIncludes(systemIncludes);
+			config.setUserIncludes(userIncludes);
 			fe.showTranslation(config);
 		} else {
 			fe.compileAndLink(new File[] { file }, Language.CIVL_C,

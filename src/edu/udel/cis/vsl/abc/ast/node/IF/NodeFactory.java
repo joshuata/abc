@@ -1712,9 +1712,6 @@ public interface NodeFactory {
 	 * Creates a new node representing an entire translation unit. The children
 	 * of this node will be external definitions.
 	 * 
-	 * TODO: thin about changing the name of this method, since it is also used
-	 * to represent a whole program, obtained by linking translation units
-	 * 
 	 * @param source
 	 *            source specification spanning the entire translation unit,
 	 *            which is typically the entire token sequence emanating from
@@ -1725,6 +1722,22 @@ public interface NodeFactory {
 	 * @return the new tranlation unit node
 	 */
 	SequenceNode<ExternalDefinitionNode> newTranslationUnitNode(Source source,
+			List<ExternalDefinitionNode> definitions);
+
+	/**
+	 * Creates a new node representing an entire program. The children of this
+	 * node will be external definitions.
+	 * 
+	 * @param source
+	 *            source specification for the whole program; typically a "fake"
+	 *            source
+	 * @param definitions
+	 *            the list of external definitions which form the children of
+	 *            the new node; typically obtained by concatenating those from
+	 *            the translation units, perhaps after some modifications
+	 * @return the new program node
+	 */
+	SequenceNode<ExternalDefinitionNode> newProgramNode(Source source,
 			List<ExternalDefinitionNode> definitions);
 
 	/**
@@ -2001,4 +2014,5 @@ public interface NodeFactory {
 	 */
 	OmpWorksharingNode newWorksharingNode(Source source,
 			OmpWorksharingNodeKind kind);
+
 }
