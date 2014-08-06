@@ -280,32 +280,39 @@ public class FrontEnd {
 	}
 
 	/**
-	 * Shows stages of translation.
+	 * Shows stages of translation. Useful mainly for debugging and
+	 * experimentation.
 	 * 
-	 * @param config
+	 * @param task
 	 *            configuration object specifying options and files
 	 * @throws IOException
+	 *             if file(s) cannot be opened
 	 * @throws PreprocessorException
+	 *             if any file contains a preprocessor error
 	 * @throws ParseException
+	 *             if the token stream emanating from the preprocessing of a
+	 *             file does not satisfy the grammar of the language
 	 * @throws SyntaxException
+	 *             if any file violates some aspect of the syntax of the
+	 *             language or the translation units cannot be linked for some
+	 *             reason
 	 */
-	public void showTranslation(TranslationTask config) throws IOException,
+	public void showTranslation(TranslationTask task) throws IOException,
 			PreprocessorException, ParseException, SyntaxException {
-		PrintStream out = config.out;
-		boolean verbose = config.verbose;
-		int nfiles = config.files.length;
+		PrintStream out = task.getOut();
+		boolean verbose = task.isVerbose();
+		int nfiles = task.getFiles().length;
 		FrontEnd frontEnd = new FrontEnd();
 		Preprocessor preprocessor = frontEnd.getPreprocessor(
-				config.systemIncludes, config.userIncludes);
+				task.getSystemIncludes(), task.getUserIncludes());
 		AST[] asts = new AST[nfiles];
 
 		for (int i = 0; i < nfiles; i++) {
-			File file = config.files[i];
+			File file = task.getFiles()[i];
 			String filename = file.getName();
 			CTokenSource tokens;
 
 			if (verbose) {
-				// print the original source file...
 				out.println(bar + " File " + filename + " " + bar);
 				ANTLRUtils.source(out, file);
 				out.println();
@@ -319,7 +326,7 @@ public class FrontEnd {
 				out.println();
 				out.flush();
 			}
-			if (!config.preprocOnly) {
+			if (!task.isPreprocOnly()) {
 				CParser parser = frontEnd.getParser(tokens);
 				CommonTree tree = parser.getTree();
 				ASTBuilder builder;
@@ -341,20 +348,24 @@ public class FrontEnd {
 				}
 			}
 		}
-		if (!config.preprocOnly) {
-			Program program = frontEnd.link(asts, config.language);
+		if (!task.isPreprocOnly()) {
+			Program program = frontEnd.link(asts, task.getLanguage());
 
-			if (config.transformCodes.isEmpty() || verbose) {
+			if (verbose)
 				out.println(bar + " Program " + bar);
-				frontEnd.printProgram(out, program);
-			}
-			for (String code : config.transformCodes) {
+			for (String code : task.getTransformCodes()) {
 				Transformer transformer = frontEnd.getTransformer(code);
 
-				out.println("\n\n" + bar + " After " + transformer + " " + bar);
+				if (verbose) {
+					frontEnd.printProgram(out, program);
+					out.println();
+					out.println(bar + " Program after " + transformer + " "
+							+ bar);
+					out.flush();
+				}
 				program.apply(transformer);
-				frontEnd.printProgram(out, program);
 			}
+			frontEnd.printProgram(out, program);
 		}
 	}
 }

@@ -18,7 +18,14 @@ import java.math.BigInteger;
 public interface Configuration {
 
 	public static enum Language {
-		C, CIVL_C
+		/** The programming language C, as specified in the C11 Standard */
+		C,
+		/**
+		 * The programming language CIVL-C, an extension of C for concurrency
+		 * and verification. See <a
+		 * href="http://vsl.cis.udel.edu/civl">http://vsl.cis.udel.edu/civl</a>.
+		 */
+		CIVL_C
 	};
 
 	/**
@@ -29,7 +36,7 @@ public interface Configuration {
 	// public static Language language = Language.C;
 
 	Language getLanguage();
-	
+
 	void setLanguage(Language language);
 
 	BigInteger unsignedCharMax();

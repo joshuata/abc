@@ -197,20 +197,20 @@ public class ABC {
 		nfiles = infileNames.size();
 		if (nfiles == 0)
 			err("No input file specified");
-		result.files = new File[nfiles];
+		result.setFiles(new File[nfiles]);
 		for (int i = 0; i < nfiles; i++)
-			result.files[i] = new File(infileNames.get(i));
-		result.userIncludes = userIncludeList.toArray(new File[0]);
-		result.systemIncludes = systemIncludeList.toArray(new File[0]);
+			result.getFiles()[i] = new File(infileNames.get(i));
+		result.setUserIncludes(userIncludeList.toArray(new File[0]));
+		result.setSystemIncludes(systemIncludeList.toArray(new File[0]));
 		if (outfileName == null)
-			result.out = System.out;
+			result.setOut(System.out);
 		else
-			result.out = new PrintStream(new File(outfileName));
-		result.language = language == null ? getLanguageFromName(infileNames
-				.get(0)) : language;
-		result.verbose = verbose;
-		result.preprocOnly = preprocOnly;
-		result.transformCodes = transformCodes;
+			result.setOut(new PrintStream(new File(outfileName)));
+		result.setLanguage(language == null ? getLanguageFromName(infileNames
+				.get(0)) : language);
+		result.setVerbose(verbose);
+		result.setPreprocOnly(preprocOnly);
+		result.addAllTransformCodes(transformCodes);
 		return result;
 	}
 
@@ -239,6 +239,6 @@ public class ABC {
 		config = parseCommandLine(args);
 		frontEnd = new FrontEnd();
 		frontEnd.showTranslation(config);
-		config.out.close();
+		config.getOut().close();
 	}
 }

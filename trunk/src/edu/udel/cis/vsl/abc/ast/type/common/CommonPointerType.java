@@ -74,7 +74,6 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 			out.println();
 			out.print(prefix + "| ");
 			referencedType.print(prefix + "| ", out, true);
-			out.println();
 		}
 	}
 

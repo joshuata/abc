@@ -28,10 +28,9 @@ public class CIVLTranslationTest {
 		File file = new File(root, filenameRoot + ".cvl");
 
 		if (debug) {
-			TranslationTask config = new TranslationTask(Language.CIVL_C,
-					file);
+			TranslationTask config = new TranslationTask(Language.CIVL_C, file);
 
-			config.transformCodes = codes;
+			config.addAllTransformCodes(codes);
 			f.showTranslation(config);
 		} else {
 			f.compileAndLink(new File[] { file }, Language.CIVL_C,

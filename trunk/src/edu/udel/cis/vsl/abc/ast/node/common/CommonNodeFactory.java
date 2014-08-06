@@ -666,6 +666,12 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public SequenceNode<ExternalDefinitionNode> newProgramNode(Source source,
+			List<ExternalDefinitionNode> definitions) {
+		return newSequenceNode(source, "Program", definitions);
+	}
+
+	@Override
 	public Value getConstantValue(ExpressionNode expression)
 			throws SyntaxException {
 		CommonExpressionNode commonNode = (CommonExpressionNode) expression;
