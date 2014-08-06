@@ -1,7 +1,10 @@
 package edu.udel.cis.vsl.abc.program.common;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +12,17 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
@@ -69,7 +76,7 @@ public class CommonProgramFactory implements ProgramFactory {
 	private void transform(SequenceNode<ExternalDefinitionNode> root, Plan plan) {
 		Renamer renamer = new Renamer(plan.getRenameMap());
 
-		for (TaggedEntity entity : plan.getDeleteActions()) {
+		for (TaggedEntity entity : plan.getMakeIncompleteActions()) {
 			DeclarationNode def = entity.getDefinition();
 
 			if (def instanceof StructureOrUnionTypeNode) {
@@ -78,6 +85,20 @@ public class CommonProgramFactory implements ProgramFactory {
 				((EnumerationTypeNode) def).makeIncomplete();
 			} else
 				throw new ABCRuntimeException("unreachable");
+		}
+		for (Entity entity : plan.getEntityRemoveActions()) {
+			Iterator<DeclarationNode> declIter = entity.getDeclarations();
+
+			while (declIter.hasNext()) {
+				DeclarationNode decl = declIter.next();
+				ASTNode parent = decl.parent();
+
+				if (parent != null) {
+					int declIndex = decl.childIndex();
+
+					parent.removeChild(declIndex);
+				}
+			}
 		}
 		renamer.renameFrom(root);
 	}
@@ -115,6 +136,7 @@ public class CommonProgramFactory implements ProgramFactory {
 		Plan[] plans = new Plan[n];
 		Map<String, OrdinaryEntityInfo> ordinaryInfoMap = new HashMap<>();
 		Map<String, TaggedEntityInfo> taggedInfoMap = new HashMap<>();
+		Collection<String> systemTypedefs = new HashSet<String>();
 		AST result;
 
 		for (int i = 0; i < n; i++)
@@ -161,13 +183,29 @@ public class CommonProgramFactory implements ProgramFactory {
 			ast.release();
 			transform(roots.get(i), plans[i]);
 		}
+
 		for (SequenceNode<ExternalDefinitionNode> root : roots) {
 			int numChildren = root.numChildren();
 
 			for (int i = 0; i < numChildren; i++) {
 				ExternalDefinitionNode def = root.removeChild(i);
 
-				definitions.add(def);
+				if (def != null) {
+					if (def instanceof TypedefDeclarationNode) {
+						Typedef typedef = ((TypedefDeclarationNode) def)
+								.getEntity();
+
+						if (typedef.isSystem()) {
+							// only add these once...
+							String name = typedef.getName();
+
+							if (systemTypedefs.contains(name))
+								continue;
+							systemTypedefs.add(name);
+						}
+					}
+					definitions.add(def);
+				}
 			}
 		}
 		newRoot = nodeFactory.newProgramNode(fakeSource, definitions);

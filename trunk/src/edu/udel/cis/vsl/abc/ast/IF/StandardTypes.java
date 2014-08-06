@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.analysis.entity;
+package edu.udel.cis.vsl.abc.ast.IF;
 
 import java.util.Collection;
 import java.util.HashSet;

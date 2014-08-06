@@ -117,6 +117,7 @@ public class DeclarationAnalyzer {
 				entityAnalyzer.typeAnalyzer.processTypeNode(typeNode);
 				identifier.setEntity(entity);
 				node.setEntity(entity);
+				entity.addDeclaration(node);
 			} else
 				throw error("Expected system typedef, got " + entity, node);
 		} else {
@@ -146,7 +147,7 @@ public class DeclarationAnalyzer {
 				}
 				typedef.setDefinition((TypedefDeclarationNode) node);
 			}
-			typedef.addDeclaration((TypedefDeclarationNode) node);
+			typedef.addDeclaration(node);
 			node.setEntity(typedef);
 			identifier.setEntity(typedef);
 		}

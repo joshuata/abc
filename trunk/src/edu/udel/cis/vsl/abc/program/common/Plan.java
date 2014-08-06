@@ -27,10 +27,15 @@ public class Plan {
 	 */
 	private Map<Entity, String> renameMap = new HashMap<>();
 
+	/**
+	 * Entities whose declarations should be deleted from the AST.
+	 */
+	private Collection<Entity> entityRemoveSet = new LinkedList<>();
+
 	public Plan() {
 	}
 
-	public void addDefDeleteAction(TaggedEntity entity) {
+	public void addMakeIncompleteAction(TaggedEntity entity) {
 		defDeleteSet.add(entity);
 	}
 
@@ -38,12 +43,20 @@ public class Plan {
 		renameMap.put(entity, newName);
 	}
 
-	public Iterable<TaggedEntity> getDeleteActions() {
+	public void addEntityRemoveAction(Entity entity) {
+		entityRemoveSet.add(entity);
+	}
+
+	public Iterable<TaggedEntity> getMakeIncompleteActions() {
 		return defDeleteSet;
 	}
 
 	public Map<Entity, String> getRenameMap() {
 		return renameMap;
+	}
+
+	public Iterable<Entity> getEntityRemoveActions() {
+		return entityRemoveSet;
 	}
 
 }
