@@ -158,12 +158,36 @@ public interface Preprocessor {
 
 	TokenFactory getTokenFactory();
 
+	/**
+	 * Gets the short name of a given file.
+	 * 
+	 * @param fileName
+	 *            The original file name.
+	 * @return The short name of the given file.
+	 */
 	String shortFileName(String fileName);
 
+	/**
+	 * Shows the mapping of short names and original file names.
+	 * 
+	 * @param out
+	 *            where to print the output
+	 */
 	void printShorterFileNameMap(PrintStream out);
 
+	/**
+	 * Adds a header file which is encountered during preprocessing.
+	 * 
+	 * @param fileName
+	 *            name of the header file to be added
+	 */
 	void addHeaderFile(String fileName);
 
+	/**
+	 * Returns all the names of header files encountered by this preprocessor.
+	 * 
+	 * @return all the names of header files encountered by this preprocessor.
+	 */
 	Set<String> headerFiles();
 
 }
