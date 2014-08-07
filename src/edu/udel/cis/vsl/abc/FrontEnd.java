@@ -369,9 +369,15 @@ public class FrontEnd {
 	 *            the output stream
 	 * @param program
 	 *            the program
+	 * @param pretty
+	 *            if true, print AST in the original language, else print in
+	 *            hierarchical form
 	 */
-	public void printProgram(PrintStream out, Program program) {
-		program.print(out);
+	public void printProgram(PrintStream out, Program program, boolean pretty) {
+		if (pretty)
+			program.prettyPrint(out);
+		else
+			program.print(out);
 		out.println("\n\nSymbol Table:\n");
 		program.printSymbolTable(out);
 		out.println("\n\nTypes:\n");
@@ -402,6 +408,7 @@ public class FrontEnd {
 			PreprocessorException, ParseException, SyntaxException {
 		PrintStream out = task.getOut();
 		boolean verbose = task.isVerbose();
+		boolean pretty = task.doPrettyPrint();
 		int nfiles = task.getFiles().length;
 		FrontEnd frontEnd = new FrontEnd();
 		Preprocessor preprocessor = frontEnd.getPreprocessor(
@@ -443,7 +450,10 @@ public class FrontEnd {
 				if (verbose) {
 					out.println(bar + " Raw Translation Unit for " + filename
 							+ " " + bar);
-					asts[i].print(out);
+					if (pretty)
+						asts[i].prettyPrint(out);
+					else
+						asts[i].print(out);
 					out.println();
 					out.flush();
 				}
@@ -458,7 +468,7 @@ public class FrontEnd {
 				Transformer transformer = frontEnd.getTransformer(code);
 
 				if (verbose) {
-					frontEnd.printProgram(out, program);
+					frontEnd.printProgram(out, program, pretty);
 					out.println();
 					out.println(bar + " Program after " + transformer + " "
 							+ bar);
@@ -466,7 +476,7 @@ public class FrontEnd {
 				}
 				program.apply(transformer);
 			}
-			frontEnd.printProgram(out, program);
+			frontEnd.printProgram(out, program, pretty);
 		}
 	}
 }

@@ -50,6 +50,12 @@ public class TranslationTask {
 	private boolean verbose;
 
 	/**
+	 * Print out program in original language, as opposed to a hierarchical
+	 * representation.
+	 */
+	private boolean prettyPrint;
+
+	/**
 	 * The source files to translate. Each generates one translation unit.
 	 */
 	private File[] files;
@@ -72,6 +78,7 @@ public class TranslationTask {
 		out = System.out;
 		preprocOnly = false;
 		verbose = true;
+		prettyPrint = false;
 		files = null;
 		transformCodes = new LinkedList<>();
 	}
@@ -84,6 +91,7 @@ public class TranslationTask {
 		userIncludes = new File[0];
 		preprocOnly = false;
 		verbose = true;
+		prettyPrint = false;
 		transformCodes = new LinkedList<>();
 	}
 
@@ -206,6 +214,14 @@ public class TranslationTask {
 
 	public void addAllTransformCodes(Collection<String> codes) {
 		transformCodes.addAll(codes);
+	}
+
+	public boolean doPrettyPrint() {
+		return prettyPrint;
+	}
+
+	public void setPrettyPrint(boolean value) {
+		this.prettyPrint = value;
 	}
 
 }
