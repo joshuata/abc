@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
@@ -23,7 +22,7 @@ import edu.udel.cis.vsl.sarl.IF.expr.NumericSymbolicConstant;
  */
 public class ExpressionEvaluator {
 	// Record mapping from ABC IDs, defined by their Entity, and the translated SARL representation
-	private static Map<Entity,NumericSymbolicConstant> translateID;
+	private static Map<String,NumericSymbolicConstant> translateID;
 	
 	private static SymbolicUniverse universe = SARL.newStandardUniverse();
 
@@ -35,7 +34,7 @@ public class ExpressionEvaluator {
 		BooleanExpression context = universe.trueExpression();
 		Reasoner reasoner = universe.reasoner(context);
 		
-		translateID = new HashMap<Entity,NumericSymbolicConstant>();
+		translateID = new HashMap<String,NumericSymbolicConstant>();
 		
 		NumericExpression n1 = toSarlNumeric(o1);
 		NumericExpression n2 = toSarlNumeric(o2);
@@ -70,8 +69,8 @@ public class ExpressionEvaluator {
 			if (oper == OperatorNode.Operator.NEQ) {
 				return universe.not(toSarlBool(op.getArgument(1)));
 			} else if (oper == OperatorNode.Operator.LAND || oper == OperatorNode.Operator.LOR) {
-				BooleanExpression op1 = toSarlBool(op.getArgument(1));
-				BooleanExpression op2 = toSarlBool(op.getArgument(2));
+				BooleanExpression op1 = toSarlBool(op.getArgument(0));
+				BooleanExpression op2 = toSarlBool(op.getArgument(1));
 				switch (oper) {
 				case LAND:
 					return universe.and(op1,op2);
@@ -81,8 +80,8 @@ public class ExpressionEvaluator {
 					assert false : "ExpressionEvaluator : cannot translate "+oper+" to SARL";
 				}
 			} else {
-				NumericExpression op1 = toSarlNumeric(op.getArgument(1));
-				NumericExpression op2 = toSarlNumeric(op.getArgument(2));
+				NumericExpression op1 = toSarlNumeric(op.getArgument(0));
+				NumericExpression op2 = toSarlNumeric(op.getArgument(1));
 
 				switch (oper) {
 				case LT:
@@ -115,7 +114,7 @@ public class ExpressionEvaluator {
 			 * Works with basic integer operators now.  Could be extended to handle
 			 * arrays, etc. (not sure how well that will work, but ...)
 			 */
-			NumericExpression op1 = (NumericExpression) toSarlNumeric(op.getArgument(1));
+			NumericExpression op1 = (NumericExpression) toSarlNumeric(op.getArgument(0));
 			OperatorNode.Operator oper = op.getOperator();
 			if (oper == OperatorNode.Operator.UNARYPLUS) {
 				return op1;
@@ -143,13 +142,13 @@ public class ExpressionEvaluator {
 			return universe.integer(((IntegerConstantNode)o).getConstantValue().getIntegerValue());
 
 		} else if (o instanceof IdentifierExpressionNode) {
-			Entity idEntity = ((IdentifierExpressionNode)o).getIdentifier().getEntity();
-			if (translateID.containsKey(idEntity)) {
-				return translateID.get(idEntity);
+			String idName = ((IdentifierExpressionNode)o).getIdentifier().name();
+			if (translateID.containsKey(idName)) {
+				return translateID.get(idName);
 			} else {
 				NumericSymbolicConstant idSarl = (NumericSymbolicConstant) universe
-						.symbolicConstant(universe.stringObject(idEntity.toString()), universe.integerType());
-				translateID.put(idEntity, idSarl);
+						.symbolicConstant(universe.stringObject(idName), universe.integerType());
+				translateID.put(idName, idSarl);
 				return idSarl;
 			}
 			
