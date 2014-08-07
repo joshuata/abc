@@ -41,6 +41,11 @@ public class CommonProgram implements Program {
 	}
 
 	@Override
+	public void prettyPrint(PrintStream out) {
+		ast.prettyPrint(out);
+	}
+
+	@Override
 	public void printSymbolTable(PrintStream out) {
 		ast.getRootNode().getScope().print(out);
 	}

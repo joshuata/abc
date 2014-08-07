@@ -66,6 +66,15 @@ public interface Program {
 	 */
 	void print(PrintStream out);
 
+	/**
+	 * Prints a human readable representation of the program in original
+	 * language.
+	 * 
+	 * @param out
+	 *            a print stream
+	 */
+	void prettyPrint(PrintStream out);
+
 	void printSymbolTable(PrintStream out);
 
 	/**
