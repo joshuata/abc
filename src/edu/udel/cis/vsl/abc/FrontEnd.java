@@ -451,7 +451,7 @@ public class FrontEnd {
 					out.println(bar + " Raw Translation Unit for " + filename
 							+ " " + bar);
 					if (pretty)
-						asts[i].prettyPrint(out);
+						asts[i].prettyPrint(out, false);
 					else
 						asts[i].print(out);
 					out.println();
