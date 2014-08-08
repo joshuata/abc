@@ -55,4 +55,19 @@ void $seq_insert(void *array, int index, void *values, int count);
  */
 void $seq_remove(void *array, int index, void *values, int count);
 
+/* Given a pointer an object of type "incomplete-array-of-T",
+ * appends count elements at the end of the array.   
+ * The final length of the array will be its original length
+ * plus count.  The values to be inserted are taken from the
+ * region specified by parameters values.  If count=0, this is 
+ * a no-op and values will not be evaluated (hence may be NULL).
+ *
+ * Parameters:
+ *   array: pointer-to-incomplete-array-of-T
+ *   values: pointer-to-T
+ *   count: any integer type, count>=0
+ *
+ */
+void $seq_append(void *array, void *values, int count);
+
 #endif

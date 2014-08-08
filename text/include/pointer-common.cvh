@@ -21,4 +21,11 @@ void * $translate_ptr(void *ptr, void *obj);
  * location specified by the left operand. */
 void $copy(void *ptr, void *value);
 
+/*
+  copy the references to the leaf nodes of obj to the given array
+  obj: pointer to type T' whose leaf node types are all type T
+  array: pointer to array of pointer to type T
+*/
+void $leaf_node_ptrs(void *array, void *obj);
+
 #endif
