@@ -17,15 +17,22 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundLiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.LiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.ScalarLiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode.OrdinaryDeclarationKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
@@ -96,6 +103,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
+import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
@@ -275,7 +283,7 @@ public class CommonAST implements AST {
 	}
 
 	@Override
-	public void prettyPrint(PrintStream out) {
+	public void prettyPrint(PrintStream out, boolean ignoreStdLibs) {
 		Map<String, StringBuffer> results = new LinkedHashMap<>();
 		Set<String> headers = new LinkedHashSet<>();
 		SequenceNode<ExternalDefinitionNode> root = getRootNode();
@@ -285,7 +293,7 @@ public class CommonAST implements AST {
 			ExternalDefinitionNode child = root.getSequenceChild(i);
 
 			if (child != null)
-				this.externalDef2CIVL(child, results, headers);
+				this.externalDef2CIVL(child, results, headers, ignoreStdLibs);
 		}
 		for (Entry<String, StringBuffer> entry : results.entrySet()) {
 			out.print("================ ");
@@ -301,73 +309,214 @@ public class CommonAST implements AST {
 	}
 
 	private void externalDef2CIVL(ExternalDefinitionNode extern,
-			Map<String, StringBuffer> results, Set<String> headers) {
+			Map<String, StringBuffer> results, Set<String> headers,
+			boolean ignoreStdLibs) {
 		String sourceFile = extern.getSource().getFirstToken().getSourceFile()
 				.getName();
 		StringBuffer myBuffer;
 
-		switch (sourceFile) {
-		case "assert.h":
-		case "civlc.h":
-		case "civlc.cvh":
-		case "bundle.cvh":
-		case "comm.cvh":
-		case "concurrency.cvh":
-		case "pointer.cvh":
-		case "scope.cvh":
-		case "seq.cvh":
-		case "float.h":
-		case "math.h":
-		case "mpi.h":
-		case "omp.h":
-		case "pthread.h":
-		case "stdbool.h":
-		case "stddef.h":
-		case "stdio.h":
-		case "stdlib.h":
-		case "string.h":
-			headers.add(sourceFile);
-			return;
-		case "civlc-common.cvh":
-		case "bundle-common.cvh":
-		case "comm-common.cvh":
-		case "concurrency-common.cvh":
-		case "omp.cvh":
-		case "pointer-common.cvh":
-		case "scope-common.cvh":
-		case "seq-common.cvh":
-		case "stdlib-common.h":
-		case "string-common.h":
-		case "stdio-common.h":
-		case "omp-common.h":
-		case "mpi-common.h":
-		case "civlc-common.h":
-		case "civlc-omp.cvl":
-		case "stdio-c.cvl":
-		case "stdio.cvl":
-		case "mpi.cvl":
-		case "pthread-c.cvl":
-		case "pthread.cvl":
-			return;
-		default:
-			if (!results.containsKey(sourceFile))
-				results.put(sourceFile, new StringBuffer());
-		}
+		if (ignoreStdLibs)
+			switch (sourceFile) {
+			case "assert.h":
+			case "civlc.h":
+			case "civlc.cvh":
+			case "bundle.cvh":
+			case "comm.cvh":
+			case "concurrency.cvh":
+			case "pointer.cvh":
+			case "scope.cvh":
+			case "seq.cvh":
+			case "float.h":
+			case "math.h":
+			case "mpi.h":
+			case "omp.h":
+			case "pthread.h":
+			case "stdbool.h":
+			case "stddef.h":
+			case "stdio.h":
+			case "stdlib.h":
+			case "string.h":
+				headers.add(sourceFile);
+				return;
+			case "civlc-common.cvh":
+			case "bundle-common.cvh":
+			case "comm-common.cvh":
+			case "concurrency-common.cvh":
+			case "omp.cvh":
+			case "pointer-common.cvh":
+			case "scope-common.cvh":
+			case "seq-common.cvh":
+			case "stdlib-common.h":
+			case "string-common.h":
+			case "stdio-common.h":
+			case "omp-common.h":
+			case "mpi-common.h":
+			case "civlc-common.h":
+			case "civlc-omp.cvl":
+			case "stdio-c.cvl":
+			case "stdio.cvl":
+			case "mpi.cvl":
+			case "pthread-c.cvl":
+			case "pthread.cvl":
+				return;
+			default:
+			}
+		if (!results.containsKey(sourceFile))
+			results.put(sourceFile, new StringBuffer());
 		myBuffer = results.get(sourceFile);
 		if (extern instanceof AssumeNode) {
 			myBuffer.append(assume2CIVL("", (AssumeNode) extern));
-
-		} else if (extern instanceof VariableDeclarationNode) {
-			myBuffer.append(variableDeclaration2CIVL("",
-					(VariableDeclarationNode) extern));
 			myBuffer.append(";");
-		} else if (extern instanceof FunctionDeclarationNode) {
-			myBuffer.append(functionDeclaration2CIVL("",
-					(FunctionDeclarationNode) extern));
+		} else if (extern instanceof EnumerationTypeNode) {
+			myBuffer.append(enumType2CIVL("", (EnumerationTypeNode) extern));
+			myBuffer.append(";");
+		} else if (extern instanceof OrdinaryDeclarationNode) {
+			int length;
+			char lastChar;
+
+			myBuffer.append(ordinaryDeclaration2CIVL("",
+					(OrdinaryDeclarationNode) extern));
+			length = myBuffer.length();
+			lastChar = myBuffer.charAt(length - 1);
+			if (lastChar != '}' && lastChar != ';')
+				myBuffer.append(";");
+		} else if (extern instanceof PragmaNode) {
+			myBuffer.append(pragma2CIVL("", (PragmaNode) extern));
+		} else if (extern instanceof StaticAssertionNode) {
+			myBuffer.append(staticAssertion2CIVL("",
+					(StaticAssertionNode) extern));
+			myBuffer.append(";");
+		} else if (extern instanceof StructureOrUnionTypeNode) {
+			myBuffer.append(structOrUnion2CIVL("",
+					(StructureOrUnionTypeNode) extern));
+			myBuffer.append(";");
+		} else if (extern instanceof TypedefDeclarationNode) {
+			myBuffer.append(typedefDeclaration2CIVL("",
+					(TypedefDeclarationNode) extern));
+			myBuffer.append(";");
 		} else if (extern instanceof OmpDeclarativeNode) {
 			myBuffer.append(ompDeclarative2CIVL("", (OmpDeclarativeNode) extern));
 		}
 		myBuffer.append("\n");
+	}
+
+	private StringBuffer structOrUnion2CIVL(String prefix,
+			StructureOrUnionTypeNode strOrUnion) {
+		StringBuffer result = new StringBuffer();
+		String myIndent = prefix + indention;
+		SequenceNode<FieldDeclarationNode> fields = strOrUnion
+				.getStructDeclList();
+
+		result.append(prefix);
+		if (strOrUnion.isStruct())
+			result.append("struct ");
+		else
+			result.append("union ");
+		if (strOrUnion.getName() != null)
+			result.append(strOrUnion.getName());
+		if (fields != null) {
+			int numFields = fields.numChildren();
+
+			result.append("{");
+			for (int i = 0; i < numFields; i++) {
+				FieldDeclarationNode field = fields.getSequenceChild(i);
+
+				result.append("\n");
+				if (!(field.getTypeNode() instanceof StructureOrUnionTypeNode))
+					result.append(myIndent);
+				result.append(this.type2CIVL(myIndent, field.getTypeNode(),
+						true));
+				result.append(" ");
+				result.append(field.getName());
+				result.append(";");
+			}
+			result.append("\n");
+			result.append(prefix);
+			result.append("}");
+		}
+		return result;
+	}
+
+	private StringBuffer staticAssertion2CIVL(String prefix,
+			StaticAssertionNode assertion) {
+		StringBuffer result = new StringBuffer();
+
+		result.append(prefix);
+		result.append("(");
+		result.append(this.expression2CIVL(assertion.getExpression()));
+		result.append(", \"");
+		result.append(assertion.getMessage().getStringRepresentation());
+		result.append("\")");
+		return result;
+	}
+
+	private StringBuffer pragma2CIVL(String prefix, PragmaNode pragma) {
+		StringBuffer result = new StringBuffer();
+		Iterator<CToken> tokens = pragma.getTokens();
+
+		result.append(prefix);
+		result.append("#pragma ");
+		result.append(pragma.getPragmaIdentifier().name());
+
+		while (tokens.hasNext()) {
+			CToken token = tokens.next();
+
+			result.append(" ");
+			result.append(token.getText());
+		}
+		return result;
+	}
+
+	private StringBuffer ordinaryDeclaration2CIVL(String prefix,
+			OrdinaryDeclarationNode declaration) {
+		OrdinaryDeclarationKind kind = declaration.ordinaryDeclarationKind();
+
+		switch (kind) {
+		case VARIABLE_DECLARATION:
+			return variableDeclaration2CIVL(prefix,
+					(VariableDeclarationNode) declaration);
+		default: // cases FUNCTION_DECLARATION, FUNCTION_DEFINITION,
+					// ABSTRACT_FUNCTION_DEFINITION:
+			return functionDeclaration2CIVL(prefix,
+					(FunctionDeclarationNode) declaration);
+		}
+	}
+
+	private StringBuffer enumType2CIVL(String prefix,
+			EnumerationTypeNode enumeration) {
+		StringBuffer result = new StringBuffer();
+		IdentifierNode tag = enumeration.getTag();
+		SequenceNode<EnumeratorDeclarationNode> enumerators = enumeration
+				.enumerators();
+		String myIndent = prefix + indention;
+
+		result.append(prefix);
+		result.append("enum ");
+		if (tag != null)
+			result.append(tag.name());
+		if (enumerators != null) {
+			int num = enumerators.numChildren();
+
+			result.append("{");
+			for (int i = 0; i < num; i++) {
+				EnumeratorDeclarationNode enumerator = enumerators
+						.getSequenceChild(i);
+
+				if (i != 0)
+					result.append(",");
+				result.append("\n");
+				result.append(myIndent);
+				result.append(enumerator.getName());
+				if (enumerator.getValue() != null) {
+					result.append("=");
+					result.append(this.expression2CIVL(enumerator.getValue()));
+				}
+			}
+			result.append("\n");
+			result.append(prefix);
+			result.append("}");
+		}
+		return result;
 	}
 
 	private StringBuffer ompDeclarative2CIVL(String prefix,
@@ -406,7 +555,7 @@ public class CommonAST implements AST {
 		if (function instanceof AbstractFunctionDefinitionNode)
 			result.append("$abstract ");
 		result.append(prefix);
-		result.append(type2CIVL(returnType));
+		result.append(type2CIVL(prefix, returnType, false));
 		result.append(" ");
 		result.append(function.getName());
 		result.append("(");
@@ -484,10 +633,10 @@ public class CommonAST implements AST {
 
 		result.append(prefix);
 		result.append("typdef ");
-		result.append(typedef.getIdentifier().name());
 		result.append(" ");
-		result.append(type2CIVL(typedef.getTypeNode()));
-		result.append(";");
+		result.append(type2CIVL(prefix, typedef.getTypeNode(), true));
+		result.append(" ");
+		result.append(typedef.getName());
 		return result;
 	}
 
@@ -1050,7 +1199,7 @@ public class CommonAST implements AST {
 			result.append("$input ");
 		if (typeNode.isOutputQualified())
 			result.append("$output ");
-		result.append(type2CIVL(typeNode));
+		result.append(type2CIVL(prefix, typeNode, false));
 		result.append(" ");
 		result.append(variable.getName());
 		if (init != null) {
@@ -1163,7 +1312,7 @@ public class CommonAST implements AST {
 			CastNode cast = (CastNode) expression;
 
 			result.append("(");
-			result.append(type2CIVL(cast.getCastType()));
+			result.append(type2CIVL("", cast.getCastType(), false));
 			result.append(")");
 			result.append(expression2CIVL(cast.getArgument()));
 			break;
@@ -1217,7 +1366,7 @@ public class CommonAST implements AST {
 	private StringBuffer sizeable2CIVL(SizeableNode argument) {
 		if (argument instanceof ExpressionNode)
 			return expression2CIVL((ExpressionNode) argument);
-		return type2CIVL((TypeNode) argument);
+		return type2CIVL("", (TypeNode) argument, false);
 	}
 
 	private StringBuffer functionCall2CIVL(FunctionCallNode call) {
@@ -1411,7 +1560,8 @@ public class CommonAST implements AST {
 		return result;
 	}
 
-	private StringBuffer type2CIVL(TypeNode type) {
+	private StringBuffer type2CIVL(String prefix, TypeNode type,
+			boolean isTypeDeclaration) {
 		StringBuffer result = new StringBuffer();
 		TypeNodeKind kind = type.kind();
 
@@ -1420,9 +1570,10 @@ public class CommonAST implements AST {
 			ArrayTypeNode arrayType = (ArrayTypeNode) type;
 			ExpressionNode extent = arrayType.getExtent();
 
-			result.append("(");
-			result.append(type2CIVL(arrayType.getElementType()));
-			result.append(")");
+			//result.append("(");
+			result.append(type2CIVL(prefix, arrayType.getElementType(),
+					isTypeDeclaration));
+			//result.append(")");
 			result.append("[");
 			if (extent != null)
 				result.append(expression2CIVL(extent));
@@ -1449,15 +1600,32 @@ public class CommonAST implements AST {
 		case ENUMERATION:
 			EnumerationTypeNode enumType = (EnumerationTypeNode) type;
 
-			result.append("enum");
-			if (enumType.getIdentifier() != null)
-				result.append(" " + enumType.getIdentifier().name());
+			if (isTypeDeclaration)
+				result.append(this.enumType2CIVL(prefix, enumType));
+			else {
+				result.append("enum");
+				if (enumType.getIdentifier() != null)
+					result.append(" " + enumType.getIdentifier().name());
+			}
 			break;
-		case STRUCTURE_OR_UNION:
-			result.append(((StructureOrUnionTypeNode) type).getName());
+		case STRUCTURE_OR_UNION: {
+			StructureOrUnionTypeNode strOrUnion = (StructureOrUnionTypeNode) type;
+
+			if (isTypeDeclaration)
+				result.append(this.structOrUnion2CIVL(prefix, strOrUnion));
+			else {
+				if (strOrUnion.isStruct())
+					result.append("struct ");
+				else
+					result.append("union ");
+				result.append(strOrUnion.getName());
+			}
 			break;
+		}
 		case POINTER:
-			result.append(type2CIVL(((PointerTypeNode) type).referencedType()));
+			result.append(type2CIVL(prefix,
+					((PointerTypeNode) type).referencedType(),
+					isTypeDeclaration));
 			result.append("*");
 			break;
 		case TYPEDEF_NAME:
@@ -1473,7 +1641,7 @@ public class CommonAST implements AST {
 			int i = 0;
 
 			result.append(" (");
-			result.append(type2CIVL(funcType.getReturnType()));
+			result.append(type2CIVL(prefix, funcType.getReturnType(), false));
 			result.append(" (");
 			for (VariableDeclarationNode para : paras) {
 				if (i != 0)

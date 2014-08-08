@@ -79,12 +79,16 @@ public interface AST {
 	 * representation.
 	 * */
 	void print(PrintStream out);
-	
+
 	/**
-	 * Pretty-prints the entire tree. This should be a human-readable
-	 * representation.
-	 * */
-	void prettyPrint(PrintStream out);
+	 * Pretty-prints the entire tree, in the form of the original language.
+	 * 
+	 * @param out
+	 *            the output stream for printing
+	 * @param ignoreStdLibs
+	 *            ignore standard libraries? If true, then
+	 */
+	void prettyPrint(PrintStream out, boolean ignoreStdLibs);
 
 	/**
 	 * Dissolves this AST. The nodes will be untouched, except they will become

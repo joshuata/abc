@@ -42,7 +42,7 @@ public class CommonProgram implements Program {
 
 	@Override
 	public void prettyPrint(PrintStream out) {
-		ast.prettyPrint(out);
+		ast.prettyPrint(out, false);
 	}
 
 	@Override

@@ -303,7 +303,9 @@ public interface NodeFactory {
 	 *            the node representing the return type of the function type
 	 * @param formals
 	 *            the sequence of formal parameter declaration nodes for the
-	 *            function type
+	 *            function type. TODO: if there is no parameter, can this be
+	 *            NULL or it has to be sequence node with an empty list as its
+	 *            children?
 	 * @param hasIdentifierList
 	 *            <code>true</code> if the function is declared using an
 	 *            identifier list (i.e., without types associated to the
@@ -1719,7 +1721,7 @@ public interface NodeFactory {
 	 * @param definitions
 	 *            the list of external definitions which form the children of
 	 *            the translation unit
-	 * @return the new tranlation unit node
+	 * @return the new translation unit node
 	 */
 	SequenceNode<ExternalDefinitionNode> newTranslationUnitNode(Source source,
 			List<ExternalDefinitionNode> definitions);

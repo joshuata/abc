@@ -261,9 +261,9 @@ public class CommonPreprocessor implements Preprocessor {
 			Map<String, Macro> macroMap, TokenFactory tokenFactory)
 			throws PreprocessorException {
 		PreprocessorParser parser = parser(file);
-		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file, parser,
-				systemIncludePaths, userIncludePaths, macroMap, tokenFactory,
-				this);
+		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
+				parser, systemIncludePaths, userIncludePaths, macroMap,
+				tokenFactory, this);
 
 		return tokenSource;
 	}
