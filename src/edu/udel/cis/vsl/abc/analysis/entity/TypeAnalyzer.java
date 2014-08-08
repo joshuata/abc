@@ -591,8 +591,9 @@ public class TypeAnalyzer {
 							bitWidthExpression);
 				bitWidth = nodeFactory.getConstantValue(bitWidthExpression);
 			}
-			field = entityFactory.newField(decl, fieldType, bitWidth,
-					structureOrUnion);
+			field = entityFactory.newField(decl, fieldType, bitWidth
+			// ,structureOrUnion
+					);
 			decl.setEntity(field);
 			if (decl.getIdentifier() != null)
 				decl.getIdentifier().setEntity(field);
