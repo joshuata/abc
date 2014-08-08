@@ -58,8 +58,12 @@ public class CommonEntityFactory implements EntityFactory {
 
 	@Override
 	public Field newField(FieldDeclarationNode declaration, ObjectType type,
-			Value bitWidth, StructureOrUnion structureOrUnion) {
-		return new CommonField(declaration, type, bitWidth, structureOrUnion);
+			Value bitWidth
+	// , StructureOrUnion structureOrUnion
+	) {
+		return new CommonField(declaration, type, bitWidth
+		// , structureOrUnion
+		);
 	}
 
 	@Override

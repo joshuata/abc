@@ -119,13 +119,14 @@ public interface EntityFactory {
 	 * @param type
 	 *            the type of the field
 	 * @param bitWidth
-	 *            the optional bit width parameter
-	 * @param structureOrUnion
-	 *            the structure or union entity in which this field occurs
+	 *            the optional bit width parameter // * @param structureOrUnion
+	 *            // * the structure or union entity in which this field occurs
 	 * @return the new field
 	 */
 	Field newField(FieldDeclarationNode declaration, ObjectType type,
-			Value bitWidth, StructureOrUnion structureOrUnion);
+			Value bitWidth
+	// , StructureOrUnion structureOrUnion
+	);
 
 	/**
 	 * Creates a new {@link Typedef} entity.

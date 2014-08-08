@@ -49,10 +49,10 @@ public interface Field extends Entity {
 	 */
 	Value getBitWidth();
 
-	/**
-	 * Returns the structure or union entity to which this field belongs.
-	 * 
-	 * @return the StructureOrUnion object to which this Field belongs
-	 */
-	StructureOrUnion getStructureOrUnion();
+	// /**
+	// * Returns the structure or union entity to which this field belongs.
+	// *
+	// * @return the StructureOrUnion object to which this Field belongs
+	// */
+	//StructureOrUnion getStructureOrUnion();
 }
