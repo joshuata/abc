@@ -46,7 +46,7 @@ public class ExpressionEvaluator {
 			current = universe.and(current, (BooleanExpression) toSarlBool(e));
 		}
 		
-		System.out.println("ExpressionEvaluator translated "+current);
+		//System.out.println("ExpressionEvaluator translated "+current);
 		
 		return reasoner.isValid(current);
 	}
