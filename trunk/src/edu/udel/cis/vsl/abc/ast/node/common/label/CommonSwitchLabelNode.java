@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.label;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -67,4 +68,13 @@ public class CommonSwitchLabelNode extends CommonASTNode implements
 		return NodeKind.SWITCH_LABEL;
 	}
 
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof SwitchLabelNode) {
+			SwitchLabelNode thatSwitch = (SwitchLabelNode) that;
+
+			return this.isDefault == thatSwitch.isDefault();
+		}
+		return false;
+	}
 }

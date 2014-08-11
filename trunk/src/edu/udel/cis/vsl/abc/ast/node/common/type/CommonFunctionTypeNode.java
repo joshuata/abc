@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
@@ -85,5 +86,13 @@ public class CommonFunctionTypeNode extends CommonTypeNode implements
 		copyData(result);
 		result.setVariableArgs(this.hasVariableArgs());
 		return result;
+	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof FunctionTypeNode)
+			return this.hasVariableArgs == ((FunctionTypeNode) that)
+					.hasVariableArgs();
+		return false;
 	}
 }

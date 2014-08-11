@@ -118,4 +118,12 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 		}
 		return newSyncNode;
 	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof OmpSyncNode)
+			return this.ompSyncNodeKind == ((OmpSyncNode) that)
+					.ompSyncNodeKind();
+		return false;
+	}
 }

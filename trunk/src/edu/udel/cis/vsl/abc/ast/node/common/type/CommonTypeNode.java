@@ -171,4 +171,19 @@ public abstract class CommonTypeNode extends CommonASTNode implements TypeNode {
 		return typeNodeKind;
 	}
 
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof TypeNode) {
+			TypeNode thatType = (TypeNode) that;
+
+			return this.typeNodeKind == thatType.typeNodeKind()
+					&& this.atomicQualified == thatType.isAtomicQualified()
+					&& this.constQualified == thatType.isConstQualified()
+					&& this.inputQualified == thatType.isInputQualified()
+					&& this.outputQualified == thatType.isOutputQualified()
+					&& this.restrictQualified == thatType.isRestrictQualified()
+					&& this.volatileQualified == thatType.isVolatileQualified();
+		}
+		return false;
+	}
 }

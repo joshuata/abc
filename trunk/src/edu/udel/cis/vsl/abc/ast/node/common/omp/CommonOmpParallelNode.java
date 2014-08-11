@@ -119,4 +119,12 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 		}
 		return newParallelNode;
 	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof OmpParallelNode)
+			return this.isDefaultShared == ((OmpParallelNode) that)
+					.isDefaultShared();
+		return false;
+	}
 }

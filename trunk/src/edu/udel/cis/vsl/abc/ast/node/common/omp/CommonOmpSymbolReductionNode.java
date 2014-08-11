@@ -48,4 +48,11 @@ public class CommonOmpSymbolReductionNode extends CommonOmpReductionNode
 		return (SequenceNode<IdentifierExpressionNode>) this.child(0);
 	}
 
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof OmpSymbolReductionNode)
+			return this.operator == ((OmpSymbolReductionNode) that).operator();
+		return false;
+	}
+
 }

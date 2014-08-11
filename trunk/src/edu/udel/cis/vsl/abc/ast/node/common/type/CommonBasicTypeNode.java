@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -38,5 +39,12 @@ public class CommonBasicTypeNode extends CommonTypeNode implements
 
 		copyData(result);
 		return result;
+	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof BasicTypeNode)
+			return ((BasicTypeNode) that).getBasicTypeKind() == this.basicTypeKind;
+		return false;
 	}
 }

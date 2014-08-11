@@ -104,10 +104,11 @@ public class PrunerWorker {
 					if (child instanceof IdentifierNode) {
 						Entity entity = ((IdentifierNode) child).getEntity();
 
-						if (entity == null)
-							throw new ASTException("Identifier not resolved: "
-									+ child.getSource().getSummary(false));
-						explore(entity);
+						if (entity != null)
+							// TODO: check this: throw new
+							// ASTException("Identifier not resolved: "
+							// + child.getSource().getSummary(false));
+							explore(entity);
 					}
 					if (child instanceof OrdinaryDeclarationNode
 							|| child instanceof TypedefDeclarationNode) {

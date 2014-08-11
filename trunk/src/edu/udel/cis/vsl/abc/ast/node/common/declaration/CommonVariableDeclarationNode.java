@@ -201,4 +201,16 @@ public class CommonVariableDeclarationNode extends
 		return OrdinaryDeclarationKind.VARIABLE_DECLARATION;
 	}
 
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof VariableDeclarationNode) {
+			VariableDeclarationNode thatVar = (VariableDeclarationNode) that;
+
+			return this.autoStorage == thatVar.hasAutoStorage()
+					&& this.registerStorage == thatVar.hasRegisterStorage()
+					&& this.threadLocalStorage == thatVar
+							.hasThreadLocalStorage();
+		}
+		return false;
+	}
 }

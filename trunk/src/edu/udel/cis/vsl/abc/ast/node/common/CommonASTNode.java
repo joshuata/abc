@@ -362,6 +362,30 @@ public abstract class CommonASTNode implements ASTNode {
 	}
 
 	@Override
+	public boolean equiv(ASTNode that) {
+		if (that == null)
+			return false;
+		if (!equivWork(that))
+			return false;
+		if (this.numChildren() != that.numChildren())
+			return false;
+		for (int i = 0; i < this.numChildren(); i++) {
+			ASTNode thisChild = this.child(i), thatChild = that.child(i);
+
+			if (thisChild != null) {
+				if (!thisChild.equiv(thatChild))
+					return false;
+			} else if (thatChild != null)
+				return false;
+		}
+		return true;
+	}
+
+	protected boolean equivWork(ASTNode that) {
+		return this.nodeKind() == that.nodeKind();
+	}
+
+	@Override
 	public String toString() {
 		return "Node[" + id + ", " + instanceId + ", "
 				+ source.getSummary(false) + "]";
