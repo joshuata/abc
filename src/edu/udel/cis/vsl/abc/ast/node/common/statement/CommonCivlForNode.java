@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
@@ -64,6 +65,13 @@ public class CommonCivlForNode extends CommonStatementNode implements
 			out.print("$parfor");
 		else
 			out.print("$for");
+	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof CivlForNode)
+			return this.isParallel == ((CivlForNode) that).isParallel();
+		return false;
 	}
 
 }

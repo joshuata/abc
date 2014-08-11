@@ -65,5 +65,4 @@ public class CommonOrdinaryLabelNode extends CommonDeclarationNode implements
 	public NodeKind nodeKind() {
 		return NodeKind.ORDINARY_LABEL;
 	}
-
 }

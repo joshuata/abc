@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
@@ -61,9 +62,19 @@ public abstract class CommonOrdinaryDeclarationNode extends
 		return BlockItemKind.ORDINARY_DECLARATION;
 	}
 
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof OrdinaryDeclarationNode) {
+			OrdinaryDeclarationNode thatDecl = (OrdinaryDeclarationNode) that;
+
+			return this.externStorage == thatDecl.hasExternStorage()
+					&& this.staticStorage == thatDecl.hasStaticStorage();
+		}
+		return false;
+	}
+
 	void copyStorage(OrdinaryDeclarationNode node) {
 		node.setExternStorage(hasExternStorage());
 		node.setStaticStorage(hasStaticStorage());
 	}
-
 }

@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.ast.node.common;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -51,6 +52,13 @@ public class CommonIdentifierNode extends CommonASTNode implements
 	@Override
 	public NodeKind nodeKind() {
 		return NodeKind.IDENTIFIER;
+	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof IdentifierNode)
+			return this.name.equals(((IdentifierNode) that).name());
+		return false;
 	}
 
 }

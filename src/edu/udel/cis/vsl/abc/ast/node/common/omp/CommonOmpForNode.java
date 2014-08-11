@@ -220,4 +220,16 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		newForNode.setSchedule(this.schedule);
 		return newForNode;
 	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof OmpForNode) {
+			OmpForNode thatFor = (OmpForNode) that;
+
+			return this.collapse == thatFor.collapse()
+					&& this.ordered == thatFor.ordered()
+					&& this.schedule == thatFor.schedule();
+		}
+		return false;
+	}
 }

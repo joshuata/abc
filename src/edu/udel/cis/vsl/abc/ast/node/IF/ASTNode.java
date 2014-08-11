@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.NoSuchElementException;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.ArrayDesignatorNode;
@@ -552,6 +553,15 @@ public interface ASTNode {
 	 *            the scope
 	 */
 	void setScope(Scope scope);
+
+	/**
+	 * Is the given AST node equivalent to me?
+	 * 
+	 * @param that
+	 *            The given AST node to be compared.
+	 * @return True iff this AST node is equivalent with that AST node.
+	 */
+	boolean equiv(ASTNode that);
 
 	/**
 	 * Returns a short textual representation of this node only.

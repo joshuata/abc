@@ -34,5 +34,4 @@ public class CommonCompoundStatementNode extends
 	public BlockItemKind blockItemKind() {
 		return BlockItemKind.STATEMENT;
 	}
-
 }

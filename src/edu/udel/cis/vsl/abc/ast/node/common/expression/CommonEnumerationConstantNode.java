@@ -35,4 +35,8 @@ public class CommonEnumerationConstantNode extends CommonConstantNode implements
 				duplicate(getName()));
 	}
 
+	@Override
+	public ConstantKind constantKind() {
+		return ConstantKind.ENUM;
+	}
 }

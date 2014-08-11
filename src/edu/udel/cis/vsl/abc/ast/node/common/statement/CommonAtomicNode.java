@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -59,5 +60,12 @@ public class CommonAtomicNode extends CommonStatementNode implements AtomicNode 
 	@Override
 	public boolean isAtom() {
 		return this.isAtom;
+	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof AtomicNode)
+			return this.isAtom == ((AtomicNode) that).isAtom();
+		return false;
 	}
 }

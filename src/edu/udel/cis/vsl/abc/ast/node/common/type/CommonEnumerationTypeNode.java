@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
@@ -95,6 +96,14 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 	@Override
 	public BlockItemKind blockItemKind() {
 		return BlockItemKind.ENUMERATOR;
+	}
+
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof EnumerationTypeNode)
+			return this.isDefinition == ((EnumerationTypeNode) that)
+					.isDefinition();
+		return false;
 	}
 
 }

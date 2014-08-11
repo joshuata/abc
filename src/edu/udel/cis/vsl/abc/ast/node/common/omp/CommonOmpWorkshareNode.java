@@ -67,4 +67,12 @@ public class CommonOmpWorkshareNode extends CommonOmpStatementNode implements
 		}
 	}
 
+	@Override
+	protected boolean equivWork(ASTNode that) {
+		if (that instanceof OmpWorksharingNode)
+			return this.ompWorkshareKind == ((OmpWorksharingNode) that)
+					.ompWorkshareNodeKind();
+		return false;
+	}
+
 }
