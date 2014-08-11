@@ -80,142 +80,105 @@ public class SimpleCudaAST {
 
 		// build the _block definition
 		SequenceNode<VariableDeclarationNode> blockFormals = nodeF
-				.newSequenceNode(source, "blockFormals",
-						new ArrayList<VariableDeclarationNode>() {
-							{
-								add(nodeF.newVariableDeclarationNode(source,
-										newId("blockIdx"), nodeF
-												.newTypedefNameNode(
-														newId("uint3"), null)));
-							}
-						});
+				.newSequenceNode(
+						source,
+						"blockFormals",
+						Arrays.asList(nodeF.newVariableDeclarationNode(source,
+								newId("blockIdx"),
+								nodeF.newTypedefNameNode(newId("uint3"), null))));
 		FunctionTypeNode blockType = nodeF.newFunctionTypeNode(source,
 				nodeF.newVoidTypeNode(source), blockFormals, false);
 
 		final FunctionCallNode runThreadsCall = nodeF.newFunctionCallNode(
-				source,
-				nodeF.newIdentifierExpressionNode(source, newId("_runProcs")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("blockDim")));
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("_thread")));
-					}
-				}, null);
+				source, nodeF.newIdentifierExpressionNode(source,
+						newId("_runProcs")), Arrays.<ExpressionNode> asList(
+						nodeF.newIdentifierExpressionNode(source,
+								newId("blockDim")), nodeF
+								.newIdentifierExpressionNode(source,
+										newId("_thread"))), null);
 		CompoundStatementNode blockBody = nodeF.newCompoundStatementNode(
-				source, new ArrayList<BlockItemNode>() {
-					{
-						add(threadDef);
-						add(nodeF.newExpressionStatementNode(runThreadsCall));
-					}
-				});
+				source,
+				Arrays.asList(threadDef,
+						nodeF.newExpressionStatementNode(runThreadsCall)));
 		final FunctionDefinitionNode blockDef = nodeF
 				.newFunctionDefinitionNode(source, newId("_block"), blockType,
 						null, blockBody);
 
 		// build the innerKernel definition
 		SequenceNode<VariableDeclarationNode> innerKernelFormals = nodeF
-				.newSequenceNode(source, "innerKernelFormals",
-						new ArrayList<VariableDeclarationNode>() {
-							{
-								add(nodeF.newVariableDeclarationNode(
+				.newSequenceNode(
+						source,
+						"innerKernelFormals",
+						Arrays.<VariableDeclarationNode> asList(
+								nodeF.newVariableDeclarationNode(
 										source,
 										newId("this"),
 										nodeF.newPointerTypeNode(
 												source,
 												nodeF.newTypedefNameNode(
 														newId("_kernelInstance"),
+														null))), nodeF
+										.newVariableDeclarationNode(source,
+												newId("e"),
+												nodeF.newTypedefNameNode(
+														newId("cudaEvent_t"),
 														null))));
-								add(nodeF.newVariableDeclarationNode(source,
-										newId("e"), nodeF.newTypedefNameNode(
-												newId("cudaEvent_t"), null)));
-							}
-						});
 		FunctionTypeNode innerKernelType = nodeF.newFunctionTypeNode(source,
 				nodeF.newVoidTypeNode(source), innerKernelFormals, false);
 		final FunctionCallNode waitInQueueCall = nodeF.newFunctionCallNode(
 				source, nodeF.newIdentifierExpressionNode(source,
 						newId("_waitInQueue")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("this")));
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("e")));
-					}
-				}, null);
+				Arrays.<ExpressionNode> asList(nodeF
+						.newIdentifierExpressionNode(source, newId("this")),
+						nodeF.newIdentifierExpressionNode(source, newId("e"))),
+				null);
 		final FunctionCallNode runBlocksCall = nodeF.newFunctionCallNode(
-				source,
-				nodeF.newIdentifierExpressionNode(source, newId("_runProcs")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("gridDim")));
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("_block")));
-					}
-				}, null);
+				source, nodeF.newIdentifierExpressionNode(source,
+						newId("_runProcs")), Arrays.<ExpressionNode> asList(
+						nodeF.newIdentifierExpressionNode(source,
+								newId("gridDim")), nodeF
+								.newIdentifierExpressionNode(source,
+										newId("_block"))), null);
 		final FunctionCallNode kernelFinishCall = nodeF.newFunctionCallNode(
 				source, nodeF.newIdentifierExpressionNode(source,
-						newId("_kernelFinish")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("this")));
-					}
-				}, null);
+						newId("_kernelFinish")), Arrays
+						.<ExpressionNode> asList(nodeF
+								.newIdentifierExpressionNode(source,
+										newId("this"))), null);
 		CompoundStatementNode innerKernelBody = nodeF.newCompoundStatementNode(
-				source, new ArrayList<BlockItemNode>() {
-					{
-						add(blockDef);
-						add(nodeF.newExpressionStatementNode(waitInQueueCall));
-						add(nodeF.newExpressionStatementNode(runBlocksCall));
-						add(nodeF.newExpressionStatementNode(kernelFinishCall));
-					}
-				});
+				source, Arrays.asList(blockDef,
+						nodeF.newExpressionStatementNode(waitInQueueCall),
+						nodeF.newExpressionStatementNode(runBlocksCall),
+						nodeF.newExpressionStatementNode(kernelFinishCall)));
 		final FunctionDefinitionNode innerKernelDef = nodeF
 				.newFunctionDefinitionNode(source, newId("_kernel"),
 						innerKernelType, null, innerKernelBody);
 
 		// build the kernel definition
 		SequenceNode<VariableDeclarationNode> kernelFormals = nodeF
-				.newSequenceNode(source, "kernelFormals",
-						new ArrayList<VariableDeclarationNode>() {
-							{
-								add(nodeF.newVariableDeclarationNode(source,
-										newId("gridDim"), nodeF
-												.newTypedefNameNode(
-														newId("dim3"), null)));
-								add(nodeF.newVariableDeclarationNode(source,
-										newId("blockDim"), nodeF
-												.newTypedefNameNode(
-														newId("dim3"), null)));
-								add(nodeF.newVariableDeclarationNode(source,
-										newId("s"), nodeF.newTypedefNameNode(
-												newId("cudaStream_t"), null)));
-							}
-						});
+				.newSequenceNode(source, "kernelFormals", Arrays.asList(nodeF
+						.newVariableDeclarationNode(source, newId("gridDim"),
+								nodeF.newTypedefNameNode(newId("dim3"), null)),
+						nodeF.newVariableDeclarationNode(source,
+								newId("blockDim"),
+								nodeF.newTypedefNameNode(newId("dim3"), null)),
+						nodeF.newVariableDeclarationNode(source, newId("s"),
+								nodeF.newTypedefNameNode(newId("cudaStream_t"),
+										null))));
 		FunctionTypeNode kernelType = nodeF.newFunctionTypeNode(source,
 				nodeF.newVoidTypeNode(source), kernelFormals, false);
 		final FunctionCallNode enqueueKernelCall = nodeF.newFunctionCallNode(
 				source, nodeF.newIdentifierExpressionNode(source,
-						newId("_enqueueKernel")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("s")));
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("_kernel")));
-					}
-				}, null);
+						newId("_enqueueKernel")), Arrays
+						.<ExpressionNode> asList(
+								nodeF.newIdentifierExpressionNode(source,
+										newId("s")), nodeF
+										.newIdentifierExpressionNode(source,
+												newId("_kernel"))), null);
 		CompoundStatementNode kernelBody = nodeF.newCompoundStatementNode(
-				source, new ArrayList<BlockItemNode>() {
-					{
-						add(innerKernelDef);
-						add(nodeF.newExpressionStatementNode(enqueueKernelCall));
-					}
-				});
+				source,
+				Arrays.asList(innerKernelDef,
+						nodeF.newExpressionStatementNode(enqueueKernelCall)));
 		final FunctionDefinitionNode kernelDef = nodeF
 				.newFunctionDefinitionNode(source, newId("_kernel_simple"),
 						kernelType, null, kernelBody);
@@ -226,48 +189,36 @@ public class SimpleCudaAST {
 						new ArrayList<VariableDeclarationNode>());
 		FunctionTypeNode innerMainType = nodeF.newFunctionTypeNode(source,
 				nodeF.newVoidTypeNode(source), innerMainFormals, false);
-		FunctionCallNode t1Init = nodeF.newFunctionCallNode(source,
-				nodeF.newIdentifierExpressionNode(source, newId("_toDim3")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIntegerConstantNode(source, "1"));
-					}
-				}, null);
+		FunctionCallNode t1Init = nodeF.newFunctionCallNode(source, nodeF
+				.newIdentifierExpressionNode(source, newId("_toDim3")), Arrays
+				.<ExpressionNode> asList(nodeF.newIntegerConstantNode(source,
+						"1")), null);
 		final VariableDeclarationNode t1Decl = nodeF
 				.newVariableDeclarationNode(source, newId("_t1"),
 						nodeF.newTypedefNameNode(newId("dim3"), null), t1Init);
-		FunctionCallNode t2Init = nodeF.newFunctionCallNode(source,
-				nodeF.newIdentifierExpressionNode(source, newId("_toDim3")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIntegerConstantNode(source, "1"));
-					}
-				}, null);
+		FunctionCallNode t2Init = nodeF.newFunctionCallNode(source, nodeF
+				.newIdentifierExpressionNode(source, newId("_toDim3")), Arrays
+				.<ExpressionNode> asList(nodeF.newIntegerConstantNode(source,
+						"1")), null);
 		final VariableDeclarationNode t2Decl = nodeF
 				.newVariableDeclarationNode(source, newId("_t2"),
 						nodeF.newTypedefNameNode(newId("dim3"), null), t2Init);
-		final FunctionCallNode kernelCall = nodeF.newFunctionCallNode(source,
-				nodeF.newIdentifierExpressionNode(source,
-						newId("_kernel_simple")),
-				new ArrayList<ExpressionNode>() {
-					{
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("_t1")));
-						add(nodeF.newIdentifierExpressionNode(source,
-								newId("_t2")));
-						add(nodeF.newIntegerConstantNode(source, "0"));
-					}
-				}, null);
+		final FunctionCallNode kernelCall = nodeF
+				.newFunctionCallNode(source, nodeF.newIdentifierExpressionNode(
+						source, newId("_kernel_simple")),
+						Arrays.asList(nodeF.newIdentifierExpressionNode(source,
+								newId("_t1")), nodeF
+								.newIdentifierExpressionNode(source,
+										newId("_t2")), nodeF
+								.newIntegerConstantNode(source, "0")), null);
 		CompoundStatementNode innerMainBody = nodeF.newCompoundStatementNode(
-				source, new ArrayList<BlockItemNode>() {
-					{
-						add(t1Decl);
-						add(t2Decl);
-						add(nodeF.newExpressionStatementNode(kernelCall));
-						add(nodeF.newReturnNode(source,
-								nodeF.newIntegerConstantNode(source, "0")));
-					}
-				});
+				source,
+				Arrays.asList(
+						t1Decl,
+						t2Decl,
+						nodeF.newExpressionStatementNode(kernelCall),
+						nodeF.newReturnNode(source,
+								nodeF.newIntegerConstantNode(source, "0"))));
 		final FunctionDefinitionNode innerMainDef = nodeF
 				.newFunctionDefinitionNode(source, newId("_main"),
 						innerMainType, null, innerMainBody);
@@ -289,26 +240,18 @@ public class SimpleCudaAST {
 				source, nodeF.newIdentifierExpressionNode(source,
 						newId("_cudaFinalize")),
 				new ArrayList<ExpressionNode>(), null);
-		CompoundStatementNode mainBody = nodeF.newCompoundStatementNode(source,
-				new ArrayList<BlockItemNode>() {
-					{
-						add(innerMainDef);
-						add(nodeF.newExpressionStatementNode(cudaInitCall));
-						add(nodeF.newExpressionStatementNode(innerMainCall));
-						add(nodeF.newExpressionStatementNode(cudaFinalizeCall));
-					}
-				});
+		CompoundStatementNode mainBody = nodeF.newCompoundStatementNode(
+				source,
+				Arrays.asList(innerMainDef,
+						nodeF.newExpressionStatementNode(cudaInitCall),
+						nodeF.newExpressionStatementNode(innerMainCall),
+						nodeF.newExpressionStatementNode(cudaFinalizeCall)));
 		final FunctionDefinitionNode mainDef = nodeF.newFunctionDefinitionNode(
 				source, newId("main"), mainType, null, mainBody);
 
 		// build the AST
 		AST ast = astF.newAST(nodeF.newSequenceNode(source, "definitions",
-				new ArrayList<ExternalDefinitionNode>() {
-					{
-						add(kernelDef);
-						add(mainDef);
-					}
-				}));
+				Arrays.<ExternalDefinitionNode> asList(kernelDef, mainDef)));
 
 		ast.print(System.out);
 	}
