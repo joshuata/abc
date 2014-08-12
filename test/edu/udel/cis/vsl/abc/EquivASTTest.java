@@ -15,7 +15,7 @@ import edu.udel.cis.vsl.abc.program.IF.Program;
 
 public class EquivASTTest {
 
-	private static boolean debug = true;
+	private static boolean debug = false;
 
 	private static File[] systemIncludes = new File[0];
 
