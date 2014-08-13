@@ -41,6 +41,11 @@ public abstract class CommonIntegerType extends CommonObjectType implements
 	}
 
 	@Override
+	public boolean equivalentTo(Type type) {
+		return equals(type);
+	}
+
+	@Override
 	public boolean isVariablyModified() {
 		return false;
 	}

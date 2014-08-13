@@ -1,11 +1,16 @@
 package edu.udel.cis.vsl.abc.program.common;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.util.IF.Pair;
 
 /**
  * <p>
@@ -16,6 +21,12 @@ import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
  * @author siegel
  */
 public class TaggedEntityInfo extends EntityInfo {
+
+	/**
+	 * Translation unit ID-Entity pairs for all tagged entities sharing the name
+	 * corresponding to this info object.
+	 */
+	private ArrayList<Pair<Integer, TaggedEntity>> entityPairs = new ArrayList<>();
 
 	/**
 	 * Information about those entities using the tag and which are structs.
@@ -39,67 +50,80 @@ public class TaggedEntityInfo extends EntityInfo {
 	 * @param tag
 	 *            the tag
 	 */
-	public TaggedEntityInfo(String tag) {
-		super(tag);
+	public TaggedEntityInfo(String tag, int numTranslationUnits) {
+		super(tag, numTranslationUnits);
 		structInfo = new TagCategoryInfo(this);
 		unionInfo = new TagCategoryInfo(this);
 		enumInfo = new TagCategoryInfo(this);
 	}
 
-	/**
-	 * Determines whether no renamings are necessary. If this returns
-	 * <code>true</code> all uses of the tag are compatible, so there is no need
-	 * to rename. However, you still need to nullify every definition after the
-	 * first.
-	 * 
-	 * @return
-	 */
-	private boolean isConsistent() {
-		if (structInfo.isConsistent() && unionInfo.isConsistent()
-				&& enumInfo.isConsistent()) {
-			int numEmpty = 0;
+	boolean isExclusive() {
+		int numEmpty = 0;
 
-			if (structInfo.isEmpty())
-				numEmpty++;
-			if (unionInfo.isEmpty())
-				numEmpty++;
-			if (enumInfo.isEmpty())
-				numEmpty++;
-			return numEmpty >= 2;
-		}
-		return false;
+		if (structInfo.isEmpty())
+			numEmpty++;
+		if (unionInfo.isEmpty())
+			numEmpty++;
+		if (enumInfo.isEmpty())
+			numEmpty++;
+		return numEmpty >= 2;
+	}
+
+	// /**
+	// * Determines whether no renamings are necessary. If this returns
+	// * <code>true</code> all uses of the tag are compatible, so there is no
+	// need
+	// * to rename. However, you still need to nullify every definition after
+	// the
+	// * first.
+	// *
+	// * @return
+	// */
+	// private boolean isConsistent() {
+	// if (structInfo.isConsistent() && unionInfo.isConsistent()
+	// && enumInfo.isConsistent()) {
+	// return isExclusive();
+	// }
+	// return false;
+	// }
+
+	ArrayList<Pair<Integer, TaggedEntity>> getEntityPairs() {
+		return entityPairs;
 	}
 
 	@Override
 	protected void addEntity(int tuid, Entity entity) {
 		TaggedEntity taggedEntity = (TaggedEntity) entity;
+		Pair<Integer, TaggedEntity> pair = new Pair<>(tuid, taggedEntity);
 		Type type = entity.getType();
 		TypeKind kind = type.kind();
 
+		entityPairs.add(pair);
 		if (kind == TypeKind.STRUCTURE_OR_UNION) {
 			if (((StructureOrUnionType) type).isStruct())
-				structInfo.add(tuid, taggedEntity);
+				structInfo.add(pair);
 			else
-				unionInfo.add(tuid, taggedEntity);
+				unionInfo.add(pair);
 		} else if (kind == TypeKind.ENUMERATION)
-			enumInfo.add(tuid, taggedEntity);
+			enumInfo.add(pair);
 		else
 			throw new ABCRuntimeException("Unreachable");
 	}
 
-	@Override
-	public void computeActions(Plan[] plans) {
-		if (isConsistent()) {
-			if (!structInfo.isEmpty())
-				structInfo.addDefDelActions(plans);
-			else if (!enumInfo.isEmpty())
-				enumInfo.addDefDelActions(plans);
-			else if (!unionInfo.isEmpty())
-				unionInfo.addDefDelActions(plans);
-		} else {
-			structInfo.addActions(plans);
-			unionInfo.addActions(plans);
-			enumInfo.addActions(plans);
-		}
+	public void computeActions(Plan[] plans,
+			Map<Enumeration, Integer> enumMergeMap) {
+		structInfo.addActions(plans);
+		unionInfo.addActions(plans);
+		enumInfo.addToEnumMergeMap(enumMergeMap);
+		enumInfo.addActions(plans);
+	}
+
+	public boolean merge() {
+		boolean result = false;
+
+		result = result || enumInfo.merge();
+		result = result || structInfo.merge();
+		result = result || unionInfo.merge();
+		return result;
 	}
 }
