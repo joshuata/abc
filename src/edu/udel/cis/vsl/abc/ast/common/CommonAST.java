@@ -37,7 +37,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -46,7 +45,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
@@ -338,14 +336,13 @@ public class CommonAST implements AST {
 			case "stdio.h":
 			case "stdlib.h":
 			case "string.h":
-			case "time.h":
 				headers.add(sourceFile);
 				return;
 			case "civlc-common.cvh":
 			case "bundle-common.cvh":
 			case "comm-common.cvh":
 			case "concurrency-common.cvh":
-			case "omp.cvl":
+			case "omp.cvh":
 			case "pointer-common.cvh":
 			case "scope-common.cvh":
 			case "seq-common.cvh":
@@ -361,8 +358,6 @@ public class CommonAST implements AST {
 			case "mpi.cvl":
 			case "pthread-c.cvl":
 			case "pthread.cvl":
-			case "time-common.h":
-			case "math.cvl":
 				return;
 			default:
 			}
@@ -1215,16 +1210,17 @@ public class CommonAST implements AST {
 	}
 
 	private StringBuffer initializer2CIVL(InitializerNode init) {
-		if (init instanceof CompoundInitializerNode) {
-			CompoundInitializerNode compoundInit = (CompoundInitializerNode) init;
+		StringBuffer result = new StringBuffer();
 
-			return this.compoundLiteralObject2CIVL(init.getSource(),
-					compoundInit.getType(), compoundInit.getLiteralObject());
-		} else if (init instanceof ExpressionNode)
+		if (init instanceof ExpressionNode)
 			return expression2CIVL((ExpressionNode) init);
-		else
+		else if (init instanceof CompoundInitializerNode) {
+
+		} else
 			throw new ABCRuntimeException("Invalid initializer: "
 					+ init.toString());
+
+		return result;
 	}
 
 	private StringBuffer compoundLiteralObject2CIVL(Source source, Type type,
@@ -1321,10 +1317,9 @@ public class CommonAST implements AST {
 			result.append(expression2CIVL(cast.getArgument()));
 			break;
 		}
-		case COMPOUND_LITERAL: 
-			result.append(this.compoundLiteralNode2CIVL( 
-					(CompoundLiteralNode)expression));
+		case COMPOUND_LITERAL: {
 			break;
+		}
 		case CONSTANT: {
 			String constant = ((ConstantNode) expression)
 					.getStringRepresentation();
@@ -1361,33 +1356,9 @@ public class CommonAST implements AST {
 			result.append("$spawn ");
 			result.append(functionCall2CIVL(((SpawnNode) expression).getCall()));
 			break;
-		case REGULAR_RANGE:
-			result.append(regularRange2CIVL((RegularRangeNode) expression));
-			break;
 		default:
 			throw new ABCUnsupportedException("translating expression node of "
 					+ kind + " kind into CIVL code");
-		}
-		return result;
-	}
-
-	private StringBuffer compoundLiteralNode2CIVL(CompoundLiteralNode expression) {
-		StringBuffer result = new StringBuffer();
-		
-		
-		return result;
-	}
-
-	private StringBuffer regularRange2CIVL(RegularRangeNode range) {
-		StringBuffer result = new StringBuffer();
-		ExpressionNode step = range.getStep();
-
-		result.append(this.expression2CIVL(range.getLow()));
-		result.append(" .. ");
-		result.append(this.expression2CIVL(range.getHigh()));
-		if (step != null) {
-			result.append(" # ");
-			result.append(this.expression2CIVL(step));
 		}
 		return result;
 	}
@@ -1599,10 +1570,10 @@ public class CommonAST implements AST {
 			ArrayTypeNode arrayType = (ArrayTypeNode) type;
 			ExpressionNode extent = arrayType.getExtent();
 
-			// result.append("(");
+			//result.append("(");
 			result.append(type2CIVL(prefix, arrayType.getElementType(),
 					isTypeDeclaration));
-			// result.append(")");
+			//result.append(")");
 			result.append("[");
 			if (extent != null)
 				result.append(expression2CIVL(extent));
@@ -1682,9 +1653,6 @@ public class CommonAST implements AST {
 			result.append(")");
 			break;
 		}
-		case RANGE:
-			result.append("$range");
-			break;
 		default:
 			throw new ABCUnsupportedException("translating type node of "
 					+ kind + " kind into CIVL code");

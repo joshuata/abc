@@ -13,22 +13,21 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 public class CommonDerivativeExpressionNode extends CommonExpressionNode
 		implements DerivativeExpressionNode {
 
-	// private ExpressionNode function;
-	//
-	// private SequenceNode<PairNode<IdentifierExpressionNode,
-	// IntegerConstantNode>> partials;
-	//
-	// private SequenceNode<ExpressionNode> arguments;
+	private ExpressionNode function;
+
+	private SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials;
+
+	private SequenceNode<ExpressionNode> arguments;
 
 	public CommonDerivativeExpressionNode(
 			Source source,
 			ExpressionNode function,
 			SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>> partials,
 			SequenceNode<ExpressionNode> arguments) {
-		super(source, function, partials, arguments);
-		// this.function = function;
-		// this.partials = partials;
-		// this.arguments = arguments;
+		super(source, function, arguments);
+		this.function = function;
+		this.partials = partials;
+		this.arguments = arguments;
 	}
 
 	@Override
@@ -43,43 +42,35 @@ public class CommonDerivativeExpressionNode extends CommonExpressionNode
 
 	@Override
 	public ExpressionNode getFunction() {
-		return (ExpressionNode) this.child(0);
+		return function;
 	}
 
 	@Override
 	public int getNumberOfArguments() {
-		return this.child(2).numChildren();
+		return arguments.numChildren();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public ExpressionNode getArgument(int index) {
-		return ((SequenceNode<ExpressionNode>) this.child(2))
-				.getSequenceChild(index);
+		return arguments.getSequenceChild(index);
 	}
 
 	@Override
 	public int getNumberOfPartials() {
-		return this.child(1).numChildren();
+		return partials.numChildren();
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public PairNode<IdentifierExpressionNode, IntegerConstantNode> getPartial(
 			int index) {
-		return ((SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>>) this
-				.child(1)).getSequenceChild(index);
+		return partials.getSequenceChild(index);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public DerivativeExpressionNode copy() {
-		return new CommonDerivativeExpressionNode(
-				getSource(),
-				duplicate(this.getFunction()),
-				(SequenceNode<PairNode<IdentifierExpressionNode, IntegerConstantNode>>) duplicate(this
-						.child(1)),
-				(SequenceNode<ExpressionNode>) duplicate(this.child(2)));
+		return new CommonDerivativeExpressionNode(getSource(),
+				duplicate(getFunction()), duplicate(partials),
+				duplicate(arguments));
 	}
 
 	@Override
@@ -97,4 +88,5 @@ public class CommonDerivativeExpressionNode extends CommonExpressionNode
 		}
 		return true;
 	}
+
 }

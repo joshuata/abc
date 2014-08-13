@@ -18,26 +18,6 @@ public class CommonStringLiteral implements StringLiteral {
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object)
-			return true;
-		if (object instanceof CommonStringLiteral) {
-			CommonStringLiteral that = (CommonStringLiteral) object;
-			int numChars = getNumCharacters();
-
-			if (stringKind != that.stringKind
-					|| getNumCharacters() != that.getNumCharacters())
-				return false;
-			for (int i = 0; i < numChars; i++) {
-				if (!this.getCharacter(i).equals(that.getCharacter(i)))
-					return false;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public int getNumCharacters() {
 		return characters.size();
 	}

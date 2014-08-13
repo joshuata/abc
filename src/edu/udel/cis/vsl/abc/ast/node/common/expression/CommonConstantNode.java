@@ -1,9 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public abstract class CommonConstantNode extends CommonExpressionNode implements
@@ -36,32 +34,14 @@ public abstract class CommonConstantNode extends CommonExpressionNode implements
 	public boolean isConstantExpression() {
 		return true;
 	}
-
+	
 	@Override
-	public ExpressionKind expressionKind() {
+	public ExpressionKind expressionKind(){
 		return ExpressionKind.CONSTANT;
 	}
-
+	
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		return true;
-	}
-
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof ConstantNode) {
-			ConstantNode thatConst = (ConstantNode) that;
-			Value thisValue = this.getConstantValue(), thatValue = ((ConstantNode) that)
-					.getConstantValue();
-
-			if (thatConst.constantKind() != this.constantKind())
-				return false;
-			if (thisValue != null)
-				return thisValue.equals(thatValue);
-			else if (thatValue != null)
-				return false;
-			return true;
-		}
-		return false;
 	}
 }

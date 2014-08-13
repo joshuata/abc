@@ -49,9 +49,4 @@ public class CommonProcessType extends CommonObjectType implements
 		return true;
 	}
 
-	@Override
-	public boolean equivalentTo(Type type) {
-		return type instanceof CommonProcessType;
-	}
-
 }

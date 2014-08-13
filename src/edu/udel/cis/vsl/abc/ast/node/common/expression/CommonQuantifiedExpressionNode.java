@@ -1,9 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
-import java.util.Arrays;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
@@ -21,13 +19,12 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 		implements QuantifiedExpressionNode {
 
 	private Quantifier quantifier;
-	// private VariableDeclarationNode variable;
-	// private ExpressionNode restriction;
+	private VariableDeclarationNode variable;
+	private ExpressionNode restriction;
 	private boolean isRange;
-
-	// private ExpressionNode lower;
-	// private ExpressionNode upper;
-	// private ExpressionNode expression;
+	private ExpressionNode lower;
+	private ExpressionNode upper;
+	private ExpressionNode expression;
 
 	/**
 	 * @param source
@@ -43,14 +40,13 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	public CommonQuantifiedExpressionNode(Source source, Quantifier quantifier,
 			VariableDeclarationNode variable, ExpressionNode restriction,
 			ExpressionNode expression) {
-		super(source, Arrays.asList(variable, restriction, expression, null,
-				null));
+		super(source, variable, restriction, expression);
 		this.quantifier = quantifier;
-		// this.variable = variable;
-		// this.restriction = restriction;
-		// this.expression = expression;
-		// this.lower = null;
-		// this.upper = null;
+		this.variable = variable;
+		this.restriction = restriction;
+		this.expression = expression;
+		this.lower = null;
+		this.upper = null;
 		isRange = false;
 	}
 
@@ -72,51 +68,89 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	public CommonQuantifiedExpressionNode(Source source, Quantifier quantifier,
 			VariableDeclarationNode variable, ExpressionNode lower,
 			ExpressionNode upper, ExpressionNode expression) {
-		// super(source, variable, upper, expression);
-		super(source, Arrays.asList(variable, null, expression, lower, upper));
+		super(source, variable, upper, expression);
 		this.quantifier = quantifier;
-		// this.variable = variable;
-		// this.lower = lower;
-		// this.upper = upper;
-		// this.expression = expression;
-		// this.restriction = null;
+		this.variable = variable;
+		this.lower = lower;
+		this.upper = upper;
+		this.expression = expression;
+		this.restriction = null;
 		isRange = true;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode#
+	 * isConstantExpression()
+	 */
 	@Override
 	public boolean isConstantExpression() {
 		return false;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode#copy()
+	 */
 	@Override
 	public ExpressionNode copy() {
 		if (isRange()) {
 			return new CommonQuantifiedExpressionNode(this.getSource(),
-					quantifier, variable().copy(), lower().copy(), upper()
-							.copy(), expression().copy());
+					quantifier, variable.copy(), lower.copy(), upper.copy(),
+					expression.copy());
 		}
 		return new CommonQuantifiedExpressionNode(this.getSource(), quantifier,
-				variable().copy(), restriction().copy(), expression().copy());
+				variable.copy(), restriction.copy(), expression.copy());
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode#
+	 * quantifier()
+	 */
 	@Override
 	public Quantifier quantifier() {
 		return quantifier;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode#
+	 * variable()
+	 */
 	@Override
 	public VariableDeclarationNode variable() {
-		return (VariableDeclarationNode) this.child(0);
+		return variable;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode#
+	 * restriction()
+	 */
 	@Override
 	public ExpressionNode restriction() {
-		return (ExpressionNode) this.child(1);
+		return restriction;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode#
+	 * expression()
+	 */
 	@Override
 	public ExpressionNode expression() {
-		return (ExpressionNode) this.child(2);
+		return expression;
 	}
 
 	/*
@@ -156,39 +190,27 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 
 	@Override
 	public ExpressionNode lower() {
-		return (ExpressionNode) this.child(3);
+		return lower;
 	}
 
 	@Override
 	public ExpressionNode upper() {
-		return (ExpressionNode) this.child(4);
+		return upper;
 	}
 
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		boolean result = expression().isSideEffectFree(errorsAreSideEffects);
 
-		if (this.restriction() == null) {
-			result = result
-					&& this.lower().isSideEffectFree(errorsAreSideEffects)
-					&& this.upper().isSideEffectFree(errorsAreSideEffects);
+		if (restriction == null) {
+			result = result && lower.isSideEffectFree(errorsAreSideEffects)
+					&& upper.isSideEffectFree(errorsAreSideEffects);
 		} else {
 			result = result
-					&& this.restriction()
-							.isSideEffectFree(errorsAreSideEffects);
+					&& restriction.isSideEffectFree(errorsAreSideEffects);
 		}
 		return result;
 	}
-
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof QuantifiedExpressionNode) {
-			QuantifiedExpressionNode thatQuan = (QuantifiedExpressionNode) that;
-
-			return this.isRange == thatQuan.isRange()
-					&& this.quantifier == thatQuan.quantifier();
-		}
-		return false;
-	}
-
+	
+	
 }

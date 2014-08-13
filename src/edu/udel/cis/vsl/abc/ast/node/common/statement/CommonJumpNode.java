@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.JumpNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -48,13 +47,6 @@ public class CommonJumpNode extends CommonStatementNode implements JumpNode {
 	@Override
 	public StatementKind statementKind() {
 		return StatementKind.JUMP;
-	}
-
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof JumpNode)
-			return this.jumpKind == ((JumpNode) that).getKind();
-		return false;
 	}
 
 }

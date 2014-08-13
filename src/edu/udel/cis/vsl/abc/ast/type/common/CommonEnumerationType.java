@@ -151,61 +151,6 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof CommonEnumerationType) {
-			CommonEnumerationType that = (CommonEnumerationType) type;
-
-			if (tag == null) {
-				if (that.tag != null)
-					return false;
-			} else if (!this.tag.equals(that.tag))
-				return false;
-			if (enumerators == null) {
-				if (that.enumerators != null)
-					return false;
-			} else {
-				int numEnumerators = enumerators.size();
-
-				if (that.enumerators == null)
-					return false;
-				if (numEnumerators != that.enumerators.size())
-					return false;
-				for (int i = 0; i < numEnumerators; i++) {
-					Enumerator enum1 = enumerators.get(i);
-					Enumerator enum2 = that.enumerators.get(i);
-
-					if (enum1 == null) {
-						if (enum2 != null)
-							return false;
-					} else {
-						String name1 = enum1.getName(), name2;
-						Value value1 = enum1.getValue(), value2;
-
-						if (enum2 == null)
-							return false;
-						name2 = enum2.getName();
-						if (name1 == null) {
-							if (name2 != null)
-								return false;
-						} else if (!name1.equals(name2))
-							return false;
-						value2 = enum2.getValue();
-						if (value1 == null) {
-							if (value2 != null)
-								return false;
-						} else if (!value1.equals(value2))
-							return false;
-					}
-				}
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
 	public String toString() {
 		return "EnumerationType[tag=" + tag + "]";
 	}

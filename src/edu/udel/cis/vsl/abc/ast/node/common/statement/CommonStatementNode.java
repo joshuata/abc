@@ -35,12 +35,4 @@ public abstract class CommonStatementNode extends CommonASTNode implements
 		return NodeKind.STATEMENT;
 	}
 
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof StatementNode)
-			return this.statementKind() == ((StatementNode) that)
-					.statementKind();
-		return false;
-	}
-
 }

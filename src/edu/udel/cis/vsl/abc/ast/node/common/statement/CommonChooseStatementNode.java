@@ -47,4 +47,5 @@ public class CommonChooseStatementNode extends
 	public BlockItemKind blockItemKind() {
 		return BlockItemKind.STATEMENT;
 	}
+
 }

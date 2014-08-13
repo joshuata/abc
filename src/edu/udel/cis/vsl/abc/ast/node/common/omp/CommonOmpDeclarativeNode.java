@@ -75,4 +75,5 @@ public class CommonOmpDeclarativeNode extends CommonOmpNode implements
 		return new CommonOmpDeclarativeNode(getSource(), this.variables()
 				.copy());
 	}
+
 }

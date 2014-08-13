@@ -35,11 +35,6 @@ public class CommonVoidType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		return type instanceof CommonVoidType;
-	}
-
-	@Override
 	public boolean compatibleWith(Type type) {
 		return equals(type);
 	}

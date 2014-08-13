@@ -44,4 +44,5 @@ public class CommonOmpFunctionReductionNode extends CommonOmpReductionNode
 	public SequenceNode<IdentifierExpressionNode> variables() {
 		return (SequenceNode<IdentifierExpressionNode>) this.child(1);
 	}
+
 }

@@ -4,7 +4,6 @@ import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
@@ -121,17 +120,6 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 	@Override
 	public BlockItemKind blockItemKind() {
 		return BlockItemKind.STRUCT_OR_UNION;
-	}
-
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof StructureOrUnionTypeNode) {
-			StructureOrUnionTypeNode thatType = (StructureOrUnionTypeNode) that;
-
-			return this.isDefinition == thatType.isDefinition()
-					&& this.isStruct == thatType.isStruct();
-		}
-		return false;
 	}
 
 }

@@ -35,11 +35,6 @@ public class CommonScopeType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		return type instanceof CommonScopeType;
-	}
-
-	@Override
 	public boolean compatibleWith(Type type) {
 		return equals(type);
 	}

@@ -50,4 +50,5 @@ public class CommonCompoundLiteralNode extends CommonExpressionNode implements
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		return getInitializerList().isSideEffectFree(errorsAreSideEffects);
 	}
+
 }

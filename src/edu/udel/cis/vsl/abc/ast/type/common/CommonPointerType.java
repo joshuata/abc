@@ -50,18 +50,6 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 		return false;
 	}
 
-	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof CommonPointerType) {
-			CommonPointerType that = (CommonPointerType) type;
-
-			return referencedType.equivalentTo(that.referencedType);
-		}
-		return false;
-	}
-
 	/**
 	 * "For two pointer types to be compatible, both shall be identically
 	 * qualified and both shall be pointers to compatible types."

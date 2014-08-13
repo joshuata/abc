@@ -65,8 +65,4 @@ public class CommonFloatingConstantNode extends CommonConstantNode implements
 				exponent(), getConstantValue());
 	}
 
-	@Override
-	public ConstantKind constantKind() {
-		return ConstantKind.FLOAT;
-	}
 }

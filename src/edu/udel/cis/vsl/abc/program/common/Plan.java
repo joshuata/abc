@@ -36,29 +36,14 @@ public class Plan {
 	}
 
 	public void addMakeIncompleteAction(TaggedEntity entity) {
-
-		// System.out.println("Adding incompletion action for " + entity
-		// + " def: " + entity.getDefinition());
-		// System.out.flush();
-
 		defDeleteSet.add(entity);
 	}
 
 	public void addRenameAction(Entity entity, String newName) {
-
-		// System.out.println("Adding rename action for " + entity + " def: "
-		// + entity.getDefinition() + " new name " + newName);
-		// System.out.flush();
-
 		renameMap.put(entity, newName);
 	}
 
 	public void addEntityRemoveAction(Entity entity) {
-
-		// System.out.println("Adding removal action for " + entity + " def: "
-		// + entity.getDefinition());
-		// System.out.flush();
-
 		entityRemoveSet.add(entity);
 	}
 

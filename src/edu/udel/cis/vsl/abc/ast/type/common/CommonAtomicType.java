@@ -77,16 +77,4 @@ public class CommonAtomicType extends CommonObjectType implements AtomicType {
 		return baseType.isScalar();
 	}
 
-	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof CommonAtomicType) {
-			CommonAtomicType that = (CommonAtomicType) type;
-
-			return baseType.equivalentTo(that.baseType);
-		}
-		return false;
-	}
-
 }

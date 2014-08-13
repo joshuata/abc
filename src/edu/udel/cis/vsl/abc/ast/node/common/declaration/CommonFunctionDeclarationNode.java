@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 import java.io.PrintStream;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
@@ -121,16 +120,4 @@ public class CommonFunctionDeclarationNode extends
 		return OrdinaryDeclarationKind.FUNCTION_DECLARATION;
 	}
 
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof FunctionDeclarationNode) {
-			FunctionDeclarationNode thatFunction = (FunctionDeclarationNode) that;
-
-			return this.inlineFunctionSpecifier == thatFunction
-					.hasInlineFunctionSpecifier()
-					&& this.noreturnFunctionSpecifier == thatFunction
-							.hasNoreturnFunctionSpecifier();
-		}
-		return false;
-	}
 }

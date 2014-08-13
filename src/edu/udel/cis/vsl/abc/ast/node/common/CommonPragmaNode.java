@@ -8,7 +8,6 @@ import java.util.List;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
@@ -100,26 +99,6 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 	@Override
 	public BlockItemKind blockItemKind() {
 		return BlockItemKind.PRAGMA;
-	}
-
-	@Override
-	protected boolean equivWork(ASTNode that) {
-		if (that instanceof PragmaNode) {
-			PragmaNode thatPragma = (PragmaNode) that;
-			int numTokens = this.getNumTokens();
-
-			if (numTokens != thatPragma.getNumTokens())
-				return false;
-			for (int i = 0; i < numTokens; i++) {
-				CToken thisToken = this.getToken(i), thatToken = thatPragma
-						.getToken(i);
-
-				if (!thisToken.getText().equals(thatToken.getText()))
-					return false;
-			}
-			return true;
-		}
-		return false;
 	}
 }
 
