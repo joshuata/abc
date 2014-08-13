@@ -94,4 +94,9 @@ public class CommonDomainType extends CommonObjectType implements DomainType {
 		return true;
 	}
 
+	@Override
+	public boolean equivalentTo(Type type) {
+		return equals(type);
+	}
+
 }

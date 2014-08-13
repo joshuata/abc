@@ -189,6 +189,62 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	}
 
 	@Override
+	public boolean equivalentTo(Type type) {
+		if (type instanceof CommonStructureOrUnionType) {
+			CommonStructureOrUnionType that = (CommonStructureOrUnionType) type;
+
+			if (this.tag != null) {
+				if (!this.tag.equals(that.tag))
+					return false;
+			} else {
+				if (that.tag != null)
+					return false;
+			}
+			if (!this.isComplete()) {
+				if (that.isComplete())
+					return false;
+			} else {
+				if (!that.isComplete())
+					return false;
+				else {
+					int numFields = this.getNumFields();
+
+					if (numFields != that.getNumFields())
+						return false;
+					for (int i = 0; i < numFields; i++) {
+						Field thisField = this.getField(i);
+						Field thatField = that.getField(i);
+						String thisName = thisField.getName();
+						String thatName = thatField.getName();
+						ObjectType thisType = thisField.getType();
+						ObjectType thatType = thatField.getType();
+						Value thisWidth = thisField.getBitWidth();
+						Value thatWidth = thatField.getBitWidth();
+
+						if (thisName == null) {
+							if (thatName != null)
+								return false;
+						} else if (!thisName.equals(thatName))
+							return false;
+						if (thisType == null) {
+							if (thatType != null)
+								return false;
+						} else if (!thisType.equivalentTo(thatType))
+							return false;
+						if (thisWidth == null) {
+							if (thatWidth != null)
+								return false;
+						} else if (!thisWidth.equals(thatWidth))
+							return false;
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public Field getField(String fieldName) {
 		return fieldMap.get(fieldName);
 	}
