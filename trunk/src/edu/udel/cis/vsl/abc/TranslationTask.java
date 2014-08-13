@@ -67,6 +67,11 @@ public class TranslationTask {
 	private List<String> transformCodes;
 
 	/**
+	 * Show symbol and type tables.
+	 */
+	private boolean showTables;
+
+	/**
 	 * Construcs a new task with language C, empty system and user include
 	 * paths, output stream {@link System#out}, not preproc only, verbose, no
 	 * files, no transform codes.
@@ -81,6 +86,7 @@ public class TranslationTask {
 		prettyPrint = false;
 		files = null;
 		transformCodes = new LinkedList<>();
+		showTables = false;
 	}
 
 	public TranslationTask(Language language, File[] files) {
@@ -93,6 +99,7 @@ public class TranslationTask {
 		verbose = true;
 		prettyPrint = false;
 		transformCodes = new LinkedList<>();
+		showTables = false;
 	}
 
 	public TranslationTask(Language language, File file) {
@@ -222,6 +229,14 @@ public class TranslationTask {
 
 	public void setPrettyPrint(boolean value) {
 		this.prettyPrint = value;
+	}
+
+	public boolean doShowTables() {
+		return showTables;
+	}
+
+	public void setShowTables(boolean value) {
+		this.showTables = value;
 	}
 
 }

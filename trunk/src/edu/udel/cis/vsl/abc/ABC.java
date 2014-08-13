@@ -96,6 +96,8 @@ public class ABC {
 		out.println("  verbose mode, show all processing steps");
 		out.println("-p");
 		out.println("  pretty print programs in original language");
+		out.println("-t");
+		out.println("  show symbol and type tables");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
 		for (String code : Transform.getCodes()) {
@@ -127,6 +129,7 @@ public class ABC {
 		boolean preprocOnly = false;
 		boolean verbose = false;
 		boolean pretty = false;
+		boolean tables = false; // show symbol and type tables
 		List<String> transformCodes = new LinkedList<>();
 		Language language = null;
 		TranslationTask result = new TranslationTask();
@@ -180,6 +183,8 @@ public class ABC {
 				verbose = true;
 			} else if (arg.equals("-p")) {
 				pretty = true;
+			} else if (arg.equals("-t")) {
+				tables = true;
 			} else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
 					language = Language.C;
@@ -215,6 +220,7 @@ public class ABC {
 				.get(0)) : language);
 		result.setVerbose(verbose);
 		result.setPrettyPrint(pretty);
+		result.setShowTables(tables);
 		result.setPreprocOnly(preprocOnly);
 		result.addAllTransformCodes(transformCodes);
 		return result;
