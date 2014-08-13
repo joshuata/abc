@@ -1,5 +1,5 @@
 /*
- * test1.c and test2.c become equivalent after pruner is applied.
+ * test1_0.c and test1_1.c become equivalent after pruner is applied.
 */
 
 #include<stdio.h>

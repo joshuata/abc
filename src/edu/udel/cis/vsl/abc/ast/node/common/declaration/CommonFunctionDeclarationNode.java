@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -122,15 +124,18 @@ public class CommonFunctionDeclarationNode extends
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof FunctionDeclarationNode) {
 			FunctionDeclarationNode thatFunction = (FunctionDeclarationNode) that;
 
-			return this.inlineFunctionSpecifier == thatFunction
-					.hasInlineFunctionSpecifier()
-					&& this.noreturnFunctionSpecifier == thatFunction
-							.hasNoreturnFunctionSpecifier();
+			if (!(this.inlineFunctionSpecifier == thatFunction
+					.hasInlineFunctionSpecifier() && this.noreturnFunctionSpecifier == thatFunction
+					.hasNoreturnFunctionSpecifier()))
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different function inline/noreturn specifier");
+			else
+				return null;
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
 }

@@ -3,6 +3,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 import java.io.PrintStream;
 import java.util.Arrays;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -181,14 +183,17 @@ public class CommonQuantifiedExpressionNode extends CommonExpressionNode
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof QuantifiedExpressionNode) {
 			QuantifiedExpressionNode thatQuan = (QuantifiedExpressionNode) that;
 
-			return this.isRange == thatQuan.isRange()
-					&& this.quantifier == thatQuan.quantifier();
+			if (this.isRange == thatQuan.isRange()
+					&& this.quantifier == thatQuan.quantifier())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different quantifier");
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
-
 }

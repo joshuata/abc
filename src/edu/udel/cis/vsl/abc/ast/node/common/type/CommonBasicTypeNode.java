@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -42,9 +44,13 @@ public class CommonBasicTypeNode extends CommonTypeNode implements
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof BasicTypeNode)
-			return ((BasicTypeNode) that).getBasicTypeKind() == this.basicTypeKind;
-		return false;
+			if (((BasicTypeNode) that).getBasicTypeKind() == this.basicTypeKind)
+				return null;
+			else
+				return new DifferenceObject(this, that,
+						DiffKind.BASIC_TYPE_KIND);
+		return new DifferenceObject(this, that);
 	}
 }

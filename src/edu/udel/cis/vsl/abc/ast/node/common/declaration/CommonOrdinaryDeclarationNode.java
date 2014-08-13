@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
@@ -63,14 +65,18 @@ public abstract class CommonOrdinaryDeclarationNode extends
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof OrdinaryDeclarationNode) {
 			OrdinaryDeclarationNode thatDecl = (OrdinaryDeclarationNode) that;
 
-			return this.externStorage == thatDecl.hasExternStorage()
-					&& this.staticStorage == thatDecl.hasStaticStorage();
+			if (!this.externStorage == thatDecl.hasExternStorage()
+					&& this.staticStorage == thatDecl.hasStaticStorage())
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different declaration extern/storage specifier");
+			else
+				return null;
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
 
 	void copyStorage(OrdinaryDeclarationNode node) {

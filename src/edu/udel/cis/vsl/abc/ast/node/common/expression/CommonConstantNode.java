@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -48,20 +50,24 @@ public abstract class CommonConstantNode extends CommonExpressionNode implements
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof ConstantNode) {
 			ConstantNode thatConst = (ConstantNode) that;
 			Value thisValue = this.getConstantValue(), thatValue = ((ConstantNode) that)
 					.getConstantValue();
 
 			if (thatConst.constantKind() != this.constantKind())
-				return false;
+				return new DifferenceObject(this, that);
 			if (thisValue != null)
-				return thisValue.equals(thatValue);
+				if (thisValue.equals(thatValue))
+					return null;
+				else
+					return new DifferenceObject(this, that,
+							DiffKind.CONSTANT_VALUE);
 			else if (thatValue != null)
-				return false;
-			return true;
+				return new DifferenceObject(this, that, DiffKind.CONSTANT_VALUE);
+			return null;
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
 }

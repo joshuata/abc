@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
@@ -202,15 +204,18 @@ public class CommonVariableDeclarationNode extends
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof VariableDeclarationNode) {
 			VariableDeclarationNode thatVar = (VariableDeclarationNode) that;
 
-			return this.autoStorage == thatVar.hasAutoStorage()
-					&& this.registerStorage == thatVar.hasRegisterStorage()
-					&& this.threadLocalStorage == thatVar
-							.hasThreadLocalStorage();
+			if (!(this.autoStorage == thatVar.hasAutoStorage()
+					&& this.registerStorage == thatVar.hasRegisterStorage() && this.threadLocalStorage == thatVar
+						.hasThreadLocalStorage()))
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different variable declaration auto/register/thread-local specifier");
+			else
+				return null;
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
 }

@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.JumpNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -51,10 +52,11 @@ public class CommonJumpNode extends CommonStatementNode implements JumpNode {
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof JumpNode)
-			return this.jumpKind == ((JumpNode) that).getKind();
-		return false;
+			if (this.jumpKind == ((JumpNode) that).getKind())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 
 }
