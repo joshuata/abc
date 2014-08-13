@@ -32,7 +32,7 @@ public class LinkTest {
 
 	public final static PrintStream out = System.out;
 
-	public final static boolean debug = true;
+	public final static boolean debug = false;
 
 	public final static File[] systemIncludePaths = new File[0];
 
@@ -144,7 +144,7 @@ public class LinkTest {
 		check(new String[] { "typedef1_0.c", "typedef1_1.c" },
 				"typedef1_merged.c");
 	}
-	
+
 	@Test
 	public void typedef2() throws ABCException {
 		check(new String[] { "typedef2_0.c", "typedef2_1.c" },

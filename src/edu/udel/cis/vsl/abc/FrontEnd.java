@@ -372,16 +372,22 @@ public class FrontEnd {
 	 * @param pretty
 	 *            if true, print AST in the original language, else print in
 	 *            hierarchical form
+	 * @param showTables
+	 *            if true, print the symbol and type tables in addition to the
+	 *            AST
 	 */
-	public void printProgram(PrintStream out, Program program, boolean pretty) {
+	public void printProgram(PrintStream out, Program program, boolean pretty,
+			boolean showTables) {
 		if (pretty)
 			program.prettyPrint(out);
 		else
 			program.print(out);
-		out.println("\n\nSymbol Table:\n");
-		program.printSymbolTable(out);
-		out.println("\n\nTypes:\n");
-		typeFactory.printTypes(out);
+		if (showTables) {
+			out.println("\n\nSymbol Table:\n");
+			program.printSymbolTable(out);
+			out.println("\n\nTypes:\n");
+			typeFactory.printTypes(out);
+		}
 		out.println();
 		out.flush();
 	}
@@ -409,6 +415,7 @@ public class FrontEnd {
 		PrintStream out = task.getOut();
 		boolean verbose = task.isVerbose();
 		boolean pretty = task.doPrettyPrint();
+		boolean tables = task.doShowTables();
 		int nfiles = task.getFiles().length;
 		FrontEnd frontEnd = new FrontEnd();
 		Preprocessor preprocessor = frontEnd.getPreprocessor(
@@ -468,7 +475,7 @@ public class FrontEnd {
 				Transformer transformer = frontEnd.getTransformer(code);
 
 				if (verbose) {
-					frontEnd.printProgram(out, program, pretty);
+					frontEnd.printProgram(out, program, pretty, tables);
 					out.println();
 					out.println(bar + " Program after " + transformer + " "
 							+ bar);
@@ -476,7 +483,7 @@ public class FrontEnd {
 				}
 				program.apply(transformer);
 			}
-			frontEnd.printProgram(out, program, pretty);
+			frontEnd.printProgram(out, program, pretty, tables);
 		}
 	}
 }
