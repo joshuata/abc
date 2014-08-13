@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" output="text/include" path="text/include"/>
+	<classpathentry kind="src" output="bin-test" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="var" path="VSL/lib/junit.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SARL"/>
+	<classpathentry kind="var" path="VSL/lib/antlr-3.4-complete.jar" sourcepath="/VSL/src/antlr-runtime-3.4-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
