@@ -4,9 +4,8 @@
  * struct S in a1.c.
  */
 struct S {double y;};
-void h(struct S *p); // defined in a1.c
+int h(struct S *p); // defined in a_1.c
 int main() {
-  struct S s = {3.14};
-  h(&s);
-  return 0;
+  struct S s = {.y=3.14};
+  return h(&s);
 }

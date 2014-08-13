@@ -15,6 +15,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -88,12 +89,21 @@ public class CommonProgramFactory implements ProgramFactory {
 		}
 		for (Entity entity : plan.getEntityRemoveActions()) {
 			Iterator<DeclarationNode> declIter = entity.getDeclarations();
+			boolean isSysTypedef = entity instanceof Typedef
+					&& ((Typedef) entity).isSystem();
+
+			// system typedefs require special handling because there
+			// is one entity shared by all ASTs. The declarations
+			// in that entity span all ASTs. But we only want
+			// to remove the decl from one AST. We can tell if
+			// the decl belongs to the one AST because its parent
+			// will be root...
 
 			while (declIter.hasNext()) {
 				DeclarationNode decl = declIter.next();
 				ASTNode parent = decl.parent();
 
-				if (parent != null) {
+				if (parent != null && (!isSysTypedef || parent == root)) {
 					int declIndex = decl.childIndex();
 
 					parent.removeChild(declIndex);
