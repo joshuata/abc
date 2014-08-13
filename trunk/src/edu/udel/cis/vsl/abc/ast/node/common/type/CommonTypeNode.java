@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common.type;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
@@ -172,18 +174,22 @@ public abstract class CommonTypeNode extends CommonASTNode implements TypeNode {
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof TypeNode) {
 			TypeNode thatType = (TypeNode) that;
 
-			return this.typeNodeKind == thatType.typeNodeKind()
+			if (this.typeNodeKind == thatType.typeNodeKind()
 					&& this.atomicQualified == thatType.isAtomicQualified()
 					&& this.constQualified == thatType.isConstQualified()
 					&& this.inputQualified == thatType.isInputQualified()
 					&& this.outputQualified == thatType.isOutputQualified()
 					&& this.restrictQualified == thatType.isRestrictQualified()
-					&& this.volatileQualified == thatType.isVolatileQualified();
+					&& this.volatileQualified == thatType.isVolatileQualified())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different qualifiers");
 		}
-		return false;
+		return new DifferenceObject(this, that, DiffKind.KIND);
 	}
 }

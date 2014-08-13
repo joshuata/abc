@@ -10,6 +10,8 @@ import java.util.NoSuchElementException;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -363,26 +365,37 @@ public abstract class CommonASTNode implements ASTNode {
 
 	@Override
 	public boolean equiv(ASTNode that) {
+		return diff(that) == null;
+	}
+
+	@Override
+	public DifferenceObject diff(ASTNode that) {
+		DifferenceObject diff;
+
 		if (that == null)
-			return false;
-		if (!equivWork(that))
-			return false;
+			return new DifferenceObject(this, false);
+		diff = diffWork(that);
+		if (diff != null)
+			return diff;
 		if (this.numChildren() != that.numChildren())
-			return false;
+			return new DifferenceObject(this, that, DiffKind.NUM_CHILDREN);
 		for (int i = 0; i < this.numChildren(); i++) {
 			ASTNode thisChild = this.child(i), thatChild = that.child(i);
 
 			if (thisChild != null) {
-				if (!thisChild.equiv(thatChild))
-					return false;
+				diff = thisChild.diff(thatChild);
+				if (diff != null)
+					return diff;
 			} else if (thatChild != null)
-				return false;
+				return new DifferenceObject(that, true);
 		}
-		return true;
+		return null;
 	}
 
-	protected boolean equivWork(ASTNode that) {
-		return this.nodeKind() == that.nodeKind();
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (this.nodeKind() == that.nodeKind())
+			return null;
+		return new DifferenceObject(this, that);
 	}
 
 	@Override

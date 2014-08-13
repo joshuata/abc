@@ -8,6 +8,8 @@ import java.util.List;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
@@ -103,23 +105,26 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof PragmaNode) {
 			PragmaNode thatPragma = (PragmaNode) that;
 			int numTokens = this.getNumTokens();
 
 			if (numTokens != thatPragma.getNumTokens())
-				return false;
+				return new DifferenceObject(this, that,
+						DiffKind.PRAGMA_NUM_TOKENS);
 			for (int i = 0; i < numTokens; i++) {
-				CToken thisToken = this.getToken(i), thatToken = thatPragma
-						.getToken(i);
+				String thisToken = this.getToken(i).getText(), thatToken = thatPragma
+						.getToken(i).getText();
 
-				if (!thisToken.getText().equals(thatToken.getText()))
-					return false;
+				if (!thisToken.equals(thatToken))
+					return new DifferenceObject(this, that, DiffKind.OTHER,
+							"the " + i + " token is different: " + thisToken
+									+ " vs " + thatToken);
 			}
-			return true;
+			return null;
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
 }
 

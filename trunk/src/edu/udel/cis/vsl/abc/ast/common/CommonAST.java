@@ -12,6 +12,7 @@ import java.util.Set;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
@@ -425,14 +426,27 @@ public class CommonAST implements AST {
 			result.append("{");
 			for (int i = 0; i < numFields; i++) {
 				FieldDeclarationNode field = fields.getSequenceChild(i);
+				String type;
 
 				result.append("\n");
 				if (!(field.getTypeNode() instanceof StructureOrUnionTypeNode))
 					result.append(myIndent);
-				result.append(this.type2CIVL(myIndent, field.getTypeNode(),
-						true));
-				result.append(" ");
-				result.append(field.getName());
+				type = type2CIVL(myIndent, field.getTypeNode(), true)
+						.toString();
+				if (type.endsWith("]")) {
+					int start = type.indexOf("[");
+					String suffix = type.substring(start);
+
+					type = type.substring(0, start - 1);
+					result.append(type);
+					result.append(" ");
+					result.append(field.getName());
+					result.append(suffix);
+				} else {
+					result.append(type);
+					result.append(" ");
+					result.append(field.getName());
+				}
 				result.append(";");
 			}
 			result.append("\n");
@@ -626,6 +640,8 @@ public class CommonAST implements AST {
 					(TypedefDeclarationNode) block);
 		case ENUMERATOR:
 			return new StringBuffer(prefix + "enum;");
+		case PRAGMA:
+			return this.pragma2CIVL(prefix, (PragmaNode)block);
 		default:
 			throw new ABCUnsupportedException("translating block item node of "
 					+ kind + " kind into CIVL code");
@@ -1198,15 +1214,28 @@ public class CommonAST implements AST {
 		StringBuffer result = new StringBuffer();
 		InitializerNode init = variable.getInitializer();
 		TypeNode typeNode = variable.getTypeNode();
+		String type;
 
 		result.append(prefix);
 		if (typeNode.isInputQualified())
 			result.append("$input ");
 		if (typeNode.isOutputQualified())
 			result.append("$output ");
-		result.append(type2CIVL(prefix, typeNode, false));
-		result.append(" ");
-		result.append(variable.getName());
+		type = type2CIVL(prefix, typeNode, false).toString();
+		if (type.endsWith("]")) {
+			int start = type.indexOf('[');
+			String suffix = type.substring(start);
+
+			type = type.substring(0, start - 1);
+			result.append(type);
+			result.append(" ");
+			result.append(variable.getName());
+			result.append(suffix);
+		} else {
+			result.append(type);
+			result.append(" ");
+			result.append(variable.getName());
+		}
 		if (init != null) {
 			result.append(" = ");
 			result.append(initializer2CIVL(init));
@@ -1321,9 +1350,9 @@ public class CommonAST implements AST {
 			result.append(expression2CIVL(cast.getArgument()));
 			break;
 		}
-		case COMPOUND_LITERAL: 
-			result.append(this.compoundLiteralNode2CIVL( 
-					(CompoundLiteralNode)expression));
+		case COMPOUND_LITERAL:
+			result.append(this
+					.compoundLiteralNode2CIVL((CompoundLiteralNode) expression));
 			break;
 		case CONSTANT: {
 			String constant = ((ConstantNode) expression)
@@ -1373,8 +1402,7 @@ public class CommonAST implements AST {
 
 	private StringBuffer compoundLiteralNode2CIVL(CompoundLiteralNode expression) {
 		StringBuffer result = new StringBuffer();
-		
-		
+
 		return result;
 	}
 
@@ -1759,6 +1787,16 @@ public class CommonAST implements AST {
 					+ basicKind + " kind into CIVL code");
 		}
 		return result;
+	}
+
+	@Override
+	public boolean equiv(AST that) {
+		return diff(that) == null;
+	}
+
+	@Override
+	public DifferenceObject diff(AST that) {
+		return this.getRootNode().diff(that.getRootNode());
 	}
 
 }

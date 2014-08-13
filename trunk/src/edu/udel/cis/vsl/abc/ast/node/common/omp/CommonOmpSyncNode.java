@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
@@ -120,10 +121,10 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof OmpSyncNode)
-			return this.ompSyncNodeKind == ((OmpSyncNode) that)
-					.ompSyncNodeKind();
-		return false;
+			if (this.ompSyncNodeKind == ((OmpSyncNode) that).ompSyncNodeKind())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 }

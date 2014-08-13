@@ -4,6 +4,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -144,10 +145,11 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof ExpressionNode)
-			return this.expressionKind() == ((ExpressionNode) that)
-					.expressionKind();
-		return false;
+			if (this.expressionKind() == ((ExpressionNode) that)
+					.expressionKind())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 }

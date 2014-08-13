@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -222,14 +224,18 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof OmpForNode) {
 			OmpForNode thatFor = (OmpForNode) that;
 
-			return this.collapse == thatFor.collapse()
+			if (this.collapse == thatFor.collapse()
 					&& this.ordered == thatFor.ordered()
-					&& this.schedule == thatFor.schedule();
+					&& this.schedule == thatFor.schedule())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different collapse/ordered/schedule clauses");
 		}
-		return false;
+		return new DifferenceObject(this, that);
 	}
 }

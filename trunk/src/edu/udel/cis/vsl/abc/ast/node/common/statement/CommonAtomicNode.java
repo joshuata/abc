@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -63,9 +65,13 @@ public class CommonAtomicNode extends CommonStatementNode implements AtomicNode 
 	}
 
 	@Override
-	protected boolean equivWork(ASTNode that) {
+	protected DifferenceObject diffWork(ASTNode that) {
 		if (that instanceof AtomicNode)
-			return this.isAtom == ((AtomicNode) that).isAtom();
-		return false;
+			if (this.isAtom == ((AtomicNode) that).isAtom())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different atom/atomic specifier");
+		return new DifferenceObject(this, that);
 	}
 }

@@ -131,4 +131,8 @@ public interface AST {
 	 *            an Entity with internal or external linkage
 	 */
 	void add(OrdinaryEntity entity);
+
+	DifferenceObject diff(AST that);
+
+	boolean equiv(AST that);
 }
