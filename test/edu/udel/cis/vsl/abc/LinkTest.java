@@ -150,4 +150,10 @@ public class LinkTest {
 		check(new String[] { "typedef2_0.c", "typedef2_1.c" },
 				"typedef2_merged.c");
 	}
+
+	@Test
+	public void enumconflict() throws ABCException {
+		check(new String[] { "enumconflict_0.c", "enumconflict_1.c",
+				"enumconflict_2.c" }, "enumconflict_merged.c");
+	}
 }
