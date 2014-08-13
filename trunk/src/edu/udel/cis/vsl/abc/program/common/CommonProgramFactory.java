@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.program.common;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +35,10 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public class CommonProgramFactory implements ProgramFactory {
+
+	public final static boolean debug = false;
+
+	public final static PrintStream out = System.out;
 
 	// Fields...
 
@@ -245,6 +250,21 @@ public class CommonProgramFactory implements ProgramFactory {
 		for (int i = 0; i < n; i++)
 			roots.add(translationUnits[i].getRootNode());
 		prepareASTs(translationUnits);
+
+		if (debug) {
+			out.println("Transformed translation units: ");
+			out.println();
+			for (int i = 0; i < n; i++) {
+				SequenceNode<ExternalDefinitionNode> root = roots.get(i);
+				SequenceNode<ExternalDefinitionNode> rootClone = root.copy();
+				AST ast = astFactory.newAST(rootClone);
+
+				ast.prettyPrint(out, false);
+				out.println();
+				out.flush();
+			}
+		}
+
 		for (SequenceNode<ExternalDefinitionNode> root : roots) {
 			int numChildren = root.numChildren();
 
