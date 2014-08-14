@@ -9,7 +9,42 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.BasicTypeNode;
 
 public class DifferenceObject {
 	public enum DiffKind {
-		BASIC_TYPE_KIND, KIND, THIS_NULL, THAT_NULL, NUM_CHILDREN, IDENTIFIER_NAME, PRAGMA_NUM_TOKENS, OTHER, CONSTANT_VALUE
+		/**
+		 * Two basic type nodes with different basic type kind.
+		 */
+		BASIC_TYPE_KIND,
+		/**
+		 * Two nodes with different node kind.
+		 */
+		KIND,
+		/**
+		 * This node is null while that node is not.
+		 */
+		THIS_NULL,
+		/**
+		 * That node is null while this node is not.
+		 */
+		THAT_NULL,
+		/**
+		 * Two nodes don't agree on the number of children.
+		 */
+		NUM_CHILDREN,
+		/**
+		 * Two identifier nodes with different names.
+		 */
+		IDENTIFIER_NAME,
+		/**
+		 * Two pragma nodes don't agree on the number of tokens.
+		 */
+		PRAGMA_NUM_TOKENS,
+		/**
+		 * Two constant nodes of the same type don't agree on their values.
+		 */
+		CONSTANT_VALUE,
+		/**
+		 * Other kinds, explanation is user-specified.
+		 */
+		OTHER
 	}
 
 	private ASTNode thisNode;
