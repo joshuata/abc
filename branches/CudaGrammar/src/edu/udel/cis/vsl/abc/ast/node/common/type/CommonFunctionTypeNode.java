@@ -2,6 +2,9 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
@@ -85,5 +88,17 @@ public class CommonFunctionTypeNode extends CommonTypeNode implements
 		copyData(result);
 		result.setVariableArgs(this.hasVariableArgs());
 		return result;
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof FunctionTypeNode)
+			if (this.hasVariableArgs == ((FunctionTypeNode) that)
+					.hasVariableArgs())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different specifier for variable number of arguments");
+		return new DifferenceObject(this, that);
 	}
 }

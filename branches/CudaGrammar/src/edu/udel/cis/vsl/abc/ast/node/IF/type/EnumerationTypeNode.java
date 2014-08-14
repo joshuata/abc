@@ -6,6 +6,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 
 /**
  * An enumeration type.
@@ -39,4 +40,7 @@ public interface EnumerationTypeNode extends DeclarationNode, TypeNode,
 	 * type. If already null, it is a no-op.
 	 */
 	void makeIncomplete();
+
+	@Override
+	EnumerationType getType();
 }

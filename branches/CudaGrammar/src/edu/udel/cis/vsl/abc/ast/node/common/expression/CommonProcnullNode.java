@@ -31,4 +31,10 @@ public class CommonProcnullNode extends CommonConstantNode implements
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		return true;
 	}
+
+	@Override
+	public ConstantKind constantKind() {
+		return ConstantKind.PROCNULL;
+	}
+
 }

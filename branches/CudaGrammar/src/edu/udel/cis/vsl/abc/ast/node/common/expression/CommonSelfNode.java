@@ -26,10 +26,14 @@ public class CommonSelfNode extends CommonConstantNode implements SelfNode {
 	public SelfNode copy() {
 		return new CommonSelfNode(getSource(), getInitialType());
 	}
-	
+
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		return true;
 	}
 
+	@Override
+	public ConstantKind constantKind() {
+		return ConstantKind.SELF;
+	}
 }

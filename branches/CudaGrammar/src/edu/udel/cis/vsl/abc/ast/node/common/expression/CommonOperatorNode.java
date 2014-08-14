@@ -4,6 +4,8 @@ import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -137,5 +139,13 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 			}
 		}
 		return result;
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof OperatorNode)
+			if (this.operator == ((OperatorNode) that).getOperator())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 }

@@ -122,14 +122,14 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 		return result;
 	}
 
-	@Override
-	public boolean equals(Object object) {
+	private boolean equiv(Object object, boolean strict) {
 		if (this == object)
 			return true;
 		if (object instanceof CommonArrayType) {
 			CommonArrayType that = (CommonArrayType) object;
 
-			if (!elementType.equals(that.elementType))
+			if (!(strict ? elementType.equals(that.elementType) : elementType
+					.equivalentTo(that.elementType)))
 				return false;
 			if (constantSize != null) {
 				if (that.constantSize == null)
@@ -152,6 +152,16 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 			return unspecifiedVariableLength == that.unspecifiedVariableLength;
 		}
 		return false;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		return equiv(object, true);
+	}
+
+	@Override
+	public boolean equivalentTo(Type type) {
+		return equiv(type, false);
 	}
 
 	@Override

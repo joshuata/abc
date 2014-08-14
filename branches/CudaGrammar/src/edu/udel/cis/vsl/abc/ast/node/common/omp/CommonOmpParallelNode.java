@@ -3,6 +3,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 import java.io.PrintStream;
 import java.util.List;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -118,5 +120,17 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 			}
 		}
 		return newParallelNode;
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof OmpParallelNode)
+			if (this.isDefaultShared == ((OmpParallelNode) that)
+					.isDefaultShared())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different default(shared|none) clause");
+		return new DifferenceObject(this, that);
 	}
 }

@@ -152,6 +152,8 @@ public interface Type {
 	 * @return true iff the two types are compatible
 	 */
 	boolean compatibleWith(Type type);
+	
+	boolean equivalentTo(Type type);
 
 	/**
 	 * The types created by the type factories are given unique id numbers. This

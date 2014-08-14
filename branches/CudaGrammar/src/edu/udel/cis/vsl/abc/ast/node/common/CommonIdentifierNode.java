@@ -2,7 +2,10 @@ package edu.udel.cis.vsl.abc.ast.node.common;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
@@ -51,6 +54,17 @@ public class CommonIdentifierNode extends CommonASTNode implements
 	@Override
 	public NodeKind nodeKind() {
 		return NodeKind.IDENTIFIER;
+	}
+
+	@Override
+	public DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof IdentifierNode)
+			if (this.name.equals(((IdentifierNode) that).name()))
+				return null;
+			else
+				return new DifferenceObject(this, that,
+						DiffKind.IDENTIFIER_NAME);
+		return new DifferenceObject(this, that);
 	}
 
 }

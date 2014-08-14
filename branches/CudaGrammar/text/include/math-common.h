@@ -20,4 +20,8 @@ float tanf(float x);
      
 long double tanl(long double x);
 
+double pow(double x, double y);
+
+double log(double x);
+
 #endif

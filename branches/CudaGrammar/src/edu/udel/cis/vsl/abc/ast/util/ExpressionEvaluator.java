@@ -30,6 +30,7 @@ public class ExpressionEvaluator {
 		/*
 		 * Should check that operator nodes are of an integer type
 		 */
+		//System.out.println("ExpressionEvaluator: "+o1+", "+o2+", "+conditions);
 		
 		BooleanExpression context = universe.trueExpression();
 		Reasoner reasoner = universe.reasoner(context);
@@ -41,12 +42,14 @@ public class ExpressionEvaluator {
 		BooleanExpression equiv = universe.equals(n1, n2);
 		
 		BooleanExpression current = equiv;
+		//System.out.println("ExpressionEvaluator Check "+equiv);
+
 		
 		for(ExpressionNode e : conditions) {
 			current = universe.and(current, (BooleanExpression) toSarlBool(e));
 		}
 		
-		System.out.println("ExpressionEvaluator translated "+current);
+		//System.out.println("ExpressionEvaluator Check with Conditions "+current);
 		
 		return reasoner.isValid(current);
 	}

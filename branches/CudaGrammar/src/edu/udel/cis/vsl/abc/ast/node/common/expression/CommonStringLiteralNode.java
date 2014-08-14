@@ -31,4 +31,9 @@ public class CommonStringLiteralNode extends CommonConstantNode implements
 				getStringRepresentation(), getConstantValue());
 	}
 
+	@Override
+	public ConstantKind constantKind() {
+		return ConstantKind.STRING;
+	}
+
 }

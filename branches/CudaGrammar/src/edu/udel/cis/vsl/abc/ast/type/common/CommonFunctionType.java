@@ -147,6 +147,52 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 		return false;
 	}
 
+	private boolean equiv(ArrayList<ObjectType> types1,
+			ArrayList<ObjectType> types2) {
+		int length1 = types1.size();
+		int length2 = types2.size();
+
+		if (length1 != length2)
+			return false;
+		for (int i = 0; i < length1; i++) {
+			Type x1 = types1.get(i);
+			Type x2 = types2.get(i);
+
+			if (x1 == null) {
+				if (x2 != null)
+					return false;
+			} else {
+				if (x2 == null)
+					return false;
+				if (!x1.equivalentTo(x2))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean equivalentTo(Type type) {
+		if (this == type)
+			return true;
+		if (type instanceof CommonFunctionType) {
+			CommonFunctionType that = (CommonFunctionType) type;
+
+			if (!returnType.equivalentTo(that.returnType))
+				return false;
+			if (parameterTypes == null) {
+				if (that.parameterTypes != null)
+					return false;
+			} else {
+				if (!equiv(parameterTypes, that.parameterTypes))
+					return false;
+			}
+			return hasVariableArgs == that.hasVariableArgs
+					&& fromIdentifierList == that.fromIdentifierList;
+		}
+		return false;
+	}
+
 	/**
 	 * See C11 Sec. 6.7.6.3(15).
 	 * 

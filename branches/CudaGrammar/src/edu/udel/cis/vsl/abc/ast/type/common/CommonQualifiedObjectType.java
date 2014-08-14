@@ -128,6 +128,23 @@ public class CommonQualifiedObjectType extends CommonObjectType implements
 	}
 
 	@Override
+	public boolean equivalentTo(Type type) {
+		if (this == type)
+			return true;
+		if (type instanceof QualifiedObjectType) {
+			QualifiedObjectType that = (QualifiedObjectType) type;
+
+			return constQualified == that.isConstQualified()
+					&& volatileQualified == that.isVolatileQualified()
+					&& restrictQualified == that.isRestrictQualified()
+					&& inputQualified == that.isInputQualified()
+					&& outputQualified == that.isOutputQualified()
+					&& baseType.equivalentTo(that.getBaseType());
+		}
+		return false;
+	}
+
+	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
 		String seperator = "";
 

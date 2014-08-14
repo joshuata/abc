@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -64,5 +66,13 @@ public class CommonLoopNode extends CommonStatementNode implements LoopNode {
 	@Override
 	public StatementKind statementKind() {
 		return StatementKind.LOOP;
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof LoopNode)
+			if (this.loopKind == ((LoopNode) that).getKind())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 }

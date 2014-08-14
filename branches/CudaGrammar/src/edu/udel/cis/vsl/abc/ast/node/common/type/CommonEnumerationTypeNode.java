@@ -2,20 +2,21 @@ package edu.udel.cis.vsl.abc.ast.node.common.type;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonEnumerationTypeNode extends CommonTypeNode implements
 		EnumerationTypeNode {
 
 	boolean isDefinition = false;
-
-	Enumeration entity = null;
 
 	public CommonEnumerationTypeNode(Source source, IdentifierNode tag,
 			SequenceNode<EnumeratorDeclarationNode> enumerators) {
@@ -74,13 +75,18 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 	}
 
 	@Override
-	public Enumeration getEntity() {
-		return entity;
+	public EnumerationType getType() {
+		return (EnumerationType) super.getType();
+	}
+
+	@Override
+	public EnumerationType getEntity() {
+		return getType();
 	}
 
 	@Override
 	public void setEntity(Entity entity) {
-		this.entity = (Enumeration) entity;
+		setType((EnumerationType) entity);
 	}
 
 	@Override
@@ -95,6 +101,18 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 	@Override
 	public BlockItemKind blockItemKind() {
 		return BlockItemKind.ENUMERATOR;
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof EnumerationTypeNode)
+			if (this.isDefinition == ((EnumerationTypeNode) that)
+					.isDefinition())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different definition specifier");
+		return new DifferenceObject(this, that);
 	}
 
 }

@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.entity.common;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -10,7 +9,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.PragmaHandler;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -19,7 +17,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
-import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
@@ -41,18 +38,8 @@ public class CommonEntityFactory implements EntityFactory {
 	}
 
 	@Override
-	public StructureOrUnion newStructureOrUnion(StructureOrUnionType type) {
-		return new CommonStructureOrUnion(type);
-	}
-
-	@Override
-	public Enumeration newEnumeration(EnumerationType type) {
-		return new CommonEnumeration(type);
-	}
-
-	@Override
 	public Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			Enumeration enumeration, Value value) {
+			EnumerationType enumeration, Value value) {
 		return new CommonEnumerator(declaration, enumeration, value);
 	}
 
