@@ -72,6 +72,6 @@ public class CommonEnumerationConstantNode extends CommonExpressionNode
 		if (that instanceof EnumerationConstantNode)
 			return null;
 		else
-			return new DifferenceObject(this, that, DiffKind.CONSTANT_VALUE);
+			return new DifferenceObject(this, that, DiffKind.KIND);
 	}
 }
