@@ -9,8 +9,8 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
+import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.util.IF.Pair;
@@ -132,14 +132,14 @@ public class TagCategoryInfo {
 			while (iter.hasNext())
 				enumerators.add(iter.next());
 			((Enumeration) incomplete).getType().complete(enumerators);
-		} else if (incomplete instanceof StructureOrUnion) {
+		} else if (incomplete instanceof StructureOrUnionType) {
 			List<Field> members = new LinkedList<>();
-			Iterator<Field> iter = ((StructureOrUnion) complete).getType()
+			Iterator<Field> iter = ((StructureOrUnionType) complete)
 					.getFields();
 
 			while (iter.hasNext())
 				members.add(iter.next());
-			((StructureOrUnion) incomplete).getType().complete(members);
+			((StructureOrUnionType) incomplete).complete(members);
 		}
 	}
 

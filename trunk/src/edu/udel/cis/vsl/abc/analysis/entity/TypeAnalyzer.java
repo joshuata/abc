@@ -11,7 +11,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -465,31 +464,26 @@ public class TypeAnalyzer {
 	 * @throws SyntaxException
 	 *             if already exists in scope
 	 */
-	private StructureOrUnion createStructureOrUnion(
+	private StructureOrUnionType createStructureOrUnion(
 			StructureOrUnionTypeNode node) throws SyntaxException {
 		Scope scope = node.getScope();
 		IdentifierNode identifier = node.getIdentifier();
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList(); // could be null
-		StructureOrUnion structureOrUnion;
 		StructureOrUnionType structureOrUnionType;
 
 		structureOrUnionType = typeFactory.structureOrUnionType(node,
 				node.isStruct(), tag);
 		// in case this was used in previous analysis pass, clear it:
 		structureOrUnionType.clear();
-		structureOrUnion = entityFactory
-				.newStructureOrUnion(structureOrUnionType);
-		// structureOrUnion.addDeclaration(node);
-		scope.add(structureOrUnion);
+		scope.add(structureOrUnionType);
 		if (identifier != null)
-			identifier.setEntity(structureOrUnion);
-		// structureOrUnion.addDeclaration(node);
+			identifier.setEntity(structureOrUnionType);
 		if (fieldDecls != null) {
-			completeStructOrUnion(structureOrUnion, node);
+			completeStructOrUnion(structureOrUnionType, node);
 		}
-		return structureOrUnion;
+		return structureOrUnionType;
 	}
 
 	/**
@@ -513,14 +507,14 @@ public class TypeAnalyzer {
 	private void checkConsistency(TaggedEntity old,
 			StructureOrUnionTypeNode node) throws SyntaxException {
 		String tag = node.getName();
-		StructureOrUnion su;
+		StructureOrUnionType su;
 
 		if (old.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
 			throw error("Re-use of tag " + tag
 					+ " for structure or union.  Previous use was at "
 					+ old.getFirstDeclaration().getSource(), node);
-		su = (StructureOrUnion) old;
-		if (su.getType().isStruct()) {
+		su = (StructureOrUnionType) old;
+		if (su.isStruct()) {
 			if (!node.isStruct())
 				throw error("Previous use of tag " + tag
 						+ " was for structure, current use for union. "
@@ -555,15 +549,14 @@ public class TypeAnalyzer {
 	 *             specified with a non-constant expression
 	 * @see {@link #checkConsistency(TaggedEntity, StructureOrUnionTypeNode)}
 	 */
-	private void completeStructOrUnion(StructureOrUnion structureOrUnion,
+	private void completeStructOrUnion(
+			StructureOrUnionType structureOrUnionType,
 			StructureOrUnionTypeNode node) throws SyntaxException {
-		StructureOrUnionType structureOrUnionType = structureOrUnion.getType();
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList();
 		List<Field> fieldList = new LinkedList<>();
 
-		structureOrUnion.setDefinition(node);
-		// structureOrUnion.addDeclaration(node);
+		structureOrUnionType.setDefinition(node);
 		for (FieldDeclarationNode decl : fieldDecls) {
 			TypeNode fieldTypeNode = decl.getTypeNode();
 			ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
@@ -878,7 +871,7 @@ public class TypeAnalyzer {
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList(); // could be null
-		StructureOrUnion structureOrUnion;
+		StructureOrUnionType structureOrUnion;
 		Type result;
 
 		if (node.isRestrictQualified())
@@ -895,7 +888,7 @@ public class TypeAnalyzer {
 
 				if (oldEntity != null) {
 					checkConsistency(oldEntity, node);
-					structureOrUnion = (StructureOrUnion) oldEntity;
+					structureOrUnion = (StructureOrUnionType) oldEntity;
 					completeStructOrUnion(structureOrUnion, node);
 				} else {
 					structureOrUnion = createStructureOrUnion(node);
@@ -905,7 +898,7 @@ public class TypeAnalyzer {
 
 				if (oldEntity != null) {
 					checkConsistency(oldEntity, node);
-					structureOrUnion = (StructureOrUnion) oldEntity;
+					structureOrUnion = (StructureOrUnionType) oldEntity;
 				} else {
 					structureOrUnion = createStructureOrUnion(node);
 				}
