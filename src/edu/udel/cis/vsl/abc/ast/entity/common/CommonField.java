@@ -9,19 +9,14 @@ public class CommonField extends CommonEntity implements Field {
 
 	private Value bitWidth;
 
-	// private StructureOrUnion structureOrUnion;
-
 	private int memberIndex;
 
 	public CommonField(FieldDeclarationNode declaration, ObjectType type,
-			Value bitWidth
-	// , StructureOrUnion structureOrUnion
-	) {
+			Value bitWidth) {
 		super(EntityKind.FIELD, declaration.getName(), LinkageKind.NONE);
 		addDeclaration(declaration);
 		setDefinition(declaration);
 		this.bitWidth = bitWidth;
-		// this.structureOrUnion = structureOrUnion;
 		setType(type);
 		this.memberIndex = declaration.childIndex();
 	}
@@ -40,11 +35,6 @@ public class CommonField extends CommonEntity implements Field {
 	public Value getBitWidth() {
 		return bitWidth;
 	}
-
-	// @Override
-	// public StructureOrUnion getStructureOrUnion() {
-	// return structureOrUnion;
-	// }
 
 	@Override
 	public int getMemberIndex() {
