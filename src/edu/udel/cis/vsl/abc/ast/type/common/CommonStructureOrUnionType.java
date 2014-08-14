@@ -8,16 +8,32 @@ import java.util.List;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 
 public class CommonStructureOrUnionType extends CommonObjectType implements
 		StructureOrUnionType {
 
 	private final static int classCode = CommonStructureOrUnionType.class
 			.hashCode();
+
+	// Entity fields...
+
+	private ArrayList<DeclarationNode> declarations = new ArrayList<DeclarationNode>();
+
+	private DeclarationNode definition;
+
+	/**
+	 * Is this a system-defined entity (as opposed to a user-defined one)?
+	 * Examples include standard types, like size_t.
+	 */
+	private boolean isSystem = false;
+
+	// Structure or union fields...
 
 	/** Key, cannot be null. */
 	private Object key;
@@ -189,6 +205,62 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	}
 
 	@Override
+	public boolean equivalentTo(Type type) {
+		if (type instanceof CommonStructureOrUnionType) {
+			CommonStructureOrUnionType that = (CommonStructureOrUnionType) type;
+
+			if (this.tag != null) {
+				if (!this.tag.equals(that.tag))
+					return false;
+			} else {
+				if (that.tag != null)
+					return false;
+			}
+			if (!this.isComplete()) {
+				if (that.isComplete())
+					return false;
+			} else {
+				if (!that.isComplete())
+					return false;
+				else {
+					int numFields = this.getNumFields();
+
+					if (numFields != that.getNumFields())
+						return false;
+					for (int i = 0; i < numFields; i++) {
+						Field thisField = this.getField(i);
+						Field thatField = that.getField(i);
+						String thisName = thisField.getName();
+						String thatName = thatField.getName();
+						ObjectType thisType = thisField.getType();
+						ObjectType thatType = thatField.getType();
+						Value thisWidth = thisField.getBitWidth();
+						Value thatWidth = thatField.getBitWidth();
+
+						if (thisName == null) {
+							if (thatName != null)
+								return false;
+						} else if (!thisName.equals(thatName))
+							return false;
+						if (thisType == null) {
+							if (thatType != null)
+								return false;
+						} else if (!thisType.equivalentTo(thatType))
+							return false;
+						if (thisWidth == null) {
+							if (thatWidth != null)
+								return false;
+						} else if (!thisWidth.equals(thatWidth))
+							return false;
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public Field getField(String fieldName) {
 		return fieldMap.get(fieldName);
 	}
@@ -260,6 +332,85 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 			return "struct " + tag;
 		else
 			return "union " + tag;
+	}
+
+	@Override
+	public EntityKind getEntityKind() {
+		return EntityKind.STRUCTURE_OR_UNION;
+	}
+
+	@Override
+	public String getName() {
+		return tag;
+	}
+
+	@Override
+	public Iterator<DeclarationNode> getDeclarations() {
+		return declarations.iterator();
+	}
+
+	@Override
+	public DeclarationNode getFirstDeclaration() {
+		return declarations.get(0);
+	}
+
+	@Override
+	public int getNumDeclarations() {
+		return declarations.size();
+	}
+
+	@Override
+	public DeclarationNode getDeclaration(int index) {
+		return declarations.get(index);
+	}
+
+	@Override
+	public void addDeclaration(DeclarationNode declaration) {
+		declarations.add(declaration);
+	}
+
+	@Override
+	public DeclarationNode getDefinition() {
+		return definition;
+	}
+
+	@Override
+	public void setDefinition(DeclarationNode declaration) {
+		this.definition = declaration;
+	}
+
+	@Override
+	public LinkageKind getLinkage() {
+		return LinkageKind.NONE;
+	}
+
+	@Override
+	public void setLinkage(LinkageKind linkage) {
+		if (linkage != LinkageKind.NONE)
+			throw new ABCRuntimeException(
+					"Linkage of structure or union must be NONE");
+	}
+
+	@Override
+	public StructureOrUnionType getType() {
+		return this;
+	}
+
+	@Override
+	public void setType(Type type) {
+		if (type != this)
+			throw new ABCRuntimeException(
+					"Cannot change type of structure or union");
+	}
+
+	@Override
+	public boolean isSystem() {
+		return isSystem;
+	}
+
+	@Override
+	public void setIsSystem(boolean value) {
+		this.isSystem = value;
 	}
 
 }

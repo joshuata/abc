@@ -12,6 +12,19 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
  */
 public interface ConstantNode extends ExpressionNode {
 
+	public enum ConstantKind{
+		CHAR,
+		ENUM,
+		FLOAT,
+		HERE_OR_ROOT,
+		INT,
+		PROCNULL,
+		SELF, 
+		STRING,
+	}
+	
+	ConstantKind constantKind();
+	
 	/**
 	 * Returns the representation of the constant exactly as it occurred in the
 	 * source code.

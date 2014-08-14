@@ -49,4 +49,9 @@ public class CommonHeapType extends CommonObjectType implements
 		return false;
 	}
 
+	@Override
+	public boolean equivalentTo(Type type) {
+		return type instanceof CommonHeapType;
+	}
+
 }

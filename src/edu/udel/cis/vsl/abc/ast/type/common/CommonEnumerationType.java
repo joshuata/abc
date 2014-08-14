@@ -6,14 +6,30 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 
 public class CommonEnumerationType extends CommonIntegerType implements
 		EnumerationType {
 
 	private final static int classCode = CommonEnumerationType.class.hashCode();
+
+	// Entity fields...
+
+	private ArrayList<DeclarationNode> declarations = new ArrayList<DeclarationNode>();
+
+	private DeclarationNode definition;
+
+	/**
+	 * Is this a system-defined entity (as opposed to a user-defined one)?
+	 * Examples include standard types, like size_t.
+	 */
+	private boolean isSystem = false;
+
+	// Enumeration type fields...
 
 	private Object key;
 
@@ -151,6 +167,61 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	}
 
 	@Override
+	public boolean equivalentTo(Type type) {
+		if (this == type)
+			return true;
+		if (type instanceof CommonEnumerationType) {
+			CommonEnumerationType that = (CommonEnumerationType) type;
+
+			if (tag == null) {
+				if (that.tag != null)
+					return false;
+			} else if (!this.tag.equals(that.tag))
+				return false;
+			if (enumerators == null) {
+				if (that.enumerators != null)
+					return false;
+			} else {
+				int numEnumerators = enumerators.size();
+
+				if (that.enumerators == null)
+					return false;
+				if (numEnumerators != that.enumerators.size())
+					return false;
+				for (int i = 0; i < numEnumerators; i++) {
+					Enumerator enum1 = enumerators.get(i);
+					Enumerator enum2 = that.enumerators.get(i);
+
+					if (enum1 == null) {
+						if (enum2 != null)
+							return false;
+					} else {
+						String name1 = enum1.getName(), name2;
+						Value value1 = enum1.getValue(), value2;
+
+						if (enum2 == null)
+							return false;
+						name2 = enum2.getName();
+						if (name1 == null) {
+							if (name2 != null)
+								return false;
+						} else if (!name1.equals(name2))
+							return false;
+						value2 = enum2.getValue();
+						if (value1 == null) {
+							if (value2 != null)
+								return false;
+						} else if (!value1.equals(value2))
+							return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
 	public String toString() {
 		return "EnumerationType[tag=" + tag + "]";
 	}
@@ -201,6 +272,83 @@ public class CommonEnumerationType extends CommonIntegerType implements
 		if (tag != null)
 			result ^= tag.hashCode();
 		return result;
+	}
+
+	@Override
+	public EntityKind getEntityKind() {
+		return EntityKind.ENUMERATION;
+	}
+
+	@Override
+	public String getName() {
+		return tag;
+	}
+
+	@Override
+	public Iterator<DeclarationNode> getDeclarations() {
+		return declarations.iterator();
+	}
+
+	@Override
+	public DeclarationNode getFirstDeclaration() {
+		return declarations.get(0);
+	}
+
+	@Override
+	public int getNumDeclarations() {
+		return declarations.size();
+	}
+
+	@Override
+	public DeclarationNode getDeclaration(int index) {
+		return declarations.get(index);
+	}
+
+	@Override
+	public void addDeclaration(DeclarationNode declaration) {
+		declarations.add(declaration);
+	}
+
+	@Override
+	public DeclarationNode getDefinition() {
+		return definition;
+	}
+
+	@Override
+	public void setDefinition(DeclarationNode declaration) {
+		this.definition = declaration;
+	}
+
+	@Override
+	public LinkageKind getLinkage() {
+		return LinkageKind.NONE;
+	}
+
+	@Override
+	public void setLinkage(LinkageKind linkage) {
+		if (linkage != LinkageKind.NONE)
+			throw new ABCRuntimeException("Linkage of enumeration must be NONE");
+	}
+
+	@Override
+	public EnumerationType getType() {
+		return this;
+	}
+
+	@Override
+	public void setType(Type type) {
+		if (type != this)
+			throw new ABCRuntimeException("Cannot change type of enumeration");
+	}
+
+	@Override
+	public boolean isSystem() {
+		return isSystem;
+	}
+
+	@Override
+	public void setIsSystem(boolean value) {
+		this.isSystem = value;
 	}
 
 }

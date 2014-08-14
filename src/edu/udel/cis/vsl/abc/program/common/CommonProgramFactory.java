@@ -1,9 +1,8 @@
 package edu.udel.cis.vsl.abc.program.common;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,9 +21,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.program.IF.Program;
@@ -36,6 +35,10 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public class CommonProgramFactory implements ProgramFactory {
+
+	public final static boolean debug = false;
+
+	public final static PrintStream out = System.out;
 
 	// Fields...
 
@@ -79,21 +82,33 @@ public class CommonProgramFactory implements ProgramFactory {
 		for (TaggedEntity entity : plan.getMakeIncompleteActions()) {
 			DeclarationNode def = entity.getDefinition();
 
+			// System.out.println("Making incomplete: " + def);
+			// System.out.flush();
+
 			if (def instanceof StructureOrUnionTypeNode) {
 				((StructureOrUnionTypeNode) def).makeIncomplete();
 			} else if (def instanceof EnumerationTypeNode) {
 				((EnumerationTypeNode) def).makeIncomplete();
 			} else
-				throw new ABCRuntimeException("unreachable");
+				throw new ABCRuntimeException("unreachable: " + def);
 		}
 		for (Entity entity : plan.getEntityRemoveActions()) {
 			Iterator<DeclarationNode> declIter = entity.getDeclarations();
+			boolean isSysTypedef = entity instanceof Typedef
+					&& ((Typedef) entity).isSystem();
+
+			// system typedefs require special handling because there
+			// is one entity shared by all ASTs. The declarations
+			// in that entity span all ASTs. But we only want
+			// to remove the decl from one AST. We can tell if
+			// the decl belongs to the one AST because its parent
+			// will be root...
 
 			while (declIter.hasNext()) {
 				DeclarationNode decl = declIter.next();
 				ASTNode parent = decl.parent();
 
-				if (parent != null) {
+				if (parent != null && (!isSysTypedef || parent == root)) {
 					int declIndex = decl.childIndex();
 
 					parent.removeChild(declIndex);
@@ -101,6 +116,100 @@ public class CommonProgramFactory implements ProgramFactory {
 			}
 		}
 		renamer.renameFrom(root);
+	}
+
+	/**
+	 * Merges non-anonymous tagged classes for which it has been determined that
+	 * a merge is safe. Any incomplete type which is merged with a complete one
+	 * will be completed to be in accord with the complete version.
+	 * 
+	 * @return <code>true</code> iff at least one non-trivial merge occurs
+	 */
+	private Map<String, TaggedEntityInfo> tagMerge(AST[] asts) {
+		int n = asts.length;
+		boolean changed = true;
+		Map<String, TaggedEntityInfo> taggedInfoMap = new HashMap<>();
+
+		for (int i = 0; i < n; i++) {
+			Scope scope = asts[i].getRootNode().getScope();
+
+			for (TaggedEntity entity : scope.getTaggedEntities()) {
+				String name = entity.getName();
+
+				if (name != null) {
+					TaggedEntityInfo info = taggedInfoMap.get(name);
+
+					if (info == null) {
+						info = new TaggedEntityInfo(name, n);
+						taggedInfoMap.put(name, info);
+					}
+					info.add(i, entity);
+				}
+			}
+		}
+		while (changed) {
+			changed = false;
+			for (TaggedEntityInfo info : taggedInfoMap.values())
+				changed = changed || info.merge();
+		}
+		return taggedInfoMap;
+	}
+
+	// PROBLEM: it is the anonymous enums which are getting
+	// blended. they don't have infos. but the typedef
+	// ends up merging several enums because they are equivalent.
+	// only the first typedef is kept. The others are removed.
+	// The enumerations being remooved still need to be mapped back
+	// to the first one.
+
+	private void prepareASTs(AST[] translationUnits) throws SyntaxException {
+		int n = translationUnits.length;
+		Plan[] plans = new Plan[n];
+		Map<String, OrdinaryEntityInfo> ordinaryInfoMap = new HashMap<>();
+		Map<EnumerationType, Integer> enumMergeMap = new HashMap<>();
+		Map<String, TaggedEntityInfo> taggedInfoMap;
+
+		for (int i = 0; i < n; i++)
+			plans[i] = new Plan();
+		for (AST ast : translationUnits) {
+			standardAnalyzer.clear(ast);
+			standardAnalyzer.analyze(ast);
+		}
+		taggedInfoMap = tagMerge(translationUnits);
+
+		for (TaggedEntityInfo info : taggedInfoMap.values())
+			info.computeActions(plans, enumMergeMap);
+
+		for (int i = 0; i < n; i++) {
+			AST ast = translationUnits[i];
+			Scope scope = ast.getRootNode().getScope();
+
+			for (OrdinaryEntity entity : scope.getOrdinaryEntities()) {
+				String name = entity.getName();
+				OrdinaryEntityInfo info = ordinaryInfoMap.get(name);
+
+				if (info == null) {
+					info = new OrdinaryEntityInfo(name, n);
+					ordinaryInfoMap.put(name, info);
+				}
+				info.add(i, entity);
+			}
+		}
+		for (OrdinaryEntityInfo info : ordinaryInfoMap.values())
+			info.computeTypedefRemovals(plans, enumMergeMap);
+
+		// System.out.println("enumMergeMap: " + enumMergeMap);
+		// System.out.flush();
+
+		for (OrdinaryEntityInfo info : ordinaryInfoMap.values())
+			info.computeRenamings(plans, enumMergeMap);
+		for (int i = 0; i < n; i++) {
+			AST ast = translationUnits[i];
+			SequenceNode<ExternalDefinitionNode> root = ast.getRootNode();
+
+			ast.release();
+			transform(root, plans[i]);
+		}
 	}
 
 	/**
@@ -116,6 +225,8 @@ public class CommonProgramFactory implements ProgramFactory {
 	 * <strong>Postcondition:</strong> the original ASTs are destroyed. The
 	 * resulting AST is not clean: it needs to be cleared and analyzed.
 	 * </p>
+	 * 
+	 * 
 	 * 
 	 * @param translationUnits
 	 * @return
@@ -133,55 +244,25 @@ public class CommonProgramFactory implements ProgramFactory {
 		Source fakeSource = tokenFactory.newSource(fakeToken);
 		List<ExternalDefinitionNode> definitions = new LinkedList<>();
 		SequenceNode<ExternalDefinitionNode> newRoot;
-		Plan[] plans = new Plan[n];
-		Map<String, OrdinaryEntityInfo> ordinaryInfoMap = new HashMap<>();
-		Map<String, TaggedEntityInfo> taggedInfoMap = new HashMap<>();
-		Collection<String> systemTypedefs = new HashSet<String>();
+		// Collection<String> systemTypedefs = new HashSet<String>();
 		AST result;
 
 		for (int i = 0; i < n; i++)
-			plans[i] = new Plan();
-		for (AST ast : translationUnits) {
-			standardAnalyzer.clear(ast);
-			standardAnalyzer.analyze(ast);
-		}
-		for (int i = 0; i < n; i++) {
-			AST ast = translationUnits[i];
-			Scope scope = ast.getRootNode().getScope();
+			roots.add(translationUnits[i].getRootNode());
+		prepareASTs(translationUnits);
 
-			for (OrdinaryEntity entity : scope.getOrdinaryEntities()) {
-				String name = entity.getName();
-				OrdinaryEntityInfo info = ordinaryInfoMap.get(name);
+		if (debug) {
+			out.println("Transformed translation units: ");
+			out.println();
+			for (int i = 0; i < n; i++) {
+				SequenceNode<ExternalDefinitionNode> root = roots.get(i);
+				SequenceNode<ExternalDefinitionNode> rootClone = root.copy();
+				AST ast = astFactory.newAST(rootClone);
 
-				if (info == null) {
-					info = new OrdinaryEntityInfo(name);
-					ordinaryInfoMap.put(name, info);
-				}
-				info.add(i, entity);
+				ast.prettyPrint(out, false);
+				out.println();
+				out.flush();
 			}
-			for (TaggedEntity entity : scope.getTaggedEntities()) {
-				String name = entity.getName();
-				TaggedEntityInfo info = taggedInfoMap.get(name);
-
-				if (info == null) {
-					info = new TaggedEntityInfo(name);
-					taggedInfoMap.put(name, info);
-				}
-				info.add(i, entity);
-			}
-			// TODO: what about external variables with multiple initializers?
-			// need to move the initializer up. Get rid of other decls?
-		}
-		for (TaggedEntityInfo info : taggedInfoMap.values())
-			info.computeActions(plans);
-		for (OrdinaryEntityInfo info : ordinaryInfoMap.values())
-			info.computeActions(plans);
-		for (int i = 0; i < n; i++) {
-			AST ast = translationUnits[i];
-			roots.add(ast.getRootNode());
-
-			ast.release();
-			transform(roots.get(i), plans[i]);
 		}
 
 		for (SequenceNode<ExternalDefinitionNode> root : roots) {
@@ -191,19 +272,19 @@ public class CommonProgramFactory implements ProgramFactory {
 				ExternalDefinitionNode def = root.removeChild(i);
 
 				if (def != null) {
-					if (def instanceof TypedefDeclarationNode) {
-						Typedef typedef = ((TypedefDeclarationNode) def)
-								.getEntity();
-
-						if (typedef.isSystem()) {
-							// only add these once...
-							String name = typedef.getName();
-
-							if (systemTypedefs.contains(name))
-								continue;
-							systemTypedefs.add(name);
-						}
-					}
+					// if (def instanceof TypedefDeclarationNode) {
+					// Typedef typedef = ((TypedefDeclarationNode) def)
+					// .getEntity();
+					//
+					// if (typedef.isSystem()) {
+					// // only add these once...
+					// String name = typedef.getName();
+					//
+					// if (systemTypedefs.contains(name))
+					// continue;
+					// systemTypedefs.add(name);
+					// }
+					// }
 					definitions.add(def);
 				}
 			}

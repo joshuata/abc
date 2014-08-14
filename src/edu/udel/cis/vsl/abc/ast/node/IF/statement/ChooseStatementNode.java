@@ -16,8 +16,20 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 public interface ChooseStatementNode extends StatementNode,
 		SequenceNode<StatementNode> {
 
+	/**
+	 * The default case is just some meta-data associated to the node, and is
+	 * totally independent of the methods to create and add the children.
+	 * 
+	 * @param statement
+	 */
 	LabeledStatementNode getDefaultCase();
 
+	/**
+	 * The default case is just some meta-data associated to the node, and is
+	 * totally independent of the methods to create and add the children.
+	 * 
+	 * @param statement
+	 */
 	void setDefaultCase(LabeledStatementNode statement);
 
 	@Override

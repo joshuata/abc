@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
@@ -33,6 +34,14 @@ public abstract class CommonStatementNode extends CommonASTNode implements
 	@Override
 	public NodeKind nodeKind() {
 		return NodeKind.STATEMENT;
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof StatementNode)
+			if (this.statementKind() == ((StatementNode) that).statementKind())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 
 }

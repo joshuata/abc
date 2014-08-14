@@ -2,6 +2,8 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
@@ -46,6 +48,17 @@ public class CommonOmpSymbolReductionNode extends CommonOmpReductionNode
 	@Override
 	public SequenceNode<IdentifierExpressionNode> variables() {
 		return (SequenceNode<IdentifierExpressionNode>) this.child(0);
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof OmpSymbolReductionNode)
+			if (this.operator == ((OmpSymbolReductionNode) that).operator())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different reduction symbol");
+		return new DifferenceObject(this, that);
 	}
 
 }

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
+import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 
 /**
  * A structure or union type. Such a type is specified by (0) a key, (1) a bit
@@ -18,7 +19,8 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
  * @author siegel
  * 
  */
-public interface StructureOrUnionType extends UnqualifiedObjectType {
+public interface StructureOrUnionType extends UnqualifiedObjectType,
+		TaggedEntity {
 
 	/**
 	 * Returns the key associated to this instance. The key is used in the
@@ -96,4 +98,7 @@ public interface StructureOrUnionType extends UnqualifiedObjectType {
 
 	/** Make incomplete. */
 	void clear();
+
+	@Override
+	StructureOrUnionType getType();
 }

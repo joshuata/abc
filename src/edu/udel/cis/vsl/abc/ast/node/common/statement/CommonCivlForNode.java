@@ -2,6 +2,9 @@ package edu.udel.cis.vsl.abc.ast.node.common.statement;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
@@ -64,6 +67,17 @@ public class CommonCivlForNode extends CommonStatementNode implements
 			out.print("$parfor");
 		else
 			out.print("$for");
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof CivlForNode)
+			if (this.isParallel == ((CivlForNode) that).isParallel())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different parallel specifier");
+		return new DifferenceObject(this, that);
 	}
 
 }

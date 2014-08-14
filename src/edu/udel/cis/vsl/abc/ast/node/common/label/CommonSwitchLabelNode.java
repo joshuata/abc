@@ -2,6 +2,9 @@ package edu.udel.cis.vsl.abc.ast.node.common.label;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -67,4 +70,17 @@ public class CommonSwitchLabelNode extends CommonASTNode implements
 		return NodeKind.SWITCH_LABEL;
 	}
 
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof SwitchLabelNode) {
+			SwitchLabelNode thatSwitch = (SwitchLabelNode) that;
+
+			if (this.isDefault == thatSwitch.isDefault())
+				return null;
+			else
+				return new DifferenceObject(this, that, DiffKind.OTHER,
+						"different case/default lable");
+		}
+		return new DifferenceObject(this, that);
+	}
 }

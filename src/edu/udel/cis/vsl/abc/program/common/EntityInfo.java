@@ -41,14 +41,17 @@ public abstract class EntityInfo {
 
 	// Fields...
 
+	private int numTranslationUnits;
+
 	private String name;
 
 	private int numEntities = 0;
 
 	// Constructors...
 
-	public EntityInfo(String name) {
+	public EntityInfo(String name, int numTranslationUnits) {
 		this.name = name;
+		this.numTranslationUnits = numTranslationUnits;
 	}
 
 	// Supporting methods...
@@ -72,16 +75,16 @@ public abstract class EntityInfo {
 	 */
 	protected abstract void addEntity(int tuid, Entity entity);
 
-	/**
-	 * Computes the actions required to modify the ASTs with respect to this
-	 * identifier and adds those actions to the corresponding plans.
-	 * 
-	 * @param plans
-	 *            action plans for the transformation of the translation units;
-	 *            this is an array of length n, where n is the number of
-	 *            translation units
-	 */
-	public abstract void computeActions(Plan[] plans);
+//	/**
+//	 * Computes the actions required to modify the ASTs with respect to this
+//	 * identifier and adds those actions to the corresponding plans.
+//	 * 
+//	 * @param plans
+//	 *            action plans for the transformation of the translation units;
+//	 *            this is an array of length n, where n is the number of
+//	 *            translation units
+//	 */
+//	public abstract void computeActions(Plan[] plans);
 
 	// Public methods...
 
@@ -127,6 +130,10 @@ public abstract class EntityInfo {
 	public void add(int tuid, Entity entity) {
 		addEntity(tuid, entity);
 		numEntities++;
+	}
+
+	public int getNumTranslationUnits() {
+		return numTranslationUnits;
 	}
 
 }

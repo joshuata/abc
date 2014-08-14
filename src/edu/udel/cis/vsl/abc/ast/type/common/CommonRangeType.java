@@ -35,6 +35,11 @@ public class CommonRangeType extends CommonObjectType implements
 	}
 
 	@Override
+	public boolean equivalentTo(Type type) {
+		return type instanceof CommonRangeType;
+	}
+
+	@Override
 	public boolean compatibleWith(Type type) {
 		return equals(type);
 	}

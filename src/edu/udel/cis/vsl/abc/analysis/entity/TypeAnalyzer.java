@@ -5,13 +5,11 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -395,7 +393,7 @@ public class TypeAnalyzer {
 	 * @return the new enumeration entity
 	 * @throws SyntaxException
 	 */
-	private Enumeration createEnumeration(EnumerationTypeNode node)
+	private EnumerationType createEnumeration(EnumerationTypeNode node)
 			throws SyntaxException {
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
 				.enumerators();
@@ -404,15 +402,13 @@ public class TypeAnalyzer {
 		List<Enumerator> enumeratorList = new LinkedList<>();
 		EnumerationType enumerationType = typeFactory
 				.enumerationType(node, tag);
-		Enumeration enumeration;
 		IntegerValue value = null;
 
 		// clear it, in case it was used in previous analysis pass
 		enumerationType.clear();
-		enumeration = entityFactory.newEnumeration(enumerationType);
-		scope.add(enumeration);
-		enumeration.setDefinition(node);
-		enumeration.addDeclaration(node);
+		scope.add(enumerationType);
+		enumerationType.setDefinition(node);
+		enumerationType.addDeclaration(node);
 		for (EnumeratorDeclarationNode decl : enumerators) {
 			ExpressionNode constantNode = decl.getValue();
 			Enumerator enumerator;
@@ -438,7 +434,8 @@ public class TypeAnalyzer {
 									+ tmpValue, constantNode);
 				value = (IntegerValue) tmpValue;
 			}
-			enumerator = entityFactory.newEnumerator(decl, enumeration, value);
+			enumerator = entityFactory.newEnumerator(decl, enumerationType,
+					value);
 			enumerator.addDeclaration(decl);
 			enumerator.setDefinition(decl);
 			decl.setEntity(enumerator);
@@ -451,7 +448,7 @@ public class TypeAnalyzer {
 			}
 		}
 		enumerationType.complete(enumeratorList);
-		return enumeration;
+		return enumerationType;
 	}
 
 	/**
@@ -465,31 +462,26 @@ public class TypeAnalyzer {
 	 * @throws SyntaxException
 	 *             if already exists in scope
 	 */
-	private StructureOrUnion createStructureOrUnion(
+	private StructureOrUnionType createStructureOrUnion(
 			StructureOrUnionTypeNode node) throws SyntaxException {
 		Scope scope = node.getScope();
 		IdentifierNode identifier = node.getIdentifier();
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList(); // could be null
-		StructureOrUnion structureOrUnion;
 		StructureOrUnionType structureOrUnionType;
 
 		structureOrUnionType = typeFactory.structureOrUnionType(node,
 				node.isStruct(), tag);
 		// in case this was used in previous analysis pass, clear it:
 		structureOrUnionType.clear();
-		structureOrUnion = entityFactory
-				.newStructureOrUnion(structureOrUnionType);
-		// structureOrUnion.addDeclaration(node);
-		scope.add(structureOrUnion);
+		scope.add(structureOrUnionType);
 		if (identifier != null)
-			identifier.setEntity(structureOrUnion);
-		// structureOrUnion.addDeclaration(node);
+			identifier.setEntity(structureOrUnionType);
 		if (fieldDecls != null) {
-			completeStructOrUnion(structureOrUnion, node);
+			completeStructOrUnion(structureOrUnionType, node);
 		}
-		return structureOrUnion;
+		return structureOrUnionType;
 	}
 
 	/**
@@ -513,14 +505,14 @@ public class TypeAnalyzer {
 	private void checkConsistency(TaggedEntity old,
 			StructureOrUnionTypeNode node) throws SyntaxException {
 		String tag = node.getName();
-		StructureOrUnion su;
+		StructureOrUnionType su;
 
 		if (old.getEntityKind() != EntityKind.STRUCTURE_OR_UNION)
 			throw error("Re-use of tag " + tag
 					+ " for structure or union.  Previous use was at "
 					+ old.getFirstDeclaration().getSource(), node);
-		su = (StructureOrUnion) old;
-		if (su.getType().isStruct()) {
+		su = (StructureOrUnionType) old;
+		if (su.isStruct()) {
 			if (!node.isStruct())
 				throw error("Previous use of tag " + tag
 						+ " was for structure, current use for union. "
@@ -555,15 +547,14 @@ public class TypeAnalyzer {
 	 *             specified with a non-constant expression
 	 * @see {@link #checkConsistency(TaggedEntity, StructureOrUnionTypeNode)}
 	 */
-	private void completeStructOrUnion(StructureOrUnion structureOrUnion,
+	private void completeStructOrUnion(
+			StructureOrUnionType structureOrUnionType,
 			StructureOrUnionTypeNode node) throws SyntaxException {
-		StructureOrUnionType structureOrUnionType = structureOrUnion.getType();
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList();
 		List<Field> fieldList = new LinkedList<>();
 
-		structureOrUnion.setDefinition(node);
-		// structureOrUnion.addDeclaration(node);
+		structureOrUnionType.setDefinition(node);
 		for (FieldDeclarationNode decl : fieldDecls) {
 			TypeNode fieldTypeNode = decl.getTypeNode();
 			ExpressionNode bitWidthExpression = decl.getBitFieldWidth();
@@ -767,7 +758,7 @@ public class TypeAnalyzer {
 		String tag = node.getName(); // could be null
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
 				.enumerators(); // could be null
-		Enumeration enumeration;
+		EnumerationType enumeration;
 		Type result;
 
 		if (node.isRestrictQualified())
@@ -790,15 +781,15 @@ public class TypeAnalyzer {
 									+ "    enum identifier\n"
 									+ "without an enumerator list shall only appear after the type\n"
 									+ "it specifies is complete.\"", node);
-				if (!(oldEntity instanceof Enumeration))
+				if (!(oldEntity instanceof EnumerationType))
 					throw error(
 							"Re-use of tag "
 									+ tag
 									+ " for enumeration when tag is visible with different kind.  Previous use was at "
 									+ oldEntity.getFirstDeclaration()
 											.getSource(), node);
-				enumeration = (Enumeration) oldEntity;
-				assert enumeration.getType().isComplete();
+				enumeration = (EnumerationType) oldEntity;
+				assert enumeration.isComplete();
 				// if not, you would have caught the earlier incomplete use
 				enumeration.addDeclaration(node);
 			}
@@ -878,7 +869,7 @@ public class TypeAnalyzer {
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList(); // could be null
-		StructureOrUnion structureOrUnion;
+		StructureOrUnionType structureOrUnion;
 		Type result;
 
 		if (node.isRestrictQualified())
@@ -895,7 +886,7 @@ public class TypeAnalyzer {
 
 				if (oldEntity != null) {
 					checkConsistency(oldEntity, node);
-					structureOrUnion = (StructureOrUnion) oldEntity;
+					structureOrUnion = (StructureOrUnionType) oldEntity;
 					completeStructOrUnion(structureOrUnion, node);
 				} else {
 					structureOrUnion = createStructureOrUnion(node);
@@ -905,7 +896,7 @@ public class TypeAnalyzer {
 
 				if (oldEntity != null) {
 					checkConsistency(oldEntity, node);
-					structureOrUnion = (StructureOrUnion) oldEntity;
+					structureOrUnion = (StructureOrUnionType) oldEntity;
 				} else {
 					structureOrUnion = createStructureOrUnion(node);
 				}

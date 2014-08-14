@@ -8,7 +8,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
-import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
@@ -64,38 +63,6 @@ public interface EntityFactory {
 	Function newFunction(String name, LinkageKind linkage, Type type);
 
 	/**
-	 * <p>
-	 * Creates a new structure or union entity. These are in 1-1 correspondence
-	 * with the structure or union types.
-	 * </p>
-	 * 
-	 * <p>
-	 * The usual order of events for constructing a structure or union is as
-	 * follows: first, the incomplete structure or union type is formed. Then
-	 * the structure or union entity is formed using this method. Then the
-	 * fields are formed using method
-	 * {@link #newField(FieldDeclarationNode, ObjectType, Value, StructureOrUnion)}
-	 * . Finally, the structure or union type is completed using method
-	 * {@link StructureOrUnionType#complete(java.util.List)}.
-	 * </p>
-	 * 
-	 * @param type
-	 *            the structure or union type
-	 * @return the new structure or union entity
-	 */
-	StructureOrUnion newStructureOrUnion(StructureOrUnionType type);
-
-	/**
-	 * Creates a new enumeration entity. These are in 1-1 correspondence with
-	 * the enumeration types.
-	 * 
-	 * @param type
-	 *            the enumeration type
-	 * @return the new enumeration entity
-	 */
-	Enumeration newEnumeration(EnumerationType type);
-
-	/**
 	 * Creates a new enumerator entity. These correspond to the enumerators in
 	 * the enumerator list of a complete enumeration definition.
 	 * 
@@ -108,7 +75,7 @@ public interface EntityFactory {
 	 * @return the new enumerator entity
 	 */
 	Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			Enumeration enumeration, Value value);
+			EnumerationType enumeration, Value value);
 
 	/**
 	 * Creates a new field entity. These correspond to the field declarations in

@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -65,6 +66,15 @@ public class CommonOmpWorkshareNode extends CommonOmpStatementNode implements
 		default:
 			throw new ABCRuntimeException("Unreachable");
 		}
+	}
+
+	@Override
+	protected DifferenceObject diffWork(ASTNode that) {
+		if (that instanceof OmpWorksharingNode)
+			if (this.ompWorkshareKind == ((OmpWorksharingNode) that)
+					.ompWorkshareNodeKind())
+				return null;
+		return new DifferenceObject(this, that);
 	}
 
 }
