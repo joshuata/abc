@@ -820,6 +820,7 @@ public class CommonASTFactory implements ASTFactory {
 		String myIndent = prefix + indention;
 		StatementNode bodyNode = loop.getBody();
 
+		out.print(prefix);
 		switch (loopKind) {
 		case WHILE:
 			out.print("while(");
