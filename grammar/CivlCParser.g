@@ -754,6 +754,7 @@ declarationSpecifier
 	| typeSpecifierOrQualifier
 	| functionSpecifier
 	| alignmentSpecifier
+	| cudaTypeQualifier
 	;
 
 /* 
@@ -975,6 +976,10 @@ alignmentSpecifier
         )
     ;
 
+cudaTypeQualifier
+	: CUDA_GLOBAL
+	;
+	
 /* 6.7.6
  * Root: DECLARATOR
  * Child 0: pointer or ABSENT

@@ -167,6 +167,10 @@ TRUE		:	'$true';
 UNIFORM		:	'$uniform';
 WHEN		:	'$when';
 
+/* Cuda-C keywords */
+
+CUDA_GLOBAL	:	'__global';
+
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/
 
