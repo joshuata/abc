@@ -5,7 +5,7 @@
 #include<civlc.cvh>
 #include<comm.cvh>
 #include<concurrency.cvh>
-#include<bundle.cvh>
+#include<string.h>
 
 //TODO make a Datatype struct, which has a field "int size;" Define one of these objects for MPI_INT, MPI_DOUBLE, etc. 
 //TODO Then provide methods like MPI provides for creating new ones.
