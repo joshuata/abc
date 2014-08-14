@@ -63,16 +63,6 @@ public interface EntityFactory {
 	Function newFunction(String name, LinkageKind linkage, Type type);
 
 	/**
-	 * Creates a new enumeration entity. These are in 1-1 correspondence with
-	 * the enumeration types.
-	 * 
-	 * @param type
-	 *            the enumeration type
-	 * @return the new enumeration entity
-	 */
-	Enumeration newEnumeration(EnumerationType type);
-
-	/**
 	 * Creates a new enumerator entity. These correspond to the enumerators in
 	 * the enumerator list of a complete enumeration definition.
 	 * 
@@ -85,7 +75,7 @@ public interface EntityFactory {
 	 * @return the new enumerator entity
 	 */
 	Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			Enumeration enumeration, Value value);
+			EnumerationType enumeration, Value value);
 
 	/**
 	 * Creates a new field entity. These correspond to the field declarations in

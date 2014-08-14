@@ -146,7 +146,7 @@ public class PrunerWorker {
 		// special case: if you use at least one enumerator
 		// in the enumeration, you use the whole enumeration...
 		if (entity instanceof Enumerator) {
-			explore(((Enumerator) entity).getEnumeration());
+			explore(((Enumerator) entity).getType());
 		}
 	}
 

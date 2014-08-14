@@ -410,7 +410,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 	@Override
 	public void setIsSystem(boolean value) {
-		this.isStruct = value;
+		this.isSystem = value;
 	}
 
 }
