@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
@@ -124,14 +124,14 @@ public class TagCategoryInfo {
 	// this type is ahred by many other types, so the change
 	// will be reflected in all types which use that type
 	private void complete(TaggedEntity incomplete, TaggedEntity complete) {
-		if (incomplete instanceof Enumeration) {
+		if (incomplete instanceof EnumerationType) {
 			List<Enumerator> enumerators = new LinkedList<>();
-			Iterator<Enumerator> iter = ((Enumeration) complete).getType()
+			Iterator<Enumerator> iter = ((EnumerationType) complete)
 					.getEnumerators();
 
 			while (iter.hasNext())
 				enumerators.add(iter.next());
-			((Enumeration) incomplete).getType().complete(enumerators);
+			((EnumerationType) incomplete).complete(enumerators);
 		} else if (incomplete instanceof StructureOrUnionType) {
 			List<Field> members = new LinkedList<>();
 			Iterator<Field> iter = ((StructureOrUnionType) complete)
@@ -184,12 +184,12 @@ public class TagCategoryInfo {
 	 * 
 	 * @param enumMergeMap
 	 */
-	void addToEnumMergeMap(Map<Enumeration, Integer> enumMergeMap) {
+	void addToEnumMergeMap(Map<EnumerationType, Integer> enumMergeMap) {
 		for (ArrayList<Pair<Integer, TaggedEntity>> completeClass : completeClasses) {
 			int representative = getCompleteClassRepresentative(completeClass).left;
 
 			for (Pair<Integer, TaggedEntity> pair : completeClass) {
-				enumMergeMap.put((Enumeration) pair.right, representative);
+				enumMergeMap.put((EnumerationType) pair.right, representative);
 			}
 		}
 	}

@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
@@ -394,7 +393,7 @@ public class TypeAnalyzer {
 	 * @return the new enumeration entity
 	 * @throws SyntaxException
 	 */
-	private Enumeration createEnumeration(EnumerationTypeNode node)
+	private EnumerationType createEnumeration(EnumerationTypeNode node)
 			throws SyntaxException {
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
 				.enumerators();
@@ -403,15 +402,13 @@ public class TypeAnalyzer {
 		List<Enumerator> enumeratorList = new LinkedList<>();
 		EnumerationType enumerationType = typeFactory
 				.enumerationType(node, tag);
-		Enumeration enumeration;
 		IntegerValue value = null;
 
 		// clear it, in case it was used in previous analysis pass
 		enumerationType.clear();
-		enumeration = entityFactory.newEnumeration(enumerationType);
-		scope.add(enumeration);
-		enumeration.setDefinition(node);
-		enumeration.addDeclaration(node);
+		scope.add(enumerationType);
+		enumerationType.setDefinition(node);
+		enumerationType.addDeclaration(node);
 		for (EnumeratorDeclarationNode decl : enumerators) {
 			ExpressionNode constantNode = decl.getValue();
 			Enumerator enumerator;
@@ -437,7 +434,8 @@ public class TypeAnalyzer {
 									+ tmpValue, constantNode);
 				value = (IntegerValue) tmpValue;
 			}
-			enumerator = entityFactory.newEnumerator(decl, enumeration, value);
+			enumerator = entityFactory.newEnumerator(decl, enumerationType,
+					value);
 			enumerator.addDeclaration(decl);
 			enumerator.setDefinition(decl);
 			decl.setEntity(enumerator);
@@ -450,7 +448,7 @@ public class TypeAnalyzer {
 			}
 		}
 		enumerationType.complete(enumeratorList);
-		return enumeration;
+		return enumerationType;
 	}
 
 	/**
@@ -760,7 +758,7 @@ public class TypeAnalyzer {
 		String tag = node.getName(); // could be null
 		SequenceNode<EnumeratorDeclarationNode> enumerators = node
 				.enumerators(); // could be null
-		Enumeration enumeration;
+		EnumerationType enumeration;
 		Type result;
 
 		if (node.isRestrictQualified())
@@ -783,15 +781,15 @@ public class TypeAnalyzer {
 									+ "    enum identifier\n"
 									+ "without an enumerator list shall only appear after the type\n"
 									+ "it specifies is complete.\"", node);
-				if (!(oldEntity instanceof Enumeration))
+				if (!(oldEntity instanceof EnumerationType))
 					throw error(
 							"Re-use of tag "
 									+ tag
 									+ " for enumeration when tag is visible with different kind.  Previous use was at "
 									+ oldEntity.getFirstDeclaration()
 											.getSource(), node);
-				enumeration = (Enumeration) oldEntity;
-				assert enumeration.getType().isComplete();
+				enumeration = (EnumerationType) oldEntity;
+				assert enumeration.isComplete();
 				// if not, you would have caught the earlier incomplete use
 				enumeration.addDeclaration(node);
 			}

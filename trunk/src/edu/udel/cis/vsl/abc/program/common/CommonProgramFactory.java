@@ -12,7 +12,6 @@ import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
@@ -24,6 +23,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.program.IF.Program;
@@ -166,7 +166,7 @@ public class CommonProgramFactory implements ProgramFactory {
 		int n = translationUnits.length;
 		Plan[] plans = new Plan[n];
 		Map<String, OrdinaryEntityInfo> ordinaryInfoMap = new HashMap<>();
-		Map<Enumeration, Integer> enumMergeMap = new HashMap<>();
+		Map<EnumerationType, Integer> enumMergeMap = new HashMap<>();
 		Map<String, TaggedEntityInfo> taggedInfoMap;
 
 		for (int i = 0; i < n; i++)

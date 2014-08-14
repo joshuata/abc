@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.entity.common;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
@@ -39,13 +38,8 @@ public class CommonEntityFactory implements EntityFactory {
 	}
 
 	@Override
-	public Enumeration newEnumeration(EnumerationType type) {
-		return new CommonEnumeration(type);
-	}
-
-	@Override
 	public Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			Enumeration enumeration, Value value) {
+			EnumerationType enumeration, Value value) {
 		return new CommonEnumerator(declaration, enumeration, value);
 	}
 

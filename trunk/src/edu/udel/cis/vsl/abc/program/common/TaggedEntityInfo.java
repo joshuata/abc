@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
@@ -111,7 +111,7 @@ public class TaggedEntityInfo extends EntityInfo {
 	}
 
 	public void computeActions(Plan[] plans,
-			Map<Enumeration, Integer> enumMergeMap) {
+			Map<EnumerationType, Integer> enumMergeMap) {
 		structInfo.addActions(plans);
 		unionInfo.addActions(plans);
 		enumInfo.addToEnumMergeMap(enumMergeMap);

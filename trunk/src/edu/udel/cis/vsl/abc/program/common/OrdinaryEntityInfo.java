@@ -5,11 +5,11 @@ import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumeration;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.util.IF.Pair;
@@ -88,7 +88,7 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	// containing i in E; rename to newName(j). Else, rename to
 	// newName(i).
 
-	private int[] computeNewIDs(Map<Enumeration, Integer> enumMergeMap) {
+	private int[] computeNewIDs(Map<EnumerationType, Integer> enumMergeMap) {
 		int n = getNumTranslationUnits();
 		int[] newIDs = new int[n];
 		int numInternals = internals.size();
@@ -98,8 +98,7 @@ public class OrdinaryEntityInfo extends EntityInfo {
 			OrdinaryEntity entity = pair.right;
 
 			if (entity instanceof Enumerator) {
-				Enumeration enumeration = ((Enumerator) entity)
-						.getEnumeration();
+				EnumerationType enumeration = ((Enumerator) entity).getType();
 				int newID = enumMergeMap.get(enumeration);
 
 				newIDs[i] = newID;
@@ -124,7 +123,7 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	}
 
 	public void computeTypedefRemovals(Plan[] plan,
-			Map<Enumeration, Integer> enumMergeMap) {
+			Map<EnumerationType, Integer> enumMergeMap) {
 		if (getNumEntities() > 1) {
 			int numInternals = internals.size();
 
@@ -143,8 +142,7 @@ public class OrdinaryEntityInfo extends EntityInfo {
 						Typedef typedef = (Typedef) pair.right;
 						EnumerationTypeNode enumTypeNode = (EnumerationTypeNode) typedef
 								.getDefinition().getTypeNode();
-						Enumeration enumeration = (Enumeration) enumTypeNode
-								.getEntity();
+						EnumerationType enumeration = enumTypeNode.getType();
 
 						enumMergeMap.put(enumeration, tuid0);
 					}
@@ -154,7 +152,7 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	}
 
 	public void computeRenamings(Plan[] plan,
-			Map<Enumeration, Integer> enumMergeMap) {
+			Map<EnumerationType, Integer> enumMergeMap) {
 		if (getNumEntities() > 1) {
 			if (areEquivTypedefs()) {
 				// already dealt with

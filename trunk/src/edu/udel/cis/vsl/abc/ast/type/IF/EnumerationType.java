@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 
 /**
  * An enumeration type. An enumeration type consists of a key, a tag, and a
@@ -13,7 +14,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
  * 
  * @author siegel
  */
-public interface EnumerationType extends IntegerType {
+public interface EnumerationType extends IntegerType, TaggedEntity {
 
 	/**
 	 * Returns the key associated to this instance. The key is used in the
@@ -85,4 +86,7 @@ public interface EnumerationType extends IntegerType {
 	 * <code>null</code>.
 	 */
 	void clear();
+
+	@Override
+	EnumerationType getType();
 }
