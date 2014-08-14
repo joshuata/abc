@@ -480,7 +480,7 @@ public class CommonASTFactory implements ASTFactory {
 			TypedefDeclarationNode typedef) {
 
 		out.print(prefix);
-		out.print("typdef ");
+		out.print("typedef ");
 		out.print(" ");
 		out.print(type2CIVL(prefix, typedef.getTypeNode(), true));
 		out.print(" ");
@@ -832,6 +832,7 @@ public class CommonASTFactory implements ASTFactory {
 				statement2CIVL(out, myIndent, bodyNode);
 
 			}
+			break;
 		case DO_WHILE:
 			out.print("do");
 			if (bodyNode == null)
@@ -1042,6 +1043,7 @@ public class CommonASTFactory implements ASTFactory {
 		InitializerNode init = variable.getInitializer();
 		TypeNode typeNode = variable.getTypeNode();
 		String type;
+		IdentifierNode varName = variable.getIdentifier();
 
 		result.append(prefix);
 		if (typeNode.isInputQualified())
@@ -1056,12 +1058,17 @@ public class CommonASTFactory implements ASTFactory {
 			type = type.substring(0, start);
 			result.append(type);
 			result.append(" ");
-			result.append(variable.getName());
+			if (varName != null) {
+				result.append(" ");
+				result.append(variable.getName());
+			}
 			result.append(suffix);
 		} else {
 			result.append(type);
-			result.append(" ");
-			result.append(variable.getName());
+			if (varName != null) {
+				result.append(" ");
+				result.append(variable.getName());
+			}
 		}
 		if (init != null) {
 			result.append(" = ");

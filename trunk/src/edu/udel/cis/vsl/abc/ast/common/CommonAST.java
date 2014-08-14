@@ -273,7 +273,6 @@ public class CommonAST implements AST {
 	private void externalDef2CIVL(PrintStream out, ExternalDefinitionNode extern) {
 		if (extern instanceof AssumeNode) {
 			CommonASTFactory.assume2CIVL(out, "", (AssumeNode) extern);
-			out.print(";");
 		} else if (extern instanceof EnumerationTypeNode) {
 			out.print(CommonASTFactory.enumType2CIVL("",
 					(EnumerationTypeNode) extern));
