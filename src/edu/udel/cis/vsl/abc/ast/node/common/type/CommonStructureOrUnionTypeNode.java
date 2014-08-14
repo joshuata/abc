@@ -5,12 +5,12 @@ import java.io.PrintStream;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.StructureOrUnion;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
@@ -19,8 +19,6 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 	private boolean isStruct;
 
 	private boolean isDefinition;
-
-	private StructureOrUnion entity = null;
 
 	public CommonStructureOrUnionTypeNode(Source source, boolean isStruct,
 			IdentifierNode tag,
@@ -50,13 +48,18 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 	}
 
 	@Override
-	public StructureOrUnion getEntity() {
-		return entity;
+	public StructureOrUnionType getType() {
+		return (StructureOrUnionType) super.getType();
+	}
+
+	@Override
+	public StructureOrUnionType getEntity() {
+		return getType();
 	}
 
 	@Override
 	public void setEntity(Entity entity) {
-		this.entity = (StructureOrUnion) entity;
+		setType((StructureOrUnionType) entity);
 	}
 
 	@Override
