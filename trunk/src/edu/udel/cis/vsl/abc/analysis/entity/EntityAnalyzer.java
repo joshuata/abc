@@ -34,6 +34,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
@@ -227,6 +228,8 @@ public class EntityAnalyzer implements Analyzer {
 					.processEnumerationType((EnumerationTypeNode) node));
 		} else if (node instanceof AssumeNode) {
 			statementAnalyzer.processStatement((AssumeNode) node);
+		} else if (node instanceof AssertNode) {
+			statementAnalyzer.processStatement((AssertNode) node);
 		} else if (node instanceof ScopeParameterizedDeclarationNode) {
 			declarationAnalyzer
 					.processScopeParameterizedDeclaration((ScopeParameterizedDeclarationNode) node);

@@ -61,6 +61,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -480,8 +481,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		default:
 			throw new ABCUnsupportedException(
-					"pretty print of translating block item node of " + kind
-							+ " kind");
+					"pretty print of block item node of " + kind + " kind");
 		}
 	}
 
@@ -504,6 +504,9 @@ public class CommonASTFactory implements ASTFactory {
 		case ASSUME:
 			pPrintAssume(out, prefix, (AssumeNode) statement);
 			break;
+		case ASSERT:
+			pPrintAssert(out, prefix, (AssertNode) statement);
+			break;
 		case ATOMIC:
 			pPrintAtomic(out, prefix, (AtomicNode) statement);
 			break;
@@ -517,12 +520,6 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		case CIVL_FOR:
 			pPrintCivlForStatement(out, prefix, (CivlForNode) statement);
-			break;
-		case FOR:
-			pPrintFor(out, prefix, (ForLoopNode) statement);
-			break;
-		case GOTO:
-			pPrintGoto(out, prefix, (GotoNode) statement);
 			break;
 		case IF:
 			pPrintIf(out, prefix, (IfNode) statement);
@@ -543,9 +540,6 @@ public class CommonASTFactory implements ASTFactory {
 		case OMP_STATEMENT:
 			pPrintOmpStatement(out, prefix, (OmpStatementNode) statement);
 			break;
-		case RETURN:
-			pPrintReturn(out, prefix, (ReturnNode) statement);
-			break;
 		case SWITCH:
 			pPrintSwitch(out, prefix, (SwitchNode) statement);
 			break;
@@ -553,11 +547,29 @@ public class CommonASTFactory implements ASTFactory {
 			pPrintWhen(out, prefix, (WhenNode) statement);
 			break;
 		default:
-			// throw new CIVLUnimplementedFeatureException(
-			// "translating statement node of " + kind
-			// + " kind into CIVL code", statement.getSource());
-			// return new StringBuffer(kind.toString());
+			throw new ABCUnsupportedException(
+					"pretty print of statement node of " + kind + " kind");
 		}
+	}
+
+	static void pPrintAssert(PrintStream out, String prefix,
+			AssertNode assertNode) {
+		SequenceNode<ExpressionNode> explanation = assertNode.getExplanation();
+
+		out.print(prefix);
+		out.print("$assert ");
+		out.print(pPrintExpression(assertNode.getCondition()));
+		if (explanation != null) {
+			int numArgs = explanation.numChildren();
+
+			out.print(" : ");
+			for (int i = 0; i < numArgs; i++) {
+				if (i != 0)
+					out.print(", ");
+				out.print(pPrintExpression(explanation.getSequenceChild(i)));
+			}
+		}
+		out.print(";");
 	}
 
 	private static void pPrintOmpStatement(PrintStream out, String prefix,
@@ -856,11 +868,8 @@ public class CommonASTFactory implements ASTFactory {
 			out.print(condition);
 			out.print(");");
 			break;
-		default:
-			throw new ABCUnsupportedException(
-					"The "
-							+ loopKind
-							+ " loop node is unreachable here because it should already been taken care of priorly.");
+		default: // case FOR:
+			pPrintFor(out, prefix, (ForLoopNode) loop);
 		}
 	}
 
@@ -929,7 +938,7 @@ public class CommonASTFactory implements ASTFactory {
 
 		switch (kind) {
 		case GOTO:
-			out.print("goto");
+			pPrintGoto(out, prefix, (GotoNode) jump);
 			break;
 		case CONTINUE:
 			out.print("continue;");
@@ -937,13 +946,8 @@ public class CommonASTFactory implements ASTFactory {
 		case BREAK:
 			out.print("break;");
 			break;
-		case RETURN:
+		default: // case RETURN:
 			pPrintReturn(out, prefix, (ReturnNode) jump);
-			break;
-		default:
-			throw new ABCUnsupportedException(
-					"pretty print of translating jump node of " + kind
-							+ " kind");
 		}
 	}
 
@@ -1238,8 +1242,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		default:
 			throw new ABCUnsupportedException(
-					"pretty print of translating expression node of " + kind
-							+ " kind");
+					"pretty print of expression node of " + kind + " kind");
 		}
 		return result;
 	}
@@ -1463,8 +1466,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		default:
 			throw new ABCUnsupportedException(
-					"pretty print of translating operator node of " + op
-							+ " kind");
+					"pretty print of operator node of " + op + " kind");
 		}
 		return result;
 	}
@@ -1566,9 +1568,8 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("$range");
 			break;
 		default:
-			throw new ABCUnsupportedException(
-					"pretty print of translating type node of " + kind
-							+ " kind");
+			throw new ABCUnsupportedException("pretty print of type node of "
+					+ kind + " kind");
 		}
 		return result;
 	}
@@ -1637,8 +1638,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		default:
 			throw new ABCUnsupportedException(
-					"pretty print of translating basic type node of "
-							+ basicKind + " kind");
+					"pretty print of basic type node of " + basicKind + " kind");
 		}
 		return result;
 	}

@@ -4,13 +4,12 @@ public interface StatementNode extends BlockItemNode {
 
 	public enum StatementKind {
 		ASSUME,
+		ASSERT,
 		ATOMIC,
 		CHOOSE,
 		CIVL_FOR,
 		COMPOUND,
 		EXPRESSION,
-		FOR,
-		GOTO,
 		IF,
 		JUMP,
 		LABELED,
@@ -18,9 +17,8 @@ public interface StatementNode extends BlockItemNode {
 		NULL,
 		OMP_STATEMENT,
 		PRAGMA,
-		RETURN,
 		SWITCH,
-		WHEN
+		WHEN, 
 	}
 
 	@Override

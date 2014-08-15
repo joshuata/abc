@@ -49,6 +49,7 @@ public interface CParser {
 	public static final int ARROW = CivlCParser.ARROW;
 	public static final int ASSIGN = CivlCParser.ASSIGN;
 	public static final int ASSUME = CivlCParser.ASSUME;
+	public static final int ASSERT = CivlCParser.ASSERT;
 	public static final int AT = CivlCParser.AT;
 	public static final int ATOMIC = CivlCParser.ATOMIC;
 	public static final int AUTO = CivlCParser.AUTO;

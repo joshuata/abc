@@ -20,6 +20,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
@@ -273,6 +274,8 @@ public class CommonAST implements AST {
 	private void externalDef2CIVL(PrintStream out, ExternalDefinitionNode extern) {
 		if (extern instanceof AssumeNode) {
 			CommonASTFactory.pPrintAssume(out, "", (AssumeNode) extern);
+		} else if (extern instanceof AssertNode) {
+			CommonASTFactory.pPrintAssert(out, "", (AssertNode) extern);
 		} else if (extern instanceof EnumerationTypeNode) {
 			out.print(CommonASTFactory.pPrintEnumType("",
 					(EnumerationTypeNode) extern));

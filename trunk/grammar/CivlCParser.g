@@ -1363,6 +1363,7 @@ statement
     | jumpStatement
     | pragma
     | assumeStatement
+    | assertStatement
     | whenStatement
     | chooseStatement
     | atomicStatement
@@ -1598,6 +1599,10 @@ pragmaBody
 assumeStatement
 	:	ASSUME expression SEMI -> ^(ASSUME expression)
 	;
+	
+assertStatement
+	:	ASSERT conditionalExpression (COLON conditionalExpression (COMMA conditionalExpression)*)? SEMI -> ^(ASSERT conditionalExpression conditionalExpression*)
+	;
 
 whenStatement
 	:	WHEN LPAREN expression RPAREN statement
@@ -1661,6 +1666,7 @@ scope DeclarationScope;
 		) 
 	| pragma
 	| assumeStatement
+	| assertStatement
 	;
 
 

@@ -65,9 +65,6 @@ void $exit(void);
 /* Nondeterministic choice of integer i, such that 0<=i<n. */
 int $choose_int(int n);
 
-/* assertion */
-void $assert(_Bool expr, ...);
-
 /* Returns $true iff p is a defined procecess value (i.e., 
 the value of the process id is greater than 0) */
 _Bool $proc_defined($proc p);

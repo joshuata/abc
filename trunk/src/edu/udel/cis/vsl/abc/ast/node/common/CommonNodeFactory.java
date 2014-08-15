@@ -67,6 +67,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -147,6 +148,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpWorkshareNode;
+import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssertNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
@@ -717,6 +719,12 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public AssertNode newAssertNode(Source source, ExpressionNode expression,
+			SequenceNode<ExpressionNode> explanation) {
+		return new CommonAssertNode(source, expression, explanation);
+	}
+
+	@Override
 	public WhenNode newWhenNode(Source source, ExpressionNode guard,
 			StatementNode body) {
 		return new CommonWhenNode(source, guard, body);
@@ -935,5 +943,4 @@ public class CommonNodeFactory implements NodeFactory {
 			ExpressionNode low, ExpressionNode high, ExpressionNode step) {
 		return new CommonRegularRangeNode(source, low, high, step);
 	}
-
 }

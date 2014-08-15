@@ -23,6 +23,6 @@ public class CommonReturnNode extends CommonJumpNode implements ReturnNode {
 
 	@Override
 	public StatementKind statementKind() {
-		return StatementKind.RETURN;
+		return StatementKind.JUMP;
 	}
 }
