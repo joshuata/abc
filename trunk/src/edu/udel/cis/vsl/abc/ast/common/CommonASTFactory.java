@@ -838,10 +838,12 @@ public class CommonASTFactory implements ASTFactory {
 
 	private static void pPrintLoop(PrintStream out, String prefix, LoopNode loop) {
 		LoopKind loopKind = loop.getKind();
-		StringBuffer condition = pPrintExpression(loop.getCondition());
+		StringBuffer condition = new StringBuffer();
 		String myIndent = prefix + indention;
 		StatementNode bodyNode = loop.getBody();
 
+		if (loop.getCondition() != null)
+			condition = pPrintExpression(loop.getCondition());
 		out.print(prefix);
 		switch (loopKind) {
 		case WHILE:
