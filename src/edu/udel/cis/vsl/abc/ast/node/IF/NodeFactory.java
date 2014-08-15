@@ -60,6 +60,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -1527,6 +1528,23 @@ public interface NodeFactory {
 	 * @return the new <code>$assume</code> statement node
 	 */
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
+
+	/**
+	 * Creates a new node representing a CIVL-C <code>$assert</code> statement.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$assert</code>
+	 *            statement, including the expression argument
+	 * @param expression
+	 *            a boolean expression which is to be evaluated and expected to
+	 *            be true
+	 * @param explanation
+	 *            the list of expressions for explaining the assertion if it is
+	 *            violated.
+	 * @return the new <code>$assert</code> statement node
+	 */
+	AssertNode newAssertNode(Source source, ExpressionNode expression,
+			SequenceNode<ExpressionNode> explanation);
 
 	/**
 	 * Creates a new node representing a CIVL-C <code>$when</code> node, used to

@@ -193,6 +193,7 @@ public class SideEffectRemover extends BaseTransformer {
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
+		// TODO assertNode
 		if (statement instanceof AssumeNode) {
 			result = assumeStatement((AssumeNode) statement);
 		} else if (statement instanceof ChooseStatementNode) {

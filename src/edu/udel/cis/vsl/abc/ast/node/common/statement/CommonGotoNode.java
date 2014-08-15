@@ -28,6 +28,6 @@ public class CommonGotoNode extends CommonJumpNode implements GotoNode {
 
 	@Override
 	public StatementKind statementKind(){
-		return StatementKind.GOTO;
+		return StatementKind.JUMP;
 	}
 }

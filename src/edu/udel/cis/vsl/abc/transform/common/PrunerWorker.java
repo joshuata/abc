@@ -23,6 +23,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
@@ -194,7 +195,8 @@ public class PrunerWorker {
 
 			if (externalDef instanceof PragmaNode
 					|| externalDef instanceof StaticAssertionNode
-					|| externalDef instanceof AssumeNode)
+					|| externalDef instanceof AssumeNode
+					|| externalDef instanceof AssertNode)
 				markReachable(externalDef);
 		}
 		explore(main);
