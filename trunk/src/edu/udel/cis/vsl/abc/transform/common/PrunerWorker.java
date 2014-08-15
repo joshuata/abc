@@ -9,6 +9,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -137,16 +138,25 @@ public class PrunerWorker {
 	 *            an Entity occurring in the AST
 	 */
 	private void explore(Entity entity) {
+		if (entity instanceof TaggedEntity) {
+			// only need the first decl and the defn:
+			ASTNode firstDecl = entity.getFirstDeclaration();
+			ASTNode defn = entity.getDefinition();
 
-		Iterator<DeclarationNode> declIter = entity.getDeclarations();
+			if (firstDecl != null)
+				markReachable(firstDecl);
+			if (defn != null && defn != firstDecl)
+				markReachable(defn);
+		} else {
+			Iterator<DeclarationNode> declIter = entity.getDeclarations();
 
-		while (declIter.hasNext())
-			markReachable(declIter.next());
-
-		// special case: if you use at least one enumerator
-		// in the enumeration, you use the whole enumeration...
-		if (entity instanceof Enumerator) {
-			explore(((Enumerator) entity).getType());
+			while (declIter.hasNext())
+				markReachable(declIter.next());
+			// special case: if you use at least one enumerator
+			// in the enumeration, you use the whole enumeration...
+			if (entity instanceof Enumerator) {
+				explore(((Enumerator) entity).getType());
+			}
 		}
 	}
 
