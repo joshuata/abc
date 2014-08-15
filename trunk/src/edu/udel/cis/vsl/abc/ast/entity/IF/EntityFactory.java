@@ -3,13 +3,8 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
-import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 /**
  * A factory for producing instances of {@link Entity}, and some related utility
@@ -61,39 +56,6 @@ public interface EntityFactory {
 	 * @return the new function
 	 */
 	Function newFunction(String name, LinkageKind linkage, Type type);
-
-	/**
-	 * Creates a new enumerator entity. These correspond to the enumerators in
-	 * the enumerator list of a complete enumeration definition.
-	 * 
-	 * @param declaration
-	 *            the declaration of the enumerator in the enuemrator list
-	 * @param enumeration
-	 *            the enumeration of which this enumerator is a part
-	 * @param value
-	 *            the constant integer value associated to the enumerator
-	 * @return the new enumerator entity
-	 */
-	Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			EnumerationType enumeration, Value value);
-
-	/**
-	 * Creates a new field entity. These correspond to the field declarations in
-	 * a complete structure or union definition.
-	 * 
-	 * @param declaration
-	 *            the field declaration
-	 * @param type
-	 *            the type of the field
-	 * @param bitWidth
-	 *            the optional bit width parameter // * @param structureOrUnion
-	 *            // * the structure or union entity in which this field occurs
-	 * @return the new field
-	 */
-	Field newField(FieldDeclarationNode declaration, ObjectType type,
-			Value bitWidth
-	// , StructureOrUnion structureOrUnion
-	);
 
 	/**
 	 * Creates a new {@link Typedef} entity.

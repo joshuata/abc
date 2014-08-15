@@ -1,12 +1,20 @@
-package edu.udel.cis.vsl.abc.ast.entity.common;
+package edu.udel.cis.vsl.abc.ast.entity.IF;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
+/**
+ * A simple, generic implementation of {@link Entity}. This class may be
+ * extended by specific entities, or it may used as a field (as in the
+ * Delegation Pattern) to help implement other entities that cannot extend this
+ * class for some reason (for example, because they extend some other class.)
+ * 
+ * @author siegel
+ * 
+ */
 public class CommonEntity implements Entity {
 
 	private EntityKind entityKind;

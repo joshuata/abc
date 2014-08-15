@@ -2,8 +2,6 @@ package edu.udel.cis.vsl.abc.ast.entity.common;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.PragmaHandler;
@@ -12,13 +10,8 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
-import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 public class CommonEntityFactory implements EntityFactory {
 
@@ -35,22 +28,6 @@ public class CommonEntityFactory implements EntityFactory {
 	@Override
 	public Function newFunction(String name, LinkageKind linkage, Type type) {
 		return new CommonFunction(name, linkage, type);
-	}
-
-	@Override
-	public Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			EnumerationType enumeration, Value value) {
-		return new CommonEnumerator(declaration, enumeration, value);
-	}
-
-	@Override
-	public Field newField(FieldDeclarationNode declaration, ObjectType type,
-			Value bitWidth
-	// , StructureOrUnion structureOrUnion
-	) {
-		return new CommonField(declaration, type, bitWidth
-		// , structureOrUnion
-		);
 	}
 
 	@Override

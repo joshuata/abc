@@ -16,8 +16,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory.Answer;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -351,21 +349,6 @@ public class CommonScope implements Scope {
 	@Override
 	public void print(PrintStream out) {
 		print("", out);
-	}
-
-	@Override
-	public Type getType() {
-		return translationUnit.getASTFactory().getTypeFactory().scopeType();
-	}
-
-	@Override
-	public boolean isScalar() {
-		return false;
-	}
-
-	@Override
-	public Answer isZero() {
-		return Answer.NO;
 	}
 
 	@Override

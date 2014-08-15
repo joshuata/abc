@@ -5,31 +5,29 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 
+/**
+ * Implementation of {@link EnumerationType}. The {@link Entity} methods are
+ * implemented using the Delegation Pattern by delegating to an {@link Entity}
+ * object which is a field of this class.
+ * 
+ * @author siegel
+ * 
+ */
 public class CommonEnumerationType extends CommonIntegerType implements
 		EnumerationType {
 
 	private final static int classCode = CommonEnumerationType.class.hashCode();
 
-	// Entity fields...
-
-	private ArrayList<DeclarationNode> declarations = new ArrayList<DeclarationNode>();
-
-	private DeclarationNode definition;
-
-	/**
-	 * Is this a system-defined entity (as opposed to a user-defined one)?
-	 * Examples include standard types, like size_t.
-	 */
-	private boolean isSystem = false;
-
-	// Enumeration type fields...
+	private Entity entity;
 
 	private Object key;
 
@@ -42,6 +40,8 @@ public class CommonEnumerationType extends CommonIntegerType implements
 		assert key != null;
 		this.key = key;
 		this.tag = tag;
+		this.entity = new CommonEntity(EntityKind.ENUMERATION, tag,
+				LinkageKind.NONE);
 	}
 
 	@Override
@@ -276,7 +276,7 @@ public class CommonEnumerationType extends CommonIntegerType implements
 
 	@Override
 	public EntityKind getEntityKind() {
-		return EntityKind.ENUMERATION;
+		return entity.getEntityKind();
 	}
 
 	@Override
@@ -286,42 +286,42 @@ public class CommonEnumerationType extends CommonIntegerType implements
 
 	@Override
 	public Iterator<DeclarationNode> getDeclarations() {
-		return declarations.iterator();
+		return entity.getDeclarations();
 	}
 
 	@Override
 	public DeclarationNode getFirstDeclaration() {
-		return declarations.get(0);
+		return entity.getFirstDeclaration();
 	}
 
 	@Override
 	public int getNumDeclarations() {
-		return declarations.size();
+		return entity.getNumDeclarations();
 	}
 
 	@Override
 	public DeclarationNode getDeclaration(int index) {
-		return declarations.get(index);
+		return entity.getDeclaration(index);
 	}
 
 	@Override
 	public void addDeclaration(DeclarationNode declaration) {
-		declarations.add(declaration);
+		entity.addDeclaration(declaration);
 	}
 
 	@Override
 	public DeclarationNode getDefinition() {
-		return definition;
+		return entity.getDefinition();
 	}
 
 	@Override
 	public void setDefinition(DeclarationNode declaration) {
-		this.definition = declaration;
+		entity.setDefinition(declaration);
 	}
 
 	@Override
 	public LinkageKind getLinkage() {
-		return LinkageKind.NONE;
+		return entity.getLinkage();
 	}
 
 	@Override
@@ -343,12 +343,12 @@ public class CommonEnumerationType extends CommonIntegerType implements
 
 	@Override
 	public boolean isSystem() {
-		return isSystem;
+		return entity.isSystem();
 	}
 
 	@Override
 	public void setIsSystem(boolean value) {
-		this.isSystem = value;
+		entity.setIsSystem(value);
 	}
 
 }

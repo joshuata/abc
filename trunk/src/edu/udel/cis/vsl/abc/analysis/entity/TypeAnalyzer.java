@@ -4,9 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
@@ -35,6 +32,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
@@ -69,8 +68,6 @@ public class TypeAnalyzer {
 
 	private NodeFactory nodeFactory;
 
-	private EntityFactory entityFactory;
-
 	private ValueFactory valueFactory;
 
 	private Language language;
@@ -83,12 +80,12 @@ public class TypeAnalyzer {
 
 	// ************************** Constructors ****************************
 
-	TypeAnalyzer(EntityAnalyzer entityAnalyzer, TypeFactory typeFactory,
-			EntityFactory entityFactory) {
+	TypeAnalyzer(EntityAnalyzer entityAnalyzer, TypeFactory typeFactory
+	// , EntityFactory entityFactory
+	) {
 		this.entityAnalyzer = entityAnalyzer;
 		this.nodeFactory = entityAnalyzer.nodeFactory;
 		this.typeFactory = typeFactory;
-		this.entityFactory = entityFactory;
 		this.valueFactory = entityAnalyzer.valueFactory;
 		this.enumeratorType = (IntegerType) typeFactory
 				.basicType(BasicTypeKind.INT);
@@ -434,8 +431,8 @@ public class TypeAnalyzer {
 									+ tmpValue, constantNode);
 				value = (IntegerValue) tmpValue;
 			}
-			enumerator = entityFactory.newEnumerator(decl, enumerationType,
-					value);
+			enumerator = typeFactory
+					.newEnumerator(decl, enumerationType, value);
 			enumerator.addDeclaration(decl);
 			enumerator.setDefinition(decl);
 			decl.setEntity(enumerator);
@@ -582,7 +579,7 @@ public class TypeAnalyzer {
 							bitWidthExpression);
 				bitWidth = nodeFactory.getConstantValue(bitWidthExpression);
 			}
-			field = entityFactory.newField(decl, fieldType, bitWidth
+			field = typeFactory.newField(decl, fieldType, bitWidth
 			// ,structureOrUnion
 					);
 			decl.setEntity(field);

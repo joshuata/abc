@@ -1,8 +1,9 @@
-package edu.udel.cis.vsl.abc.ast.entity.common;
+package edu.udel.cis.vsl.abc.ast.type.common;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.entity.common.CommonOrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 public class CommonEnumerator extends CommonOrdinaryEntity implements

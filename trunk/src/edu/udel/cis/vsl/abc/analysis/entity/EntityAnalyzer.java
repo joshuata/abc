@@ -121,7 +121,9 @@ public class EntityAnalyzer implements Analyzer {
 				conversionFactory, typeFactory);
 		this.compoundLiteralAnalyzer = new CompoundLiteralAnalyzer(this);
 		this.statementAnalyzer = new StatementAnalyzer(this, expressionAnalyzer);
-		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory, entityFactory);
+		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory
+		// , entityFactory
+		);
 		this.pragmaHandlerMap = new LinkedHashMap<String, PragmaHandler>();
 	}
 
