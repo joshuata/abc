@@ -184,7 +184,7 @@ public class CommonASTFactory implements ASTFactory {
 			pPrintPragma(out, "", (PragmaNode) node);
 			break;
 		case STATEMENT:
-			pPrintStatement(out, "", (StatementNode) node);
+			pPrintStatement(out, "", (StatementNode) node, true);
 			break;
 		case STATIC_ASSERTION:
 			pPrintStaticAssertion(out, "", (StaticAssertionNode) node);
@@ -414,23 +414,30 @@ public class CommonASTFactory implements ASTFactory {
 					.getBody();
 
 			out.print("\n");
-			pPrintCompoundStatement(out, prefix + indention, body);
+			pPrintCompoundStatement(out, prefix + indention, body, true);
 		} else
 			out.print(";");
 	}
 
 	private static void pPrintCompoundStatement(PrintStream out, String prefix,
-			CompoundStatementNode compound) {
+			CompoundStatementNode compound, boolean isBody) {
 		int numChildren = compound.numChildren();
-		String myPrefix = prefix.substring(0, prefix.length() - 2);
+		String myIndent = prefix;
+		String myPrefix = prefix;
 
-		out.print(myPrefix);
+		if (isBody) {
+			myPrefix = prefix.substring(0, prefix.length() - 2);
+			out.print(myPrefix);
+		} else {
+			out.print(myPrefix);
+			myIndent = prefix + indention;
+		}
 		out.print("{\n");
 		for (int i = 0; i < numChildren; i++) {
 			BlockItemNode child = compound.getSequenceChild(i);
 
 			if (child != null) {
-				pPrintBlockItem(out, prefix, child);
+				pPrintBlockItem(out, myIndent, child);
 				out.print("\n");
 			}
 		}
@@ -444,7 +451,7 @@ public class CommonASTFactory implements ASTFactory {
 
 		switch (kind) {
 		case STATEMENT:
-			pPrintStatement(out, prefix, (StatementNode) block);
+			pPrintStatement(out, prefix, (StatementNode) block, false);
 			break;
 		case ORDINARY_DECLARATION:
 			if (block instanceof VariableDeclarationNode) {
@@ -490,7 +497,7 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	private static void pPrintStatement(PrintStream out, String prefix,
-			StatementNode statement) {
+			StatementNode statement, boolean isBody) {
 		StatementKind kind = statement.statementKind();
 
 		switch (kind) {
@@ -502,7 +509,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		case COMPOUND:
 			pPrintCompoundStatement(out, prefix,
-					(CompoundStatementNode) statement);
+					(CompoundStatementNode) statement, isBody);
 			break;
 		case EXPRESSION:
 			expressionStatement2CIVL(out, prefix,
@@ -615,7 +622,7 @@ public class CommonASTFactory implements ASTFactory {
 		}
 		out.print("\n");
 		if (block != null)
-			pPrintStatement(out, myIndent, block);
+			pPrintStatement(out, myIndent, block, true);
 	}
 
 	private static void pPrintOmpWorksharing(PrintStream out, String prefix,
@@ -833,7 +840,7 @@ public class CommonASTFactory implements ASTFactory {
 				out.print(";");
 			else {
 				out.print("\n");
-				pPrintStatement(out, myIndent, bodyNode);
+				pPrintStatement(out, myIndent, bodyNode, true);
 
 			}
 			break;
@@ -843,7 +850,7 @@ public class CommonASTFactory implements ASTFactory {
 				out.print(";");
 			else {
 				out.print("\n");
-				pPrintStatement(out, myIndent, bodyNode);
+				pPrintStatement(out, myIndent, bodyNode, true);
 			}
 			out.print("while(");
 			out.print(condition);
@@ -864,7 +871,7 @@ public class CommonASTFactory implements ASTFactory {
 			out.print("$atom\n");
 		else
 			out.print("$atomic\n");
-		pPrintStatement(out, prefix + indention, atomicNode.getBody());
+		pPrintStatement(out, prefix + indention, atomicNode.getBody(), true);
 	}
 
 	private static void pPrintGoto(PrintStream out, String prefix, GotoNode go2) {
@@ -883,7 +890,7 @@ public class CommonASTFactory implements ASTFactory {
 		out.print(prefix);
 		out.print(pPrintLabelNode(label));
 		out.print("\n");
-		pPrintStatement(out, myIndent, statement);
+		pPrintStatement(out, myIndent, statement, false);
 	}
 
 	private static StringBuffer pPrintLabelNode(LabelNode label) {
@@ -968,13 +975,13 @@ public class CommonASTFactory implements ASTFactory {
 			out.print(";");
 		else {
 			out.print("\n");
-			pPrintStatement(out, myIndent, trueBranch);
+			pPrintStatement(out, myIndent, trueBranch, true);
 		}
 		if (falseBranch != null) {
 			out.print("\n");
 			out.print(prefix);
 			out.print("else\n");
-			pPrintStatement(out, myIndent, falseBranch);
+			pPrintStatement(out, myIndent, falseBranch, true);
 		}
 	}
 
@@ -1007,7 +1014,7 @@ public class CommonASTFactory implements ASTFactory {
 			out.print(";");
 		else {
 			out.print("\n");
-			pPrintStatement(out, myIndent, body);
+			pPrintStatement(out, myIndent, body, true);
 		}
 	}
 
@@ -1039,7 +1046,7 @@ public class CommonASTFactory implements ASTFactory {
 		out.print("$when(");
 		out.print(pPrintExpression(when.getGuard()));
 		out.print(")\n");
-		pPrintStatement(out, myIndent, when.getBody());
+		pPrintStatement(out, myIndent, when.getBody(), true);
 	}
 
 	static private StringBuffer pPrintVariableDeclaration(String prefix,
