@@ -1,6 +1,7 @@
 #ifdef __MPI__
 #else
 #define __MPI__
+
 typedef enum {
     MPIX_NO_OP,
     MPI_MAX, 
@@ -17,5 +18,6 @@ typedef enum {
     MPI_MAXLOC,  
     MPI_REPLACE
 } MPI_Op;
+
 #include <mpi-common.h>
 #endif
