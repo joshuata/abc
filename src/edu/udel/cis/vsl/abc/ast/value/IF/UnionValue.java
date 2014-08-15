@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.value.IF;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 
 public interface UnionValue extends CompoundValue {

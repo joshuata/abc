@@ -68,7 +68,7 @@ import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
  * distinct from all other names.
  * </p>
  */
-public interface Scope extends ScopeValue {
+public interface Scope {
 
 	/**
 	 * These are the four different kinds of scopes.

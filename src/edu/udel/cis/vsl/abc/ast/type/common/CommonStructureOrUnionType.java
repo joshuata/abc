@@ -7,8 +7,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
+import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -21,19 +23,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	private final static int classCode = CommonStructureOrUnionType.class
 			.hashCode();
 
-	// Entity fields...
-
-	private ArrayList<DeclarationNode> declarations = new ArrayList<DeclarationNode>();
-
-	private DeclarationNode definition;
-
-	/**
-	 * Is this a system-defined entity (as opposed to a user-defined one)?
-	 * Examples include standard types, like size_t.
-	 */
-	private boolean isSystem = false;
-
-	// Structure or union fields...
+	private Entity entity;
 
 	/** Key, cannot be null. */
 	private Object key;
@@ -59,6 +49,8 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 		this.tag = tag;
 		this.isStruct = isStruct;
 		this.fields = null;
+		this.entity = new CommonEntity(EntityKind.STRUCTURE_OR_UNION, tag,
+				LinkageKind.NONE);
 	}
 
 	@Override
@@ -336,7 +328,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 	@Override
 	public EntityKind getEntityKind() {
-		return EntityKind.STRUCTURE_OR_UNION;
+		return entity.getEntityKind();
 	}
 
 	@Override
@@ -346,42 +338,42 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 	@Override
 	public Iterator<DeclarationNode> getDeclarations() {
-		return declarations.iterator();
+		return entity.getDeclarations();
 	}
 
 	@Override
 	public DeclarationNode getFirstDeclaration() {
-		return declarations.get(0);
+		return entity.getFirstDeclaration();
 	}
 
 	@Override
 	public int getNumDeclarations() {
-		return declarations.size();
+		return entity.getNumDeclarations();
 	}
 
 	@Override
 	public DeclarationNode getDeclaration(int index) {
-		return declarations.get(index);
+		return entity.getDeclaration(index);
 	}
 
 	@Override
 	public void addDeclaration(DeclarationNode declaration) {
-		declarations.add(declaration);
+		entity.addDeclaration(declaration);
 	}
 
 	@Override
 	public DeclarationNode getDefinition() {
-		return definition;
+		return entity.getDefinition();
 	}
 
 	@Override
 	public void setDefinition(DeclarationNode declaration) {
-		this.definition = declaration;
+		entity.setDefinition(declaration);
 	}
 
 	@Override
 	public LinkageKind getLinkage() {
-		return LinkageKind.NONE;
+		return entity.getLinkage();
 	}
 
 	@Override
@@ -405,12 +397,12 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 	@Override
 	public boolean isSystem() {
-		return isSystem;
+		return entity.isSystem();
 	}
 
 	@Override
 	public void setIsSystem(boolean value) {
-		this.isSystem = value;
+		entity.setIsSystem(value);
 	}
 
 }

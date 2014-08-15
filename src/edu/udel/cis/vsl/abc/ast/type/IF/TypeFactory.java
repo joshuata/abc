@@ -7,12 +7,15 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardSignedIntegerType.SignedIntKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardUnsignedIntegerType.UnsignedIntKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
+import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 /**
  * <p>
@@ -309,6 +312,21 @@ public interface TypeFactory {
 			String tag);
 
 	/**
+	 * Creates a new field entity. These correspond to the field declarations in
+	 * a complete structure or union definition.
+	 * 
+	 * @param declaration
+	 *            the field declaration
+	 * @param type
+	 *            the type of the field
+	 * @param bitWidth
+	 *            the optional bit width parameter
+	 * @return the new field
+	 */
+	Field newField(FieldDeclarationNode declaration, ObjectType type,
+			Value bitWidth);
+
+	/**
 	 * Returns an enumeration type with the given tag and key. The type can be
 	 * completed using methods in the resulting EnumerationType object.
 	 * 
@@ -322,6 +340,21 @@ public interface TypeFactory {
 	 * @return a new, incomplete enumeration type
 	 */
 	EnumerationType enumerationType(Object key, String tag);
+
+	/**
+	 * Creates a new enumerator entity. These correspond to the enumerators in
+	 * the enumerator list of a complete enumeration definition.
+	 * 
+	 * @param declaration
+	 *            the declaration of the enumerator in the enuemrator list
+	 * @param enumeration
+	 *            the enumeration of which this enumerator is a part
+	 * @param value
+	 *            the constant integer value associated to the enumerator
+	 * @return the new enumerator entity
+	 */
+	Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
+			EnumerationType enumeration, Value value);
 
 	/**
 	 * Returns a qualified type based on the given unqualified type. At least

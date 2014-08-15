@@ -1,7 +1,7 @@
-package edu.udel.cis.vsl.abc.ast.entity.IF;
+package edu.udel.cis.vsl.abc.ast.type.IF;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 /**
@@ -49,10 +49,4 @@ public interface Field extends Entity {
 	 */
 	Value getBitWidth();
 
-	// /**
-	// * Returns the structure or union entity to which this field belongs.
-	// *
-	// * @return the StructureOrUnion object to which this Field belongs
-	// */
-	//StructureOrUnion getStructureOrUnion();
 }

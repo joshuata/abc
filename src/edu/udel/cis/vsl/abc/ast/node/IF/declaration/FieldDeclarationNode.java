@@ -1,8 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 
 /**
  * Represents a declaration of a field (member) in a struct or union type.

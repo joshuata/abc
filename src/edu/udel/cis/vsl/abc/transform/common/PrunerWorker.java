@@ -6,7 +6,6 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
@@ -28,6 +27,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;

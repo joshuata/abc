@@ -3,6 +3,8 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
 import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
 /**

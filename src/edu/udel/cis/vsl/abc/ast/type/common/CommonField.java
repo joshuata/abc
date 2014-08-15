@@ -1,7 +1,8 @@
-package edu.udel.cis.vsl.abc.ast.entity.common;
+package edu.udel.cis.vsl.abc.ast.type.common;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
+import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 

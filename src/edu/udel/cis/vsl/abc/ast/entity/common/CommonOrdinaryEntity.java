@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.entity.common;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 

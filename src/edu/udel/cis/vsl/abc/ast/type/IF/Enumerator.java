@@ -1,7 +1,7 @@
-package edu.udel.cis.vsl.abc.ast.entity.IF;
+package edu.udel.cis.vsl.abc.ast.type.IF;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 /**
