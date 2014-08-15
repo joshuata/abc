@@ -272,30 +272,30 @@ public class CommonAST implements AST {
 
 	private void externalDef2CIVL(PrintStream out, ExternalDefinitionNode extern) {
 		if (extern instanceof AssumeNode) {
-			CommonASTFactory.assume2CIVL(out, "", (AssumeNode) extern);
+			CommonASTFactory.pPrintAssume(out, "", (AssumeNode) extern);
 		} else if (extern instanceof EnumerationTypeNode) {
-			out.print(CommonASTFactory.enumType2CIVL("",
+			out.print(CommonASTFactory.pPrintEnumType("",
 					(EnumerationTypeNode) extern));
 			out.print(";");
 		} else if (extern instanceof OrdinaryDeclarationNode) {
-			CommonASTFactory.ordinaryDeclaration2CIVL(out, "",
+			CommonASTFactory.pPrintOrdinaryDeclaration(out, "",
 					(OrdinaryDeclarationNode) extern);
 		} else if (extern instanceof PragmaNode) {
-			CommonASTFactory.pragma2CIVL(out, "", (PragmaNode) extern);
+			CommonASTFactory.pPrintPragma(out, "", (PragmaNode) extern);
 		} else if (extern instanceof StaticAssertionNode) {
-			CommonASTFactory.staticAssertion2CIVL(out, "",
+			CommonASTFactory.pPrintStaticAssertion(out, "",
 					(StaticAssertionNode) extern);
 			out.print(";");
 		} else if (extern instanceof StructureOrUnionTypeNode) {
-			out.print(CommonASTFactory.structOrUnion2CIVL("",
+			out.print(CommonASTFactory.pPrintStructOrUnion("",
 					(StructureOrUnionTypeNode) extern));
 			out.print(";");
 		} else if (extern instanceof TypedefDeclarationNode) {
-			CommonASTFactory.typedefDeclaration2CIVL(out, "",
+			CommonASTFactory.pPrintTypedefDeclaration(out, "",
 					(TypedefDeclarationNode) extern);
 			out.print(";");
 		} else if (extern instanceof OmpDeclarativeNode) {
-			CommonASTFactory.ompDeclarative2CIVL(out, "",
+			CommonASTFactory.pPrintOmpDeclarative(out, "",
 					(OmpDeclarativeNode) extern);
 		}
 		out.print("\n");
