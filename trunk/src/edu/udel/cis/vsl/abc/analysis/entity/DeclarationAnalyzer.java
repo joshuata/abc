@@ -522,7 +522,8 @@ public class DeclarationAnalyzer {
 			FunctionDeclarationNode declaration) throws SyntaxException {
 		TypeNode typeNode = declaration.getTypeNode();
 		OrdinaryDeclarationNode previousDeclaration;
-		Iterator<DeclarationNode> declarationIter = function.getDeclarations();
+		Iterator<DeclarationNode> declarationIter = function.getDeclarations()
+				.iterator();
 
 		if (declarationIter.hasNext())
 			previousDeclaration = (OrdinaryDeclarationNode) declarationIter

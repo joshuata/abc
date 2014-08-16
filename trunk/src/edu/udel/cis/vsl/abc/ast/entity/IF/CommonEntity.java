@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -57,8 +56,8 @@ public class CommonEntity implements Entity {
 	}
 
 	@Override
-	public Iterator<DeclarationNode> getDeclarations() {
-		return declarations.iterator();
+	public Iterable<DeclarationNode> getDeclarations() {
+		return declarations;
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.Iterator;
-
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
@@ -622,11 +620,8 @@ public class ExpressionAnalyzer {
 		if (node.parent() instanceof FunctionCallNode) {
 			result = functionType;
 		} else {
-			Iterator<DeclarationNode> decls = function.getDeclarations();
-
-			while (decls.hasNext()) {
-				FunctionDeclarationNode decl = (FunctionDeclarationNode) decls
-						.next();
+			for (DeclarationNode dn : function.getDeclarations()) {
+				FunctionDeclarationNode decl = (FunctionDeclarationNode) dn;
 				FunctionTypeNode typeNode = decl.getTypeNode();
 
 				if (!typeNode.hasIdentifierList()) {

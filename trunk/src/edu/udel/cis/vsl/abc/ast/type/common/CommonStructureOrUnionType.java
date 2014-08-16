@@ -337,7 +337,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	}
 
 	@Override
-	public Iterator<DeclarationNode> getDeclarations() {
+	public Iterable<DeclarationNode> getDeclarations() {
 		return entity.getDeclarations();
 	}
 

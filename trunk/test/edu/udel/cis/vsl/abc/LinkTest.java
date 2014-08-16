@@ -38,7 +38,7 @@ public class LinkTest {
 
 	public final static File[] userIncludePaths = new File[0];
 
-	private File root = new File("examples/link");
+	private File root = new File(new File("examples"), "link");
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
