@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.ast.type.IF;
 
 import java.io.PrintStream;
 import java.math.BigInteger;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
@@ -456,7 +455,7 @@ public interface TypeFactory {
 	 *         is known
 	 */
 	FunctionType functionType(ObjectType returnType,
-			boolean fromIdentifierList, List<ObjectType> parameterTypes,
+			boolean fromIdentifierList, Iterable<ObjectType> parameterTypes,
 			boolean hasVariableArgs);
 
 	/**

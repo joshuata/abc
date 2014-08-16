@@ -1,8 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
-import java.util.Iterator;
-import java.util.List;
-
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 
 /**
@@ -79,9 +76,9 @@ public interface StructureOrUnionType extends UnqualifiedObjectType,
 	 * Returns an iterator over the fields in this type, or null if this type is
 	 * not yet complete.
 	 * 
-	 * @return an iterator over the fields, in order, or null
+	 * @return an iterable over the fields, in order, or null
 	 */
-	Iterator<Field> getFields();
+	Iterable<Field> getFields();
 
 	/**
 	 * Completes this structure of union type by specifying its contents, i.e.,
@@ -93,7 +90,7 @@ public interface StructureOrUnionType extends UnqualifiedObjectType,
 	 * @param fields
 	 *            an ordered list of fields
 	 */
-	void complete(List<Field> fields);
+	void complete(Iterable<Field> fields);
 
 	/** Make incomplete. */
 	void clear();

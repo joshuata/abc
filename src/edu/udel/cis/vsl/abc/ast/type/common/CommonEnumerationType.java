@@ -2,8 +2,6 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
@@ -60,17 +58,17 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	@Override
 	public Enumerator getEnumerator(int index) {
 		if (!isComplete())
-			throw new RuntimeException("Enumeration type " + tag
+			throw new ABCRuntimeException("Enumeration type " + tag
 					+ " is incomplete");
 		return enumerators.get(index);
 	}
 
 	@Override
-	public Iterator<Enumerator> getEnumerators() {
+	public Iterable<Enumerator> getEnumerators() {
 		if (!isComplete())
-			throw new RuntimeException("Enumeration type " + tag
+			throw new ABCRuntimeException("Enumeration type " + tag
 					+ " is incomplete");
-		return enumerators.iterator();
+		return enumerators;
 	}
 
 	@Override
@@ -78,11 +76,13 @@ public class CommonEnumerationType extends CommonIntegerType implements
 		return enumerators != null;
 	}
 
-	public void complete(List<Enumerator> enumeratorList) {
+	public void complete(Iterable<Enumerator> enumeratorList) {
 		if (isComplete())
-			throw new RuntimeException("Enumerator type " + tag
+			throw new ABCRuntimeException("Enumerator type " + tag
 					+ " is already complete");
-		enumerators = new ArrayList<Enumerator>(enumeratorList);
+		enumerators = new ArrayList<>();
+		for (Enumerator enumerator : enumeratorList)
+			enumerators.add(enumerator);
 	}
 
 	@Override

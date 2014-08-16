@@ -249,9 +249,9 @@ public interface Scope {
 	 * Returns an iterator over the variables in this scope, in order of
 	 * increasing variable ID.
 	 * 
-	 * @return an iterator over the variables in this scope.
+	 * @return an iterable over the variables in this scope.
 	 */
-	Iterator<Variable> getVariables();
+	Iterable<Variable> getVariables();
 
 	/**
 	 * Returns the number of functions in this scope. Note this does not include
@@ -276,7 +276,7 @@ public interface Scope {
 	 * 
 	 * @return iterator over functions in this scope
 	 */
-	Iterator<Function> getFunctions();
+	Iterable<Function> getFunctions();
 
 	// Tagged entities (enumerations, structures, and unions)...
 

@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -291,11 +290,7 @@ public class EntityAnalyzer implements Analyzer {
 			throw new IllegalArgumentException(
 					"Tentative definition only exist at file scope");
 
-		Iterator<Variable> variableIter = scope.getVariables();
-
-		while (variableIter.hasNext()) {
-			Variable variable = variableIter.next();
-
+		for (Variable variable : scope.getVariables()) {
 			if (variable.getDefinition() == null) {
 				for (DeclarationNode decl : variable.getDeclarations()) {
 					VariableDeclarationNode declaration = (VariableDeclarationNode) decl;

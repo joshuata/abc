@@ -2,8 +2,6 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
@@ -58,12 +56,14 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 	 *            (indicated by a "..." in the parameter type list)?
 	 */
 	public CommonFunctionType(ObjectType returnType,
-			boolean fromIdentifierList, List<ObjectType> parameterTypes,
+			boolean fromIdentifierList, Iterable<ObjectType> parameterTypes,
 			boolean hasVariableArgs) {
 		super(TypeKind.FUNCTION);
 		this.returnType = returnType;
 		this.fromIdentifierList = fromIdentifierList;
-		this.parameterTypes = new ArrayList<ObjectType>(parameterTypes);
+		this.parameterTypes = new ArrayList<ObjectType>();
+		for (ObjectType ot : parameterTypes)
+			this.parameterTypes.add(ot);
 		this.hasVariableArgs = hasVariableArgs;
 	}
 
@@ -96,12 +96,12 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 	}
 
 	@Override
-	public Iterator<ObjectType> getParameterTypes() {
+	public Iterable<ObjectType> getParameterTypes() {
 		if (parameterTypes == null)
 			throw new ASTException(
 					"The parameters for the function have not been specified."
 							+ "\nNote that a prototype for a function with 0 parameters must have the form \"f(void)\"");
-		return parameterTypes.iterator();
+		return parameterTypes;
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
-import java.util.Iterator;
-
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 
 /**
@@ -85,7 +83,7 @@ public interface FunctionType extends Type {
 	 *                if the parameter information is not known
 	 * @return sequence of parameter declarations
 	 */
-	Iterator<ObjectType> getParameterTypes();
+	Iterable<ObjectType> getParameterTypes();
 
 	/**
 	 * A function that takes a variable number of arguments will have an
