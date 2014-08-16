@@ -4,12 +4,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.rmi.activation.Activator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
 /**
@@ -241,16 +246,45 @@ public class ABC {
 	 * @throws IOException
 	 *             if the file cannot be opened
 	 */
-	public static void main(String[] args) throws ABCException, IOException {
-		TranslationTask config;
+	public static void main(String[] args) {
+		TranslationTask config = null;
 		FrontEnd frontEnd;
+		PrintStream err = System.err, out = System.out;
 
-		System.out.println("ABC v" + version + " of " + date
+		out.println("ABC v" + version + " of " + date
 				+ " -- http://vsl.cis.udel.edu\n");
-		System.out.flush();
-		config = parseCommandLine(args);
+		out.flush();
+		try {
+			config = parseCommandLine(args);
+		} catch (FileNotFoundException e) {
+			err.println(e.getMessage());
+			err.flush();
+			System.exit(1);
+		}
 		frontEnd = new FrontEnd();
-		frontEnd.showTranslation(config);
+		try {
+			frontEnd.showTranslation(config);
+		} catch (PreprocessorException e) {
+			err.println(e.getMessage());
+			err.flush();
+			System.exit(2);
+		} catch (PreprocessorRuntimeException e) {
+			err.println(e.getMessage());
+			err.flush();
+			System.exit(2);
+		} catch (ParseException e) {
+			err.println(e.getMessage());
+			err.flush();
+			System.exit(3);
+		} catch (SyntaxException e) {
+			err.println(e.getMessage());
+			err.flush();
+			System.exit(4);
+		} catch (IOException e) {
+			err.println(e.getMessage());
+			err.flush();
+			System.exit(5);
+		}
 		config.getOut().close();
 	}
 }
