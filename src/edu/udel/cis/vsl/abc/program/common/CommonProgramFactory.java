@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.program.common;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +92,6 @@ public class CommonProgramFactory implements ProgramFactory {
 				throw new ABCRuntimeException("unreachable: " + def);
 		}
 		for (Entity entity : plan.getEntityRemoveActions()) {
-			Iterator<DeclarationNode> declIter = entity.getDeclarations();
 			boolean isSysTypedef = entity instanceof Typedef
 					&& ((Typedef) entity).isSystem();
 
@@ -104,8 +102,7 @@ public class CommonProgramFactory implements ProgramFactory {
 			// the decl belongs to the one AST because its parent
 			// will be root...
 
-			while (declIter.hasNext()) {
-				DeclarationNode decl = declIter.next();
+			for (DeclarationNode decl : entity.getDeclarations()) {
 				ASTNode parent = decl.parent();
 
 				if (parent != null && (!isSysTypedef || parent == root)) {

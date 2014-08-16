@@ -285,7 +285,7 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	}
 
 	@Override
-	public Iterator<DeclarationNode> getDeclarations() {
+	public Iterable<DeclarationNode> getDeclarations() {
 		return entity.getDeclarations();
 	}
 

@@ -295,13 +295,10 @@ public class EntityAnalyzer implements Analyzer {
 
 		while (variableIter.hasNext()) {
 			Variable variable = variableIter.next();
-			VariableDeclarationNode declaration = variable.getDefinition();
 
-			if (declaration == null) {
-				Iterator<DeclarationNode> declIter = variable.getDeclarations();
-
-				while (declIter.hasNext()) {
-					declaration = (VariableDeclarationNode) declIter.next();
+			if (variable.getDefinition() == null) {
+				for (DeclarationNode decl : variable.getDeclarations()) {
+					VariableDeclarationNode declaration = (VariableDeclarationNode) decl;
 
 					if (declaration.getInitializer() == null
 							&& !(declaration.hasAutoStorage()

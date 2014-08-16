@@ -149,10 +149,8 @@ public class PrunerWorker {
 			if (defn != null && defn != firstDecl)
 				markReachable(defn);
 		} else {
-			Iterator<DeclarationNode> declIter = entity.getDeclarations();
-
-			while (declIter.hasNext())
-				markReachable(declIter.next());
+			for (DeclarationNode dn : entity.getDeclarations())
+				markReachable(dn);
 			// special case: if you use at least one enumerator
 			// in the enumeration, you use the whole enumeration...
 			if (entity instanceof Enumerator) {

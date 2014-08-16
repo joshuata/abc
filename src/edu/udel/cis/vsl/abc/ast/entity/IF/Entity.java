@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
-import java.util.Iterator;
+import java.util.Enumeration;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
@@ -172,7 +172,7 @@ public interface Entity {
 	 * 
 	 * @return iterator over declarations of this entity
 	 */
-	Iterator<DeclarationNode> getDeclarations();
+	Iterable<DeclarationNode> getDeclarations();
 
 	/**
 	 * Gets one of the declarations of this entity.
