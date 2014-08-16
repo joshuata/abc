@@ -177,8 +177,8 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public Iterator<Variable> getVariables() {
-		return variableList.iterator();
+	public Iterable<Variable> getVariables() {
+		return variableList;
 	}
 
 	@Override
@@ -192,8 +192,8 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public Iterator<Function> getFunctions() {
-		return functionList.iterator();
+	public Iterable<Function> getFunctions() {
+		return functionList;
 	}
 
 	@Override

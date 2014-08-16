@@ -2,9 +2,7 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
@@ -86,16 +84,17 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	}
 
 	@Override
-	public Iterator<Field> getFields() {
-		return fields.iterator();
+	public Iterable<Field> getFields() {
+		return fields;
 	}
 
 	@Override
-	public void complete(List<Field> fields) {
-		this.fields = new ArrayList<Field>(fields);
+	public void complete(Iterable<Field> fields) {
+		this.fields = new ArrayList<Field>();
 		for (Field field : fields) {
 			String name = field.getName();
 
+			this.fields.add(field);
 			if (name != null)
 				fieldMap.put(name, field);
 		}

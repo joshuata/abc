@@ -1,8 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.type.IF;
 
-import java.util.Iterator;
-import java.util.List;
-
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 
 /**
@@ -66,7 +63,7 @@ public interface EnumerationType extends IntegerType, TaggedEntity {
 	 * @return the sequence node for the enumerators of this type, or
 	 *         <code>null</code>
 	 */
-	Iterator<Enumerator> getEnumerators();
+	Iterable<Enumerator> getEnumerators();
 
 	/**
 	 * Completes this enumeration type by specifying the contents of the type,
@@ -78,7 +75,7 @@ public interface EnumerationType extends IntegerType, TaggedEntity {
 	 * @exception RuntimeException
 	 *                if the type is already complete
 	 */
-	void complete(List<Enumerator> enumerators);
+	void complete(Iterable<Enumerator> enumerators);
 
 	/**
 	 * Makes this type incomplete, i.e., sets the enumerators to

@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -167,11 +166,9 @@ public class PrunerWorker {
 	private void search() throws SyntaxException {
 		Scope rootScope = root.getScope();
 		Function main = (Function) rootScope.getOrdinaryEntity("main");
-		Iterator<Variable> iter = rootScope.getVariables();
 		Iterable<ASTNode> children = root.children();
 
-		while (iter.hasNext()) {
-			Variable variable = iter.next();
+		for (Variable variable : rootScope.getVariables()) {
 			Type type = variable.getType();
 
 			if (type instanceof QualifiedObjectType) {
