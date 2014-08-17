@@ -94,8 +94,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
-import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.Field;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
@@ -106,6 +106,8 @@ import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+
+//TODO improve the printing of variable declarations when array type is involved.
 
 public class CommonASTFactory implements ASTFactory {
 
@@ -460,7 +462,6 @@ public class CommonASTFactory implements ASTFactory {
 						(VariableDeclarationNode) block));
 
 				out.print(";");
-				;
 			} else if (block instanceof FunctionDeclarationNode)
 				pPrintFunctionDeclaration(out, prefix,
 						(FunctionDeclarationNode) block);
@@ -830,10 +831,24 @@ public class CommonASTFactory implements ASTFactory {
 
 	private static void pPrintCivlForStatement(PrintStream out, String prefix,
 			CivlForNode civlFor) {
-		civlFor.getDomain();
-		// civlFor.
+		DeclarationListNode vars = civlFor.getVariables();
+		int numVars = vars.numChildren();
 
-		// TODO Auto-generated method stub
+		out.print(prefix);
+		if (civlFor.isParallel())
+			out.print("$parfor");
+		else
+			out.print("$for");
+		out.print("(int ");
+		for (int i = 0; i < numVars; i++) {
+			if (i != 0)
+				out.print(", ");
+			out.print(vars.getSequenceChild(i).getName());
+		}
+		out.print(": ");
+		out.print(pPrintExpression(civlFor.getDomain()));
+		out.println(")");
+		pPrintStatement(out, prefix + indention, civlFor.getBody(), true);
 	}
 
 	private static void pPrintLoop(PrintStream out, String prefix, LoopNode loop) {
@@ -928,11 +943,12 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	private static void pPrintSwitch(PrintStream out, String prefix,
-			SwitchNode swtichNode) {
-		// return new StringBuffer("switch");
-		// TODO throw new CIVLUnimplementedFeatureException(
-		// "translating switch node into CIVL code",
-		// swtichNode.getSource());
+			SwitchNode switchNode) {
+		out.print(prefix);
+		out.print("switch(");
+		out.print(pPrintExpression(switchNode.getCondition()));
+		out.println(")");
+		pPrintStatement(out, prefix + indention, switchNode.getBody(), true);
 	}
 
 	private static void pPrintJump(PrintStream out, String prefix, JumpNode jump) {
@@ -1250,9 +1266,13 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	private static StringBuffer pPrintCompoundLiteral(
-			CompoundLiteralNode expression) {
+			CompoundLiteralNode compound) {
 		StringBuffer result = new StringBuffer();
+		@SuppressWarnings("unused")
+		CompoundInitializerNode list = compound.getInitializerList();
 
+		result.append("{");
+		result.append("}");
 		// TODO
 		return result;
 	}
