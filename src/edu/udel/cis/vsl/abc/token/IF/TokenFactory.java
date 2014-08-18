@@ -107,9 +107,9 @@ public interface TokenFactory {
 
 	// TokenSources...
 
-	CTokenSourceProducer subTokenSourceProducer(CTokenSource fullSource,
+	CTokenSequence getTokenSubsequence(CTokenSource fullSource,
 			CToken startToken, CToken stopToken);
 
-	CTokenSourceProducer emptySubTokenSourceProducer(CTokenSource originalSource);
+	CTokenSequence getEmptyTokenSubsequence(CTokenSource originalSource);
 
 }
