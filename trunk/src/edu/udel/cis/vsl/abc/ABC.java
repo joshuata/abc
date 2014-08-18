@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.rmi.activation.Activator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,9 +18,11 @@ import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
 /**
  * <p>
- * The main class for the ABC C front end. Provides a simple command line
- * interface as well as static methods to produce an {@link Activator} for more
- * advanced uses.
+ * This is the main class for ABC. It provides a simple command line interface
+ * for using ABC. Most applications will not use this class, since they will use
+ * ABC more as a library and access the functionality through the API. However,
+ * the command line is useful for debugging, "seeing what is going on", and
+ * general exploration.
  * </p>
  * 
  * <p>
@@ -31,7 +32,8 @@ import edu.udel.cis.vsl.abc.transform.IF.Transform;
  * and entities associated to every identifier. It prints out the final result
  * in a plain text human-readable form. Various options can control how much
  * information is printed, and can also cause various transformations to be
- * applied to the AST.
+ * applied to the AST. Executing with no command line arguments will print a
+ * help message desciribing the options.
  * </p>
  * 
  * <p>
