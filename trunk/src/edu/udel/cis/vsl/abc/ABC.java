@@ -102,7 +102,9 @@ public class ABC {
 		out.println("-v");
 		out.println("  verbose mode, show all processing steps");
 		out.println("-p");
-		out.println("  pretty print programs in original language");
+		out.println("  pretty print programs in original language (default)");
+		out.println("-a");
+		out.println("  print the AST(s) using a hierarchical representation");
 		out.println("-t");
 		out.println("  show symbol and type tables");
 		out.println("-lang=[c|civlc]");
@@ -135,7 +137,7 @@ public class ABC {
 		ArrayList<File> userIncludeList = new ArrayList<File>();
 		boolean preprocOnly = false;
 		boolean verbose = false;
-		boolean pretty = false;
+		boolean pretty = true;
 		boolean tables = false; // show symbol and type tables
 		List<String> transformCodes = new LinkedList<>();
 		Language language = null;
@@ -190,6 +192,8 @@ public class ABC {
 				verbose = true;
 			} else if (arg.equals("-p")) {
 				pretty = true;
+			} else if (arg.equals("-a")) {
+				pretty = false;
 			} else if (arg.equals("-t")) {
 				tables = true;
 			} else if (arg.startsWith("-lang")) {
