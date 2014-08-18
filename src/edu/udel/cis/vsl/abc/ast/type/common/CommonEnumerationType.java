@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
@@ -25,7 +26,7 @@ public class CommonEnumerationType extends CommonIntegerType implements
 
 	private final static int classCode = CommonEnumerationType.class.hashCode();
 
-	private Entity entity;
+	private ProgramEntity entity;
 
 	private Object key;
 
@@ -39,7 +40,7 @@ public class CommonEnumerationType extends CommonIntegerType implements
 		this.key = key;
 		this.tag = tag;
 		this.entity = new CommonEntity(EntityKind.ENUMERATION, tag,
-				LinkageKind.NONE);
+				ProgramEntity.LinkageKind.NONE);
 	}
 
 	@Override
@@ -320,13 +321,13 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	}
 
 	@Override
-	public LinkageKind getLinkage() {
+	public ProgramEntity.LinkageKind getLinkage() {
 		return entity.getLinkage();
 	}
 
 	@Override
-	public void setLinkage(LinkageKind linkage) {
-		if (linkage != LinkageKind.NONE)
+	public void setLinkage(ProgramEntity.LinkageKind linkage) {
+		if (linkage != ProgramEntity.LinkageKind.NONE)
 			throw new ABCRuntimeException("Linkage of enumeration must be NONE");
 	}
 

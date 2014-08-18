@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
@@ -25,12 +25,12 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	}
 
 	@Override
-	protected void addEntity(int tuid, Entity entity) {
-		LinkageKind kind = entity.getLinkage();
+	protected void addEntity(int tuid, ProgramEntity entity) {
+		ProgramEntity.LinkageKind kind = entity.getLinkage();
 		Pair<Integer, OrdinaryEntity> pair = new Pair<>(tuid,
 				(OrdinaryEntity) entity);
 
-		if (kind == LinkageKind.EXTERNAL)
+		if (kind == ProgramEntity.LinkageKind.EXTERNAL)
 			externals.add(pair);
 		else
 			internals.add(pair);

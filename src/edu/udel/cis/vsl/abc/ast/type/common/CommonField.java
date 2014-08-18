@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
@@ -14,7 +15,7 @@ public class CommonField extends CommonEntity implements Field {
 
 	public CommonField(FieldDeclarationNode declaration, ObjectType type,
 			Value bitWidth) {
-		super(EntityKind.FIELD, declaration.getName(), LinkageKind.NONE);
+		super(EntityKind.FIELD, declaration.getName(), ProgramEntity.LinkageKind.NONE);
 		addDeclaration(declaration);
 		setDefinition(declaration);
 		this.bitWidth = bitWidth;

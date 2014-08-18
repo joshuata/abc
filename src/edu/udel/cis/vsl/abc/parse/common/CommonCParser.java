@@ -1,11 +1,8 @@
 package edu.udel.cis.vsl.abc.parse.common;
 
-import java.util.Map;
-
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
@@ -13,63 +10,21 @@ import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
-import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
-import edu.udel.cis.vsl.abc.token.IF.Source;
-import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.common.CommonCToken;
+
+// why not make static methods of all these?
 
 public class CommonCParser implements CParser {
 
 	/* ****************************** Fields ****************************** */
 
-	/**
-	 * Which rule is the start rule for parsing?
-	 */
-	private RuleKind rule;
-
-	/**
-	 * The token source provides the sequence of tokens which are to be parsed.
-	 */
-	private CTokenSource tokenSource;
-
-	/**
-	 * The ANTLR token stream, which is formed from the token source, and which
-	 * is used as input to the ANTLR parer.
-	 */
-	private TokenStream stream;
-
-	/**
-	 * The ANTLR-generated parser used by this CParser to do the real work.
-	 */
-	private CivlCParser parser;
-
-	/**
-	 * The factory used for producing tokens and related objects.
-	 */
-	private TokenFactory tokenFactory;
-
 	/* *************************** Constructors *************************** */
 
-	public CommonCParser(CTokenSource tokenSource) {
-		this.rule = RuleKind.TRANSLATION_UNIT;
-		this.tokenSource = tokenSource;
-		this.tokenFactory = tokenSource.getTokenFactory();
-		this.stream = new CommonTokenStream(tokenSource);
-		this.parser = new CivlCParser(stream);
-	}
+	public CommonCParser() {
 
-	public CommonCParser(RuleKind rule, CTokenSource tokenSource,
-			int startTokenIndex, int lastTokenIndex) {
-		this.rule = rule;
-		this.tokenSource = new SubTokenSource(tokenSource, startTokenIndex,
-				lastTokenIndex);
-		this.tokenFactory = tokenSource.getTokenFactory();
-		this.stream = new CommonTokenStream(this.tokenSource);
-		this.parser = new CivlCParser(stream);
 	}
 
 	/* ********************** Static Helper Methods *********************** */
@@ -175,128 +130,38 @@ public class CommonCParser implements CParser {
 	 *             if something goes wrong parsing the input
 	 */
 	@Override
-	public CommonTree getTree() throws ParseException {
-		try {
-			CommonTree tree;
+	public ParseTree parse(RuleKind rule, CTokenSource tokenSource)
+			throws ParseException {
+		TokenStream stream = new CommonTokenStream(tokenSource);
+		CivlCParser parser = new CivlCParser(stream);
+		CommonTree root;
 
+		try {
 			switch (rule) {
 			case TRANSLATION_UNIT:
-				tree = (CommonTree) parser.translationUnit().getTree();
+				root = (CommonTree) parser.translationUnit().getTree();
 				break;
 			case EXTERNAL_DEFINITION:
-				tree = (CommonTree) parser.externalDeclaration().getTree();
+				root = (CommonTree) parser.externalDeclaration().getTree();
 				break;
 			case BLOCK_ITEM:
-				tree = (CommonTree) parser.blockItem().getTree();
+				root = (CommonTree) parser.blockItem().getTree();
 				break;
 			default:
 				throw new ABCRuntimeException("Unreachable");
 			}
-			postProcessTree(tree);
-			return tree;
+			postProcessTree(root);
 		} catch (RecognitionException e) {
 			throw new ParseException(e.getMessage(), e.token);
 		} catch (RuntimeParseException e) {
 			throw new ParseException(e.getMessage());
 		}
+		return new CommonParseTree(rule, tokenSource, root);
 	}
 
 	@Override
-	public Source source(CommonTree tree) {
-		CToken firstToken = null, lastToken = null;
-		int start = tree.getTokenStartIndex();
-		int stop = tree.getTokenStopIndex();
-
-		if (start >= 0)
-			firstToken = tokenSource.getToken(start);
-		if (stop >= 0)
-			lastToken = tokenSource.getToken(stop);
-		if (firstToken == null)
-			if (lastToken == null)
-				throw new IllegalArgumentException(
-						"No tokens associated to tree node " + tree);
-			else
-				firstToken = lastToken;
-		else if (lastToken == null)
-			lastToken = firstToken;
-		return tokenFactory.newSource(firstToken, lastToken);
+	public ParseTree parse(CTokenSource tokenSource) throws ParseException {
+		return parse(RuleKind.TRANSLATION_UNIT, tokenSource);
 	}
 
-	@Override
-	public SyntaxException newSyntaxException(String message, CommonTree tree) {
-		return tokenFactory.newSyntaxException(message, source(tree));
-	}
-
-	@Override
-	public CTokenSource getTokenSource() {
-		return tokenSource;
-	}
-
-}
-
-/**
- * A helper class which represents a subsequence of sequence of tokens through
- * the CTokenSource abstraction.
- * 
- * @author siegel
- * 
- */
-class SubTokenSource implements CTokenSource {
-
-	int startTokenIndex;
-
-	int lastTokenIndex;
-
-	int currentTokenIndex;
-
-	CTokenSource rootSource;
-
-	CToken eofToken;
-
-	SubTokenSource(CTokenSource rootSource, int startTokenIndex,
-			int lastTokenIndex) {
-		this.rootSource = rootSource;
-		this.startTokenIndex = startTokenIndex;
-		this.lastTokenIndex = lastTokenIndex;
-		this.currentTokenIndex = startTokenIndex;
-		this.eofToken = rootSource.getTokenFactory().newCToken(CParser.EOF,
-				"EOF", null);
-	}
-
-	@Override
-	public Token nextToken() {
-		if (currentTokenIndex > lastTokenIndex) {
-			return eofToken;
-		} else {
-			Token result = rootSource.getToken(currentTokenIndex);
-
-			currentTokenIndex++;
-			return result;
-		}
-	}
-
-	@Override
-	public String getSourceName() {
-		return rootSource.getSourceName();
-	}
-
-	@Override
-	public Map<String, Macro> getMacroMap() {
-		return rootSource.getMacroMap();
-	}
-
-	@Override
-	public int getNumTokens() {
-		return currentTokenIndex - startTokenIndex;
-	}
-
-	@Override
-	public CToken getToken(int index) {
-		return rootSource.getToken(index);
-	}
-
-	@Override
-	public TokenFactory getTokenFactory() {
-		return rootSource.getTokenFactory();
-	}
 }

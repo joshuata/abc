@@ -3,7 +3,7 @@ package edu.udel.cis.vsl.abc.program.common;
 import java.util.ArrayList;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
@@ -69,30 +69,12 @@ public class TaggedEntityInfo extends EntityInfo {
 		return numEmpty >= 2;
 	}
 
-	// /**
-	// * Determines whether no renamings are necessary. If this returns
-	// * <code>true</code> all uses of the tag are compatible, so there is no
-	// need
-	// * to rename. However, you still need to nullify every definition after
-	// the
-	// * first.
-	// *
-	// * @return
-	// */
-	// private boolean isConsistent() {
-	// if (structInfo.isConsistent() && unionInfo.isConsistent()
-	// && enumInfo.isConsistent()) {
-	// return isExclusive();
-	// }
-	// return false;
-	// }
-
 	ArrayList<Pair<Integer, TaggedEntity>> getEntityPairs() {
 		return entityPairs;
 	}
 
 	@Override
-	protected void addEntity(int tuid, Entity entity) {
+	protected void addEntity(int tuid, ProgramEntity entity) {
 		TaggedEntity taggedEntity = (TaggedEntity) entity;
 		Pair<Integer, TaggedEntity> pair = new Pair<>(tuid, taggedEntity);
 		Type type = entity.getType();

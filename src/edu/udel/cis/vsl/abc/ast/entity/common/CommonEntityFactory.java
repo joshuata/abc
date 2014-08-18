@@ -1,10 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.entity.common;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
-import edu.udel.cis.vsl.abc.ast.entity.IF.PragmaHandler;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
@@ -21,12 +20,14 @@ public class CommonEntityFactory implements EntityFactory {
 	}
 
 	@Override
-	public Variable newVariable(String name, LinkageKind linkage, Type type) {
+	public Variable newVariable(String name, ProgramEntity.LinkageKind linkage,
+			Type type) {
 		return new CommonVariable(name, linkage, type);
 	}
 
 	@Override
-	public Function newFunction(String name, LinkageKind linkage, Type type) {
+	public Function newFunction(String name, ProgramEntity.LinkageKind linkage,
+			Type type) {
 		return new CommonFunction(name, linkage, type);
 	}
 
@@ -38,11 +39,6 @@ public class CommonEntityFactory implements EntityFactory {
 	@Override
 	public Label newLabel(OrdinaryLabelNode declaration) {
 		return new CommonLabel(declaration);
-	}
-
-	@Override
-	public PragmaHandler newPragmaHandler(String name) {
-		return new CommonPragmaHandler(name);
 	}
 
 	@Override

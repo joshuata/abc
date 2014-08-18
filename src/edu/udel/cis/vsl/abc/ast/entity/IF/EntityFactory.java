@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
@@ -42,7 +41,8 @@ public interface EntityFactory {
 	 *            the type of the variable
 	 * @return the new variable
 	 */
-	Variable newVariable(String name, LinkageKind linkage, Type type);
+	Variable newVariable(String name, ProgramEntity.LinkageKind linkage,
+			Type type);
 
 	/**
 	 * Creates a new {@link Function}.
@@ -55,7 +55,8 @@ public interface EntityFactory {
 	 *            the type of the function
 	 * @return the new function
 	 */
-	Function newFunction(String name, LinkageKind linkage, Type type);
+	Function newFunction(String name, ProgramEntity.LinkageKind linkage,
+			Type type);
 
 	/**
 	 * Creates a new {@link Typedef} entity.
@@ -78,16 +79,6 @@ public interface EntityFactory {
 	 * @return the new label entity
 	 */
 	Label newLabel(OrdinaryLabelNode declaration);
-
-	/**
-	 * Creates a new pragma handler for the given name. There is just one
-	 * univeral name space for the pragma universes.
-	 * 
-	 * @param name
-	 *            the name of the pragma universe, such as <code>omp</code>
-	 * @return the pragma handler for that name
-	 */
-	PragmaHandler newPragmaHandler(String name);
 
 	/**
 	 * Computes the join of the two scopes in the scope tree and returns it.

@@ -190,6 +190,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
@@ -640,9 +641,9 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public PragmaNode newPragmaNode(Source source, IdentifierNode identifier,
-			List<CToken> body, CToken newlineToken) {
+			CTokenSourceProducer producer, CToken newlineToken) {
 		newlineToken.setType(CivlCParser.EOF);
-		return new CommonPragmaNode(source, identifier, body, newlineToken);
+		return new CommonPragmaNode(source, identifier, producer, newlineToken);
 	}
 
 	@Override

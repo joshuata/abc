@@ -14,13 +14,13 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
  * @author siegel
  * 
  */
-public class CommonEntity implements Entity {
+public class CommonEntity implements ProgramEntity {
 
 	private EntityKind entityKind;
 
 	private String name;
 
-	private LinkageKind linkage;
+	private ProgramEntity.LinkageKind linkage;
 
 	private ArrayList<DeclarationNode> declarations = new ArrayList<DeclarationNode>();
 
@@ -34,7 +34,8 @@ public class CommonEntity implements Entity {
 	 */
 	private boolean isSystem = false;
 
-	public CommonEntity(EntityKind kind, String name, LinkageKind linkage) {
+	public CommonEntity(EntityKind kind, String name,
+			ProgramEntity.LinkageKind linkage) {
 		this.entityKind = kind;
 		this.name = name;
 		this.linkage = linkage;
@@ -91,12 +92,12 @@ public class CommonEntity implements Entity {
 	}
 
 	@Override
-	public LinkageKind getLinkage() {
+	public ProgramEntity.LinkageKind getLinkage() {
 		return linkage;
 	}
 
 	@Override
-	public void setLinkage(LinkageKind linkage) {
+	public void setLinkage(ProgramEntity.LinkageKind linkage) {
 		this.linkage = linkage;
 	}
 

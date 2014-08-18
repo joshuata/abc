@@ -1,11 +1,8 @@
 package edu.udel.cis.vsl.abc.parse.IF;
 
-import org.antlr.runtime.tree.CommonTree;
-
+import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.token.IF.Source;
-import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * <p>
@@ -299,13 +296,6 @@ public interface CParser {
 	public static final int TYPE_QUALIFIER_LIST = CivlCParser.TYPE_QUALIFIER_LIST;
 
 	/**
-	 * Returns the token source used by this C parser.
-	 * 
-	 * @return the token source
-	 */
-	CTokenSource getTokenSource();
-
-	/**
 	 * Returns the ANTLR CommonTree resulting from parsing the input, after some
 	 * "post-processing" has been done to the tree to fill in some fields.
 	 * 
@@ -313,28 +303,9 @@ public interface CParser {
 	 * @throws ParseException
 	 *             if there is a syntax exception
 	 */
-	CommonTree getTree() throws ParseException;
+	ParseTree parse(CTokenSource tokenSource) throws ParseException;
 
-	/**
-	 * Given a node in the parse tree, returns a source object for it.
-	 * 
-	 * @param tree
-	 *            node in tree returned by method getTree()
-	 * @return a source object describing the origin of that node in the source
-	 *         code
-	 */
-	Source source(CommonTree tree);
-
-	/**
-	 * Creates a new syntax exception.
-	 * 
-	 * @param message
-	 *            the message to print out when this exception is reported to
-	 *            the user
-	 * @param tree
-	 *            the node in the ANTLR tree that led to this exception
-	 * @return the new syntax exception
-	 */
-	SyntaxException newSyntaxException(String message, CommonTree tree);
+	ParseTree parse(RuleKind rule, CTokenSource tokenSource)
+			throws ParseException;
 
 }

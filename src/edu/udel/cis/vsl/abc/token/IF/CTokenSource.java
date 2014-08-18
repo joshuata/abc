@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import java.util.Map;
-
 import org.antlr.runtime.TokenSource;
 
 /**
@@ -31,14 +29,6 @@ import org.antlr.runtime.TokenSource;
  * 
  */
 public interface CTokenSource extends TokenSource {
-
-	/**
-	 * Returns a map in which a key is the name of a macro (object or function)
-	 * and the value associated to that key is the Macro object.
-	 * 
-	 * @return current macro map
-	 */
-	Map<String, Macro> getMacroMap();
 
 	/**
 	 * The number of tokens produced by this token source so far.

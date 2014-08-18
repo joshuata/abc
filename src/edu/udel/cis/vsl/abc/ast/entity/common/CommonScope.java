@@ -202,7 +202,7 @@ public class CommonScope implements Scope {
 		int result = taggedEntityList.size();
 
 		if (name != null) {
-			Entity oldEntity = taggedEntityMap.get(name);
+			TaggedEntity oldEntity = taggedEntityMap.get(name);
 
 			if (oldEntity != null)
 				throw new SyntaxException("Tagged entity with name " + name

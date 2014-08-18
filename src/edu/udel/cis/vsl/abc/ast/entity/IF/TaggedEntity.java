@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
+import java.util.Enumeration;
+
 /**
  * Marker interfaces for {@link StructureOrUnion} and {@link Enumeration}
  * entities. These are entities that have a "tag", the identifier that appears
@@ -10,7 +12,7 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
  * @author siegel
  * 
  */
-public interface TaggedEntity extends Entity {
+public interface TaggedEntity extends ProgramEntity {
 
 	/**
 	 * Is this tagged entity complete? That is, have the members inside curly
