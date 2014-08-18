@@ -12,5 +12,5 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
  * @author siegel
  * 
  */
-public interface OrdinaryEntity extends Entity {
+public interface OrdinaryEntity extends ProgramEntity {
 }

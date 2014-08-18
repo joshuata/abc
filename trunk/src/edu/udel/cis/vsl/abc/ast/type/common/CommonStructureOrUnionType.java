@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
@@ -21,7 +21,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	private final static int classCode = CommonStructureOrUnionType.class
 			.hashCode();
 
-	private Entity entity;
+	private ProgramEntity entity;
 
 	/** Key, cannot be null. */
 	private Object key;
@@ -48,7 +48,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 		this.isStruct = isStruct;
 		this.fields = null;
 		this.entity = new CommonEntity(EntityKind.STRUCTURE_OR_UNION, tag,
-				LinkageKind.NONE);
+				ProgramEntity.LinkageKind.NONE);
 	}
 
 	@Override
@@ -371,13 +371,13 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	}
 
 	@Override
-	public LinkageKind getLinkage() {
+	public ProgramEntity.LinkageKind getLinkage() {
 		return entity.getLinkage();
 	}
 
 	@Override
-	public void setLinkage(LinkageKind linkage) {
-		if (linkage != LinkageKind.NONE)
+	public void setLinkage(ProgramEntity.LinkageKind linkage) {
+		if (linkage != ProgramEntity.LinkageKind.NONE)
 			throw new ABCRuntimeException(
 					"Linkage of structure or union must be NONE");
 	}

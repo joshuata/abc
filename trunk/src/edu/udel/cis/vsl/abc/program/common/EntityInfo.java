@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.program.common;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 
 /**
  * <p>
@@ -73,18 +74,7 @@ public abstract class EntityInfo {
 	 * @param entity
 	 *            the entity to add
 	 */
-	protected abstract void addEntity(int tuid, Entity entity);
-
-//	/**
-//	 * Computes the actions required to modify the ASTs with respect to this
-//	 * identifier and adds those actions to the corresponding plans.
-//	 * 
-//	 * @param plans
-//	 *            action plans for the transformation of the translation units;
-//	 *            this is an array of length n, where n is the number of
-//	 *            translation units
-//	 */
-//	public abstract void computeActions(Plan[] plans);
+	protected abstract void addEntity(int tuid, ProgramEntity entity);
 
 	// Public methods...
 
@@ -127,7 +117,7 @@ public abstract class EntityInfo {
 	 *            a tagged entity with tag equal to the tag associated to this
 	 *            info object
 	 */
-	public void add(int tuid, Entity entity) {
+	public void add(int tuid, ProgramEntity entity) {
 		addEntity(tuid, entity);
 		numEntities++;
 	}

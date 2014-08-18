@@ -10,8 +10,8 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
@@ -171,11 +171,11 @@ public class CommonAST implements AST {
 
 	@Override
 	public void add(OrdinaryEntity entity) {
-		LinkageKind linkage = entity.getLinkage();
+		ProgramEntity.LinkageKind linkage = entity.getLinkage();
 
-		if (linkage == LinkageKind.EXTERNAL)
+		if (linkage == ProgramEntity.LinkageKind.EXTERNAL)
 			externalEntities.add(entity);
-		else if (linkage == LinkageKind.INTERNAL)
+		else if (linkage == ProgramEntity.LinkageKind.INTERNAL)
 			internalEntities.add(entity);
 		else
 			throw new IllegalArgumentException(

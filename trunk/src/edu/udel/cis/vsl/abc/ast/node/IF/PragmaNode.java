@@ -1,11 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.node.IF;
 
-import java.util.Iterator;
-
-import org.antlr.runtime.TokenSource;
-
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 
 /**
  * A pragma may be included in the AST wherever a statement or an external
@@ -48,19 +45,20 @@ public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 	CToken getToken(int index);
 
 	/**
-	 * Returns an iterator over the tokens in the pragma body.
+	 * Returns an iterable over the tokens in the pragma body.
 	 * 
 	 * @return iterator over the tokens of pragma body
 	 */
-	Iterator<CToken> getTokens();
+	Iterable<CToken> getTokens();
 
 	/**
-	 * Returns the tokens of the pragma body as an ANTLR TokenSource, which can
-	 * then be fed into an ANTLR parser for syntactic analysis.
+	 * Returns the tokens of the pragma body as a {@link CTokenSource}, which
+	 * can then be fed into an ANTLR parser for syntactic analysis. Note that
+	 * each call returns a new token source, since each can only be used once.
 	 * 
 	 * @return a token source for the tokens comprising this pragma
 	 */
-	TokenSource getTokenSource();
+	CTokenSource newTokenSource();
 
 	@Override
 	PragmaNode copy();

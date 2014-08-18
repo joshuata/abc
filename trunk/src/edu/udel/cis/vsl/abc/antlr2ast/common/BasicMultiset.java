@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.antlr2ast.impl;
+package edu.udel.cis.vsl.abc.antlr2ast.common;
 
 import java.util.HashMap;
 import java.util.Map;

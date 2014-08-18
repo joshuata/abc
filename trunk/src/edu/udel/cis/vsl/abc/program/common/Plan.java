@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 
 /**
@@ -25,12 +25,12 @@ public class Plan {
 	/**
 	 * Mapping from entity that must be renamed to its new name.
 	 */
-	private Map<Entity, String> renameMap = new HashMap<>();
+	private Map<ProgramEntity, String> renameMap = new HashMap<>();
 
 	/**
 	 * Entities whose declarations should be deleted from the AST.
 	 */
-	private Collection<Entity> entityRemoveSet = new LinkedList<>();
+	private Collection<ProgramEntity> entityRemoveSet = new LinkedList<>();
 
 	public Plan() {
 	}
@@ -44,7 +44,7 @@ public class Plan {
 		defDeleteSet.add(entity);
 	}
 
-	public void addRenameAction(Entity entity, String newName) {
+	public void addRenameAction(ProgramEntity entity, String newName) {
 
 		// System.out.println("Adding rename action for " + entity + " def: "
 		// + entity.getDefinition() + " new name " + newName);
@@ -53,7 +53,7 @@ public class Plan {
 		renameMap.put(entity, newName);
 	}
 
-	public void addEntityRemoveAction(Entity entity) {
+	public void addEntityRemoveAction(ProgramEntity entity) {
 
 		// System.out.println("Adding removal action for " + entity + " def: "
 		// + entity.getDefinition());
@@ -66,11 +66,11 @@ public class Plan {
 		return defDeleteSet;
 	}
 
-	public Map<Entity, String> getRenameMap() {
+	public Map<ProgramEntity, String> getRenameMap() {
 		return renameMap;
 	}
 
-	public Iterable<Entity> getEntityRemoveActions() {
+	public Iterable<ProgramEntity> getEntityRemoveActions() {
 		return entityRemoveSet;
 	}
 

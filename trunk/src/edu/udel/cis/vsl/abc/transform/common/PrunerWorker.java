@@ -6,6 +6,7 @@ import java.util.List;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
@@ -105,11 +106,11 @@ public class PrunerWorker {
 					if (child instanceof IdentifierNode) {
 						Entity entity = ((IdentifierNode) child).getEntity();
 
-						if (entity != null)
+						if (entity != null && entity instanceof ProgramEntity)
 							// TODO: check this: throw new
 							// ASTException("Identifier not resolved: "
 							// + child.getSource().getSummary(false));
-							explore(entity);
+							explore((ProgramEntity) entity);
 					}
 					if (child instanceof OrdinaryDeclarationNode
 							|| child instanceof TypedefDeclarationNode) {
@@ -137,7 +138,7 @@ public class PrunerWorker {
 	 * @param entity
 	 *            an Entity occurring in the AST
 	 */
-	private void explore(Entity entity) {
+	private void explore(ProgramEntity entity) {
 		if (entity instanceof TaggedEntity) {
 			// only need the first decl and the defn:
 			ASTNode firstDecl = entity.getFirstDeclaration();

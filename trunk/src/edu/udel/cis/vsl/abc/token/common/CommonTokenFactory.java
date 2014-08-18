@@ -8,6 +8,8 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Concatenation;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
@@ -169,6 +171,19 @@ public class CommonTokenFactory implements TokenFactory {
 	public MacroExpansion newMacroExpansion(CToken startToken, Macro macro,
 			int index) {
 		return new CommonMacroExpansion(startToken, macro, index);
+	}
+
+	@Override
+	public CTokenSourceProducer subTokenSourceProducer(CTokenSource fullSource,
+			CToken startToken, CToken stopToken) {
+		return new SubTokenSourceProducer(fullSource, startToken.getIndex(),
+				stopToken.getIndex());
+	}
+
+	@Override
+	public CTokenSourceProducer emptySubTokenSourceProducer(
+			CTokenSource originalSource) {
+		return new SubTokenSourceProducer(originalSource, 0, -1);
 	}
 
 }

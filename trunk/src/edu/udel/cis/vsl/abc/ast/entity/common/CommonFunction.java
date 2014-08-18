@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
@@ -21,7 +22,7 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 
 	private List<ExpressionNode> postconditions = new LinkedList<ExpressionNode>();
 
-	public CommonFunction(String name, LinkageKind linkage, Type type) {
+	public CommonFunction(String name, ProgramEntity.LinkageKind linkage, Type type) {
 		super(EntityKind.FUNCTION, name, linkage, type);
 	}
 

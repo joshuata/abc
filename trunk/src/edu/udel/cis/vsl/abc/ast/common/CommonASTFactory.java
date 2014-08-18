@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.common;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -292,15 +291,13 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	static void pPrintPragma(PrintStream out, String prefix, PragmaNode pragma) {
-		Iterator<CToken> tokens = pragma.getTokens();
+		Iterable<CToken> tokens = pragma.getTokens();
 
 		out.print(prefix);
 		out.print("#pragma ");
 		out.print(pragma.getPragmaIdentifier().name());
 
-		while (tokens.hasNext()) {
-			CToken token = tokens.next();
-
+		for (CToken token : tokens) {
 			out.print(" ");
 			out.print(token.getText());
 		}

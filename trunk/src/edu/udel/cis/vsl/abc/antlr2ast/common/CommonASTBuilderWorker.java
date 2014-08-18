@@ -1,6 +1,127 @@
-package edu.udel.cis.vsl.abc.antlr2ast.impl;
+package edu.udel.cis.vsl.abc.antlr2ast.common;
 
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.*;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ABSENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ABSTRACT_DECLARATOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ALIGNOF;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.AMPERSAND;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.AND;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ARRAY_ELEMENT_DESIGNATOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ARRAY_SUFFIX;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ARROW;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ASSERT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ASSIGN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ASSUME;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.AT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ATOMIC;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BIG_O;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITANDEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITOREQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITXOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITXOREQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.BREAK;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CALL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CASE_LABELED_STATEMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CAST;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CHARACTER_CONSTANT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CHOOSE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CIVLATOM;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CIVLATOMIC;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CIVLFOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.COLLECTIVE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMMA;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMPOUND_LITERAL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMPOUND_STATEMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CONST;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.CONTINUE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DECLARATION;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DECLARATOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DEFAULT_LABELED_STATEMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DERIVATIVE_EXPRESSION;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DIV;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DIVEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DO;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOTDOT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ELLIPSIS;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENSURES;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENUMERATION_CONSTANT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.EQUALS;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXISTS;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXPR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXPRESSION_STATEMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FALSE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FIELD_DESIGNATOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FLOATING_CONSTANT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FORALL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FUNCTION_DEFINITION;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FUNCTION_SUFFIX;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.GENERIC;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.GOTO;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.GT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.GTE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.HERE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.IDENTIFIER;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.IDENTIFIER_LABELED_STATEMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.IDENTIFIER_LIST;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.IF;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.IMPLIES;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.INDEX;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.INITIALIZER_LIST;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.INTEGER_CONSTANT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.LT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.LTE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.MOD;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.MODEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.NEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.NOT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.OPERATOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.OR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PARAMETER_TYPE_LIST;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PARENTHESIZED_EXPRESSION;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PARFOR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PLUS;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PLUSEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.POST_DECREMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.POST_INCREMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PRAGMA;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PRE_DECREMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PRE_INCREMENT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.PROCNULL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.QMARK;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.REQUIRES;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESTRICT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESULT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.RETURN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.ROOT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SCALAR_INITIALIZER;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SCOPE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SCOPEOF;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SELF;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTLEFT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTLEFTEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTRIGHT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTRIGHTEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SIZEOF;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SPAWN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STAR;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STAREQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATIC;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATICASSERT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STRING_LITERAL;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.STRUCT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SUB;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SUBEQ;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SWITCH;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TILDE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TRUE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPE_NAME;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.UNIFORM;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.VOLATILE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.WHEN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.WHILE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +134,10 @@ import java.util.Set;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 
-import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilderWorker;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.PragmaFactory;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.PragmaHandler;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.SimpleScope;
-import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
@@ -75,7 +197,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
@@ -90,19 +214,21 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
  * @author siegel
  * 
  */
-public class CommonASTBuilder implements ASTBuilder {
+public class CommonASTBuilderWorker implements ASTBuilderWorker {
 
 	/* ************************** Instance Fields ************************* */
 
-	private CParser parser;
+	private ParseTree parseTree;
 
 	private NodeFactory nodeFactory;
 
-	private TokenFactory sourceFactory;
+	private TokenFactory tokenFactory;
 
-	private ASTFactory astFactory;
+	private PragmaFactory pragmaFactory;
 
 	private CommonTree rootTree;
+
+	private Map<String, PragmaHandler> pragmaMap = new HashMap<>();
 
 	/* *************************** Constructors *************************** */
 
@@ -117,13 +243,13 @@ public class CommonASTBuilder implements ASTBuilder {
 	 *            the CTokenSource used to produce the ANTLR tree
 	 * 
 	 */
-	public CommonASTBuilder(CParser parser, ASTFactory astFactory,
-			CommonTree rootTree) {
-		this.parser = parser;
-		this.astFactory = astFactory;
+	public CommonASTBuilderWorker(ParseTree parseTree, ASTFactory astFactory,
+			PragmaFactory pragmaFactory) {
+		this.parseTree = parseTree;
 		this.nodeFactory = astFactory.getNodeFactory();
-		this.sourceFactory = astFactory.getTokenFactory();
-		this.rootTree = rootTree;
+		this.tokenFactory = astFactory.getTokenFactory();
+		this.rootTree = parseTree.getRoot();
+		this.pragmaFactory = pragmaFactory;
 	}
 
 	/* ************************* Private Methods ************************** */
@@ -139,12 +265,12 @@ public class CommonASTBuilder implements ASTBuilder {
 	}
 
 	private Source newSource(CommonTree tree) {
-		return parser.source(tree);
+		return parseTree.source(tree);
 	}
 
 	private SpecifierAnalysis newSpecifierAnalysis(CommonTree specifiers)
 			throws SyntaxException {
-		return new SpecifierAnalysis(specifiers, parser);
+		return new SpecifierAnalysis(specifiers, parseTree);
 	}
 
 	private boolean isFunction(TypeNode type, SimpleScope scope)
@@ -189,9 +315,9 @@ public class CommonASTBuilder implements ASTBuilder {
 		if (idToken instanceof CToken)
 			token = (CToken) idToken;
 		else {
-			token = sourceFactory.newCToken(idToken, null);
+			token = tokenFactory.newCToken(idToken, null);
 		}
-		source = sourceFactory.newSource(token);
+		source = tokenFactory.newSource(token);
 		return nodeFactory.newIdentifierNode(source, token.getText());
 	}
 
@@ -1035,7 +1161,7 @@ public class CommonASTBuilder implements ASTBuilder {
 			}
 			if (scopeList != null) {
 				definition = nodeFactory.newScopeParameterizedDeclarationNode(
-						sourceFactory.join(scopeList.getSource(),
+						tokenFactory.join(scopeList.getSource(),
 								definition.getSource()), scopeList,
 						(DeclarationNode) definition);
 			}
@@ -1558,7 +1684,7 @@ public class CommonASTBuilder implements ASTBuilder {
 			CommonTree starNode = (CommonTree) pointerTree.getChild(i);
 			CommonTree qualifiers = (CommonTree) starNode.getChild(0);
 
-			source = sourceFactory.join(source, newSource(starNode));
+			source = tokenFactory.join(source, newSource(starNode));
 			type = nodeFactory.newPointerTypeNode(source, type);
 			applyQualifiers(qualifiers, type);
 		}
@@ -1669,7 +1795,7 @@ public class CommonASTBuilder implements ASTBuilder {
 		boolean unspecifiedVariableLength = false;
 		ExpressionNode extent = null;
 		ArrayTypeNode result;
-		Source source = sourceFactory.join(baseType.getSource(),
+		Source source = tokenFactory.join(baseType.getSource(),
 				newSource(suffix));
 
 		switch (extentNodeType) {
@@ -1702,7 +1828,7 @@ public class CommonASTBuilder implements ASTBuilder {
 		CommonTree child = (CommonTree) suffix.getChild(1);
 		int childKind = child.getType();
 		FunctionTypeNode result;
-		Source source = sourceFactory.join(baseType.getSource(),
+		Source source = tokenFactory.join(baseType.getSource(),
 				newSource(suffix));
 
 		if (!scope.isFunctionScope()) {
@@ -1861,7 +1987,7 @@ public class CommonASTBuilder implements ASTBuilder {
 		StatementNode statement = translateStatement(
 				(CommonTree) statementTree.getChild(2), scope);
 		Source expressionSource = newSource(expression);
-		Source labelSource = sourceFactory.join(expressionSource, caseToken);
+		Source labelSource = tokenFactory.join(expressionSource, caseToken);
 		SwitchLabelNode labelDecl = nodeFactory.newCaseLabelDeclarationNode(
 				labelSource, expressionNode, statement);
 
@@ -1874,7 +2000,7 @@ public class CommonASTBuilder implements ASTBuilder {
 		Source statementSource = newSource(statementTree);
 		CToken defaultToken = (CToken) ((CommonTree) statementTree.getChild(0))
 				.getToken();
-		Source labelSource = sourceFactory.newSource(defaultToken);
+		Source labelSource = tokenFactory.newSource(defaultToken);
 		StatementNode statement = translateStatement(
 				(CommonTree) statementTree.getChild(1), scope);
 		SwitchLabelNode labelDecl = nodeFactory.newDefaultLabelDeclarationNode(
@@ -2093,24 +2219,34 @@ public class CommonASTBuilder implements ASTBuilder {
 		}
 	}
 
-	private PragmaNode translatePragma(Source source, CommonTree pragmaTree,
+	private PragmaHandler getPragmaHandler(String code) {
+		PragmaHandler result = pragmaMap.get(code);
+
+		if (result == null) {
+			result = pragmaFactory.newHandler(code, parseTree);
+			pragmaMap.put(code, result);
+		}
+		return result;
+	}
+
+	private ASTNode translatePragma(Source source, CommonTree pragmaTree,
 			SimpleScope scope) throws SyntaxException {
 		CommonTree identifierTree = (CommonTree) pragmaTree.getChild(0);
 		IdentifierNode identifier = translateIdentifier(identifierTree);
+		String code = identifier.name();
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
 		CommonTree newlineTree = (CommonTree) pragmaTree.getChild(2);
-		int numTokens = bodyTree.getChildCount();
-		List<CToken> body = new LinkedList<>();
 		CToken newlineToken = (CToken) newlineTree.getToken();
+		CTokenSourceProducer producer = parseTree
+				.getTokenSourceProducer(bodyTree);
+		PragmaNode pragmaNode = nodeFactory.newPragmaNode(source, identifier,
+				producer, newlineToken);
+		PragmaHandler handler = getPragmaHandler(code);
+		ASTNode result;
 
-		for (int i = 0; i < numTokens; i++) {
-			CToken token = (CToken) ((CommonTree) bodyTree.getChild(i))
-					.getToken();
-
-			body.add(token);
-		}
-		return nodeFactory
-				.newPragmaNode(source, identifier, body, newlineToken);
+		identifier.setEntity(handler);
+		result = handler.processPragmaNode(pragmaNode, scope);
+		return result;
 	}
 
 	/**
@@ -2231,9 +2367,16 @@ public class CommonASTBuilder implements ASTBuilder {
 			return translateIdentifierLabeledStatement(statementTree, scope);
 		case IF:
 			return translateIf(statementTree, scope);
-		case PRAGMA:
-			return translatePragma(newSource(statementTree), statementTree,
-					scope);
+		case PRAGMA: {
+			ASTNode newNode = translatePragma(newSource(statementTree),
+					statementTree, scope);
+
+			if (newNode instanceof StatementNode)
+				return (StatementNode) newNode;
+			else
+				throw error("This pragma cannot be used as a statement",
+						newNode);
+		}
 		case RETURN:
 			return nodeFactory.newReturnNode(
 					newSource(statementTree),
@@ -2383,7 +2526,7 @@ public class CommonASTBuilder implements ASTBuilder {
 				getContract(contractTree, newScope), body);
 		if (scopeListNode != null)
 			result = nodeFactory.newScopeParameterizedDeclarationNode(
-					sourceFactory.join(scopeListNode.getSource(),
+					tokenFactory.join(scopeListNode.getSource(),
 							result.getSource()), scopeListNode,
 					(DeclarationNode) result);
 		return result;
@@ -2471,10 +2614,17 @@ public class CommonASTBuilder implements ASTBuilder {
 			else if (definitionType == STATICASSERT)
 				definitions
 						.add(translateStaticAssertion(definitionTree, scope));
-			else if (definitionType == PRAGMA)
-				definitions.add(translatePragma(newSource(definitionTree),
-						definitionTree, scope));
-			else if (definitionType == ASSUME)
+			else if (definitionType == PRAGMA) {
+				ASTNode newNode = translatePragma(newSource(definitionTree),
+						definitionTree, scope);
+
+				if (newNode instanceof ExternalDefinitionNode)
+					definitions.add((ExternalDefinitionNode) newNode);
+				else
+					throw error(
+							"This pragma cannot be used as an external definition",
+							newNode);
+			} else if (definitionType == ASSUME)
 				definitions.add(translateAssume(newSource(definitionTree),
 						definitionTree, scope));
 			else
@@ -2485,44 +2635,8 @@ public class CommonASTBuilder implements ASTBuilder {
 				definitions);
 	}
 
-	/* ************************ ASTBuilder Methods ************************ */
-
-	@Override
-	public CParser getCParser() {
-		return this.parser;
-	}
-
-	/**
-	 * The main method: given an ANTLR tree, produces a TranslationUnit.
-	 * 
-	 * @param tree
-	 *            an ANTLR syntax tree
-	 * @return a TranslationUnit representing the given syntax tree
-	 * @throws SyntaxException
-	 *             if there is something in the tree that does not conform to
-	 *             the C11 standard
-	 */
-	@Override
-	public AST getTranslationUnit() throws SyntaxException {
-		SequenceNode<ExternalDefinitionNode> root = translateTranslationUnit(rootTree);
-
-		return astFactory.newAST(root);
-	}
-
-	@Override
-	public ExpressionNode translateExpression(CommonTree expressionTree,
-			SimpleScope scope) throws SyntaxException {
-		int kind = expressionTree.getType();
-
-		if (kind == ABSENT)
-			return null;
-		return translateExpression(newSource(expressionTree), expressionTree,
-				scope);
-	}
-
-	@Override
-	public List<BlockItemNode> translateBlockItemNode(CommonTree blockItemTree,
-			SimpleScope scope) throws SyntaxException {
+	private List<BlockItemNode> translateBlockItemNode(
+			CommonTree blockItemTree, SimpleScope scope) throws SyntaxException {
 		int kind = blockItemTree.getType();
 		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
 
@@ -2544,6 +2658,41 @@ public class CommonASTBuilder implements ASTBuilder {
 			items.add(statementNode);
 		}
 		return items;
+	}
+
+	/* ********************* ASTBuilderWorker Methods ********************* */
+
+	/**
+	 * The main method: given an ANTLR tree, produces a TranslationUnit.
+	 * 
+	 * @param tree
+	 *            an ANTLR syntax tree
+	 * @return a TranslationUnit representing the given syntax tree
+	 * @throws SyntaxException
+	 *             if there is something in the tree that does not conform to
+	 *             the C11 standard
+	 */
+	@Override
+	public SequenceNode<ExternalDefinitionNode> translateRoot()
+			throws SyntaxException {
+		return translateTranslationUnit(rootTree);
+	}
+
+	@Override
+	public ExpressionNode translateExpression(CommonTree expressionTree,
+			SimpleScope scope) throws SyntaxException {
+		int kind = expressionTree.getType();
+
+		if (kind == ABSENT)
+			return null;
+		return translateExpression(newSource(expressionTree), expressionTree,
+				scope);
+	}
+
+	@Override
+	public List<BlockItemNode> translateBlockItem(CommonTree blockItemTree,
+			SimpleScope scope) throws SyntaxException {
+		return translateBlockItemNode(blockItemTree, scope);
 	}
 }
 

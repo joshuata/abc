@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
-import org.antlr.runtime.tree.CommonTree;
-
 import edu.udel.cis.vsl.abc.analysis.IF.Analysis;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
@@ -33,6 +31,7 @@ import edu.udel.cis.vsl.abc.config.IF.Configurations;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocess;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
@@ -72,6 +71,8 @@ public class FrontEnd {
 	private PreprocessorFactory preprocessorFactory = Preprocess
 			.newPreprocessorFactory();
 
+	private CParser parser = Parse.newCParser();
+
 	private TypeFactory typeFactory = Types.newTypeFactory();
 
 	private ValueFactory valueFactory = Values.newValueFactory(typeFactory);
@@ -87,9 +88,15 @@ public class FrontEnd {
 	private ConversionFactory conversionFactory = Conversions
 			.newConversionFactory(typeFactory);
 
+	private ASTBuilder builder = Antlr2AST.newASTBuilder(astFactory, parser);
+
 	private Configuration c_config;
 
 	private Configuration civl_config;
+
+	private Analyzer analyzer_c;
+
+	private Analyzer analyzer_civl;
 
 	/**
 	 * Constructs a new front end. The front end can be used repeatedly to
@@ -103,6 +110,10 @@ public class FrontEnd {
 		c_config.setLanguage(Language.C);
 		civl_config = Configurations.newMinimalConfiguration();
 		civl_config.setLanguage(Language.CIVL_C);
+		analyzer_c = Analysis.newStandardAnalyzer(c_config, astFactory,
+				entityFactory, conversionFactory);
+		analyzer_civl = Analysis.newStandardAnalyzer(civl_config, astFactory,
+				entityFactory, conversionFactory);
 	}
 
 	/**
@@ -123,22 +134,8 @@ public class FrontEnd {
 				userIncludePaths);
 	}
 
-	/**
-	 * Creates a new parser for parsing a specified token source. This parser is
-	 * not reusable, i.e., it can be used only once, to parse the specified
-	 * source. The token source can be obtained, for example, from a
-	 * {@link Preprocessor}. An ANTLR tree representation of the translation
-	 * unit can be obtained from the new parser.
-	 * 
-	 * @see CParser#getTree()
-	 * @see Preprocessor#outputTokenSource(File)
-	 * 
-	 * @param tokens
-	 *            a token source
-	 * @return a new parser for parsing that token source
-	 */
-	public CParser getParser(CTokenSource tokens) {
-		return Parse.newCParser(tokens);
+	public CParser getParser() {
+		return parser;
 	}
 
 	/**
@@ -152,41 +149,8 @@ public class FrontEnd {
 		return astFactory;
 	}
 
-	/**
-	 * Creates a new AST builder, an object which builds an AST from an ANTLR
-	 * tree. The builder actually requires the CParser used to create the tree,
-	 * as well as the tree itself.
-	 * 
-	 * @param parser
-	 *            the parser used to create the ANTLR tree
-	 * @param tree
-	 *            the root of the ANTLR tree created by the parser
-	 * @return the new AST builder
-	 * @throws SyntaxException
-	 *             if there is a statically detectable error in ths translation
-	 *             unit parsed
-	 */
-	public ASTBuilder getASTBuilder(CParser parser, CommonTree tree)
-			throws SyntaxException {
-		return Antlr2AST.newASTBuilder(parser, astFactory, tree);
-	}
-
-	/**
-	 * Creates a new AST builder, an object which builds an AST from an ANTLR
-	 * tree. The builder actually requires the CParser used to create the tree,
-	 * which also contains a reference to the tree.
-	 * 
-	 * @param parser
-	 *            the parser used to create the ANTLR tree
-	 * @return the new AST builder
-	 * @throws SyntaxException
-	 *             if there is a statically detectable error in ths translation
-	 *             unit parsed
-	 * @throws ParseException
-	 */
-	public ASTBuilder getASTBuilder(CParser parser) throws SyntaxException,
-			ParseException {
-		return Antlr2AST.newASTBuilder(parser, astFactory, parser.getTree());
+	public ASTBuilder getASTBuilder() {
+		return builder;
 	}
 
 	/**
@@ -200,8 +164,7 @@ public class FrontEnd {
 	 * @return a standard Analyzer for that language
 	 */
 	public Analyzer getStandardAnalyzer(Language language) {
-		return Analysis.newStandardAnalyzer(language == Language.C ? c_config
-				: civl_config, astFactory, entityFactory, conversionFactory);
+		return language == Language.C ? analyzer_c : analyzer_civl;
 	}
 
 	/**
@@ -248,11 +211,10 @@ public class FrontEnd {
 		Preprocessor preprocessor = getPreprocessor(systemIncludePaths,
 				userIncludePaths);
 		CTokenSource tokens = preprocessor.outputTokenSource(file);
-		CParser parser = getParser(tokens);
-		ASTBuilder builder = getASTBuilder(parser, parser.getTree());
-		AST result = builder.getTranslationUnit();
+		ParseTree parseTree = parser.parse(tokens);
+		AST ast = builder.getTranslationUnit(parseTree);
 
-		return result;
+		return ast;
 	}
 
 	/**
@@ -352,10 +314,9 @@ public class FrontEnd {
 
 		for (int i = 0; i < n; i++) {
 			CTokenSource tokens = preprocessor.outputTokenSource(files[i]);
-			CParser parser = getParser(tokens);
-			ASTBuilder builder = getASTBuilder(parser, parser.getTree());
+			ParseTree parseTree = parser.parse(tokens);
 
-			asts[i] = builder.getTranslationUnit();
+			asts[i] = builder.getTranslationUnit(parseTree);
 		}
 		result = programFactory.newProgram(asts);
 		return result;
@@ -442,18 +403,15 @@ public class FrontEnd {
 				out.flush();
 			}
 			if (!task.isPreprocOnly()) {
-				CParser parser = frontEnd.getParser(tokens);
-				CommonTree tree = parser.getTree();
-				ASTBuilder builder;
+				ParseTree parseTree = parser.parse(tokens);
 
 				if (verbose) {
 					out.println(bar + " ANTLR Tree for " + filename + " " + bar);
-					ANTLRUtils.printTree(out, tree);
+					ANTLRUtils.printTree(out, parseTree.getRoot());
 					out.println();
 					out.flush();
 				}
-				builder = frontEnd.getASTBuilder(parser, tree);
-				asts[i] = builder.getTranslationUnit();
+				asts[i] = builder.getTranslationUnit(parseTree);
 				if (verbose) {
 					out.println(bar + " Raw Translation Unit for " + filename
 							+ " " + bar);

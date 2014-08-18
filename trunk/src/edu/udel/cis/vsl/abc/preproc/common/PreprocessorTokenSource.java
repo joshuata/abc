@@ -290,10 +290,10 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	// Options...
 
-	@Override
-	public Map<String, Macro> getMacroMap() {
-		return macroMap;
-	}
+	// @Override
+	// public Map<String, Macro> getMacroMap() {
+	// return macroMap;
+	// }
 
 	@Override
 	public int getNumTokens() {

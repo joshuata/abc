@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.common.CommonOrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
@@ -23,7 +24,7 @@ public class CommonEnumerator extends CommonOrdinaryEntity implements
 	 */
 	public CommonEnumerator(EnumeratorDeclarationNode declaration,
 			EnumerationType enumeration, Value value) {
-		super(EntityKind.ENUMERATOR, declaration.getName(), LinkageKind.NONE,
+		super(EntityKind.ENUMERATOR, declaration.getName(), ProgramEntity.LinkageKind.NONE,
 				enumeration);
 		this.addDeclaration(declaration);
 		this.setDefinition(declaration);
