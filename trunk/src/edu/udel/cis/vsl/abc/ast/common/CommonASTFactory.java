@@ -38,6 +38,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
@@ -64,6 +65,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
@@ -513,8 +515,11 @@ public class CommonASTFactory implements ASTFactory {
 					(CompoundStatementNode) statement, isBody);
 			break;
 		case EXPRESSION:
-			expressionStatement2CIVL(out, prefix,
+			pPrintExpressionStatement(out, prefix,
 					(ExpressionStatementNode) statement);
+			break;
+		case CHOOSE:
+			pPrintChooseStatement(out, prefix, (ChooseStatementNode) statement);
 			break;
 		case CIVL_FOR:
 			pPrintCivlForStatement(out, prefix, (CivlForNode) statement);
@@ -548,6 +553,12 @@ public class CommonASTFactory implements ASTFactory {
 			throw new ABCUnsupportedException(
 					"pretty print of statement node of " + kind + " kind");
 		}
+	}
+
+	private static void pPrintChooseStatement(PrintStream out, String prefix,
+			ChooseStatementNode statement) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	static void pPrintAssert(PrintStream out, String prefix,
@@ -956,9 +967,11 @@ public class CommonASTFactory implements ASTFactory {
 			pPrintGoto(out, prefix, (GotoNode) jump);
 			break;
 		case CONTINUE:
+			out.print(prefix);
 			out.print("continue;");
 			break;
 		case BREAK:
+			out.print(prefix);
 			out.print("break;");
 			break;
 		default: // case RETURN:
@@ -1051,7 +1064,7 @@ public class CommonASTFactory implements ASTFactory {
 		return result;
 	}
 
-	private static void expressionStatement2CIVL(PrintStream out,
+	private static void pPrintExpressionStatement(PrintStream out,
 			String prefix, ExpressionStatementNode expr) {
 		out.print(prefix);
 		out.print(pPrintExpression(expr.getExpression()));
@@ -1255,6 +1268,11 @@ public class CommonASTFactory implements ASTFactory {
 		case REGULAR_RANGE:
 			result.append(pPrintRegularRange((RegularRangeNode) expression));
 			break;
+		case SCOPEOF:
+			result.append("$scopeof(");
+			result.append(pPrintExpression(((ScopeOfNode) expression)
+					.expression()));
+			result.append(")");
 		default:
 			throw new ABCUnsupportedException(
 					"pretty print of expression node of " + kind + " kind");
