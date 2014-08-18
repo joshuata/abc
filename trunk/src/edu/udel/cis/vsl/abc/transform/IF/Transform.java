@@ -82,7 +82,7 @@ public class Transform {
 	 * Adds a new transform to the collection of known ones. Use this method if
 	 * you don't want to hardwire your transform in to the ABC code base. You
 	 * will need to create an instance of TransformRecord, for example, in the
-	 * anonymous way done above with the build-in transforms. It can be added at
+	 * anonymous way done above with the built-in transforms. It can be added at
 	 * any time but usually it is done in some initialization phase.
 	 * 
 	 * @param record
