@@ -5,7 +5,6 @@ import java.io.File;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
-import org.antlr.runtime.tree.CommonTree;
 
 /**
  * Utility class providing static methods dealing with Token objects.
@@ -152,9 +151,9 @@ public class TokenUtils {
 		result = result + " " + excerpt;
 		return result;
 	}
-	
+
 	// what we want:
-	// 
+	//
 
 	/**
 	 * A utility function to return the text of a token surrounded by double
@@ -184,16 +183,16 @@ public class TokenUtils {
 		return new ListTokenSource(first);
 	}
 
-	/**
-	 * Given a CommonTree node, forms a token source from the children of that
-	 * node. Adds an EOF token to the end of the source.
-	 * 
-	 * 
-	 * @param node
-	 */
-	public static TokenSource makeTokenSourceFromChildren(CommonTree node) {
-		return new NodeTokenSource(node);
-	}
+	// /**
+	// * Given a CommonTree node, forms a token source from the children of that
+	// * node. Adds an EOF token to the end of the source.
+	// *
+	// *
+	// * @param node
+	// */
+	// public static TokenSource makeTokenSourceFromChildren(CommonTree node) {
+	// return new NodeTokenSource(node);
+	// }
 
 }
 
@@ -245,58 +244,58 @@ class ListTokenSource implements TokenSource {
 
 }
 
-/**
- * A simple TokenSource formed by iterating over the children of a CommonTree
- * node.
- * 
- * @author siegel
- * 
- */
-class NodeTokenSource implements TokenSource {
-
-	private CommonTree root;
-
-	/**
-	 * Index of the next child that will be returned by a call to nextToken().
-	 */
-	private int position = 0;
-
-	private int numChildren;
-
-	NodeTokenSource(CommonTree root) {
-		this.root = root;
-		this.numChildren = root.getChildCount();
-	}
-
-	@Override
-	public Token nextToken() {
-		if (position >= numChildren)
-			return Token.EOF_TOKEN;
-		else {
-			Token result = ((CommonTree) root.getChild(position)).getToken();
-
-			position++;
-			return result;
-		}
-	}
-
-	@Override
-	public String getSourceName() {
-		Token token = root.getToken();
-
-		if (token == null)
-			return "unknown";
-
-		CharStream stream = token.getInputStream();
-
-		if (stream == null)
-			return "unknown";
-
-		String name = stream.getSourceName();
-
-		if (name == null)
-			return "unknown";
-
-		return name;
-	}
-}
+// /**
+// * A simple TokenSource formed by iterating over the children of a CommonTree
+// * node.
+// *
+// * @author siegel
+// *
+// */
+// class NodeTokenSource implements TokenSource {
+//
+// private CommonTree root;
+//
+// /**
+// * Index of the next child that will be returned by a call to nextToken().
+// */
+// private int position = 0;
+//
+// private int numChildren;
+//
+// NodeTokenSource(CommonTree root) {
+// this.root = root;
+// this.numChildren = root.getChildCount();
+// }
+//
+// @Override
+// public Token nextToken() {
+// if (position >= numChildren)
+// return Token.EOF_TOKEN;
+// else {
+// Token result = ((CommonTree) root.getChild(position)).getToken();
+//
+// position++;
+// return result;
+// }
+// }
+//
+// @Override
+// public String getSourceName() {
+// Token token = root.getToken();
+//
+// if (token == null)
+// return "unknown";
+//
+// CharStream stream = token.getInputStream();
+//
+// if (stream == null)
+// return "unknown";
+//
+// String name = stream.getSourceName();
+//
+// if (name == null)
+// return "unknown";
+//
+// return name;
+// }
+// }
