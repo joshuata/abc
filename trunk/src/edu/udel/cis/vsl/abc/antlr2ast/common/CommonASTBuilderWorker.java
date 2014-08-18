@@ -199,7 +199,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
@@ -2237,7 +2237,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
 		CommonTree newlineTree = (CommonTree) pragmaTree.getChild(2);
 		CToken newlineToken = (CToken) newlineTree.getToken();
-		CTokenSourceProducer producer = parseTree
+		CTokenSequence producer = parseTree
 				.getTokenSourceProducer(bodyTree);
 		PragmaNode pragmaNode = nodeFactory.newPragmaNode(source, identifier,
 				producer, newlineToken);

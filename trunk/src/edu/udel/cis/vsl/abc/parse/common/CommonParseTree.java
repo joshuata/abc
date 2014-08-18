@@ -6,7 +6,7 @@ import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
@@ -61,18 +61,18 @@ public class CommonParseTree implements ParseTree {
 	}
 
 	@Override
-	public CTokenSourceProducer getTokenSourceProducer(CommonTree tokenListNode) {
+	public CTokenSequence getTokenSourceProducer(CommonTree tokenListNode) {
 		int numChildren = tokenListNode.getChildCount();
 
 		if (numChildren == 0) {
-			return tokenFactory.emptySubTokenSourceProducer(tokenSource);
+			return tokenFactory.getEmptyTokenSubsequence(tokenSource);
 		} else {
 			CToken startToken = (CToken) ((CommonTree) tokenListNode
 					.getChild(0)).getToken();
 			CToken stopToken = (CToken) ((CommonTree) tokenListNode
 					.getChild(numChildren - 1)).getToken();
 
-			return tokenFactory.subTokenSourceProducer(tokenSource, startToken,
+			return tokenFactory.getTokenSubsequence(tokenSource, startToken,
 					stopToken);
 		}
 	}

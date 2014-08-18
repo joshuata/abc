@@ -8,27 +8,25 @@ import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
-import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 
 	protected CToken[] body;
 
-	protected CToken eofToken;
+	protected CTokenSequence tokenSequence;
 
-	protected CTokenSourceProducer bodyTokenSourceProducer;
+	protected CToken newlineToken;
 
 	public CommonPragmaNode(Source source, IdentifierNode identifier,
-			CTokenSourceProducer bodyTokenSourceProducer, CToken eofToken) {
+			CTokenSequence tokenSequence, CToken newlineToken) {
 		super(source, identifier);
-		this.bodyTokenSourceProducer = bodyTokenSourceProducer;
-		this.eofToken = eofToken;
-		assert eofToken.getType() == CivlCParser.EOF;
-		body = bodyTokenSourceProducer.getTokens();
+		this.tokenSequence = tokenSequence;
+		this.newlineToken = newlineToken;
+		body = tokenSequence.getTokens();
 	}
 
 	@Override
@@ -72,8 +70,8 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 		IdentifierNode identifierCopy = identifier == null ? null : identifier
 				.copy();
 
-		return new CommonPragmaNode(getSource(), identifierCopy,
-				bodyTokenSourceProducer, eofToken);
+		return new CommonPragmaNode(getSource(), identifierCopy, tokenSequence,
+				newlineToken);
 	}
 
 	@Override
@@ -116,6 +114,11 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 
 	@Override
 	public CTokenSource newTokenSource() {
-		return bodyTokenSourceProducer.newSource();
+		return tokenSequence.newSource();
+	}
+
+	@Override
+	public CToken getNewlineToken() {
+		return newlineToken;
 	}
 }
