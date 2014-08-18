@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
@@ -22,7 +23,7 @@ public class CommonVariable extends CommonOrdinaryEntity implements Variable {
 
 	private Set<Value> constantAlignments = new HashSet<Value>();
 
-	public CommonVariable(String name, LinkageKind linkage, Type type) {
+	public CommonVariable(String name, ProgramEntity.LinkageKind linkage, Type type) {
 		super(EntityKind.VARIABLE, name, linkage, type);
 	}
 

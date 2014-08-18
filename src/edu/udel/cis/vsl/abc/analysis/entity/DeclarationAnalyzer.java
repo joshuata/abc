@@ -4,11 +4,10 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
@@ -325,7 +324,7 @@ public class DeclarationAnalyzer {
 		hasNoStorageClass = hasNoStorageClass(node);
 		if (node.hasExternStorage()
 				|| (isFunction && hasNoStorageClass && (isFileScope || !civl))) {
-			Entity previous = scope.getLexicalOrdinaryEntity(name);
+			OrdinaryEntity previous = scope.getLexicalOrdinaryEntity(name);
 
 			if (previous == null) {
 				return LinkageKind.EXTERNAL;
@@ -522,7 +521,8 @@ public class DeclarationAnalyzer {
 			FunctionDeclarationNode declaration) throws SyntaxException {
 		TypeNode typeNode = declaration.getTypeNode();
 		OrdinaryDeclarationNode previousDeclaration;
-		Iterator<DeclarationNode> declarationIter = function.getDeclarations();
+		Iterator<DeclarationNode> declarationIter = function.getDeclarations()
+				.iterator();
 
 		if (declarationIter.hasNext())
 			previousDeclaration = (OrdinaryDeclarationNode) declarationIter

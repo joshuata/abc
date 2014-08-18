@@ -9,6 +9,7 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.Parse;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocess;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
@@ -28,8 +29,10 @@ public class CParserTest {
 	private void check(String filenameRoot) throws PreprocessorException,
 			ParseException {
 		File file = new File(root, filenameRoot + ".c");
-		CParser parser = Parse.newCParser(preprocessor.outputTokenSource(file));
-		CommonTree tree = parser.getTree();
+		CParser parser = Parse.newCParser();
+		ParseTree parseTree = parser
+				.parse(preprocessor.outputTokenSource(file));
+		CommonTree tree = parseTree.getRoot();
 
 		if (debug)
 			ANTLRUtils.printTree(out, tree);

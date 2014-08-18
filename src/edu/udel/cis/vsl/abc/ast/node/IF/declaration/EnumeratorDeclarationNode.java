@@ -1,7 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 
 /**
  * The declaration of an enumerator (enumeration constant) within an enumeration

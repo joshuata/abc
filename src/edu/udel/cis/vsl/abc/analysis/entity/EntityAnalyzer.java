@@ -1,9 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -11,7 +7,6 @@ import edu.udel.cis.vsl.abc.ast.IF.StandardTypes;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
-import edu.udel.cis.vsl.abc.ast.entity.IF.PragmaHandler;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
@@ -34,6 +29,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
@@ -93,8 +89,6 @@ public class EntityAnalyzer implements Analyzer {
 
 	StandardTypes standardTypes;
 
-	Map<String, PragmaHandler> pragmaHandlerMap;
-
 	Configuration configuration;
 
 	// Private fields...
@@ -120,8 +114,7 @@ public class EntityAnalyzer implements Analyzer {
 				conversionFactory, typeFactory);
 		this.compoundLiteralAnalyzer = new CompoundLiteralAnalyzer(this);
 		this.statementAnalyzer = new StatementAnalyzer(this, expressionAnalyzer);
-		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory, entityFactory);
-		this.pragmaHandlerMap = new LinkedHashMap<String, PragmaHandler>();
+		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory);
 	}
 
 	// Public methods...
@@ -227,6 +220,8 @@ public class EntityAnalyzer implements Analyzer {
 					.processEnumerationType((EnumerationTypeNode) node));
 		} else if (node instanceof AssumeNode) {
 			statementAnalyzer.processStatement((AssumeNode) node);
+		} else if (node instanceof AssertNode) {
+			statementAnalyzer.processStatement((AssertNode) node);
 		} else if (node instanceof ScopeParameterizedDeclarationNode) {
 			declarationAnalyzer
 					.processScopeParameterizedDeclaration((ScopeParameterizedDeclarationNode) node);
@@ -247,21 +242,27 @@ public class EntityAnalyzer implements Analyzer {
 	}
 
 	void processPragma(PragmaNode node) throws SyntaxException {
-		IdentifierNode identifier = node.getPragmaIdentifier();
+		// there is nothing to do. Now the CommonASTBuilderWorker
+		// has already processed the pragma node. If that resulted
+		// replacing the pragma node with some other kind of node,
+		// you won't be here. Otherwise, the entity of the pragma
+		// identifier has already been set to the handler.
 
-		if (identifier == null) {
-			return;
-		} else {
-			String name = identifier.name();
-			PragmaHandler handler = pragmaHandlerMap.get(name);
-
-			if (handler == null) {
-				handler = entityFactory.newPragmaHandler(name);
-
-				pragmaHandlerMap.put(name, handler);
-			}
-			identifier.setEntity(handler);
-		}
+		// IdentifierNode identifier = node.getPragmaIdentifier();
+		//
+		// if (identifier == null) {
+		// return;
+		// } else {
+		// String name = identifier.name();
+		// PragmaHandler handler = pragmaHandlerMap.get(name);
+		//
+		// if (handler == null) {
+		// handler = pragmaFactory.getHandler(name);
+		//
+		// pragmaHandlerMap.put(name, handler);
+		// }
+		// identifier.setEntity(handler);
+		// }
 	}
 
 	/**
@@ -286,17 +287,10 @@ public class EntityAnalyzer implements Analyzer {
 			throw new IllegalArgumentException(
 					"Tentative definition only exist at file scope");
 
-		Iterator<Variable> variableIter = scope.getVariables();
-
-		while (variableIter.hasNext()) {
-			Variable variable = variableIter.next();
-			VariableDeclarationNode declaration = variable.getDefinition();
-
-			if (declaration == null) {
-				Iterator<DeclarationNode> declIter = variable.getDeclarations();
-
-				while (declIter.hasNext()) {
-					declaration = (VariableDeclarationNode) declIter.next();
+		for (Variable variable : scope.getVariables()) {
+			if (variable.getDefinition() == null) {
+				for (DeclarationNode decl : variable.getDeclarations()) {
+					VariableDeclarationNode declaration = (VariableDeclarationNode) decl;
 
 					if (declaration.getInitializer() == null
 							&& !(declaration.hasAutoStorage()

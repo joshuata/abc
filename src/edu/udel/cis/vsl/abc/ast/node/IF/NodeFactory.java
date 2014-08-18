@@ -60,6 +60,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -94,6 +95,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
@@ -1529,6 +1531,23 @@ public interface NodeFactory {
 	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 
 	/**
+	 * Creates a new node representing a CIVL-C <code>$assert</code> statement.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$assert</code>
+	 *            statement, including the expression argument
+	 * @param expression
+	 *            a boolean expression which is to be evaluated and expected to
+	 *            be true
+	 * @param explanation
+	 *            the list of expressions for explaining the assertion if it is
+	 *            violated.
+	 * @return the new <code>$assert</code> statement node
+	 */
+	AssertNode newAssertNode(Source source, ExpressionNode expression,
+			SequenceNode<ExpressionNode> explanation);
+
+	/**
 	 * Creates a new node representing a CIVL-C <code>$when</code> node, used to
 	 * represent a guarded command. Such a statement blocks until the guard is
 	 * <code>true</code>. Note that only the first atomic sub-statement of the
@@ -1620,15 +1639,18 @@ public interface NodeFactory {
 	 * @param identifier
 	 *            the first token after the <code>#pragma</code> token
 	 *            specifying the pragma domain (e.g., <code>omp</code>)
-	 * @param body
-	 *            the sequence of tokens comprising the rest of the pragma body
-	 *            after the identifier, and not including the newline
+	 * @param producer
+	 *            a producer for producing new {@link CTokenSource} objects
+	 *            which are essentially iterators over the tokens comprising the
+	 *            body, i.e., the sequence of tokens comprising the rest of the
+	 *            pragma body after the identifier, and not including the
+	 *            newline
 	 * @param newlineToken
 	 *            the newlinen token at the end of the pragma
 	 * @return the new pragma node
 	 */
 	PragmaNode newPragmaNode(Source source, IdentifierNode identifier,
-			List<CToken> body, CToken newlineToken);
+			CTokenSourceProducer producer, CToken newlineToken);
 
 	/**
 	 * Constructs a new node representing a CIVL-C <code>$requires</code>

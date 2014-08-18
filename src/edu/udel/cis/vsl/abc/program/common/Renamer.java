@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.program.common;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 
@@ -19,14 +20,14 @@ public class Renamer {
 	/**
 	 * Map from entities to new name.
 	 */
-	private Map<Entity, String> map;
+	private Map<ProgramEntity, String> map;
 
 	/**
 	 * Constructs new renamed with given renaming map.
 	 * 
 	 * @param map
 	 */
-	public Renamer(Map<Entity, String> map) {
+	public Renamer(Map<ProgramEntity, String> map) {
 		this.map = map;
 	}
 

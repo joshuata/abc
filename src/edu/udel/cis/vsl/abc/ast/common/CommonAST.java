@@ -4,17 +4,14 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
@@ -23,6 +20,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
@@ -173,11 +171,11 @@ public class CommonAST implements AST {
 
 	@Override
 	public void add(OrdinaryEntity entity) {
-		LinkageKind linkage = entity.getLinkage();
+		ProgramEntity.LinkageKind linkage = entity.getLinkage();
 
-		if (linkage == LinkageKind.EXTERNAL)
+		if (linkage == ProgramEntity.LinkageKind.EXTERNAL)
 			externalEntities.add(entity);
-		else if (linkage == LinkageKind.INTERNAL)
+		else if (linkage == ProgramEntity.LinkageKind.INTERNAL)
 			internalEntities.add(entity);
 		else
 			throw new IllegalArgumentException(
@@ -203,127 +201,107 @@ public class CommonAST implements AST {
 
 	@Override
 	public void prettyPrint(PrintStream out, boolean ignoreStdLibs) {
-		Map<String, StringBuffer> results = new LinkedHashMap<>();
-		Set<String> headers = new LinkedHashSet<>();
 		SequenceNode<ExternalDefinitionNode> root = getRootNode();
 		int numChildren = root.numChildren();
+		String currentFile = null;
 
 		for (int i = 0; i < numChildren; i++) {
 			ExternalDefinitionNode child = root.getSequenceChild(i);
 
-			if (child != null)
-				this.externalDef2CIVL(child, results, headers, ignoreStdLibs);
-		}
-		for (Entry<String, StringBuffer> entry : results.entrySet()) {
-			out.print("================ ");
-			out.print(entry.getKey());
-			out.println(" ================");
-			for (String header : headers) {
-				out.print("#include <");
-				out.print(header);
-				out.println(">");
+			if (child != null) {
+				String sourceFile = child.getSource().getFirstToken()
+						.getSourceFile().getName();
+
+				if (ignoreStdLibs)
+					switch (sourceFile) {
+					case "assert.h":
+					case "civlc.h":
+					case "civlc.cvh":
+					case "bundle.cvh":
+					case "comm.cvh":
+					case "concurrency.cvh":
+					case "pointer.cvh":
+					case "scope.cvh":
+					case "seq.cvh":
+					case "float.h":
+					case "math.h":
+					case "mpi.h":
+					case "omp.h":
+					case "pthread.h":
+					case "stdbool.h":
+					case "stddef.h":
+					case "stdio.h":
+					case "stdlib.h":
+					case "string.h":
+					case "time.h":
+					case "civlc-common.cvh":
+					case "bundle-common.cvh":
+					case "comm-common.cvh":
+					case "concurrency-common.cvh":
+					case "omp.cvl":
+					case "pointer-common.cvh":
+					case "scope-common.cvh":
+					case "seq-common.cvh":
+					case "stdlib-common.h":
+					case "string-common.h":
+					case "stdio-common.h":
+					case "omp-common.h":
+					case "mpi-common.h":
+					case "civlc-common.h":
+					case "civlc-omp.cvl":
+					case "stdio-c.cvl":
+					case "stdio.cvl":
+					case "mpi.cvl":
+					case "pthread-c.cvl":
+					case "pthread.cvl":
+					case "time-common.h":
+					case "math.cvl":
+						continue;
+					default:
+					}
+
+				if (currentFile == null || !currentFile.equals(sourceFile)) {
+					out.print("//================ ");
+					out.print(sourceFile);
+					out.println(" ================");
+					currentFile = sourceFile;
+				}
+				this.externalDef2CIVL(out, child);
 			}
-			out.print(entry.getValue());
 		}
 	}
 
-	private void externalDef2CIVL(ExternalDefinitionNode extern,
-			Map<String, StringBuffer> results, Set<String> headers,
-			boolean ignoreStdLibs) {
-		String sourceFile = extern.getSource().getFirstToken().getSourceFile()
-				.getName();
-		StringBuffer myBuffer;
-
-		if (ignoreStdLibs)
-			switch (sourceFile) {
-			case "assert.h":
-			case "civlc.h":
-			case "civlc.cvh":
-			case "bundle.cvh":
-			case "comm.cvh":
-			case "concurrency.cvh":
-			case "pointer.cvh":
-			case "scope.cvh":
-			case "seq.cvh":
-			case "float.h":
-			case "math.h":
-			case "mpi.h":
-			case "omp.h":
-			case "pthread.h":
-			case "stdbool.h":
-			case "stddef.h":
-			case "stdio.h":
-			case "stdlib.h":
-			case "string.h":
-			case "time.h":
-				headers.add(sourceFile);
-				return;
-			case "civlc-common.cvh":
-			case "bundle-common.cvh":
-			case "comm-common.cvh":
-			case "concurrency-common.cvh":
-			case "omp.cvl":
-			case "pointer-common.cvh":
-			case "scope-common.cvh":
-			case "seq-common.cvh":
-			case "stdlib-common.h":
-			case "string-common.h":
-			case "stdio-common.h":
-			case "omp-common.h":
-			case "mpi-common.h":
-			case "civlc-common.h":
-			case "civlc-omp.cvl":
-			case "stdio-c.cvl":
-			case "stdio.cvl":
-			case "mpi.cvl":
-			case "pthread-c.cvl":
-			case "pthread.cvl":
-			case "time-common.h":
-			case "math.cvl":
-				return;
-			default:
-			}
-		if (!results.containsKey(sourceFile))
-			results.put(sourceFile, new StringBuffer());
-		myBuffer = results.get(sourceFile);
+	private void externalDef2CIVL(PrintStream out, ExternalDefinitionNode extern) {
 		if (extern instanceof AssumeNode) {
-			myBuffer.append(CommonASTFactory.assume2CIVL("",
-					(AssumeNode) extern));
-			myBuffer.append(";");
+			CommonASTFactory.pPrintAssume(out, "", (AssumeNode) extern);
+		} else if (extern instanceof AssertNode) {
+			CommonASTFactory.pPrintAssert(out, "", (AssertNode) extern);
 		} else if (extern instanceof EnumerationTypeNode) {
-			myBuffer.append(CommonASTFactory.enumType2CIVL("",
+			out.print(CommonASTFactory.pPrintEnumType("",
 					(EnumerationTypeNode) extern));
-			myBuffer.append(";");
+			out.print(";");
 		} else if (extern instanceof OrdinaryDeclarationNode) {
-			int length;
-			char lastChar;
-
-			myBuffer.append(CommonASTFactory.ordinaryDeclaration2CIVL("",
-					(OrdinaryDeclarationNode) extern));
-			length = myBuffer.length();
-			lastChar = myBuffer.charAt(length - 1);
-			if (lastChar != '}' && lastChar != ';')
-				myBuffer.append(";");
+			CommonASTFactory.pPrintOrdinaryDeclaration(out, "",
+					(OrdinaryDeclarationNode) extern);
 		} else if (extern instanceof PragmaNode) {
-			myBuffer.append(CommonASTFactory.pragma2CIVL("",
-					(PragmaNode) extern));
+			CommonASTFactory.pPrintPragma(out, "", (PragmaNode) extern);
 		} else if (extern instanceof StaticAssertionNode) {
-			myBuffer.append(CommonASTFactory.staticAssertion2CIVL("",
-					(StaticAssertionNode) extern));
-			myBuffer.append(";");
+			CommonASTFactory.pPrintStaticAssertion(out, "",
+					(StaticAssertionNode) extern);
+			out.print(";");
 		} else if (extern instanceof StructureOrUnionTypeNode) {
-			myBuffer.append(CommonASTFactory.structOrUnion2CIVL("",
+			out.print(CommonASTFactory.pPrintStructOrUnion("",
 					(StructureOrUnionTypeNode) extern));
-			myBuffer.append(";");
+			out.print(";");
 		} else if (extern instanceof TypedefDeclarationNode) {
-			myBuffer.append(CommonASTFactory.typedefDeclaration2CIVL("",
-					(TypedefDeclarationNode) extern));
-			myBuffer.append(";");
+			CommonASTFactory.pPrintTypedefDeclaration(out, "",
+					(TypedefDeclarationNode) extern);
+			out.print(";");
 		} else if (extern instanceof OmpDeclarativeNode) {
-			myBuffer.append(CommonASTFactory.ompDeclarative2CIVL("",
-					(OmpDeclarativeNode) extern));
+			CommonASTFactory.pPrintOmpDeclarative(out, "",
+					(OmpDeclarativeNode) extern);
 		}
-		myBuffer.append("\n");
+		out.print("\n");
 	}
 
 	// private StringBuffer structOrUnion2CIVL(String prefix,

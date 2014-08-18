@@ -105,4 +105,11 @@ public interface TokenFactory {
 	FunctionMacro newFunctionMacro(Tree definitionNode, File file,
 			String shotFileName);
 
+	// TokenSources...
+
+	CTokenSourceProducer subTokenSourceProducer(CTokenSource fullSource,
+			CToken startToken, CToken stopToken);
+
+	CTokenSourceProducer emptySubTokenSourceProducer(CTokenSource originalSource);
+
 }

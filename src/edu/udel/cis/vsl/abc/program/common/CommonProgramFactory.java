@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.program.common;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +10,8 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
@@ -92,8 +91,7 @@ public class CommonProgramFactory implements ProgramFactory {
 			} else
 				throw new ABCRuntimeException("unreachable: " + def);
 		}
-		for (Entity entity : plan.getEntityRemoveActions()) {
-			Iterator<DeclarationNode> declIter = entity.getDeclarations();
+		for (ProgramEntity entity : plan.getEntityRemoveActions()) {
 			boolean isSysTypedef = entity instanceof Typedef
 					&& ((Typedef) entity).isSystem();
 
@@ -104,8 +102,7 @@ public class CommonProgramFactory implements ProgramFactory {
 			// the decl belongs to the one AST because its parent
 			// will be root...
 
-			while (declIter.hasNext()) {
-				DeclarationNode decl = declIter.next();
+			for (DeclarationNode decl : entity.getDeclarations()) {
 				ASTNode parent = decl.parent();
 
 				if (parent != null && (!isSysTypedef || parent == root)) {

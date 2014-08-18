@@ -26,6 +26,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode.OmpReductionNodeKin
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode.OmpStatementNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -41,9 +42,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.JumpNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LabeledStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.NullStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode.StatementKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
@@ -314,31 +315,59 @@ public class StatementAnalyzer {
 	// ************************* Exported Methods **************************
 
 	void processStatement(StatementNode statement) throws SyntaxException {
-		if (statement instanceof CompoundStatementNode)
+		StatementKind kind = statement.statementKind();
+
+		switch (kind) {
+		case COMPOUND:
 			processCompoundStatement((CompoundStatementNode) statement);
-		else if (statement instanceof ExpressionStatementNode)
+			break;
+		case EXPRESSION:
 			processExpression(((ExpressionStatementNode) statement)
 					.getExpression());
-		else if (statement instanceof IfNode) {
+			break;
+		case IF:
 			processIf((IfNode) statement);
-		} else if (statement instanceof JumpNode) {
+			break;
+		case JUMP:
 			processJump((JumpNode) statement);
-		} else if (statement instanceof LabeledStatementNode) {
+			break;
+		case LABELED:
 			processLabeledStatement((LabeledStatementNode) statement);
-		} else if (statement instanceof LoopNode) {
+			break;
+		case LOOP:
 			processLoop((LoopNode) statement);
-		} else if (statement instanceof SwitchNode) {
+			break;
+		case SWITCH:
 			processExpression(((SwitchNode) statement).getCondition());
 			processStatement(((SwitchNode) statement).getBody());
-		} else if (statement instanceof PragmaNode) {
+			break;
+		case PRAGMA:
 			entityAnalyzer.processPragma((PragmaNode) statement);
-		} else if (statement instanceof OmpStatementNode) {
+			break;
+		case OMP_STATEMENT:
 			processOmpStatement((OmpStatementNode) statement);
-		} else if (statement instanceof NullStatementNode) {
-			// nothing to do
-		} else if (statement instanceof AssumeNode) {
+			break;
+		case NULL:
+			break;
+		case ASSUME:
 			processExpression(((AssumeNode) statement).getExpression());
-		} else if (statement instanceof WhenNode) {
+			break;
+		case ASSERT: {
+			AssertNode assertNode = (AssertNode) statement;
+			SequenceNode<ExpressionNode> explanation = assertNode
+					.getExplanation();
+
+			processExpression(assertNode.getCondition());
+			if (explanation != null) {
+				int numArgs = explanation.numChildren();
+
+				
+				for (int i = 0; i < numArgs; i++){
+					processExpression(explanation.getSequenceChild(i));}
+			}
+			break;
+		}
+		case WHEN: {
 			ExpressionNode guard = ((WhenNode) statement).getGuard();
 			Type guardType;
 
@@ -348,17 +377,71 @@ public class StatementAnalyzer {
 			if (!guardType.isScalar())
 				throw error("Guard has non-scalar type " + guardType, guard);
 			processStatement(((WhenNode) statement).getBody());
-		} else if (statement instanceof ChooseStatementNode) {
+			break;
+		}
+		case CHOOSE: {
 			ChooseStatementNode chooseStatement = (ChooseStatementNode) statement;
 
 			for (StatementNode child : chooseStatement)
 				processStatement(child);
-		} else if (statement instanceof AtomicNode) {
+			break;
+		}
+		case ATOMIC:
 			processStatement(((AtomicNode) statement).getBody());
-		} else if (statement instanceof CivlForNode) {
+			break;
+		case CIVL_FOR:
 			processCivlFor((CivlForNode) statement);
-		} else
+			break;
+		default:
 			throw error("Unknown kind of statement", statement);
+		}
+
+		// if (statement instanceof CompoundStatementNode)
+		// processCompoundStatement((CompoundStatementNode) statement);
+		// else if (statement instanceof ExpressionStatementNode)
+		// processExpression(((ExpressionStatementNode) statement)
+		// .getExpression());
+		// else if (statement instanceof IfNode) {
+		// processIf((IfNode) statement);
+		// } else if (statement instanceof JumpNode) {
+		// processJump((JumpNode) statement);
+		// } else if (statement instanceof LabeledStatementNode) {
+		// processLabeledStatement((LabeledStatementNode) statement);
+		// } else if (statement instanceof LoopNode) {
+		// processLoop((LoopNode) statement);
+		// } else if (statement instanceof SwitchNode) {
+		// processExpression(((SwitchNode) statement).getCondition());
+		// processStatement(((SwitchNode) statement).getBody());
+		// } else if (statement instanceof PragmaNode) {
+		// entityAnalyzer.processPragma((PragmaNode) statement);
+		// } else if (statement instanceof OmpStatementNode) {
+		// processOmpStatement((OmpStatementNode) statement);
+		// } else if (statement instanceof NullStatementNode) {
+		// // nothing to do
+		// } else if (statement instanceof AssumeNode) {
+		// processExpression(((AssumeNode) statement).getExpression());
+		// } else if (statement instanceof WhenNode) {
+		// ExpressionNode guard = ((WhenNode) statement).getGuard();
+		// Type guardType;
+		//
+		// processExpression(guard);
+		// guardType = guard.getConvertedType();
+		// // check guardType can be converted to a boolean...
+		// if (!guardType.isScalar())
+		// throw error("Guard has non-scalar type " + guardType, guard);
+		// processStatement(((WhenNode) statement).getBody());
+		// } else if (statement instanceof ChooseStatementNode) {
+		// ChooseStatementNode chooseStatement = (ChooseStatementNode)
+		// statement;
+		//
+		// for (StatementNode child : chooseStatement)
+		// processStatement(child);
+		// } else if (statement instanceof AtomicNode) {
+		// processStatement(((AtomicNode) statement).getBody());
+		// } else if (statement instanceof CivlForNode) {
+		// processCivlFor((CivlForNode) statement);
+		// } else
+		// throw error("Unknown kind of statement", statement);
 	}
 
 	@SuppressWarnings("unchecked")

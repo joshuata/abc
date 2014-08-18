@@ -1,14 +1,10 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
-import java.util.Iterator;
-
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -57,6 +53,8 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
@@ -622,11 +620,8 @@ public class ExpressionAnalyzer {
 		if (node.parent() instanceof FunctionCallNode) {
 			result = functionType;
 		} else {
-			Iterator<DeclarationNode> decls = function.getDeclarations();
-
-			while (decls.hasNext()) {
-				FunctionDeclarationNode decl = (FunctionDeclarationNode) decls
-						.next();
+			for (DeclarationNode dn : function.getDeclarations()) {
+				FunctionDeclarationNode decl = (FunctionDeclarationNode) dn;
 				FunctionTypeNode typeNode = decl.getTypeNode();
 
 				if (!typeNode.hasIdentifierList()) {

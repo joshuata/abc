@@ -22,7 +22,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.GenericSelectionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ResultNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.SelfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode;
@@ -30,7 +29,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 /**
@@ -212,13 +210,6 @@ public interface ASTNode {
 		 */
 		SCOPE_PARAMETERIZED_DECLARATION,
 		/**
-		 * A use of the CIVL-C built-in variable <code>$self</code> of type
-		 * <code>$proc</code>. It represents the process which is evaluating the
-		 * expression containing <code>$self</code>. A node of this kind may be
-		 * safely cast to {@link SelfNode}.
-		 */
-		SELF,
-		/**
 		 * A node which implement the interface {@link SequenceNode}
 		 * <code>< T ></code>. This is a node whose children all have type
 		 * <code>T</code>, where <code>T</code> is a subtype of {@link ASTNode}.
@@ -253,12 +244,6 @@ public interface ASTNode {
 		 * {@link TypedefDeclarationNode}.
 		 */
 		TYPEDEF,
-		/**
-		 * Use of a typedef name in the program. These are distinguished from
-		 * all other identifiers for grammatical reasons. A node of this kind
-		 * can be safely cast to {@link TypedefNameNode}.
-		 */
-		TYPEDEF_NAME,
 		/**
 		 * A variable declaration node. A node of this kind can be safely cast
 		 * to {@link VariableDeclarationNode}.

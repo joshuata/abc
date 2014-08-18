@@ -1,14 +1,14 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
+import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -22,10 +22,12 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -104,11 +106,11 @@ public class PrunerWorker {
 					if (child instanceof IdentifierNode) {
 						Entity entity = ((IdentifierNode) child).getEntity();
 
-						if (entity != null)
+						if (entity != null && entity instanceof ProgramEntity)
 							// TODO: check this: throw new
 							// ASTException("Identifier not resolved: "
 							// + child.getSource().getSummary(false));
-							explore(entity);
+							explore((ProgramEntity) entity);
 					}
 					if (child instanceof OrdinaryDeclarationNode
 							|| child instanceof TypedefDeclarationNode) {
@@ -136,17 +138,24 @@ public class PrunerWorker {
 	 * @param entity
 	 *            an Entity occurring in the AST
 	 */
-	private void explore(Entity entity) {
+	private void explore(ProgramEntity entity) {
+		if (entity instanceof TaggedEntity) {
+			// only need the first decl and the defn:
+			ASTNode firstDecl = entity.getFirstDeclaration();
+			ASTNode defn = entity.getDefinition();
 
-		Iterator<DeclarationNode> declIter = entity.getDeclarations();
-
-		while (declIter.hasNext())
-			markReachable(declIter.next());
-
-		// special case: if you use at least one enumerator
-		// in the enumeration, you use the whole enumeration...
-		if (entity instanceof Enumerator) {
-			explore(((Enumerator) entity).getType());
+			if (firstDecl != null)
+				markReachable(firstDecl);
+			if (defn != null && defn != firstDecl)
+				markReachable(defn);
+		} else {
+			for (DeclarationNode dn : entity.getDeclarations())
+				markReachable(dn);
+			// special case: if you use at least one enumerator
+			// in the enumeration, you use the whole enumeration...
+			if (entity instanceof Enumerator) {
+				explore(((Enumerator) entity).getType());
+			}
 		}
 	}
 
@@ -158,11 +167,9 @@ public class PrunerWorker {
 	private void search() throws SyntaxException {
 		Scope rootScope = root.getScope();
 		Function main = (Function) rootScope.getOrdinaryEntity("main");
-		Iterator<Variable> iter = rootScope.getVariables();
 		Iterable<ASTNode> children = root.children();
 
-		while (iter.hasNext()) {
-			Variable variable = iter.next();
+		for (Variable variable : rootScope.getVariables()) {
 			Type type = variable.getType();
 
 			if (type instanceof QualifiedObjectType) {
@@ -184,7 +191,8 @@ public class PrunerWorker {
 
 			if (externalDef instanceof PragmaNode
 					|| externalDef instanceof StaticAssertionNode
-					|| externalDef instanceof AssumeNode)
+					|| externalDef instanceof AssumeNode
+					|| externalDef instanceof AssertNode)
 				markReachable(externalDef);
 		}
 		explore(main);

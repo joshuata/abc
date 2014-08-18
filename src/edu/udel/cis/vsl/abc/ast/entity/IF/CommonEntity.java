@@ -1,19 +1,26 @@
-package edu.udel.cis.vsl.abc.ast.entity.common;
+package edu.udel.cis.vsl.abc.ast.entity.IF;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
-public class CommonEntity implements Entity {
+/**
+ * A simple, generic implementation of {@link Entity}. This class may be
+ * extended by specific entities, or it may used as a field (as in the
+ * Delegation Pattern) to help implement other entities that cannot extend this
+ * class for some reason (for example, because they extend some other class.)
+ * 
+ * @author siegel
+ * 
+ */
+public class CommonEntity implements ProgramEntity {
 
 	private EntityKind entityKind;
 
 	private String name;
 
-	private LinkageKind linkage;
+	private ProgramEntity.LinkageKind linkage;
 
 	private ArrayList<DeclarationNode> declarations = new ArrayList<DeclarationNode>();
 
@@ -27,7 +34,8 @@ public class CommonEntity implements Entity {
 	 */
 	private boolean isSystem = false;
 
-	public CommonEntity(EntityKind kind, String name, LinkageKind linkage) {
+	public CommonEntity(EntityKind kind, String name,
+			ProgramEntity.LinkageKind linkage) {
 		this.entityKind = kind;
 		this.name = name;
 		this.linkage = linkage;
@@ -49,8 +57,8 @@ public class CommonEntity implements Entity {
 	}
 
 	@Override
-	public Iterator<DeclarationNode> getDeclarations() {
-		return declarations.iterator();
+	public Iterable<DeclarationNode> getDeclarations() {
+		return declarations;
 	}
 
 	@Override
@@ -84,12 +92,12 @@ public class CommonEntity implements Entity {
 	}
 
 	@Override
-	public LinkageKind getLinkage() {
+	public ProgramEntity.LinkageKind getLinkage() {
 		return linkage;
 	}
 
 	@Override
-	public void setLinkage(LinkageKind linkage) {
+	public void setLinkage(ProgramEntity.LinkageKind linkage) {
 		this.linkage = linkage;
 	}
 

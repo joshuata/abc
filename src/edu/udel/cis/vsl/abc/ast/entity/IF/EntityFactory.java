@@ -1,15 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
-import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 /**
  * A factory for producing instances of {@link Entity}, and some related utility
@@ -47,7 +41,8 @@ public interface EntityFactory {
 	 *            the type of the variable
 	 * @return the new variable
 	 */
-	Variable newVariable(String name, LinkageKind linkage, Type type);
+	Variable newVariable(String name, ProgramEntity.LinkageKind linkage,
+			Type type);
 
 	/**
 	 * Creates a new {@link Function}.
@@ -60,40 +55,8 @@ public interface EntityFactory {
 	 *            the type of the function
 	 * @return the new function
 	 */
-	Function newFunction(String name, LinkageKind linkage, Type type);
-
-	/**
-	 * Creates a new enumerator entity. These correspond to the enumerators in
-	 * the enumerator list of a complete enumeration definition.
-	 * 
-	 * @param declaration
-	 *            the declaration of the enumerator in the enuemrator list
-	 * @param enumeration
-	 *            the enumeration of which this enumerator is a part
-	 * @param value
-	 *            the constant integer value associated to the enumerator
-	 * @return the new enumerator entity
-	 */
-	Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
-			EnumerationType enumeration, Value value);
-
-	/**
-	 * Creates a new field entity. These correspond to the field declarations in
-	 * a complete structure or union definition.
-	 * 
-	 * @param declaration
-	 *            the field declaration
-	 * @param type
-	 *            the type of the field
-	 * @param bitWidth
-	 *            the optional bit width parameter // * @param structureOrUnion
-	 *            // * the structure or union entity in which this field occurs
-	 * @return the new field
-	 */
-	Field newField(FieldDeclarationNode declaration, ObjectType type,
-			Value bitWidth
-	// , StructureOrUnion structureOrUnion
-	);
+	Function newFunction(String name, ProgramEntity.LinkageKind linkage,
+			Type type);
 
 	/**
 	 * Creates a new {@link Typedef} entity.
@@ -116,16 +79,6 @@ public interface EntityFactory {
 	 * @return the new label entity
 	 */
 	Label newLabel(OrdinaryLabelNode declaration);
-
-	/**
-	 * Creates a new pragma handler for the given name. There is just one
-	 * univeral name space for the pragma universes.
-	 * 
-	 * @param name
-	 *            the name of the pragma universe, such as <code>omp</code>
-	 * @return the pragma handler for that name
-	 */
-	PragmaHandler newPragmaHandler(String name);
 
 	/**
 	 * Computes the join of the two scopes in the scope tree and returns it.

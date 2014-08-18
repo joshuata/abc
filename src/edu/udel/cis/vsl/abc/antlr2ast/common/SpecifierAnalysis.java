@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.antlr2ast.impl;
+package edu.udel.cis.vsl.abc.antlr2ast.common;
 
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.ABSTRACT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.ALIGNAS;
@@ -43,6 +43,7 @@ import org.antlr.runtime.tree.CommonTree;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -83,7 +84,7 @@ public class SpecifierAnalysis {
 
 	// Instance variables...
 
-	private CParser parser;
+	private ParseTree parseTree;
 
 	/**
 	 * The given tree node whose children are the declaration specifiers to be
@@ -164,20 +165,20 @@ public class SpecifierAnalysis {
 	 * @param specifierListNode
 	 * @throws SyntaxException
 	 */
-	SpecifierAnalysis(CommonTree specifierListNode, CParser parser)
+	SpecifierAnalysis(CommonTree specifierListNode, ParseTree parseTree)
 			throws SyntaxException {
 		this.specifierListNode = specifierListNode;
-		this.parser = parser;
+		this.parseTree = parseTree;
 		analyze();
 	}
 
 	private SyntaxException error(String message, CommonTree tree) {
-		return parser.newSyntaxException(message, tree);
+		return parseTree.newSyntaxException(message, tree);
 	}
 
 	private void analyze() throws SyntaxException {
 		int numChildren = specifierListNode.getChildCount();
-		
+
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree node = (CommonTree) specifierListNode.getChild(i);
 			int kind = node.getType();

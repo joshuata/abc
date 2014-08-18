@@ -1,4 +1,4 @@
-package edu.udel.cis.vsl.abc.antlr2ast.impl;
+package edu.udel.cis.vsl.abc.antlr2ast.common;
 
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.AMPERSAND;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.ATOMIC;
@@ -44,20 +44,22 @@ import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UNIQUE_FOR;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UNIQUE_PARALLEL;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
-import edu.udel.cis.vsl.abc.antlr2ast.IF.OmpBuilder;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilderWorker;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.PragmaHandler;
+import edu.udel.cis.vsl.abc.antlr2ast.IF.SimpleScope;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
@@ -74,20 +76,18 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNod
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.parse.IF.OmpCParser;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
-/**
- * Builds an OpenMP AST node from a given token collection representing a
- * certain OpenMP pragma.
- * 
- * @author Manchun Zheng (zmanchun)
- * 
- */
-public class CommonOmpBuilder implements OmpBuilder {
+public class OMPPragmaHandler implements PragmaHandler {
+
+	private ParseTree parseTree;
+
+	private ASTBuilderWorker worker;
 
 	/**
 	 * The node factory used to create new AST nodes.
@@ -97,29 +97,18 @@ public class CommonOmpBuilder implements OmpBuilder {
 	/**
 	 * The token factory used to create new tokens.
 	 */
-	private TokenFactory sourceFactory;
+	private TokenFactory tokenFactory;
 
-	/**
-	 * The AST builder to be used to create expressions.
-	 */
-	private ASTBuilder astBuilder;
+	public OMPPragmaHandler(ASTBuilder builder, ParseTree parseTree) {
+		ASTFactory astFactory = builder.getASTFactory();
 
-	/**
-	 * Constructs a new OmpBuilder for the given ANTLR tree of OpenMP.
-	 * 
-	 * @param factory
-	 *            an ASTFactory to use
-	 * @param rootTree
-	 *            the root of the ANTLR tree
-	 * @param tokenSource
-	 *            the CTokenSource used to produce the ANTLR tree
-	 * 
-	 */
-	public CommonOmpBuilder(ASTFactory astFactory, ASTBuilder astBuilder) {
+		this.parseTree = parseTree;
+		this.worker = builder.getWorker(parseTree);
 		this.nodeFactory = astFactory.getNodeFactory();
-		this.sourceFactory = astFactory.getTokenFactory();
-		this.astBuilder = astBuilder;
+		this.tokenFactory = astFactory.getTokenFactory();
 	}
+
+	// Private methods...
 
 	/**
 	 * Translates C tokens into OpenMP tokens.
@@ -128,12 +117,10 @@ public class CommonOmpBuilder implements OmpBuilder {
 	 *            The list of C tokens to be translated.
 	 * @return
 	 */
-	private TokenStream ompTokenStream(List<CToken> ctokens) {
-		int number = ctokens.size();
-		TokenSource source;
+	private void modifyTokens(PragmaNode pragmaNode) {
+		int number = pragmaNode.getNumTokens();
 
-		for (int i = 0; i < number; i++) {
-			CToken token = ctokens.get(i);
+		for (CToken token : pragmaNode.getTokens()) {
 			int type = token.getType();
 
 			if (type == IDENTIFIER) {
@@ -222,81 +209,9 @@ public class CommonOmpBuilder implements OmpBuilder {
 				default:
 				}
 			}
-			if (i == number - 1) {
-				token.setNext(null);
-			}
 		}
-		source = TokenUtils.makeTokenSourceFromList(ctokens.get(0));
-		return new CommonTokenStream(source);
-	}
-
-	@Override
-	public OmpNode getOmpNode(Source source, Iterator<CToken> ctokens)
-			throws SyntaxException {
-		try {
-			List<CToken> tokenList = new ArrayList<>();
-			TokenStream tokens;
-			CommonTree rootTree;
-			int type;
-
-			while (ctokens.hasNext()) {
-				tokenList.add(ctokens.next());
-			}
-			tokens = this.ompTokenStream(tokenList);
-			rootTree = OmpCParser.parse(tokens);
-			type = rootTree.getType();
-			switch (type) {
-			case PARALLEL_FOR:
-				return translateParallelFor(source, rootTree);
-			case PARALLEL_SECTIONS:
-				return translateParallelSections(source, rootTree);
-			case PARALLEL:
-				return translateParallel(source, rootTree);
-			case FOR:
-				return translateFor(source, rootTree);
-			case SECTIONS:
-				return translateWorkshare(source, rootTree,
-						OmpWorksharingNodeKind.SECTIONS);
-			case SINGLE:
-				return translateWorkshare(source, rootTree,
-						OmpWorksharingNodeKind.SINGLE);
-			case MASTER:
-				return nodeFactory.newOmpMasterNode(source, null);
-			case CRITICAL:
-				OmpSyncNode criticalNode = nodeFactory.newOmpCriticalNode(
-						source, null, null);
-
-				if (rootTree.getChildCount() > 0) {
-					criticalNode.setCriticalName(this
-							.translateIdentifier((CommonTree) rootTree
-									.getChild(0)));
-				}
-				return criticalNode;
-			case ORDERED:
-				return nodeFactory.newOmpOrederedNode(source, null);
-			case SECTION:
-				return nodeFactory.newOmpSectionNode(source, null);
-			case BARRIER:
-				return nodeFactory.newOmpBarrierNode(source);
-			case FLUSH:
-				return nodeFactory.newOmpFlushNode(
-						source,
-						translateIdentifierList(source, "flushList",
-								(CommonTree) rootTree.getChild(0)));
-			case THD_PRIVATE:
-				return nodeFactory.newOmpThreadprivateNode(
-						source,
-						translateIdentifierList(source, "threadprivateList",
-								(CommonTree) rootTree.getChild(0)));
-			case ATOMIC:
-				throw new ABCUnsupportedException("atomic construct of OpenMP");
-			default:
-				throw new ABCRuntimeException("Unreachable");
-			}
-		} catch (RecognitionException e) {
-			e.printStackTrace();
-			return null;
-		}
+		if (number >= 1)
+			pragmaNode.getToken(number - 1).setNext(null);
 	}
 
 	private OmpWorksharingNode translateWorkshare(Source source,
@@ -320,7 +235,7 @@ public class CommonOmpBuilder implements OmpBuilder {
 				} else {
 					throw new ABCRuntimeException(
 							"At most one nowait directive is allowed in an OpenMP construct.",
-							(sourceFactory.newSource((CToken) sectionsClause
+							(tokenFactory.newSource((CToken) sectionsClause
 									.getToken()).getSummary(false)));
 				}
 				workshareNode.setNowait(true);
@@ -389,7 +304,10 @@ public class CommonOmpBuilder implements OmpBuilder {
 			}
 			if (forClause.getChildCount() > 1) {
 				CommonTree chunkSizeTree = (CommonTree) forClause.getChild(1);
-				ExpressionNode chunkSizeNode = astBuilder.translateExpression(
+
+				// TODO: is null acceptable for a SimpleScope?
+
+				ExpressionNode chunkSizeNode = worker.translateExpression(
 						chunkSizeTree, null);
 
 				forNode.setChunsize(chunkSizeNode);
@@ -426,9 +344,8 @@ public class CommonOmpBuilder implements OmpBuilder {
 					} else {
 						throw new ABCRuntimeException(
 								"At most one if clause is allowed in an OpenMP parallel construct.",
-								(sourceFactory
-										.newSource((CToken) parallelClause
-												.getToken()).getSummary(false)));
+								(tokenFactory.newSource((CToken) parallelClause
+										.getToken()).getSummary(false)));
 					}
 				} else if (result == NUM_THREADS) {
 					if (!hasNumThreads) {
@@ -436,9 +353,8 @@ public class CommonOmpBuilder implements OmpBuilder {
 					} else {
 						throw new ABCRuntimeException(
 								"At most one num_threads() clause is allowed in an OpenMP parallel construct.",
-								(sourceFactory
-										.newSource((CToken) parallelClause
-												.getToken()).getSummary(false)));
+								(tokenFactory.newSource((CToken) parallelClause
+										.getToken()).getSummary(false)));
 					}
 				}
 				break;
@@ -459,12 +375,12 @@ public class CommonOmpBuilder implements OmpBuilder {
 
 		switch (child.getType()) {
 		case IF:
-			expression = astBuilder.translateExpression(
+			expression = worker.translateExpression(
 					(CommonTree) child.getChild(0), null);
 			parallelNode.setIfClause(expression);
 			return IF;
 		case NUM_THREADS:
-			expression = astBuilder.translateExpression(
+			expression = worker.translateExpression(
 					(CommonTree) child.getChild(0), null);
 			parallelNode.setNumThreads(expression);
 			return NUM_THREADS;
@@ -595,7 +511,7 @@ public class CommonOmpBuilder implements OmpBuilder {
 		int operatorType = reduction.getChild(0).getType();
 		List<IdentifierExpressionNode> list = translateIdentifierList((CommonTree) reduction
 				.getChild(1));
-		Source rootSource = sourceFactory.newSource((CToken) reduction
+		Source rootSource = tokenFactory.newSource((CToken) reduction
 				.getToken());
 		SequenceNode<IdentifierExpressionNode> nodes = nodeFactory
 				.newSequenceNode(rootSource, "reductionList", list);
@@ -669,8 +585,93 @@ public class CommonOmpBuilder implements OmpBuilder {
 
 	private IdentifierNode translateIdentifier(CommonTree identifier) {
 		CToken token = (CToken) identifier.getToken();
-		Source source = sourceFactory.newSource(token);
+		Source source = tokenFactory.newSource(token);
 
 		return nodeFactory.newIdentifierNode(source, token.getText());
+	}
+
+	// Public methods....
+
+	@Override
+	public EntityKind getEntityKind() {
+		return EntityKind.PRAGMA_HANDLER;
+	}
+
+	@Override
+	public String getName() {
+		return "omp";
+	}
+
+	@Override
+	public ParseTree getParseTree() {
+		return parseTree;
+	}
+
+	@Override
+	public ASTNode processPragmaNode(PragmaNode pragmaNode, SimpleScope scope)
+			throws SyntaxException {
+		Source source = pragmaNode.getSource();
+		CTokenSource tokenSource;
+		TokenStream tokens;
+
+		modifyTokens(pragmaNode);
+		tokenSource = pragmaNode.newTokenSource();
+		tokens = new CommonTokenStream(tokenSource);
+		try {
+			CommonTree rootTree = OmpCParser.parse(tokens);
+			int type = rootTree.getType();
+
+			switch (type) {
+			case PARALLEL_FOR:
+				return translateParallelFor(source, rootTree);
+			case PARALLEL_SECTIONS:
+				return translateParallelSections(source, rootTree);
+			case PARALLEL:
+				return translateParallel(source, rootTree);
+			case FOR:
+				return translateFor(source, rootTree);
+			case SECTIONS:
+				return translateWorkshare(source, rootTree,
+						OmpWorksharingNodeKind.SECTIONS);
+			case SINGLE:
+				return translateWorkshare(source, rootTree,
+						OmpWorksharingNodeKind.SINGLE);
+			case MASTER:
+				return nodeFactory.newOmpMasterNode(source, null);
+			case CRITICAL: {
+				OmpSyncNode criticalNode = nodeFactory.newOmpCriticalNode(
+						source, null, null);
+
+				if (rootTree.getChildCount() > 0) {
+					criticalNode.setCriticalName(this
+							.translateIdentifier((CommonTree) rootTree
+									.getChild(0)));
+				}
+				return criticalNode;
+			}
+			case ORDERED:
+				return nodeFactory.newOmpOrederedNode(source, null);
+			case SECTION:
+				return nodeFactory.newOmpSectionNode(source, null);
+			case BARRIER:
+				return nodeFactory.newOmpBarrierNode(source);
+			case FLUSH:
+				return nodeFactory.newOmpFlushNode(
+						source,
+						translateIdentifierList(source, "flushList",
+								(CommonTree) rootTree.getChild(0)));
+			case THD_PRIVATE:
+				return nodeFactory.newOmpThreadprivateNode(
+						source,
+						translateIdentifierList(source, "threadprivateList",
+								(CommonTree) rootTree.getChild(0)));
+			case ATOMIC:
+				throw new ABCUnsupportedException("atomic construct of OpenMP");
+			default:
+				throw new ABCRuntimeException("Unreachable");
+			}
+		} catch (RecognitionException e) {
+			throw new SyntaxException(e.getMessage(), source);
+		}
 	}
 }

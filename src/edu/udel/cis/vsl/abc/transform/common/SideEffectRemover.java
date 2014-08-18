@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.EntityKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -193,6 +192,7 @@ public class SideEffectRemover extends BaseTransformer {
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
+		// TODO assertNode
 		if (statement instanceof AssumeNode) {
 			result = assumeStatement((AssumeNode) statement);
 		} else if (statement instanceof ChooseStatementNode) {
@@ -1046,13 +1046,13 @@ public class SideEffectRemover extends BaseTransformer {
 			List<BlockItemNode> before = new ArrayList<>();
 			ExpressionNode functionExpression = ((FunctionCallNode) expression)
 					.getFunction();
-			Entity functionEntity;
+			Function functionEntity;
 			TypeNode returnTypeNode;
 			VariableDeclarationNode tmpVariable;
 			List<ExpressionNode> arguments = new ArrayList<>();
 
 			assert functionExpression instanceof IdentifierExpressionNode;
-			functionEntity = ((IdentifierExpressionNode) functionExpression)
+			functionEntity = (Function) ((IdentifierExpressionNode) functionExpression)
 					.getIdentifier().getEntity();
 			assert functionEntity.getEntityKind() == EntityKind.FUNCTION;
 			// siegel: another possible way is to clone, but

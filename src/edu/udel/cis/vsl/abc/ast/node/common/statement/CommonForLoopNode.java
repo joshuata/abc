@@ -35,7 +35,7 @@ public class CommonForLoopNode extends CommonLoopNode implements ForLoopNode {
 
 	@Override
 	public StatementKind statementKind() {
-		return StatementKind.FOR;
+		return StatementKind.LOOP;
 	}
 
 }

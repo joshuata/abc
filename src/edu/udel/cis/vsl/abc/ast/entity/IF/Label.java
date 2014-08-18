@@ -10,7 +10,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
  * @author siegel
  * 
  */
-public interface Label extends Entity {
+public interface Label extends ProgramEntity {
 
 	/**
 	 * Returns the node representing the label.
