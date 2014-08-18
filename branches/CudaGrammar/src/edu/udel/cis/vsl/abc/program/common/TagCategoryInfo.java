@@ -1,15 +1,12 @@
 package edu.udel.cis.vsl.abc.program.common;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
@@ -125,21 +122,15 @@ public class TagCategoryInfo {
 	// will be reflected in all types which use that type
 	private void complete(TaggedEntity incomplete, TaggedEntity complete) {
 		if (incomplete instanceof EnumerationType) {
-			List<Enumerator> enumerators = new LinkedList<>();
-			Iterator<Enumerator> iter = ((EnumerationType) complete)
+			Iterable<Enumerator> iter = ((EnumerationType) complete)
 					.getEnumerators();
 
-			while (iter.hasNext())
-				enumerators.add(iter.next());
-			((EnumerationType) incomplete).complete(enumerators);
+			((EnumerationType) incomplete).complete(iter);
 		} else if (incomplete instanceof StructureOrUnionType) {
-			List<Field> members = new LinkedList<>();
-			Iterator<Field> iter = ((StructureOrUnionType) complete)
+			Iterable<Field> iter = ((StructureOrUnionType) complete)
 					.getFields();
 
-			while (iter.hasNext())
-				members.add(iter.next());
-			((StructureOrUnionType) incomplete).complete(members);
+			((StructureOrUnionType) incomplete).complete(iter);
 		}
 	}
 

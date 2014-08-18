@@ -16,8 +16,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.Type;
-import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory.Answer;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -179,8 +177,8 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public Iterator<Variable> getVariables() {
-		return variableList.iterator();
+	public Iterable<Variable> getVariables() {
+		return variableList;
 	}
 
 	@Override
@@ -194,8 +192,8 @@ public class CommonScope implements Scope {
 	}
 
 	@Override
-	public Iterator<Function> getFunctions() {
-		return functionList.iterator();
+	public Iterable<Function> getFunctions() {
+		return functionList;
 	}
 
 	@Override
@@ -204,7 +202,7 @@ public class CommonScope implements Scope {
 		int result = taggedEntityList.size();
 
 		if (name != null) {
-			Entity oldEntity = taggedEntityMap.get(name);
+			TaggedEntity oldEntity = taggedEntityMap.get(name);
 
 			if (oldEntity != null)
 				throw new SyntaxException("Tagged entity with name " + name
@@ -351,21 +349,6 @@ public class CommonScope implements Scope {
 	@Override
 	public void print(PrintStream out) {
 		print("", out);
-	}
-
-	@Override
-	public Type getType() {
-		return translationUnit.getASTFactory().getTypeFactory().scopeType();
-	}
-
-	@Override
-	public boolean isScalar() {
-		return false;
-	}
-
-	@Override
-	public Answer isZero() {
-		return Answer.NO;
 	}
 
 	@Override

@@ -1,4 +1,10 @@
-package edu.udel.cis.vsl.abc.ast.entity.IF;
+package edu.udel.cis.vsl.abc.antlr2ast.IF;
+
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
+import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * <p>
@@ -22,5 +28,9 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
  * 
  */
 public interface PragmaHandler extends Entity {
+	
+	ParseTree getParseTree();
+
+	ASTNode processPragmaNode(PragmaNode pragmaNode, SimpleScope scope) throws SyntaxException;
 
 }

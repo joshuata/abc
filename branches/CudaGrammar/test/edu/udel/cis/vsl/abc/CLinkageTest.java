@@ -12,9 +12,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity.LinkageKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
@@ -67,7 +67,7 @@ public class CLinkageTest {
 		// linkage called "f". It should be a function...
 		assertNotNull(entity);
 		assertTrue(entity instanceof Function);
-		assertEquals(LinkageKind.EXTERNAL, entity.getLinkage());
+		assertEquals(ProgramEntity.LinkageKind.EXTERNAL, entity.getLinkage());
 		for (ASTNode exDef : ast.getRootNode().children()) {
 			switch (exDef.nodeKind()) {
 			case FUNCTION_DECLARATION: {

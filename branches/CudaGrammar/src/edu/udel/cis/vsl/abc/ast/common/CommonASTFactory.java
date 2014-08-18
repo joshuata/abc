@@ -1,11 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.common;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Field;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
@@ -61,6 +59,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -94,6 +93,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -105,6 +105,8 @@ import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+
+//TODO improve the printing of variable declarations when array type is involved.
 
 public class CommonASTFactory implements ASTFactory {
 
@@ -150,55 +152,54 @@ public class CommonASTFactory implements ASTFactory {
 	@Override
 	public void prettyPrint(ASTNode node, PrintStream out) {
 		NodeKind kind = node.nodeKind();
-		StringBuffer result = null;
 
 		switch (kind) {
 		case DECLARATION_LIST:
-			result = declarationList2CIVL((DeclarationListNode) node);
+			out.print(pPrintDeclarationList((DeclarationListNode) node));
 			break;
 		case ENUMERATOR_DECLARATION:
-			result = enumeratorDeclaration2CIVL((EnumeratorDeclarationNode) node);
+			out.print(pPrintEnumeratorDeclaration((EnumeratorDeclarationNode) node));
 			break;
 		case EXPRESSION:
-			result = expression2CIVL((ExpressionNode) node);
+			out.print(pPrintExpression((ExpressionNode) node));
 			break;
 		case FIELD_DECLARATION:
-			result = fieldDeclaration2CIVL("", (FieldDeclarationNode) node);
+			out.print(pPrintfieldDeclaration("", (FieldDeclarationNode) node));
 			break;
 		case FUNCTION_DECLARATION:
-			functionDeclaration2CIVL("", (FunctionDeclarationNode) node);
+			pPrintFunctionDeclaration(out, "", (FunctionDeclarationNode) node);
 			break;
 		case IDENTIFIER:
-			result = new StringBuffer(((IdentifierNode) node).name());
+			out.print(((IdentifierNode) node).name());
 			break;
 		case OMP_NODE:
-			result = ompNode2CIVL("", (OmpNode) node);
+			pPrintOmpNode(out, "", (OmpNode) node);
 			break;
 		case OMP_REDUCTION_OPERATOR:
-			result = ompReductionNode2CIVL((OmpReductionNode) node);
+			out.print(pPrintOmpReduction((OmpReductionNode) node));
 			break;
 		case ORDINARY_LABEL:
 		case SWITCH_LABEL:
-			result = labelNode2CIVL((LabelNode) node);
+			out.print(pPrintLabelNode((LabelNode) node));
 			break;
 		case PRAGMA:
-			result = pragma2CIVL("", (PragmaNode) node);
+			pPrintPragma(out, "", (PragmaNode) node);
 			break;
 		case STATEMENT:
-			result = statement2CIVL("", (StatementNode) node);
+			pPrintStatement(out, "", (StatementNode) node, true);
 			break;
 		case STATIC_ASSERTION:
-			result = staticAssertion2CIVL("", (StaticAssertionNode) node);
+			pPrintStaticAssertion(out, "", (StaticAssertionNode) node);
 			break;
 		case TYPE:
-			result = type2CIVL("", (TypeNode) node, true);
+			out.print(pPrintType("", (TypeNode) node, true));
 			break;
 		case TYPEDEF:
-			result = typedefDeclaration2CIVL("", (TypedefDeclarationNode) node);
+			pPrintTypedefDeclaration(out, "", (TypedefDeclarationNode) node);
 			break;
 		case VARIABLE_DECLARATION:
-			result = variableDeclaration2CIVL("",
-					(VariableDeclarationNode) node);
+			out.print(pPrintVariableDeclaration("",
+					(VariableDeclarationNode) node));
 			break;
 		case PAIR:
 		case SEQUENCE:
@@ -208,22 +209,21 @@ public class CommonASTFactory implements ASTFactory {
 							+ " kind is not supported yet.", node.getSource()
 							.getLocation(false));
 		}
-		if (result == null)
-			out.print(result);
 	}
 
-	private static StringBuffer ompNode2CIVL(String prefix, OmpNode ompNode) {
+	private static void pPrintOmpNode(PrintStream out, String prefix,
+			OmpNode ompNode) {
 		OmpNodeKind kind = ompNode.ompNodeKind();
 
 		switch (kind) {
 		case DECLARATIVE:
-			return ompDeclarative2CIVL(prefix, (OmpDeclarativeNode) ompNode);
+			pPrintOmpDeclarative(out, prefix, (OmpDeclarativeNode) ompNode);
 		default:// EXECUTABLE
-			return ompStatement2CIVL(prefix, (OmpStatementNode) ompNode);
+			pPrintOmpStatement(out, prefix, (OmpStatementNode) ompNode);
 		}
 	}
 
-	static StringBuffer structOrUnion2CIVL(String prefix,
+	static StringBuffer pPrintStructOrUnion(String prefix,
 			StructureOrUnionTypeNode strOrUnion) {
 		StringBuffer result = new StringBuffer();
 		String myIndent = prefix + indention;
@@ -247,7 +247,7 @@ public class CommonASTFactory implements ASTFactory {
 				result.append("\n");
 				if (!(field.getTypeNode() instanceof StructureOrUnionTypeNode))
 					result.append(myIndent);
-				result.append(fieldDeclaration2CIVL(myIndent, field));
+				result.append(pPrintfieldDeclaration(myIndent, field));
 				result.append(";");
 			}
 			result.append("\n");
@@ -257,12 +257,12 @@ public class CommonASTFactory implements ASTFactory {
 		return result;
 	}
 
-	private static StringBuffer fieldDeclaration2CIVL(String prefix,
+	private static StringBuffer pPrintfieldDeclaration(String prefix,
 			FieldDeclarationNode field) {
 		String type;
 		StringBuffer result = new StringBuffer();
 
-		type = type2CIVL(prefix, field.getTypeNode(), true).toString();
+		type = pPrintType(prefix, field.getTypeNode(), true).toString();
 		if (type.endsWith("]")) {
 			int start = type.indexOf("[");
 			String suffix = type.substring(start);
@@ -280,52 +280,47 @@ public class CommonASTFactory implements ASTFactory {
 		return result;
 	}
 
-	static StringBuffer staticAssertion2CIVL(String prefix,
+	static void pPrintStaticAssertion(PrintStream out, String prefix,
 			StaticAssertionNode assertion) {
-		StringBuffer result = new StringBuffer();
-
-		result.append(prefix);
-		result.append("(");
-		result.append(expression2CIVL(assertion.getExpression()));
-		result.append(", \"");
-		result.append(assertion.getMessage().getStringRepresentation());
-		result.append("\")");
-		return result;
+		out.print(prefix);
+		out.print("(");
+		out.print(pPrintExpression(assertion.getExpression()));
+		out.print(", \"");
+		out.print(assertion.getMessage().getStringRepresentation());
+		out.print("\")");
 	}
 
-	static StringBuffer pragma2CIVL(String prefix, PragmaNode pragma) {
-		StringBuffer result = new StringBuffer();
-		Iterator<CToken> tokens = pragma.getTokens();
+	static void pPrintPragma(PrintStream out, String prefix, PragmaNode pragma) {
+		Iterable<CToken> tokens = pragma.getTokens();
 
-		result.append(prefix);
-		result.append("#pragma ");
-		result.append(pragma.getPragmaIdentifier().name());
+		out.print(prefix);
+		out.print("#pragma ");
+		out.print(pragma.getPragmaIdentifier().name());
 
-		while (tokens.hasNext()) {
-			CToken token = tokens.next();
-
-			result.append(" ");
-			result.append(token.getText());
+		for (CToken token : tokens) {
+			out.print(" ");
+			out.print(token.getText());
 		}
-		return result;
 	}
 
-	static StringBuffer ordinaryDeclaration2CIVL(String prefix,
+	static void pPrintOrdinaryDeclaration(PrintStream out, String prefix,
 			OrdinaryDeclarationNode declaration) {
 		OrdinaryDeclarationKind kind = declaration.ordinaryDeclarationKind();
 
 		switch (kind) {
 		case VARIABLE_DECLARATION:
-			return variableDeclaration2CIVL(prefix,
-					(VariableDeclarationNode) declaration);
+			out.print(pPrintVariableDeclaration(prefix,
+					(VariableDeclarationNode) declaration));
+			out.print(";");
+			break;
 		default: // cases FUNCTION_DECLARATION, FUNCTION_DEFINITION,
 					// ABSTRACT_FUNCTION_DEFINITION:
-			return functionDeclaration2CIVL(prefix,
+			pPrintFunctionDeclaration(out, prefix,
 					(FunctionDeclarationNode) declaration);
 		}
 	}
 
-	static StringBuffer enumType2CIVL(String prefix,
+	static StringBuffer pPrintEnumType(String prefix,
 			EnumerationTypeNode enumeration) {
 		StringBuffer result = new StringBuffer();
 		IdentifierNode tag = enumeration.getTag();
@@ -349,7 +344,7 @@ public class CommonASTFactory implements ASTFactory {
 					result.append(",");
 				result.append("\n");
 				result.append(myIndent);
-				result.append(enumeratorDeclaration2CIVL(enumerator));
+				result.append(pPrintEnumeratorDeclaration(enumerator));
 			}
 			result.append("\n");
 			result.append(prefix);
@@ -358,30 +353,29 @@ public class CommonASTFactory implements ASTFactory {
 		return result;
 	}
 
-	private static StringBuffer enumeratorDeclaration2CIVL(
+	private static StringBuffer pPrintEnumeratorDeclaration(
 			EnumeratorDeclarationNode enumerator) {
 		StringBuffer result = new StringBuffer();
 
 		result.append(enumerator.getName());
 		if (enumerator.getValue() != null) {
 			result.append("=");
-			result.append(expression2CIVL(enumerator.getValue()));
+			result.append(pPrintExpression(enumerator.getValue()));
 		}
 		return result;
 	}
 
-	static StringBuffer ompDeclarative2CIVL(String prefix,
+	static void pPrintOmpDeclarative(PrintStream out, String prefix,
 			OmpDeclarativeNode ompDeclarative) {
-		StringBuffer result = new StringBuffer();
 		OmpDeclarativeNodeKind kind = ompDeclarative.ompDeclarativeNodeKind();
 
-		result.append("#pragma omp ");
+		out.print("#pragma omp ");
 		switch (kind) {
 		case REDUCTION:
-			result.append("reduction");
+			out.print("reduction");
 			break;
 		case THREADPRIVATE:
-			result.append("threadprivate");
+			out.print("threadprivate");
 			break;
 		default:
 			throw new ABCUnsupportedException(
@@ -389,161 +383,195 @@ public class CommonASTFactory implements ASTFactory {
 							+ " is not supported yet.", ompDeclarative
 							.getSource().getLocation(false));
 		}
-		result.append("(");
-		result.append(sequenceExpressionNode2CIVL(ompDeclarative.variables()));
-		result.append(")");
-		return result;
+		out.print("(");
+		out.print(pPrintSequenceExpression(ompDeclarative.variables()));
+		out.print(")");
 	}
 
-	private static StringBuffer functionDeclaration2CIVL(String prefix,
-			FunctionDeclarationNode function) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintFunctionDeclaration(PrintStream out,
+			String prefix, FunctionDeclarationNode function) {
 		FunctionTypeNode typeNode = function.getTypeNode();
 		TypeNode returnType = typeNode.getReturnType();
 		SequenceNode<VariableDeclarationNode> paras = typeNode.getParameters();
 		int numOfParas = paras.numChildren();
 
 		if (function instanceof AbstractFunctionDefinitionNode)
-			result.append("$abstract ");
-		result.append(prefix);
-		result.append(type2CIVL(prefix, returnType, false));
-		result.append(" ");
-		result.append(function.getName());
-		result.append("(");
+			out.print("$abstract ");
+		out.print(prefix);
+		out.print(pPrintType(prefix, returnType, false));
+		out.print(" ");
+		out.print(function.getName());
+		out.print("(");
 		for (int i = 0; i < numOfParas; i++) {
 			if (i != 0)
-				result.append(", ");
-			result.append(variableDeclaration2CIVL("",
-					paras.getSequenceChild(i)));
+				out.print(", ");
+			out.print(pPrintVariableDeclaration("", paras.getSequenceChild(i)));
 		}
-		result.append(")");
+		out.print(")");
 
 		if (function instanceof FunctionDefinitionNode) {
 			CompoundStatementNode body = ((FunctionDefinitionNode) function)
 					.getBody();
 
-			result.append("\n");
-			result.append(compoundStatement2CIVL(prefix + indention, body));
+			out.print("\n");
+			pPrintCompoundStatement(out, prefix + indention, body, true);
 		} else
-			result.append(";");
-		return result;
+			out.print(";");
 	}
 
-	private static StringBuffer compoundStatement2CIVL(String prefix,
-			CompoundStatementNode compound) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintCompoundStatement(PrintStream out, String prefix,
+			CompoundStatementNode compound, boolean isBody) {
 		int numChildren = compound.numChildren();
-		String myPrefix = prefix.substring(0, prefix.length() - 2);
+		String myIndent = prefix;
+		String myPrefix = prefix;
 
-		result.append(myPrefix);
-		result.append("{\n");
+		if (isBody) {
+			myPrefix = prefix.substring(0, prefix.length() - 2);
+			out.print(myPrefix);
+		} else {
+			out.print(myPrefix);
+			myIndent = prefix + indention;
+		}
+		out.print("{\n");
 		for (int i = 0; i < numChildren; i++) {
 			BlockItemNode child = compound.getSequenceChild(i);
 
 			if (child != null) {
-				result.append(blockItem2CIVL(prefix, child));
-				result.append("\n");
+				pPrintBlockItem(out, myIndent, child);
+				out.print("\n");
 			}
 		}
-		result.append(myPrefix);
-		result.append("}");
-		return result;
+		out.print(myPrefix);
+		out.print("}");
 	}
 
-	private static StringBuffer blockItem2CIVL(String prefix,
+	private static void pPrintBlockItem(PrintStream out, String prefix,
 			BlockItemNode block) {
 		BlockItemKind kind = block.blockItemKind();
 
 		switch (kind) {
 		case STATEMENT:
-			return statement2CIVL(prefix, (StatementNode) block);
+			pPrintStatement(out, prefix, (StatementNode) block, false);
+			break;
 		case ORDINARY_DECLARATION:
 			if (block instanceof VariableDeclarationNode) {
-				StringBuffer result = variableDeclaration2CIVL(prefix,
-						(VariableDeclarationNode) block);
+				out.print(pPrintVariableDeclaration(prefix,
+						(VariableDeclarationNode) block));
 
-				result.append(";");
-				return result;
-			} else if (block instanceof FunctionDeclarationNode) {
-				return functionDeclaration2CIVL(prefix,
+				out.print(";");
+			} else if (block instanceof FunctionDeclarationNode)
+				pPrintFunctionDeclaration(out, prefix,
 						(FunctionDeclarationNode) block);
-			}
+			break;
 		case TYPEDEF:
-			return typedefDeclaration2CIVL(prefix,
+			pPrintTypedefDeclaration(out, prefix,
 					(TypedefDeclarationNode) block);
+			break;
 		case ENUMERATOR:
-			return new StringBuffer(prefix + "enum;");
+			out.print(prefix + "enum;");
+			break;
 		case PRAGMA:
-			return pragma2CIVL(prefix, (PragmaNode) block);
+			pPrintPragma(out, prefix, (PragmaNode) block);
+			break;
+		case STRUCT_OR_UNION:
+			out.print(pPrintStructOrUnion(prefix,
+					(StructureOrUnionTypeNode) block));
+			break;
 		default:
-			throw new ABCUnsupportedException("translating block item node of "
-					+ kind + " kind into CIVL code");
+			throw new ABCUnsupportedException(
+					"pretty print of block item node of " + kind + " kind");
 		}
 	}
 
-	static StringBuffer typedefDeclaration2CIVL(String prefix,
+	static void pPrintTypedefDeclaration(PrintStream out, String prefix,
 			TypedefDeclarationNode typedef) {
-		StringBuffer result = new StringBuffer();
 
-		result.append(prefix);
-		result.append("typdef ");
-		result.append(" ");
-		result.append(type2CIVL(prefix, typedef.getTypeNode(), true));
-		result.append(" ");
-		result.append(typedef.getName());
-		return result;
+		out.print(prefix);
+		out.print("typedef ");
+		out.print(" ");
+		out.print(pPrintType(prefix, typedef.getTypeNode(), true));
+		out.print(" ");
+		out.print(typedef.getName());
 	}
 
-	private static StringBuffer statement2CIVL(String prefix,
-			StatementNode statement) {
+	private static void pPrintStatement(PrintStream out, String prefix,
+			StatementNode statement, boolean isBody) {
 		StatementKind kind = statement.statementKind();
 
 		switch (kind) {
 		case ASSUME:
-			return assume2CIVL(prefix, (AssumeNode) statement);
+			pPrintAssume(out, prefix, (AssumeNode) statement);
+			break;
+		case ASSERT:
+			pPrintAssert(out, prefix, (AssertNode) statement);
+			break;
 		case ATOMIC:
-			return atomic2CIVL(prefix, (AtomicNode) statement);
+			pPrintAtomic(out, prefix, (AtomicNode) statement);
+			break;
 		case COMPOUND:
-			return compoundStatement2CIVL(prefix,
-					(CompoundStatementNode) statement);
+			pPrintCompoundStatement(out, prefix,
+					(CompoundStatementNode) statement, isBody);
+			break;
 		case EXPRESSION:
-			return expressionStatement2CIVL(prefix,
+			expressionStatement2CIVL(out, prefix,
 					(ExpressionStatementNode) statement);
+			break;
 		case CIVL_FOR:
-			return civlForStatement2CIVL(prefix, (CivlForNode) statement);
-		case FOR:
-			return for2CIVL(prefix, (ForLoopNode) statement);
-		case GOTO:
-			return goto2CIVL(prefix, (GotoNode) statement);
+			pPrintCivlForStatement(out, prefix, (CivlForNode) statement);
+			break;
 		case IF:
-			return if2CIVL(prefix, (IfNode) statement);
+			pPrintIf(out, prefix, (IfNode) statement);
+			break;
 		case JUMP:
-			return jump2CIVL(prefix, (JumpNode) statement);
+			pPrintJump(out, prefix, (JumpNode) statement);
+			break;
 		case LABELED:
-			return labeled2CIVL(prefix, (LabeledStatementNode) statement);
+			pPrintLabeled(out, prefix, (LabeledStatementNode) statement);
+			break;
 		case LOOP:
-			return loop2CIVL(prefix, (LoopNode) statement);
+			pPrintLoop(out, prefix, (LoopNode) statement);
+			break;
 		case NULL:
-			return new StringBuffer(";");
+			out.print(prefix);
+			out.print(";");
+			break;
 		case OMP_STATEMENT:
-			return ompStatement2CIVL(prefix, (OmpStatementNode) statement);
-		case RETURN:
-			return return2CIVL(prefix, (ReturnNode) statement);
+			pPrintOmpStatement(out, prefix, (OmpStatementNode) statement);
+			break;
 		case SWITCH:
-			return switch2CIVL(prefix, (SwitchNode) statement);
+			pPrintSwitch(out, prefix, (SwitchNode) statement);
+			break;
 		case WHEN:
-			return when2CIVL(prefix, (WhenNode) statement);
+			pPrintWhen(out, prefix, (WhenNode) statement);
+			break;
 		default:
-			// throw new CIVLUnimplementedFeatureException(
-			// "translating statement node of " + kind
-			// + " kind into CIVL code", statement.getSource());
-			return new StringBuffer(kind.toString());
+			throw new ABCUnsupportedException(
+					"pretty print of statement node of " + kind + " kind");
 		}
 	}
 
-	private static StringBuffer ompStatement2CIVL(String prefix,
+	static void pPrintAssert(PrintStream out, String prefix,
+			AssertNode assertNode) {
+		SequenceNode<ExpressionNode> explanation = assertNode.getExplanation();
+
+		out.print(prefix);
+		out.print("$assert ");
+		out.print(pPrintExpression(assertNode.getCondition()));
+		if (explanation != null) {
+			int numArgs = explanation.numChildren();
+
+			out.print(" : ");
+			for (int i = 0; i < numArgs; i++) {
+				if (i != 0)
+					out.print(", ");
+				out.print(pPrintExpression(explanation.getSequenceChild(i)));
+			}
+		}
+		out.print(";");
+	}
+
+	private static void pPrintOmpStatement(PrintStream out, String prefix,
 			OmpStatementNode ompStmt) {
-		StringBuffer result = new StringBuffer();
 		OmpStatementNodeKind kind = ompStmt.ompStatementNodeKind();
 		SequenceNode<IdentifierExpressionNode> privateList = ompStmt
 				.privateList(), firstPrivateList = ompStmt.firstprivateList(), sharedList = ompStmt
@@ -554,64 +582,61 @@ public class CommonASTFactory implements ASTFactory {
 		String myIndent = prefix + indention;
 		StatementNode block = ompStmt.statementNode();
 
-		result.append(prefix);
-		result.append("#pragma omp ");
+		out.print(prefix);
+		out.print("#pragma omp ");
 		switch (kind) {
 		case PARALLEL:
-			result.append(ompParallel2CIVL(prefix, (OmpParallelNode) ompStmt));
+			pPrintOmpParallel(out, prefix, (OmpParallelNode) ompStmt);
 			break;
 		case SYNCHRONIZATION:
-			result.append(ompSync2CIVL(prefix, (OmpSyncNode) ompStmt));
+			pPrintOmpSync(out, prefix, (OmpSyncNode) ompStmt);
 			break;
 		default: // case WORKSHARING:
-			result.append(ompWorksharing2CIVL(prefix,
-					(OmpWorksharingNode) ompStmt));
+			pPrintOmpWorksharing(out, prefix, (OmpWorksharingNode) ompStmt);
 			break;
 		}
 		if (nowait)
-			result.append("nowait");
+			out.print("nowait");
 		if (privateList != null) {
-			result.append("private(");
-			result.append(sequenceExpressionNode2CIVL(privateList));
-			result.append(") ");
+			out.print("private(");
+			out.print(pPrintSequenceExpression(privateList));
+			out.print(") ");
 		}
 		if (firstPrivateList != null) {
-			result.append("firstprivate(");
-			result.append(sequenceExpressionNode2CIVL(firstPrivateList));
-			result.append(") ");
+			out.print("firstprivate(");
+			out.print(pPrintSequenceExpression(firstPrivateList));
+			out.print(") ");
 		}
 		if (sharedList != null) {
-			result.append("shared(");
-			result.append(sequenceExpressionNode2CIVL(sharedList));
-			result.append(") ");
+			out.print("shared(");
+			out.print(pPrintSequenceExpression(sharedList));
+			out.print(") ");
 		}
 		if (copyinList != null) {
-			result.append("copyin(");
-			result.append(sequenceExpressionNode2CIVL(copyinList));
-			result.append(") ");
+			out.print("copyin(");
+			out.print(pPrintSequenceExpression(copyinList));
+			out.print(") ");
 		}
 		if (copyPrivateList != null) {
-			result.append("copyprivate(");
-			result.append(sequenceExpressionNode2CIVL(copyPrivateList));
-			result.append(") ");
+			out.print("copyprivate(");
+			out.print(pPrintSequenceExpression(copyPrivateList));
+			out.print(") ");
 		}
 		if (lastPrivateList != null) {
-			result.append("lastprivate(");
-			result.append(sequenceExpressionNode2CIVL(lastPrivateList));
-			result.append(") ");
+			out.print("lastprivate(");
+			out.print(pPrintSequenceExpression(lastPrivateList));
+			out.print(") ");
 		}
 		if (reductionList != null) {
-			result.append(sequenceReductionNode2CIVL(reductionList));
+			out.print(pPrintSequenceReduction(reductionList));
 		}
-		result.append("\n");
+		out.print("\n");
 		if (block != null)
-			result.append(statement2CIVL(myIndent, block));
-		return result;
+			pPrintStatement(out, myIndent, block, true);
 	}
 
-	private static StringBuffer ompWorksharing2CIVL(String prefix,
+	private static void pPrintOmpWorksharing(PrintStream out, String prefix,
 			OmpWorksharingNode ompWs) {
-		StringBuffer result = new StringBuffer();
 		OmpWorksharingNodeKind kind = ompWs.ompWorkshareNodeKind();
 
 		switch (kind) {
@@ -619,109 +644,105 @@ public class CommonASTFactory implements ASTFactory {
 			OmpForNode forNode = (OmpForNode) ompWs;
 			int collapse = forNode.collapse();
 
-			result.append("for schedule(");
+			out.print("for schedule(");
 			switch (forNode.schedule()) {
 			case AUTO:
-				result.append("auto");
+				out.print("auto");
 				break;
 			case DYNAMIC:
-				result.append("dynamic");
+				out.print("dynamic");
 				break;
 			case GUIDED:
-				result.append("guided");
+				out.print("guided");
 				break;
 			case RUNTIME:
-				result.append("runtime");
+				out.print("runtime");
 				break;
 			default:// STATIC
-				result.append("static");
+				out.print("static");
 				break;
 			}
 			if (forNode.chunkSize() != null) {
-				result.append(", ");
-				result.append(expression2CIVL(forNode.chunkSize()));
+				out.print(", ");
+				out.print(pPrintExpression(forNode.chunkSize()));
 			}
-			result.append(") ");
+			out.print(") ");
 			if (collapse > 1) {
-				result.append("collapse(");
-				result.append(collapse);
-				result.append(")");
+				out.print("collapse(");
+				out.print(collapse);
+				out.print(")");
 			}
 			if (forNode.ordered())
-				result.append("ordered");
+				out.print("ordered");
 			break;
 		}
 		case SECTIONS:
-			result.append("sections ");
+			out.print("sections ");
 			break;
 		case SINGLE:
-			result.append("single ");
+			out.print("single ");
 			break;
 		default: // case SECTION:
-			result.append("section ");
+			out.print("section ");
 		}
-		return result;
 	}
 
-	private static StringBuffer ompSync2CIVL(String prefix, OmpSyncNode ompSync) {
+	private static void pPrintOmpSync(PrintStream out, String prefix,
+			OmpSyncNode ompSync) {
 		OmpSyncNodeKind kind = ompSync.ompSyncNodeKind();
-		StringBuffer result = new StringBuffer();
 
 		switch (kind) {
 		case MASTER:
-			result.append("master ");
+			out.print("master ");
 			break;
 		case CRITICAL:
-			result.append("critical ");
+			out.print("critical ");
 			if (ompSync.criticalName() != null) {
-				result.append("(");
-				result.append(ompSync.criticalName().name());
-				result.append(")");
+				out.print("(");
+				out.print(ompSync.criticalName().name());
+				out.print(")");
 			}
 			break;
 		case BARRIER:
-			result.append("barrier ");
+			out.print("barrier ");
 			break;
 		case FLUSH:
-			result.append("flush ");
+			out.print("flush ");
 			if (ompSync.flushedList() != null) {
-				result.append("(");
-				result.append(sequenceExpressionNode2CIVL(ompSync.flushedList()));
-				result.append(")");
+				out.print("(");
+				out.print(pPrintSequenceExpression(ompSync.flushedList()));
+				out.print(")");
 			}
 			break;
 		default:// ORDERED
-			result.append("ordered ");
+			out.print("ordered ");
 		}
-		return result;
 	}
 
-	private static StringBuffer ompParallel2CIVL(String prefix,
+	private static void pPrintOmpParallel(PrintStream out, String prefix,
 			OmpParallelNode para) {
-		StringBuffer result = new StringBuffer();
 		ExpressionNode ifClause = para.ifClause(), numThreads = para
 				.numThreads();
 		boolean isDefaultShared = para.isDefaultShared();
 
-		result.append("parallel ");
+		out.print("parallel ");
 		if (ifClause != null) {
-			result.append("if(");
-			result.append(expression2CIVL(ifClause));
-			result.append(") ");
+			out.print("if(");
+			out.print(pPrintExpression(ifClause));
+			out.print(") ");
 		}
 		if (numThreads != null) {
-			result.append("num_threads(");
-			result.append(expression2CIVL(numThreads));
-			result.append(") ");
+			out.print("num_threads(");
+			out.print(pPrintExpression(numThreads));
+			out.print(") ");
 		}
 		if (isDefaultShared)
-			result.append("default(shared) ");
+			out.print("default(shared) ");
 		else
-			result.append("default(none) ");
-		return result;
+			out.print("default(none) ");
 	}
 
-	private static StringBuffer sequenceReductionNode2CIVL(
+	private static StringBuffer pPrintSequenceReduction(
 			SequenceNode<OmpReductionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int num = sequence.numChildren();
@@ -729,14 +750,14 @@ public class CommonASTFactory implements ASTFactory {
 		for (int i = 0; i < num; i++) {
 			OmpReductionNode reduction = sequence.getSequenceChild(i);
 
-			result.append(ompReductionNode2CIVL(reduction));
+			result.append(pPrintOmpReduction(reduction));
 			if (i < num - 1)
 				result.append(" ");
 		}
 		return result;
 	}
 
-	private static StringBuffer ompReductionNode2CIVL(OmpReductionNode reduction) {
+	private static StringBuffer pPrintOmpReduction(OmpReductionNode reduction) {
 		StringBuffer result = new StringBuffer();
 
 		result.append("reduction(");
@@ -744,7 +765,7 @@ public class CommonASTFactory implements ASTFactory {
 		case FUNCTION: {
 			OmpFunctionReductionNode funcNode = (OmpFunctionReductionNode) reduction;
 
-			result.append(expression2CIVL(funcNode.function()));
+			result.append(pPrintExpression(funcNode.function()));
 			break;
 		}
 		default: // operator
@@ -785,12 +806,12 @@ public class CommonASTFactory implements ASTFactory {
 		}
 		}
 		result.append(": ");
-		result.append(sequenceExpressionNode2CIVL(reduction.variables()));
+		result.append(pPrintSequenceExpression(reduction.variables()));
 		result.append(")");
 		return result;
 	}
 
-	private static StringBuffer sequenceExpressionNode2CIVL(
+	private static StringBuffer pPrintSequenceExpression(
 			SequenceNode<IdentifierExpressionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int numExpressions = sequence.numChildren();
@@ -800,98 +821,102 @@ public class CommonASTFactory implements ASTFactory {
 
 			if (i != 0)
 				result.append(", ");
-			result.append(expression2CIVL(expression));
+			result.append(pPrintExpression(expression));
 		}
 		return result;
 	}
 
-	private static StringBuffer civlForStatement2CIVL(String prefix,
+	private static void pPrintCivlForStatement(PrintStream out, String prefix,
 			CivlForNode civlFor) {
-		civlFor.getDomain();
-		// civlFor.
+		DeclarationListNode vars = civlFor.getVariables();
+		int numVars = vars.numChildren();
 
-		// TODO Auto-generated method stub
-		return null;
+		out.print(prefix);
+		if (civlFor.isParallel())
+			out.print("$parfor");
+		else
+			out.print("$for");
+		out.print("(int ");
+		for (int i = 0; i < numVars; i++) {
+			if (i != 0)
+				out.print(", ");
+			out.print(vars.getSequenceChild(i).getName());
+		}
+		out.print(": ");
+		out.print(pPrintExpression(civlFor.getDomain()));
+		out.println(")");
+		pPrintStatement(out, prefix + indention, civlFor.getBody(), true);
 	}
 
-	private static StringBuffer loop2CIVL(String prefix, LoopNode loop) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintLoop(PrintStream out, String prefix, LoopNode loop) {
 		LoopKind loopKind = loop.getKind();
-		StringBuffer condition = expression2CIVL(loop.getCondition());
+		StringBuffer condition = new StringBuffer();
 		String myIndent = prefix + indention;
 		StatementNode bodyNode = loop.getBody();
-		StringBuffer body = bodyNode == null ? null : statement2CIVL(myIndent,
-				loop.getBody());
 
+		if (loop.getCondition() != null)
+			condition = pPrintExpression(loop.getCondition());
+		out.print(prefix);
 		switch (loopKind) {
 		case WHILE:
-			result.append("while(");
-			result.append(condition);
-			result.append(")");
-			if (body == null)
-				result.append(";");
+			out.print("while(");
+			out.print(condition);
+			out.print(")");
+			if (bodyNode == null)
+				out.print(";");
 			else {
-				result.append("\n");
-				result.append(body);
+				out.print("\n");
+				pPrintStatement(out, myIndent, bodyNode, true);
+
 			}
-		case DO_WHILE:
-			result.append("do");
-			if (body == null)
-				result.append(";");
-			else {
-				result.append("\n");
-				result.append(body);
-			}
-			result.append("while(");
-			result.append(condition);
-			result.append(");");
 			break;
-		default:
-			throw new ABCUnsupportedException(
-					"The "
-							+ loopKind
-							+ " loop node is unreachable here because it should already been taken care of priorly.");
+		case DO_WHILE:
+			out.print("do");
+			if (bodyNode == null)
+				out.print(";");
+			else {
+				out.print("\n");
+				pPrintStatement(out, myIndent, bodyNode, true);
+			}
+			out.print("while(");
+			out.print(condition);
+			out.print(");");
+			break;
+		default: // case FOR:
+			pPrintFor(out, prefix, (ForLoopNode) loop);
 		}
-		return result;
 	}
 
-	private static StringBuffer atomic2CIVL(String prefix, AtomicNode atomicNode) {
-		StringBuffer result = new StringBuffer();
-
-		result.append(prefix);
+	private static void pPrintAtomic(PrintStream out, String prefix,
+			AtomicNode atomicNode) {
+		out.print(prefix);
 		if (atomicNode.isAtom())
-			result.append("$atom\n");
+			out.print("$atom\n");
 		else
-			result.append("$atomic\n");
-		result.append(statement2CIVL(prefix + indention, atomicNode.getBody()));
-		return result;
+			out.print("$atomic\n");
+		pPrintStatement(out, prefix + indention, atomicNode.getBody(), true);
 	}
 
-	private static StringBuffer goto2CIVL(String prefix, GotoNode go2) {
-		StringBuffer result = new StringBuffer();
-
-		result.append(prefix);
-		result.append("goto ");
-		result.append(go2.getLabel().name());
-		result.append(";");
-		return result;
+	private static void pPrintGoto(PrintStream out, String prefix, GotoNode go2) {
+		out.print(prefix);
+		out.print("goto ");
+		out.print(go2.getLabel().name());
+		out.print(";");
 	}
 
-	private static StringBuffer labeled2CIVL(String prefix,
+	private static void pPrintLabeled(PrintStream out, String prefix,
 			LabeledStatementNode labeled) {
 		LabelNode label = labeled.getLabel();
 		StatementNode statement = labeled.getStatement();
-		StringBuffer result = new StringBuffer();
 		String myIndent = prefix + indention;
 
-		result.append(prefix);
-		result.append(labelNode2CIVL(label));
-		result.append("\n");
-		result.append(statement2CIVL(myIndent, statement));
-		return result;
+		out.print(prefix);
+		out.print(pPrintLabelNode(label));
+		out.print("\n");
+		pPrintStatement(out, myIndent, statement, false);
 	}
 
-	private static StringBuffer labelNode2CIVL(LabelNode label) {
+	private static StringBuffer pPrintLabelNode(LabelNode label) {
 		StringBuffer result = new StringBuffer();
 
 		if (label instanceof OrdinaryLabelNode) {
@@ -907,119 +932,112 @@ public class CommonASTFactory implements ASTFactory {
 				result.append("default:");
 			else {
 				result.append("case ");
-				result.append(expression2CIVL(switchLabel.getExpression()));
+				result.append(pPrintExpression(switchLabel.getExpression()));
 				result.append(":");
 			}
 		}
 		return result;
 	}
 
-	private static StringBuffer switch2CIVL(String prefix, SwitchNode swtichNode) {
-		return new StringBuffer("switch");
-		// TODO throw new CIVLUnimplementedFeatureException(
-		// "translating switch node into CIVL code",
-		// swtichNode.getSource());
+	private static void pPrintSwitch(PrintStream out, String prefix,
+			SwitchNode switchNode) {
+		out.print(prefix);
+		out.print("switch(");
+		out.print(pPrintExpression(switchNode.getCondition()));
+		out.println(")");
+		pPrintStatement(out, prefix + indention, switchNode.getBody(), true);
 	}
 
-	private static StringBuffer jump2CIVL(String prefix, JumpNode jump) {
+	private static void pPrintJump(PrintStream out, String prefix, JumpNode jump) {
 		JumpKind kind = jump.getKind();
-		StringBuffer result = new StringBuffer();
 
 		switch (kind) {
 		case GOTO:
-			result.append("goto");
+			pPrintGoto(out, prefix, (GotoNode) jump);
 			break;
 		case CONTINUE:
-			result.append("continue;");
+			out.print("continue;");
 			break;
 		case BREAK:
-			result.append("break;");
+			out.print("break;");
 			break;
-		case RETURN:
-			return return2CIVL(prefix, (ReturnNode) jump);
-		default:
-			throw new ABCUnsupportedException("translating jump node of "
-					+ kind + " kind into CIVL code");
+		default: // case RETURN:
+			pPrintReturn(out, prefix, (ReturnNode) jump);
 		}
-		return result;
 	}
 
-	private static StringBuffer return2CIVL(String prefix, ReturnNode returnNode) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintReturn(PrintStream out, String prefix,
+			ReturnNode returnNode) {
 		ExpressionNode expr = returnNode.getExpression();
 
-		result.append(prefix);
-		result.append("return");
+		out.print(prefix);
+		out.print("return");
 		if (expr != null) {
-			result.append(" ");
-			result.append(expression2CIVL(expr));
+			out.print(" ");
+			out.print(pPrintExpression(expr));
 		}
-		result.append(";");
-		return result;
+		out.print(";");
 	}
 
-	private static StringBuffer if2CIVL(String prefix, IfNode ifNode) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintIf(PrintStream out, String prefix, IfNode ifNode) {
 		ExpressionNode condition = ifNode.getCondition();
 		StatementNode trueBranch = ifNode.getTrueBranch();
 		StatementNode falseBranch = ifNode.getFalseBranch();
 		String myIndent = prefix + indention;
 
-		result.append(prefix);
-		result.append("if(");
+		out.print(prefix);
+		out.print("if(");
 		if (condition != null)
-			result.append(expression2CIVL(condition));
-		result.append(")");
+			out.print(pPrintExpression(condition));
+		out.print(")");
 		if (trueBranch == null)
-			result.append(";");
+			out.print(";");
 		else {
-			result.append("\n");
-			result.append(statement2CIVL(myIndent, trueBranch));
+			out.print("\n");
+			pPrintStatement(out, myIndent, trueBranch, true);
 		}
 		if (falseBranch != null) {
-			result.append("\n");
-			result.append(prefix);
-			result.append("else\n");
-			result.append(statement2CIVL(myIndent, falseBranch));
+			out.print("\n");
+			out.print(prefix);
+			out.print("else\n");
+			pPrintStatement(out, myIndent, falseBranch, true);
 		}
-		return result;
 	}
 
-	private static StringBuffer for2CIVL(String prefix, ForLoopNode loop) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintFor(PrintStream out, String prefix,
+			ForLoopNode loop) {
 		ForLoopInitializerNode init = loop.getInitializer();
 		ExpressionNode condition = loop.getCondition();
 		ExpressionNode incrementer = loop.getIncrementer();
 		StatementNode body = loop.getBody();
 		String myIndent = prefix + indention;
 
-		result.append(prefix);
-		result.append("for(");
+		out.print(prefix);
+		out.print("for(");
 		if (init != null) {
 			if (init instanceof ExpressionNode)
-				result.append(expression2CIVL((ExpressionNode) init));
+				out.print(pPrintExpression((ExpressionNode) init));
 			else if (init instanceof DeclarationListNode)
-				result.append(declarationList2CIVL((DeclarationListNode) init));
+				out.print(pPrintDeclarationList((DeclarationListNode) init));
 		}
-		result.append("; ");
+		out.print("; ");
 		if (condition != null) {
-			result.append(expression2CIVL(condition));
+			out.print(pPrintExpression(condition));
 		}
-		result.append("; ");
+		out.print("; ");
 		if (incrementer != null) {
-			result.append(expression2CIVL(incrementer));
+			out.print(pPrintExpression(incrementer));
 		}
-		result.append(")");
+		out.print(")");
 		if (body == null)
-			result.append(";");
+			out.print(";");
 		else {
-			result.append("\n");
-			result.append(statement2CIVL(myIndent, body));
+			out.print("\n");
+			pPrintStatement(out, myIndent, body, true);
 		}
-		return result;
 	}
 
-	private static StringBuffer declarationList2CIVL(DeclarationListNode list) {
+	private static StringBuffer pPrintDeclarationList(DeclarationListNode list) {
 		int num = list.numChildren();
 		StringBuffer result = new StringBuffer();
 
@@ -1028,46 +1046,42 @@ public class CommonASTFactory implements ASTFactory {
 
 			if (i != 0)
 				result.append(", ");
-			result.append(variableDeclaration2CIVL("", var));
+			result.append(pPrintVariableDeclaration("", var));
 		}
 		return result;
 	}
 
-	private static StringBuffer expressionStatement2CIVL(String prefix,
-			ExpressionStatementNode expr) {
-		StringBuffer result = new StringBuffer();
-
-		result.append(prefix);
-		result.append(expression2CIVL(expr.getExpression()));
-		result.append(";");
-		return result;
+	private static void expressionStatement2CIVL(PrintStream out,
+			String prefix, ExpressionStatementNode expr) {
+		out.print(prefix);
+		out.print(pPrintExpression(expr.getExpression()));
+		out.print(";");
 	}
 
-	private static StringBuffer when2CIVL(String prefix, WhenNode when) {
-		StringBuffer result = new StringBuffer();
+	private static void pPrintWhen(PrintStream out, String prefix, WhenNode when) {
 		String myIndent = prefix + indention;
 
-		result.append(prefix);
-		result.append("$when(");
-		result.append(expression2CIVL(when.getGuard()));
-		result.append(")\n");
-		result.append(statement2CIVL(myIndent, when.getBody()));
-		return result;
+		out.print(prefix);
+		out.print("$when(");
+		out.print(pPrintExpression(when.getGuard()));
+		out.print(")\n");
+		pPrintStatement(out, myIndent, when.getBody(), true);
 	}
 
-	static private StringBuffer variableDeclaration2CIVL(String prefix,
+	static private StringBuffer pPrintVariableDeclaration(String prefix,
 			VariableDeclarationNode variable) {
 		StringBuffer result = new StringBuffer();
 		InitializerNode init = variable.getInitializer();
 		TypeNode typeNode = variable.getTypeNode();
 		String type;
+		IdentifierNode varName = variable.getIdentifier();
 
 		result.append(prefix);
 		if (typeNode.isInputQualified())
 			result.append("$input ");
 		if (typeNode.isOutputQualified())
 			result.append("$output ");
-		type = type2CIVL(prefix, typeNode, false).toString();
+		type = pPrintType(prefix, typeNode, false).toString();
 		if (type.endsWith("]")) {
 			int start = type.indexOf('[');
 			String suffix = type.substring(start);
@@ -1075,34 +1089,39 @@ public class CommonASTFactory implements ASTFactory {
 			type = type.substring(0, start);
 			result.append(type);
 			result.append(" ");
-			result.append(variable.getName());
+			if (varName != null) {
+				result.append(" ");
+				result.append(variable.getName());
+			}
 			result.append(suffix);
 		} else {
 			result.append(type);
-			result.append(" ");
-			result.append(variable.getName());
+			if (varName != null) {
+				result.append(" ");
+				result.append(variable.getName());
+			}
 		}
 		if (init != null) {
 			result.append(" = ");
-			result.append(initializer2CIVL(init));
+			result.append(pPrintInitializer(init));
 		}
 		return result;
 	}
 
-	private static StringBuffer initializer2CIVL(InitializerNode init) {
+	private static StringBuffer pPrintInitializer(InitializerNode init) {
 		if (init instanceof CompoundInitializerNode) {
 			CompoundInitializerNode compoundInit = (CompoundInitializerNode) init;
 
-			return compoundLiteralObject2CIVL(init.getSource(),
+			return pPrintCompoundLiteralObject(init.getSource(),
 					compoundInit.getType(), compoundInit.getLiteralObject());
 		} else if (init instanceof ExpressionNode)
-			return expression2CIVL((ExpressionNode) init);
+			return pPrintExpression((ExpressionNode) init);
 		else
 			throw new ABCRuntimeException("Invalid initializer: "
 					+ init.toString());
 	}
 
-	private static StringBuffer compoundLiteralObject2CIVL(Source source,
+	private static StringBuffer pPrintCompoundLiteralObject(Source source,
 			Type type, CompoundLiteralObject compoundObj) {
 		StringBuffer result = new StringBuffer();
 		TypeKind typeKind = type.kind();
@@ -1119,7 +1138,7 @@ public class CommonASTFactory implements ASTFactory {
 				// result.append("[");
 				// result.append(i);
 				// result.append("]=");
-				result.append(literalObject2CIVL(source, elementType,
+				result.append(pPrintLiteralObject(source, elementType,
 						compoundObj.get(i)));
 			}
 			result.append("}");
@@ -1140,7 +1159,7 @@ public class CommonASTFactory implements ASTFactory {
 				result.append(".");
 				result.append(field.getName());
 				result.append("=");
-				result.append(literalObject2CIVL(source, field.getType(),
+				result.append(pPrintLiteralObject(source, field.getType(),
 						compoundObj.get(i)));
 			}
 			result.append("}");
@@ -1153,28 +1172,25 @@ public class CommonASTFactory implements ASTFactory {
 		return result;
 	}
 
-	private static StringBuffer literalObject2CIVL(Source source, Type type,
+	private static StringBuffer pPrintLiteralObject(Source source, Type type,
 			LiteralObject obj) {
 		if (obj instanceof CompoundLiteralObject)
-			return compoundLiteralObject2CIVL(source, type,
+			return pPrintCompoundLiteralObject(source, type,
 					(CompoundLiteralObject) obj);
 		else if (obj instanceof ScalarLiteralObject)
-			return expression2CIVL(((ScalarLiteralObject) obj).getExpression());
+			return pPrintExpression(((ScalarLiteralObject) obj).getExpression());
 		else
 			throw new ABCRuntimeException("Invalid literal object: " + obj);
 	}
 
-	static StringBuffer assume2CIVL(String prefix, AssumeNode assume) {
-		StringBuffer result = new StringBuffer();
-
-		result.append(prefix);
-		result.append("$assume ");
-		result.append(expression2CIVL(assume.getExpression()));
-		result.append(";");
-		return result;
+	static void pPrintAssume(PrintStream out, String prefix, AssumeNode assume) {
+		out.print(prefix);
+		out.print("$assume ");
+		out.print(pPrintExpression(assume.getExpression()));
+		out.print(";");
 	}
 
-	private static StringBuffer expression2CIVL(ExpressionNode expression) {
+	private static StringBuffer pPrintExpression(ExpressionNode expression) {
 		StringBuffer result = new StringBuffer();
 		ExpressionKind kind = expression.expressionKind();
 
@@ -1182,7 +1198,7 @@ public class CommonASTFactory implements ASTFactory {
 		case ARROW: {
 			ArrowNode arrow = (ArrowNode) expression;
 
-			result.append(expression2CIVL(arrow.getStructurePointer()));
+			result.append(pPrintExpression(arrow.getStructurePointer()));
 			result.append("->");
 			result.append(arrow.getFieldName().name());
 			break;
@@ -1191,13 +1207,13 @@ public class CommonASTFactory implements ASTFactory {
 			CastNode cast = (CastNode) expression;
 
 			result.append("(");
-			result.append(type2CIVL("", cast.getCastType(), false));
+			result.append(pPrintType("", cast.getCastType(), false));
 			result.append(")");
-			result.append(expression2CIVL(cast.getArgument()));
+			result.append(pPrintExpression(cast.getArgument()));
 			break;
 		}
 		case COMPOUND_LITERAL:
-			result.append(compoundLiteralNode2CIVL((CompoundLiteralNode) expression));
+			result.append(pPrintCompoundLiteral((CompoundLiteralNode) expression));
 			break;
 		case CONSTANT: {
 			String constant = ((ConstantNode) expression)
@@ -1213,86 +1229,91 @@ public class CommonASTFactory implements ASTFactory {
 		case DOT: {
 			DotNode dot = (DotNode) expression;
 
-			result.append(expression2CIVL(dot.getStructure()));
+			result.append(pPrintExpression(dot.getStructure()));
 			result.append(".");
 			result.append(dot.getFieldName().name());
 			break;
 		}
 		case FUNCTION_CALL:
-			return functionCall2CIVL((FunctionCallNode) expression);
+			return pPrintFunctionCall((FunctionCallNode) expression);
 		case IDENTIFIER_EXPRESSION:
 			result.append(((IdentifierExpressionNode) expression)
 					.getIdentifier().name());
 			break;
 		case OPERATOR:
-			result = operator2CIVL((OperatorNode) expression);
+			result = pPrintOperator((OperatorNode) expression);
 			break;
 		case SIZEOF:
 			result.append("sizeof(");
-			result.append(sizeable2CIVL(((SizeofNode) expression).getArgument()));
+			result.append(pPrintSizeable(((SizeofNode) expression)
+					.getArgument()));
 			break;
 		case SPAWN:
 			result.append("$spawn ");
-			result.append(functionCall2CIVL(((SpawnNode) expression).getCall()));
+			result.append(pPrintFunctionCall(((SpawnNode) expression).getCall()));
 			break;
 		case REGULAR_RANGE:
-			result.append(regularRange2CIVL((RegularRangeNode) expression));
+			result.append(pPrintRegularRange((RegularRangeNode) expression));
 			break;
 		default:
-			throw new ABCUnsupportedException("translating expression node of "
-					+ kind + " kind into CIVL code");
+			throw new ABCUnsupportedException(
+					"pretty print of expression node of " + kind + " kind");
 		}
 		return result;
 	}
 
-	private static StringBuffer compoundLiteralNode2CIVL(
-			CompoundLiteralNode expression) {
+	private static StringBuffer pPrintCompoundLiteral(
+			CompoundLiteralNode compound) {
 		StringBuffer result = new StringBuffer();
+		@SuppressWarnings("unused")
+		CompoundInitializerNode list = compound.getInitializerList();
 
+		result.append("{");
+		result.append("}");
 		// TODO
 		return result;
 	}
 
-	private static StringBuffer regularRange2CIVL(RegularRangeNode range) {
+	private static StringBuffer pPrintRegularRange(RegularRangeNode range) {
 		StringBuffer result = new StringBuffer();
 		ExpressionNode step = range.getStep();
 
-		result.append(expression2CIVL(range.getLow()));
+		result.append(pPrintExpression(range.getLow()));
 		result.append(" .. ");
-		result.append(expression2CIVL(range.getHigh()));
+		result.append(pPrintExpression(range.getHigh()));
 		if (step != null) {
 			result.append(" # ");
-			result.append(expression2CIVL(step));
+			result.append(pPrintExpression(step));
 		}
 		return result;
 	}
 
-	private static StringBuffer sizeable2CIVL(SizeableNode argument) {
+	private static StringBuffer pPrintSizeable(SizeableNode argument) {
 		if (argument instanceof ExpressionNode)
-			return expression2CIVL((ExpressionNode) argument);
-		return type2CIVL("", (TypeNode) argument, false);
+			return pPrintExpression((ExpressionNode) argument);
+		return pPrintType("", (TypeNode) argument, false);
 	}
 
-	private static StringBuffer functionCall2CIVL(FunctionCallNode call) {
+	private static StringBuffer pPrintFunctionCall(FunctionCallNode call) {
 		int argNum = call.getNumberOfArguments();
 		StringBuffer result = new StringBuffer();
 
-		result.append(expression2CIVL(call.getFunction()));
+		result.append(pPrintExpression(call.getFunction()));
 		result.append("(");
 		for (int i = 0; i < argNum; i++) {
 			if (i > 0)
 				result.append(", ");
-			result.append(expression2CIVL(call.getArgument(i)));
+			result.append(pPrintExpression(call.getArgument(i)));
 		}
 		result.append(")");
 		return result;
 	}
 
-	private static StringBuffer operator2CIVL(OperatorNode operator) {
+	private static StringBuffer pPrintOperator(OperatorNode operator) {
 		StringBuffer result = new StringBuffer();
 		Operator op = operator.getOperator();
-		StringBuffer arg0 = expression2CIVL(operator.getArgument(0));
-		StringBuffer arg1 = operator.getNumberOfArguments() > 1 ? expression2CIVL(operator
+		StringBuffer arg0 = pPrintExpression(operator.getArgument(0));
+		StringBuffer arg1 = operator.getNumberOfArguments() > 1 ? pPrintExpression(operator
 				.getArgument(1)) : null;
 
 		switch (op) {
@@ -1329,12 +1350,17 @@ public class CommonASTFactory implements ASTFactory {
 			result.append(" ^ ");
 			result.append(arg1);
 			break;
+		case COMMA:
+			result.append(arg0);
+			result.append(", ");
+			result.append(arg1);
+			break;
 		case CONDITIONAL:
 			result.append(arg0);
 			result.append(" ? ");
 			result.append(arg1);
 			result.append(" : ");
-			result.append(expression2CIVL(operator.getArgument(2)));
+			result.append(pPrintExpression(operator.getArgument(2)));
 			break;
 		case DEREFERENCE:
 			result.append("*");
@@ -1458,13 +1484,13 @@ public class CommonASTFactory implements ASTFactory {
 			result.append(arg0);
 			break;
 		default:
-			throw new ABCUnsupportedException("translating operator node of "
-					+ op + " kind into CIVL code");
+			throw new ABCUnsupportedException(
+					"pretty print of operator node of " + op + " kind");
 		}
 		return result;
 	}
 
-	private static StringBuffer type2CIVL(String prefix, TypeNode type,
+	private static StringBuffer pPrintType(String prefix, TypeNode type,
 			boolean isTypeDeclaration) {
 		StringBuffer result = new StringBuffer();
 		TypeNodeKind kind = type.kind();
@@ -1475,12 +1501,12 @@ public class CommonASTFactory implements ASTFactory {
 			ExpressionNode extent = arrayType.getExtent();
 
 			// result.append("(");
-			result.append(type2CIVL(prefix, arrayType.getElementType(),
+			result.append(pPrintType(prefix, arrayType.getElementType(),
 					isTypeDeclaration));
 			// result.append(")");
 			result.append("[");
 			if (extent != null)
-				result.append(expression2CIVL(extent));
+				result.append(pPrintExpression(extent));
 			result.append("]");
 		}
 			break;
@@ -1491,7 +1517,7 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("$domain");
 			if (dim != null) {
 				result.append("(");
-				result.append(expression2CIVL(dim));
+				result.append(pPrintExpression(dim));
 				result.append(")");
 			}
 			break;
@@ -1500,12 +1526,12 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("void");
 			break;
 		case BASIC:
-			return basicType2CIVL((BasicTypeNode) type);
+			return pPrintBasicType((BasicTypeNode) type);
 		case ENUMERATION:
 			EnumerationTypeNode enumType = (EnumerationTypeNode) type;
 
 			if (isTypeDeclaration)
-				result.append(enumType2CIVL(prefix, enumType));
+				result.append(pPrintEnumType(prefix, enumType));
 			else {
 				result.append("enum");
 				if (enumType.getIdentifier() != null)
@@ -1516,7 +1542,7 @@ public class CommonASTFactory implements ASTFactory {
 			StructureOrUnionTypeNode strOrUnion = (StructureOrUnionTypeNode) type;
 
 			if (isTypeDeclaration)
-				result.append(structOrUnion2CIVL(prefix, strOrUnion));
+				result.append(pPrintStructOrUnion(prefix, strOrUnion));
 			else {
 				if (strOrUnion.isStruct())
 					result.append("struct ");
@@ -1527,7 +1553,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		}
 		case POINTER:
-			result.append(type2CIVL(prefix,
+			result.append(pPrintType(prefix,
 					((PointerTypeNode) type).referencedType(),
 					isTypeDeclaration));
 			result.append("*");
@@ -1545,12 +1571,12 @@ public class CommonASTFactory implements ASTFactory {
 			int i = 0;
 
 			result.append(" (");
-			result.append(type2CIVL(prefix, funcType.getReturnType(), false));
+			result.append(pPrintType(prefix, funcType.getReturnType(), false));
 			result.append(" (");
 			for (VariableDeclarationNode para : paras) {
 				if (i != 0)
 					result.append(", ");
-				result.append(variableDeclaration2CIVL("", para));
+				result.append(pPrintVariableDeclaration("", para));
 				i++;
 			}
 			result.append(")");
@@ -1561,13 +1587,13 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("$range");
 			break;
 		default:
-			throw new ABCUnsupportedException("translating type node of "
-					+ kind + " kind into CIVL code");
+			throw new ABCUnsupportedException("pretty print of type node of "
+					+ kind + " kind");
 		}
 		return result;
 	}
 
-	private static StringBuffer basicType2CIVL(BasicTypeNode type) {
+	private static StringBuffer pPrintBasicType(BasicTypeNode type) {
 		StringBuffer result = new StringBuffer();
 		BasicTypeKind basicKind = type.getBasicTypeKind();
 
@@ -1630,8 +1656,8 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("unsigned short");
 			break;
 		default:
-			throw new ABCUnsupportedException("translating basic type node of "
-					+ basicKind + " kind into CIVL code");
+			throw new ABCUnsupportedException(
+					"pretty print of basic type node of " + basicKind + " kind");
 		}
 		return result;
 	}

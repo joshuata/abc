@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.parse.IF;
 
 import edu.udel.cis.vsl.abc.parse.common.CommonCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 
 /**
  * The entry point for the parse module, this class provides static method(s)
@@ -29,12 +28,12 @@ public class Parse {
 	 *            {@link CToken}s that are to be parsed
 	 * @return the new {@link CParser}
 	 */
-	public static CParser newCParser(CTokenSource source) {
-		return new CommonCParser(source);
+	public static CParser newCParser() {
+		return new CommonCParser();
 	}
 
-	public static CParser newCParser(RuleKind rule, CTokenSource source,
-			int startTokenIndex, int lastTokenIndex) {
-		return new CommonCParser(rule, source, startTokenIndex, lastTokenIndex);
-	}
+	// public static CParser newCParser(RuleKind rule, CTokenSource source,
+	// int startTokenIndex, int lastTokenIndex) {
+	// return new CommonCParser(rule, source, startTokenIndex, lastTokenIndex);
+	// }
 }

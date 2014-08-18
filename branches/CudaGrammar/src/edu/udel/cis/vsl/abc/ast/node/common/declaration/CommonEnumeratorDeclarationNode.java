@@ -2,10 +2,10 @@ package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 
 import java.io.PrintStream;
 
-import edu.udel.cis.vsl.abc.ast.entity.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonEnumeratorDeclarationNode extends CommonDeclarationNode

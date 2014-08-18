@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.expression;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
@@ -45,7 +46,7 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 	public void setArgument(int index, ExpressionNode value) {
 		((CommonASTNode) child(1)).setChild(index, value);
 	}
-	
+
 	@Override
 	public void setArguments(SequenceNode<ExpressionNode> arguments) {
 		this.setChild(1, arguments);
@@ -99,8 +100,8 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 				// causing a failure with ring2.cvl
 				return false;
 			}
-			functionDeclaration = functionIdentifier.getEntity()
-					.getFirstDeclaration();
+			functionDeclaration = ((OrdinaryEntity) functionIdentifier
+					.getEntity()).getFirstDeclaration();
 			// Check if this is an abstract function.
 			if (functionDeclaration instanceof AbstractFunctionDefinitionNode) {
 				for (int i = 0; i < getNumberOfArguments(); i++) {

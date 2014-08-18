@@ -3,18 +3,21 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
+import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
@@ -36,6 +39,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnsignedIntegerType;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
+import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 
 /**
  * An implementation of TypeFactory. The Flyweight Pattern is used on Types so
@@ -265,10 +269,22 @@ public class CommonTypeFactory implements TypeFactory {
 	}
 
 	@Override
+	public Field newField(FieldDeclarationNode declaration, ObjectType type,
+			Value bitWidth) {
+		return new CommonField(declaration, type, bitWidth);
+	}
+
+	@Override
 	public EnumerationType enumerationType(Object key, String tag) {
 		EnumerationType result = new CommonEnumerationType(key, tag);
 
 		return (EnumerationType) canonicalize(result);
+	}
+
+	@Override
+	public Enumerator newEnumerator(EnumeratorDeclarationNode declaration,
+			EnumerationType enumeration, Value value) {
+		return new CommonEnumerator(declaration, enumeration, value);
 	}
 
 	@Override
@@ -368,13 +384,8 @@ public class CommonTypeFactory implements TypeFactory {
 
 	private FunctionType extractParameterTypes(FunctionType type,
 			ObjectType returnType) {
-		List<ObjectType> list = new LinkedList<ObjectType>();
-		Iterator<ObjectType> typeIter = type.getParameterTypes();
-
-		while (typeIter.hasNext())
-			list.add(typeIter.next());
-		return functionType(returnType, type.fromIdentifierList(), list,
-				type.hasVariableArgs());
+		return functionType(returnType, type.fromIdentifierList(),
+				type.getParameterTypes(), type.hasVariableArgs());
 	}
 
 	private FunctionType merge(FunctionType type1, FunctionType type2) {
@@ -430,7 +441,7 @@ public class CommonTypeFactory implements TypeFactory {
 
 	@Override
 	public FunctionType functionType(ObjectType returnType,
-			boolean fromIdentifierList, List<ObjectType> parameterTypes,
+			boolean fromIdentifierList, Iterable<ObjectType> parameterTypes,
 			boolean hasVariableArgs) {
 		return (FunctionType) canonicalize(new CommonFunctionType(returnType,
 				fromIdentifierList, parameterTypes, hasVariableArgs));

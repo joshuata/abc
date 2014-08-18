@@ -1,12 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.common;
 
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenSource;
+import java.util.Arrays;
 
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
@@ -15,32 +10,36 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.Source;
-import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 
-	protected ArrayList<CToken> body;
+	protected CToken[] body;
 
 	protected CToken eofToken;
 
+	protected CTokenSourceProducer bodyTokenSourceProducer;
+
 	public CommonPragmaNode(Source source, IdentifierNode identifier,
-			List<CToken> body, CToken eofToken) {
+			CTokenSourceProducer bodyTokenSourceProducer, CToken eofToken) {
 		super(source, identifier);
-		this.body = new ArrayList<CToken>(body);
+		this.bodyTokenSourceProducer = bodyTokenSourceProducer;
 		this.eofToken = eofToken;
 		assert eofToken.getType() == CivlCParser.EOF;
+		body = bodyTokenSourceProducer.getTokens();
 	}
 
 	@Override
 	protected void printBody(PrintStream out) {
-		boolean first = true;
+		int numTokens = body.length;
 
 		out.print("Pragma[");
-		for (CToken token : body) {
-			if (first)
-				first = false;
-			else
+		for (int i = 0; i < numTokens; i++) {
+			CToken token = body[i];
+
+			if (i > 0)
 				out.print(" ");
 			out.print(token.getText());
 		}
@@ -54,39 +53,27 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 
 	@Override
 	public int getNumTokens() {
-		return body.size();
+		return body.length;
 	}
 
 	@Override
 	public CToken getToken(int index) {
-		return body.get(index);
+		return body[index];
 	}
 
 	@Override
-	public Iterator<CToken> getTokens() {
-		return body.iterator();
-	}
-
-	@Override
-	public TokenSource getTokenSource() {
-		TokenSource tokenSource = new GenericTokenSource(
-				TokenUtils.getShortFilename(getSource().getFirstToken(), false),
-				body, eofToken);
-
-		return tokenSource;
+	public Iterable<CToken> getTokens() {
+		return Arrays.asList(body);
 	}
 
 	@Override
 	public PragmaNode copy() {
-		@SuppressWarnings("unchecked")
-		ArrayList<CToken> bodyCopy = body == null ? null
-				: (ArrayList<CToken>) body.clone();
 		IdentifierNode identifier = getPragmaIdentifier();
 		IdentifierNode identifierCopy = identifier == null ? null : identifier
 				.copy();
 
-		return new CommonPragmaNode(getSource(), identifierCopy, bodyCopy,
-				eofToken);
+		return new CommonPragmaNode(getSource(), identifierCopy,
+				bodyTokenSourceProducer, eofToken);
 	}
 
 	@Override
@@ -126,42 +113,9 @@ public class CommonPragmaNode extends CommonASTNode implements PragmaNode {
 		}
 		return new DifferenceObject(this, that);
 	}
-}
-
-class GenericTokenSource implements TokenSource {
-	private Iterator<CToken> tokenIterator;
-
-	private CToken nextToken;
-
-	private CToken eofToken;
-
-	private String sourceName;
-
-	public GenericTokenSource(String sourceName, Iterable<CToken> tokens,
-			CToken eofToken) {
-		this.tokenIterator = tokens.iterator();
-		this.eofToken = eofToken;
-		this.sourceName = sourceName;
-		if (tokenIterator.hasNext())
-			nextToken = tokenIterator.next();
-		else
-			nextToken = eofToken;
-	}
 
 	@Override
-	public Token nextToken() {
-		CToken result = nextToken;
-
-		if (tokenIterator.hasNext())
-			nextToken = tokenIterator.next();
-		else
-			nextToken = eofToken;
-		return result;
+	public CTokenSource newTokenSource() {
+		return bodyTokenSourceProducer.newSource();
 	}
-
-	@Override
-	public String getSourceName() {
-		return sourceName;
-	}
-
 }

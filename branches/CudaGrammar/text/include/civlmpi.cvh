@@ -1,0 +1,46 @@
+#ifdef __CIVLMPI__
+#else
+#define __CIVLMPI__
+
+#include <civlc.cvh>
+#include <comm.cvh>
+
+#define BCAST_TAG 999
+#define REDUCE_TAG 998
+
+/* Definition of CIVL-MPI */
+typedef enum __MPI_Sys_status__{
+  __UNINIT,
+  __INIT,
+  __FINALIZED
+}__MPI_Sys_status__;
+
+/* Definition of CMPI_Gcomm and MPI_Comm */
+typedef struct __CMPI_Gcomm CMPI_Gcomm;
+
+/****************************** Helper Functions **********************************/
+int sizeofDatatype(MPI_Datatype);
+
+/************************** MPI LIB Implementations *******************************/
+$abstract double CMPI_time(int i);
+
+CMPI_Gcomm CMPI_Gcomm_create($scope, int);
+
+void CMPI_Gcomm_destroy(CMPI_Gcomm);
+
+MPI_Comm CMPI_Comm_create($scope, CMPI_Gcomm , int);
+
+void CMPI_Comm_destroy(MPI_Comm);
+
+int __MPI_Init(MPI_Comm *);
+
+int __MPI_Finalize(MPI_Comm *);
+
+int CMPI_Send(const void *, int, MPI_Datatype, int, int, $comm);
+
+int CMPI_Recv(const void *, int, MPI_Datatype, int, int, $comm, MPI_Status *);
+
+#endif
+
+
+

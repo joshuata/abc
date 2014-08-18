@@ -67,6 +67,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -147,6 +148,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpWorkshareNode;
+import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssertNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
@@ -188,6 +190,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
@@ -638,9 +641,9 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public PragmaNode newPragmaNode(Source source, IdentifierNode identifier,
-			List<CToken> body, CToken newlineToken) {
+			CTokenSourceProducer producer, CToken newlineToken) {
 		newlineToken.setType(CivlCParser.EOF);
-		return new CommonPragmaNode(source, identifier, body, newlineToken);
+		return new CommonPragmaNode(source, identifier, producer, newlineToken);
 	}
 
 	@Override
@@ -714,6 +717,12 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public AssumeNode newAssumeNode(Source source, ExpressionNode expression) {
 		return new CommonAssumeNode(source, expression);
+	}
+
+	@Override
+	public AssertNode newAssertNode(Source source, ExpressionNode expression,
+			SequenceNode<ExpressionNode> explanation) {
+		return new CommonAssertNode(source, expression, explanation);
 	}
 
 	@Override
@@ -935,5 +944,4 @@ public class CommonNodeFactory implements NodeFactory {
 			ExpressionNode low, ExpressionNode high, ExpressionNode step) {
 		return new CommonRegularRangeNode(source, low, high, step);
 	}
-
 }
