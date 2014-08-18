@@ -10,10 +10,43 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
+/**
+ * An {@link ASTBuilderWorker} is used to perform specific translation tasks
+ * related to a single {@link ParseTree}. The {@link ParseTree} is associated to
+ * the worker when it is created and can never change.
+ * 
+ * @author siegel
+ * 
+ */
 public interface ASTBuilderWorker {
 
+	/**
+	 * Assuming the {@link ParseTree} associated to this worker represents an
+	 * entire translation unit, this method will translate the entire tree into
+	 * an AST tree.
+	 * 
+	 * @return the root node of the new AST tree obtained by translating the
+	 *         parse tree
+	 * @throws SyntaxException
+	 *             if any syntax error is encountered in the process of
+	 *             translation
+	 */
 	SequenceNode<ExternalDefinitionNode> translateRoot() throws SyntaxException;
 
+	/**
+	 * Translates a single expression in the parse tree. The method takes a
+	 * parse tree node (from the parse tree) representing an expression and
+	 * produces a corresponding AST {@link ExpressionNode}.
+	 * 
+	 * @param expressionTree
+	 *            parse tree node representing an expression
+	 * @param scope
+	 *            the simple scope in which the expressionTree resides. The
+	 *            simple scopes are constructed during the translation process.
+	 * @return the new {@link ExpressionNode}
+	 * @throws SyntaxException
+	 *             if there is a syntax error in the expression
+	 */
 	ExpressionNode translateExpression(CommonTree expressionTree,
 			SimpleScope scope) throws SyntaxException;
 

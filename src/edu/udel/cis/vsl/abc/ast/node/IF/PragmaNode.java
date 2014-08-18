@@ -7,8 +7,11 @@ import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 /**
  * A pragma may be included in the AST wherever a statement or an external
  * definition may occur. The pragma is represented as an identifier (the first
- * token to follow the # pragma), followed by some sequence of tokens of length
- * (say) n. We will refer to that sequence as the "pragma body".
+ * token to follow the <code># pragma</code> tokens), followed by some sequence
+ * of tokens of length (say) n, followed by a newline character. We will refer
+ * to that sequence as the "pragma body". Note that the pragma body does not
+ * include the pragma identifier and does not include the final newline
+ * character.
  * 
  * @author siegel
  * 
@@ -17,8 +20,8 @@ public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 
 	/**
 	 * Returns the pragma identifier, i.e., the identifier immediately following
-	 * "# pragma". For example, in "# pragma omp ...", the identifier "omp"
-	 * would be returned.
+	 * <code># pragma</code>. For example, in <code># pragma omp ...</code>, the
+	 * identifier <code>omp</code> would be returned.
 	 * 
 	 * @return the pragma identifier
 	 */
@@ -26,7 +29,7 @@ public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 
 	/**
 	 * Returns n, the number of tokens in the pragma body, i.e., the number of
-	 * tokens following # pragma IDENTIFIER.
+	 * tokens following <code># pragma IDENTIFIER</code>
 	 * 
 	 * @return number of tokens in the pragma body
 	 */
@@ -52,13 +55,27 @@ public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
 	Iterable<CToken> getTokens();
 
 	/**
+	 * <p>
 	 * Returns the tokens of the pragma body as a {@link CTokenSource}, which
 	 * can then be fed into an ANTLR parser for syntactic analysis. Note that
 	 * each call returns a new token source, since each can only be used once.
+	 * </p>
 	 * 
-	 * @return a token source for the tokens comprising this pragma
+	 * <p>
+	 * The token source will effectively append an infinite sequence of EOF
+	 * tokens after the pragma body. This is what is expected from most parsers.
+	 * </p>
+	 * 
+	 * @return a token source for the tokens comprising the body of this pragma
 	 */
 	CTokenSource newTokenSource();
+
+	/**
+	 * Returns the newline token which terminates this pragma.
+	 * 
+	 * @return the newline token
+	 */
+	CToken getNewlineToken();
 
 	@Override
 	PragmaNode copy();

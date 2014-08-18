@@ -14,6 +14,7 @@ public class CommonPragmaFactory implements PragmaFactory {
 
 	public CommonPragmaFactory(ASTBuilder astBuilder, CParser parser) {
 		this.astBuilder = astBuilder;
+		this.parser = parser;
 	}
 
 	@Override

@@ -1,127 +1,6 @@
 package edu.udel.cis.vsl.abc.antlr2ast.common;
 
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ABSENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ABSTRACT_DECLARATOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ALIGNOF;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.AMPERSAND;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.AND;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ARRAY_ELEMENT_DESIGNATOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ARRAY_SUFFIX;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ARROW;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ASSERT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ASSIGN;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ASSUME;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.AT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ATOMIC;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BIG_O;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITANDEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITOREQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITXOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BITXOREQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.BREAK;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CALL;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CASE_LABELED_STATEMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CAST;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CHARACTER_CONSTANT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CHOOSE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CIVLATOM;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CIVLATOMIC;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CIVLFOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.COLLECTIVE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMMA;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMPOUND_LITERAL;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.COMPOUND_STATEMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CONST;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.CONTINUE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DECLARATION;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DECLARATOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DEFAULT_LABELED_STATEMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DERIVATIVE_EXPRESSION;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DIV;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DIVEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DO;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOTDOT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ELLIPSIS;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENSURES;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENUMERATION_CONSTANT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.EQUALS;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXISTS;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXPR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXPRESSION_STATEMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FALSE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FIELD_DESIGNATOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FLOATING_CONSTANT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FORALL;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FUNCTION_DEFINITION;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.FUNCTION_SUFFIX;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.GENERIC;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.GOTO;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.GT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.GTE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.HERE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.IDENTIFIER;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.IDENTIFIER_LABELED_STATEMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.IDENTIFIER_LIST;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.IF;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.IMPLIES;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.INDEX;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.INITIALIZER_LIST;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.INTEGER_CONSTANT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.LT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.LTE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.MOD;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.MODEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.NEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.NOT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.OPERATOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.OR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PARAMETER_TYPE_LIST;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PARENTHESIZED_EXPRESSION;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PARFOR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PLUS;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PLUSEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.POST_DECREMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.POST_INCREMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PRAGMA;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PRE_DECREMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PRE_INCREMENT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.PROCNULL;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.QMARK;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.REQUIRES;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESTRICT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESULT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.RETURN;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.ROOT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SCALAR_INITIALIZER;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SCOPE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SCOPEOF;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SELF;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTLEFT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTLEFTEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTRIGHT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHIFTRIGHTEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SIZEOF;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SPAWN;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.STAR;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.STAREQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATIC;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATICASSERT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.STRING_LITERAL;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.STRUCT;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SUB;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SUBEQ;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.SWITCH;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.TILDE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.TRUE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPE_NAME;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.UNIFORM;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.VOLATILE;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.WHEN;
-import static edu.udel.cis.vsl.abc.parse.IF.CParser.WHILE;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -174,6 +53,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
@@ -199,7 +79,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
@@ -2237,7 +2117,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
 		CommonTree newlineTree = (CommonTree) pragmaTree.getChild(2);
 		CToken newlineToken = (CToken) newlineTree.getToken();
-		CTokenSourceProducer producer = parseTree
+		CTokenSequence producer = parseTree
 				.getTokenSourceProducer(bodyTree);
 		PragmaNode pragmaNode = nodeFactory.newPragmaNode(source, identifier,
 				producer, newlineToken);
@@ -2297,6 +2177,67 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				}
 			}
 		}
+
+		int numItems = items.size();
+		boolean changed = false;
+
+		for (int i = 0; i < numItems; i++) {
+			ASTNode child = items.get(i);
+
+			if (child != null && child instanceof OmpStatementNode) {
+				OmpStatementNode ompStmt = (OmpStatementNode) child;
+
+				if (!ompStmt.isComplete()) {
+					changed = true;
+					if (ompStmt instanceof OmpForNode) {
+						OmpForNode ompForNode = (OmpForNode) ompStmt;
+						int collapse = ompForNode.collapse();
+
+						if (collapse == 1) {
+							StatementNode forStatement = (StatementNode) items
+									.get(i + 1);
+
+							items.set(i + 1, null);
+							ompForNode.setStatementNode(forStatement);
+						} else {
+							List<BlockItemNode> forList = new ArrayList<>(
+									collapse);
+							CompoundStatementNode compoundStatement;
+
+							source = items.get(i + 1).getSource();
+
+							for (int k = 1; k <= collapse; k++) {
+								StatementNode forStatement = (StatementNode) items
+										.get(i + k);
+
+								items.set(i + k, null);
+								forList.add(forStatement);
+							}
+							compoundStatement = nodeFactory
+									.newCompoundStatementNode(source, forList);
+							ompForNode.setStatementNode(compoundStatement);
+						}
+						items.set(i, ompForNode);
+					} else {
+						StatementNode statementNode = (StatementNode) items
+								.get(i + 1);
+
+						items.set(i + 1, null);
+						ompStmt.setStatementNode(statementNode);
+						items.set(i, ompStmt);
+					}
+				}
+			}
+		}
+		if(changed){
+			List<BlockItemNode> newItems = new LinkedList<>();
+			for(int i = 0; i < numItems; i++){
+				BlockItemNode item = items.get(i);
+				if(item != null)
+					newItems.add(item);
+			}
+			items = newItems;
+		}
 		return nodeFactory.newCompoundStatementNode(source, items);
 	}
 
@@ -2349,8 +2290,12 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		case CIVLFOR:
 		case PARFOR:
 			return translateCivlFor(statementTree, scope);
-		case COMPOUND_STATEMENT:
-			return translateCompoundStatement(statementTree, scope);
+		case COMPOUND_STATEMENT: {
+			CompoundStatementNode compound = translateCompoundStatement(
+					statementTree, scope);
+
+			return compound;
+		}
 		case CONTINUE:
 			return nodeFactory.newContinueNode(newSource(statementTree));
 		case DEFAULT_LABELED_STATEMENT:

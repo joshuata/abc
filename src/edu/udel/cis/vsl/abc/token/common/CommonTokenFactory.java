@@ -9,7 +9,7 @@ import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Concatenation;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
@@ -174,16 +174,16 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public CTokenSourceProducer subTokenSourceProducer(CTokenSource fullSource,
+	public CTokenSequence getTokenSubsequence(CTokenSource fullSource,
 			CToken startToken, CToken stopToken) {
-		return new SubTokenSourceProducer(fullSource, startToken.getIndex(),
+		return new CTokenSubSequence(fullSource, startToken.getIndex(),
 				stopToken.getIndex());
 	}
 
 	@Override
-	public CTokenSourceProducer emptySubTokenSourceProducer(
+	public CTokenSequence getEmptyTokenSubsequence(
 			CTokenSource originalSource) {
-		return new SubTokenSourceProducer(originalSource, 0, -1);
+		return new CTokenSubSequence(originalSource, 0, -1);
 	}
 
 }

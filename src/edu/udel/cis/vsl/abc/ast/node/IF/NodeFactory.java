@@ -95,7 +95,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
@@ -1650,7 +1650,7 @@ public interface NodeFactory {
 	 * @return the new pragma node
 	 */
 	PragmaNode newPragmaNode(Source source, IdentifierNode identifier,
-			CTokenSourceProducer producer, CToken newlineToken);
+			CTokenSequence producer, CToken newlineToken);
 
 	/**
 	 * Constructs a new node representing a CIVL-C <code>$requires</code>

@@ -5,10 +5,10 @@ import org.antlr.runtime.Token;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
-public class SubTokenSourceProducer implements CTokenSourceProducer {
+public class CTokenSubSequence implements CTokenSequence {
 
 	int startTokenIndex;
 
@@ -62,7 +62,7 @@ public class SubTokenSourceProducer implements CTokenSourceProducer {
 		}
 	}
 
-	public SubTokenSourceProducer(CTokenSource rootSource, int startTokenIndex,
+	public CTokenSubSequence(CTokenSource rootSource, int startTokenIndex,
 			int lastTokenIndex) {
 		this.rootSource = rootSource;
 		this.startTokenIndex = startTokenIndex;
@@ -78,13 +78,22 @@ public class SubTokenSourceProducer implements CTokenSourceProducer {
 
 	@Override
 	public CToken[] getTokens() {
-		int numTokens = lastTokenIndex - startTokenIndex + 2;
+		int numTokens = size();
 		CToken[] result = new CToken[numTokens];
 
-		for (int i = 0; i < numTokens - 1; i++) {
+		for (int i = 0; i < numTokens; i++) {
 			result[i] = rootSource.getToken(startTokenIndex + i);
 		}
-		result[numTokens - 1] = eofToken;
 		return result;
+	}
+
+	@Override
+	public int size() {
+		return lastTokenIndex - startTokenIndex + 1;
+	}
+
+	@Override
+	public CToken getEOFToken() {
+		return this.eofToken;
 	}
 }

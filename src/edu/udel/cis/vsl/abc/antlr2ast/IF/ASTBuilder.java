@@ -15,7 +15,8 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 public interface ASTBuilder {
 
 	/**
-	 * Builds the AST.
+	 * Builds the AST specified by a {@link ParseTree} which represents a
+	 * translation unit.
 	 * 
 	 * @return the AST
 	 * @throws SyntaxException
@@ -24,6 +25,16 @@ public interface ASTBuilder {
 	 */
 	AST getTranslationUnit(ParseTree tree) throws SyntaxException;
 
+	/**
+	 * Creates a worker which can be used to perform more specific translation
+	 * tasks related to a single {@link ParseTree}. The worker can be used to
+	 * translate a single expression, a single block item, etc.
+	 * 
+	 * @param tree
+	 *            a {@link ParseTree}
+	 * @return a worker for performing specific translation tasks related to
+	 *         that parse tree
+	 */
 	ASTBuilderWorker getWorker(ParseTree tree);
 
 	/**
@@ -34,6 +45,12 @@ public interface ASTBuilder {
 	 */
 	ASTFactory getASTFactory();
 
+	/**
+	 * Gets the {@link PragmaFactory} used by this builder to translate pragmas
+	 * that occur in the parse tree.
+	 * 
+	 * @return the pragma factory used by this builder
+	 */
 	PragmaFactory getPragmaFactory();
 
 }
