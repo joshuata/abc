@@ -3,7 +3,7 @@ package edu.udel.cis.vsl.abc.parse.IF;
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSourceProducer;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
@@ -62,6 +62,6 @@ public interface ParseTree {
 	 * @return a token source comprising the sequence of tokens obtained from
 	 *         the children of the given node
 	 */
-	CTokenSourceProducer getTokenSourceProducer(CommonTree tokenListNode);
+	CTokenSequence getTokenSourceProducer(CommonTree tokenListNode);
 
 }

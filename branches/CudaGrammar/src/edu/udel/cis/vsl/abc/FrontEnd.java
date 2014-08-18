@@ -54,7 +54,7 @@ import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
  * methods to get or create individual components of the ABC tool chain, such as
  * factories, {@link Preprocessor}s, {@link CParser}s, etc., and (2)
  * higher-level methods which marshall together these different components in
- * order to carry out a complete translation tasks, such as compiling a
+ * order to carry out a complete translation task, such as compiling a
  * translation unit, or linking several translation units to form a complete
  * {@link Program}.
  * </p>
@@ -134,6 +134,13 @@ public class FrontEnd {
 				userIncludePaths);
 	}
 
+	/**
+	 * Returns the parser used by this front end. The parser is used to parse a
+	 * token stream and produce a {@link ParseTree}. The parser can be used
+	 * repeatedly.
+	 * 
+	 * @return the parser
+	 */
 	public CParser getParser() {
 		return parser;
 	}
@@ -149,6 +156,13 @@ public class FrontEnd {
 		return astFactory;
 	}
 
+	/**
+	 * Returns the {@link ASTBuilder} used by this front end. The builder is
+	 * used convert a {@link ParseTree} to an {@link AST}. The builder can be
+	 * used repeatedly.
+	 * 
+	 * @return the builder used to translate parse trees to ASTs
+	 */
 	public ASTBuilder getASTBuilder() {
 		return builder;
 	}
@@ -179,6 +193,15 @@ public class FrontEnd {
 		return Transform.newTransformer(code, astFactory);
 	}
 
+	/**
+	 * Returns a program factory based on the given analyzer. The factory will
+	 * apply that analyzer every time it instantiates a new {@link Program}.
+	 * 
+	 * @param analyzer
+	 *            an analyzer that will be applied to any program created by the
+	 *            factory
+	 * @return the new program factory based on the analyzer
+	 */
 	public ProgramFactory getProgramFactory(Analyzer analyzer) {
 		return Programs.newProgramFactory(astFactory, analyzer);
 	}

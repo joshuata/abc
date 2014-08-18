@@ -13,24 +13,47 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * following <code>#pragma</code>), as in
  * 
  * <pre>
- * #pragma TASS ...
+ * #pragma CIVL ...
  * </pre>
  * 
- * That identifier signifies the pragma family. Each family has one handler for
- * dealing with those pragmas.
+ * That identifier signifies the pragma family.
  * </p>
  * 
  * <p>
- * Fow now, this is a stump class that doesn't do anything with the pragmas.
+ * Each handler is responsible for dealing with pragmas with one code occurring
+ * in one parse tree.
  * </p>
  * 
  * @author siegel
  * 
  */
 public interface PragmaHandler extends Entity {
-	
+
+	/**
+	 * Returns the parse tree associated to this handler. The handler should
+	 * only be invoked on pragmas occurring in that tree.
+	 * 
+	 * @return the parse tree associated to this pragma
+	 */
 	ParseTree getParseTree();
 
-	ASTNode processPragmaNode(PragmaNode pragmaNode, SimpleScope scope) throws SyntaxException;
+	/**
+	 * Translates a pragma node originating from the parse tree. The result can
+	 * be any kind of rooted AST tree. The result will replace the pragma node
+	 * in the AST.
+	 * 
+	 * @param pragmaNode
+	 *            a pragma node that was formed from a pragma occurring in the
+	 *            parse tree. The pragma node comprises the raw, unparsed
+	 *            sequence of tokens occurring in the pragma
+	 * @param scope
+	 *            the simple scope in which the pragma occurrs
+	 * @return the root of the tree which is the result of the translation
+	 * @throws SyntaxException
+	 *             if the pragma does not adhere to the syntax specified by the
+	 *             pragma domain
+	 */
+	ASTNode processPragmaNode(PragmaNode pragmaNode, SimpleScope scope)
+			throws SyntaxException;
 
 }
