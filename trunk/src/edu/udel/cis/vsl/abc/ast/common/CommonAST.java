@@ -42,18 +42,26 @@ public class CommonAST implements AST {
 
 	private ASTNode[] nodes;
 
-	private Map<String, OrdinaryEntity> internalOrExternalEntityMap = new LinkedHashMap<String, OrdinaryEntity>();
+	private Map<String, OrdinaryEntity> internalOrExternalEntityMap;
 
-	private ArrayList<OrdinaryEntity> internalEntities = new ArrayList<OrdinaryEntity>();
+	private ArrayList<OrdinaryEntity> internalEntities;
 
-	private ArrayList<OrdinaryEntity> externalEntities = new ArrayList<OrdinaryEntity>();
+	private ArrayList<OrdinaryEntity> externalEntities;
 
 	public CommonAST(ASTFactory astFactory,
 			SequenceNode<ExternalDefinitionNode> root, boolean hasOmpPragma)
 			throws SyntaxException {
 		this.root = root;
 		this.astFactory = astFactory;
+		clearEntities();
 		initialize();
+	}
+
+	@Override
+	public void clearEntities() {
+		internalOrExternalEntityMap = new LinkedHashMap<String, OrdinaryEntity>();
+		internalEntities = new ArrayList<OrdinaryEntity>();
+		externalEntities = new ArrayList<OrdinaryEntity>();
 	}
 
 	@Override

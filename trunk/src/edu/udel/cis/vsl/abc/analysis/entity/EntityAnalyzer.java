@@ -308,6 +308,7 @@ public class EntityAnalyzer implements Analyzer {
 
 	@Override
 	public void clear(AST unit) {
+		unit.clearEntities();
 		clearNode(unit.getRootNode());
 	}
 
