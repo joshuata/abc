@@ -13,7 +13,10 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * Checks a number of simple C programs to make sure they pass on the parsing
@@ -39,6 +42,8 @@ public class OmpTranslationTest {
 
 	private static List<String> codes = Arrays.asList("prune", "sef");
 
+	FrontEnd fe = new FrontEnd();
+
 	@Before
 	public void setUp() throws Exception {
 	}
@@ -59,18 +64,22 @@ public class OmpTranslationTest {
 			config.setUserIncludes(userIncludes);
 			fe.showTranslation(config);
 		} else {
-			// this code should work but fails.
-			AST ast = fe.compile(file, Language.CIVL_C, systemIncludes,
-					userIncludes);
-			Program p = fe.getProgramFactory(
-					fe.getStandardAnalyzer(Language.CIVL_C)).newProgram(ast);
-			// Program p = fe.compileAndLink(new File[] { file },
-			// Language.CIVL_C,
-			// systemIncludes, userIncludes);
+			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C,
+					systemIncludes, userIncludes);
 
-			// p.prettyPrint(System.out);
 			p.applyTransformers(codes);
 		}
+	}
+
+	@Test
+	public void dijkstra_openmp_compile() throws PreprocessorException,
+			SyntaxException, ParseException {
+		AST ast = fe.compile(new File(root, "dijkstra_openmp.c"),
+				Language.CIVL_C, systemIncludes, userIncludes);
+		Program p = fe.getProgramFactory(
+				fe.getStandardAnalyzer(Language.CIVL_C)).newProgram(ast);
+
+		p.applyTransformers(codes);
 	}
 
 	@Test
