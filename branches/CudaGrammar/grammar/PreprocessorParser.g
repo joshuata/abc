@@ -202,6 +202,7 @@ c_keyword	:	AUTO | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
 		|	SPAWN | TRUE | WHEN | SCOPE | CIVLATOMIC | CIVLATOM
 		|	ABSTRACT | BIG_O | CONTIN | DERIV | FORALL | EXISTS | UNIFORM
 		|	REAL | CIVLFOR | PARFOR | DOMAIN | RANGE
+		| 	CUDA_GLOBAL
 		;
 
 punctuator	:	nonPoundPunctuator | HASH ;
@@ -234,6 +235,7 @@ nonPoundPunctuator
 		|	HASHHASH
 		|	IMPLIES
 		|	LCURLY
+		|	LEXCON
 		|	LPAREN
 		|	LSLIST
 		|	LSQUARE
@@ -250,6 +252,7 @@ nonPoundPunctuator
 		|	PLUSPLUS
 		|	QMARK
 		|	RCURLY
+		|	REXCON
 		|	RPAREN
 		|	RSLIST
 		|	RSQUARE

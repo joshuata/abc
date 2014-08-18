@@ -31,6 +31,7 @@ tokens
 	COMPOUND_LITERAL;     // literal for structs, etc.
 	CONTRACT;             // procedure contracts
 	CALL;                 // function call
+	KERNEL_CALL;		  // Cuda kernel call
 	INDEX;                // array subscript operator
 	ARGUMENT_LIST;        // list of arguments to an operator
 	POST_INCREMENT;
@@ -348,6 +349,10 @@ postfixExpression
 	    LPAREN argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
 	    	 RPAREN ABSENT)
+	  |	// kernel function call:
+	    LEXCON args1=argumentExpressionList REXCON 
+	    LPAREN args2=argumentExpressionList RPAREN
+	    -> ^(KERNEL_CALL LPAREN $postfixExpression $args1 $args2 RPAREN ABSENT)
 	  | DOT IDENTIFIER
 	    -> ^(DOT $postfixExpression IDENTIFIER)
 	  | ARROW IDENTIFIER
