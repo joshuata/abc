@@ -170,7 +170,7 @@ WHEN		:	'$when';
 
 /* Cuda-C keywords */
 
-CUDA_GLOBAL	:	'__global';
+CUDA_GLOBAL	:	'__global__';
 
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/
@@ -375,6 +375,7 @@ GTE		:	'>='		NotLineStart;
 //HASH		:	'#' | '%:'	NotLineStart;
 HASHHASH	:	'##' | '%:%:'	NotLineStart;
 LCURLY		:	'{' | '<%'	NotLineStart;
+LEXCON		:	'<<<' NotLineStart;
 LPAREN		:	'('		NotLineStart;
 LSQUARE		:	'[' | '<:'	NotLineStart;
 LT		:	'<'		NotLineStart;
@@ -390,6 +391,7 @@ PLUSEQ		:	'+='		NotLineStart;
 PLUSPLUS	:	'++'		NotLineStart;
 QMARK		:	'?'		NotLineStart;
 RCURLY		:	'}' | '%>'	NotLineStart;
+REXCON		:	'>>>' NotLineStart;
 RPAREN		:	')'		NotLineStart;
 RSQUARE		:	']' | ':>'	NotLineStart;
 SEMI		:	';'		NotLineStart;
