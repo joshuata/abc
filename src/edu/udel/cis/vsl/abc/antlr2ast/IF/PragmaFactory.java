@@ -6,7 +6,6 @@ public interface PragmaFactory {
 
 	ASTBuilder getASTBuilder();
 
-	// may need more info?
 	PragmaHandler newHandler(String code, ParseTree parseTree);
 
 }
