@@ -106,9 +106,9 @@ public class DeclarationAnalyzer {
 		Scope scope = node.getScope();
 		TypeNode typeNode = node.getTypeNode();
 
-		if (scope.getScopeKind() == ScopeKind.FILE && ignoredTypes != null
-				&& ignoredTypes.contains(name)) {
-			OrdinaryEntity entity = scope.getOrdinaryEntity(name);
+		if (// scope.getScopeKind() == ScopeKind.FILE &&
+		ignoredTypes != null && ignoredTypes.contains(name)) {
+			OrdinaryEntity entity = scope.getLexicalOrdinaryEntity(name); // scope.getOrdinaryEntity(name);
 
 			if (entity == null)
 				throw error("Cannot find definition of system typedef", node);
