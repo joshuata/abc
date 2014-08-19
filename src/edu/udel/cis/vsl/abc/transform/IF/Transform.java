@@ -33,6 +33,8 @@ import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
  */
 public class Transform {
 
+	private static CompareCombiner compareCombiner = new CompareCombiner();
+
 	/**
 	 * A list of the transformers available to the command line interface. Add
 	 * one entry here when you create a new transformer, following the same
@@ -171,12 +173,12 @@ public class Transform {
 	}
 
 	/**
-	 * Constructs a new compare combiner for combining two CIVL programs into
-	 * one which compares the two for functional equivalence.
+	 * Gets the compare combiner for combining two CIVL programs into one which
+	 * compares the two for functional equivalence.
 	 * 
 	 * @return the new compare combiner
 	 */
-	public static Combiner newCompareCombiner() {
-		return new CompareCombiner();
+	public static Combiner compareCombiner() {
+		return Transform.compareCombiner;
 	}
 }

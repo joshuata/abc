@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,7 +26,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
-import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Combiner;
@@ -71,17 +69,17 @@ public class CompareCombiner implements Combiner {
 		astFactory = unit0.getASTFactory();
 		factory = astFactory.getNodeFactory();
 		inputVariables = combineInputs(specRoot, implRoot);
-		nodes.add(factory.newFunctionDeclarationNode(specSource, factory
-				.newIdentifierNode(specSource, "$assert"), factory
-				.newFunctionTypeNode(specSource, factory
-						.newVoidTypeNode(specSource), factory.newSequenceNode(
-						specSource, "Formals", Arrays.asList(factory
-								.newVariableDeclarationNode(specSource, factory
-										.newIdentifierNode(specSource, "e"),
-										factory.newBasicTypeNode(specSource,
-												BasicTypeKind.BOOL)))), true),
-				factory.newSequenceNode(specSource, "Contract",
-						new ArrayList<ContractNode>())));
+//		nodes.add(factory.newFunctionDeclarationNode(specSource, factory
+//				.newIdentifierNode(specSource, "$assert"), factory
+//				.newFunctionTypeNode(specSource, factory
+//						.newVoidTypeNode(specSource), factory.newSequenceNode(
+//						specSource, "Formals", Arrays.asList(factory
+//								.newVariableDeclarationNode(specSource, factory
+//										.newIdentifierNode(specSource, "e"),
+//										factory.newBasicTypeNode(specSource,
+//												BasicTypeKind.BOOL)))), true),
+//				factory.newSequenceNode(specSource, "Contract",
+//						new ArrayList<ContractNode>())));
 		nodes.addAll(inputVariables.values());
 		specOutputs = outputs(specRoot);
 		implOutputs = outputs(implRoot);
@@ -291,12 +289,12 @@ public class CompareCombiner implements Combiner {
 			Map<String, VariableDeclarationNode> implOutputs) {
 		List<StatementNode> result = new ArrayList<StatementNode>();
 		// TODO: do something better for source
-		ExpressionNode assertFunction = factory.newIdentifierExpressionNode(
-				specSource, factory.newIdentifierNode(specSource, "$assert"));
+		// ExpressionNode assertFunction = factory.newIdentifierExpressionNode(
+		// specSource, factory.newIdentifierNode(specSource, "$assert"));
 
 		for (String outputName : specOutputs.keySet()) {
 			Source source = specOutputs.get(outputName).getSource();
-			List<ExpressionNode> argumentList = new ArrayList<ExpressionNode>();
+//			List<ExpressionNode> argumentList = new ArrayList<ExpressionNode>();
 			List<ExpressionNode> operatorArguments = new ArrayList<ExpressionNode>();
 			StatementNode assertion;
 
@@ -305,11 +303,14 @@ public class CompareCombiner implements Combiner {
 			operatorArguments.add(factory.newIdentifierExpressionNode(
 					implOutputs.get(outputName).getSource(),
 					implOutputs.get(outputName).getIdentifier().copy()));
-			argumentList.add(factory.newOperatorNode(source, Operator.EQUALS,
-					operatorArguments));
-			assertion = factory.newExpressionStatementNode(factory
-					.newFunctionCallNode(source, assertFunction.copy(),
-							argumentList, null));
+//			argumentList.add(factory.newOperatorNode(source, Operator.EQUALS,
+//					operatorArguments));
+//			assertion = factory.newExpressionStatementNode(factory
+//					.newFunctionCallNode(source, assertFunction.copy(),
+//							argumentList, null));
+//			result.add(assertion);
+			assertion = factory.newAssertNode(source, factory.newOperatorNode(source, Operator.EQUALS,
+					operatorArguments), null);
 			result.add(assertion);
 		}
 		return result;

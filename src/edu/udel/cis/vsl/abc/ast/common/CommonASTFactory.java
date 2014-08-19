@@ -48,6 +48,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode.OmpDeclarativeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode.OmpScheduleKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode.OmpNodeKind;
@@ -188,7 +189,7 @@ public class CommonASTFactory implements ASTFactory {
 			pPrintPragma(out, "", (PragmaNode) node);
 			break;
 		case STATEMENT:
-			pPrintStatement(out, "", (StatementNode) node, true);
+			pPrintStatement(out, "", (StatementNode) node, true, false);
 			break;
 		case STATIC_ASSERTION:
 			pPrintStaticAssertion(out, "", (StaticAssertionNode) node);
@@ -416,13 +417,13 @@ public class CommonASTFactory implements ASTFactory {
 					.getBody();
 
 			out.print("\n");
-			pPrintCompoundStatement(out, prefix + indention, body, true);
+			pPrintCompoundStatement(out, prefix + indention, body, true, false);
 		} else
 			out.print(";");
 	}
 
 	private static void pPrintCompoundStatement(PrintStream out, String prefix,
-			CompoundStatementNode compound, boolean isBody) {
+			CompoundStatementNode compound, boolean isBody, boolean isSwitchBody) {
 		int numChildren = compound.numChildren();
 		String myIndent = prefix;
 		String myPrefix = prefix;
@@ -439,7 +440,10 @@ public class CommonASTFactory implements ASTFactory {
 			BlockItemNode child = compound.getSequenceChild(i);
 
 			if (child != null) {
-				pPrintBlockItem(out, myIndent, child);
+				if (isSwitchBody && !(child instanceof LabeledStatementNode))
+					pPrintBlockItem(out, myIndent + indention, child);
+				else
+					pPrintBlockItem(out, myIndent, child);
 				out.print("\n");
 			}
 		}
@@ -453,7 +457,7 @@ public class CommonASTFactory implements ASTFactory {
 
 		switch (kind) {
 		case STATEMENT:
-			pPrintStatement(out, prefix, (StatementNode) block, false);
+			pPrintStatement(out, prefix, (StatementNode) block, false, false);
 			break;
 		case ORDINARY_DECLARATION:
 			if (block instanceof VariableDeclarationNode) {
@@ -497,7 +501,7 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	private static void pPrintStatement(PrintStream out, String prefix,
-			StatementNode statement, boolean isBody) {
+			StatementNode statement, boolean isBody, boolean isSwitchBody) {
 		StatementKind kind = statement.statementKind();
 
 		switch (kind) {
@@ -512,7 +516,7 @@ public class CommonASTFactory implements ASTFactory {
 			break;
 		case COMPOUND:
 			pPrintCompoundStatement(out, prefix,
-					(CompoundStatementNode) statement, isBody);
+					(CompoundStatementNode) statement, isBody, isSwitchBody);
 			break;
 		case EXPRESSION:
 			pPrintExpressionStatement(out, prefix,
@@ -558,7 +562,7 @@ public class CommonASTFactory implements ASTFactory {
 	private static void pPrintChooseStatement(PrintStream out, String prefix,
 			ChooseStatementNode statement) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	static void pPrintAssert(PrintStream out, String prefix,
@@ -590,7 +594,7 @@ public class CommonASTFactory implements ASTFactory {
 				.copyprivateList(), lastPrivateList = ompStmt.lastprivateList();
 		SequenceNode<OmpReductionNode> reductionList = ompStmt.reductionList();
 		boolean nowait = ompStmt.nowait();
-		String myIndent = prefix + indention;
+		// String myIndent = prefix + indention;
 		StatementNode block = ompStmt.statementNode();
 
 		out.print(prefix);
@@ -641,9 +645,11 @@ public class CommonASTFactory implements ASTFactory {
 		if (reductionList != null) {
 			out.print(pPrintSequenceReduction(reductionList));
 		}
-		out.print("\n");
-		if (block != null)
-			pPrintStatement(out, myIndent, block, true);
+
+		if (block != null) {
+			out.print("\n");
+			pPrintStatement(out, prefix, block, false, false);
+		}
 	}
 
 	private static void pPrintOmpWorksharing(PrintStream out, String prefix,
@@ -654,30 +660,34 @@ public class CommonASTFactory implements ASTFactory {
 		case FOR: {
 			OmpForNode forNode = (OmpForNode) ompWs;
 			int collapse = forNode.collapse();
+			OmpScheduleKind schedule = forNode.schedule();
 
-			out.print("for schedule(");
-			switch (forNode.schedule()) {
-			case AUTO:
-				out.print("auto");
-				break;
-			case DYNAMIC:
-				out.print("dynamic");
-				break;
-			case GUIDED:
-				out.print("guided");
-				break;
-			case RUNTIME:
-				out.print("runtime");
-				break;
-			default:// STATIC
-				out.print("static");
-				break;
+			out.print("for ");
+			if (schedule != OmpScheduleKind.NONE) {
+				out.print("schedule(");
+				switch (forNode.schedule()) {
+				case AUTO:
+					out.print("auto");
+					break;
+				case DYNAMIC:
+					out.print("dynamic");
+					break;
+				case GUIDED:
+					out.print("guided");
+					break;
+				case RUNTIME:
+					out.print("runtime");
+					break;
+				default:// STATIC
+					out.print("static");
+					break;
+				}
+				if (forNode.chunkSize() != null) {
+					out.print(", ");
+					out.print(pPrintExpression(forNode.chunkSize()));
+				}
+				out.print(") ");
 			}
-			if (forNode.chunkSize() != null) {
-				out.print(", ");
-				out.print(pPrintExpression(forNode.chunkSize()));
-			}
-			out.print(") ");
 			if (collapse > 1) {
 				out.print("collapse(");
 				out.print(collapse);
@@ -856,7 +866,7 @@ public class CommonASTFactory implements ASTFactory {
 		out.print(": ");
 		out.print(pPrintExpression(civlFor.getDomain()));
 		out.println(")");
-		pPrintStatement(out, prefix + indention, civlFor.getBody(), true);
+		pPrintStatement(out, prefix + indention, civlFor.getBody(), true, false);
 	}
 
 	private static void pPrintLoop(PrintStream out, String prefix, LoopNode loop) {
@@ -867,9 +877,10 @@ public class CommonASTFactory implements ASTFactory {
 
 		if (loop.getCondition() != null)
 			condition = pPrintExpression(loop.getCondition());
-		out.print(prefix);
+
 		switch (loopKind) {
 		case WHILE:
+			out.print(prefix);
 			out.print("while(");
 			out.print(condition);
 			out.print(")");
@@ -877,17 +888,18 @@ public class CommonASTFactory implements ASTFactory {
 				out.print(";");
 			else {
 				out.print("\n");
-				pPrintStatement(out, myIndent, bodyNode, true);
+				pPrintStatement(out, myIndent, bodyNode, true, false);
 
 			}
 			break;
 		case DO_WHILE:
+			out.print(prefix);
 			out.print("do");
 			if (bodyNode == null)
 				out.print(";");
 			else {
 				out.print("\n");
-				pPrintStatement(out, myIndent, bodyNode, true);
+				pPrintStatement(out, myIndent, bodyNode, true, false);
 			}
 			out.print("while(");
 			out.print(condition);
@@ -905,7 +917,8 @@ public class CommonASTFactory implements ASTFactory {
 			out.print("$atom\n");
 		else
 			out.print("$atomic\n");
-		pPrintStatement(out, prefix + indention, atomicNode.getBody(), true);
+		pPrintStatement(out, prefix + indention, atomicNode.getBody(), true,
+				false);
 	}
 
 	private static void pPrintGoto(PrintStream out, String prefix, GotoNode go2) {
@@ -924,7 +937,7 @@ public class CommonASTFactory implements ASTFactory {
 		out.print(prefix);
 		out.print(pPrintLabelNode(label));
 		out.print("\n");
-		pPrintStatement(out, myIndent, statement, false);
+		pPrintStatement(out, myIndent, statement, false, false);
 	}
 
 	private static StringBuffer pPrintLabelNode(LabelNode label) {
@@ -956,7 +969,8 @@ public class CommonASTFactory implements ASTFactory {
 		out.print("switch(");
 		out.print(pPrintExpression(switchNode.getCondition()));
 		out.println(")");
-		pPrintStatement(out, prefix + indention, switchNode.getBody(), true);
+		pPrintStatement(out, prefix + indention, switchNode.getBody(), true,
+				true);
 	}
 
 	private static void pPrintJump(PrintStream out, String prefix, JumpNode jump) {
@@ -1007,13 +1021,13 @@ public class CommonASTFactory implements ASTFactory {
 			out.print(";");
 		else {
 			out.print("\n");
-			pPrintStatement(out, myIndent, trueBranch, true);
+			pPrintStatement(out, myIndent, trueBranch, true, false);
 		}
 		if (falseBranch != null) {
 			out.print("\n");
 			out.print(prefix);
 			out.print("else\n");
-			pPrintStatement(out, myIndent, falseBranch, true);
+			pPrintStatement(out, myIndent, falseBranch, true, false);
 		}
 	}
 
@@ -1046,7 +1060,7 @@ public class CommonASTFactory implements ASTFactory {
 			out.print(";");
 		else {
 			out.print("\n");
-			pPrintStatement(out, myIndent, body, true);
+			pPrintStatement(out, myIndent, body, true, false);
 		}
 	}
 
@@ -1078,7 +1092,7 @@ public class CommonASTFactory implements ASTFactory {
 		out.print("$when(");
 		out.print(pPrintExpression(when.getGuard()));
 		out.print(")\n");
-		pPrintStatement(out, myIndent, when.getBody(), true);
+		pPrintStatement(out, myIndent, when.getBody(), true, false);
 	}
 
 	static private StringBuffer pPrintVariableDeclaration(String prefix,
@@ -1204,6 +1218,7 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	private static StringBuffer pPrintExpression(ExpressionNode expression) {
+
 		StringBuffer result = new StringBuffer();
 		ExpressionKind kind = expression.expressionKind();
 
@@ -1218,11 +1233,22 @@ public class CommonASTFactory implements ASTFactory {
 		}
 		case CAST: {
 			CastNode cast = (CastNode) expression;
+			ExpressionNode arg = cast.getArgument();
+			ExpressionKind argKind = arg.expressionKind();
+			boolean parenNeeded = true;
 
 			result.append("(");
 			result.append(pPrintType("", cast.getCastType(), false));
 			result.append(")");
-			result.append(pPrintExpression(cast.getArgument()));
+			if (argKind == ExpressionKind.IDENTIFIER_EXPRESSION
+					|| argKind == ExpressionKind.CONSTANT
+					|| argKind == ExpressionKind.COMPOUND_LITERAL)
+				parenNeeded = false;
+			if (parenNeeded)
+				result.append("(");
+			result.append(pPrintExpression(arg));
+			if (parenNeeded)
+				result.append(")");
 			break;
 		}
 		case COMPOUND_LITERAL:
@@ -1330,10 +1356,19 @@ public class CommonASTFactory implements ASTFactory {
 	private static StringBuffer pPrintOperator(OperatorNode operator) {
 		StringBuffer result = new StringBuffer();
 		Operator op = operator.getOperator();
-		StringBuffer arg0 = pPrintExpression(operator.getArgument(0));
-		StringBuffer arg1 = operator.getNumberOfArguments() > 1 ? pPrintExpression(operator
-				.getArgument(1)) : null;
+		ExpressionNode argNode0 = operator.getArgument(0);
+		ExpressionNode argNode1 = operator.numChildren() > 1 ? operator
+				.getArgument(1) : null;
+		String arg0 = pPrintExpression(argNode0).toString();
+		String arg1 = argNode1 != null ? pPrintExpression(argNode1).toString()
+				: null;
+		String argWtP0 = arg0, argWtP1 = arg1;
 
+		if (argNode0.expressionKind() == ExpressionKind.OPERATOR)
+			argWtP0 = "(" + arg0 + ")";
+		if (argNode1 != null
+				&& argNode1.expressionKind() == ExpressionKind.OPERATOR)
+			argWtP1 = "(" + arg1 + ")";
 		switch (op) {
 		case ADDRESSOF:
 			result.append("&");
@@ -1350,23 +1385,23 @@ public class CommonASTFactory implements ASTFactory {
 			result.append(")");
 			break;
 		case BITAND:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" & ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case BITCOMPLEMENT:
 			result.append("~");
-			result.append(arg0);
+			result.append(argWtP0);
 			break;
 		case BITOR:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" | ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case BITXOR:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" ^ ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case COMMA:
 			result.append(arg0);
@@ -1385,73 +1420,73 @@ public class CommonASTFactory implements ASTFactory {
 			result.append(arg0);
 			break;
 		case DIV:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" / ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case EQUALS:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" == ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case GT:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" > ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case GTE:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" >= ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case IMPLIES:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" => ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case LAND:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" && ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case LOR:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" || ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case LT:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" < ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case LTE:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" <= ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case MINUS:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" － ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case MOD:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" % ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case NEQ:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" != ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case NOT:
 			result.append("!");
-			result.append(arg0);
+			result.append(argWtP0);
 			break;
 		case PLUS:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" + ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case PLUSEQ:
 			result.append(arg0);
@@ -1473,14 +1508,14 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("--");
 			break;
 		case SHIFTLEFT:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" << ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case SHIFTRIGHT:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" >> ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case SUBSCRIPT:
 			result.append(arg0);
@@ -1489,17 +1524,17 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("]");
 			break;
 		case TIMES:
-			result.append(arg0);
+			result.append(argWtP0);
 			result.append(" * ");
-			result.append(arg1);
+			result.append(argWtP1);
 			break;
 		case UNARYMINUS:
 			result.append("-");
-			result.append(arg0);
+			result.append(argWtP0);
 			break;
 		case UNARYPLUS:
 			result.append("+");
-			result.append(arg0);
+			result.append(argWtP0);
 			break;
 		default:
 			throw new ABCUnsupportedException(

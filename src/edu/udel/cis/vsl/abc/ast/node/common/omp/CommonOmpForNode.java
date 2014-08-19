@@ -10,7 +10,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
-import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 /**
@@ -87,7 +86,7 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 	public CommonOmpForNode(Source source, StatementNode statement) {
 		super(source, OmpWorksharingNodeKind.FOR, statement);
 		collapse = 1;
-		schedule = OmpScheduleKind.STATIC;
+		schedule = OmpScheduleKind.NONE;
 		ordered = false;
 		this.addChild(null);// child 8
 		this.addChild(null);// child 9
@@ -171,10 +170,10 @@ public class CommonOmpForNode extends CommonOmpWorkshareNode implements
 		case RUNTIME:
 			scheduleText = "runtime";
 			break;
-		default:
-			throw new ABCRuntimeException("Unreachable");
+		default:// NONE
+			scheduleText = null;
 		}
-		if (chunkSize != null) {
+		if (chunkSize != null && scheduleText != null) {
 			out.println();
 			out.print(prefix + "schedule(");
 			out.print(scheduleText);
