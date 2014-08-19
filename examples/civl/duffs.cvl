@@ -1,4 +1,4 @@
-#include <civlc.h>
+#include <civlc.cvh>
 
 $input int a[8];
 
@@ -24,6 +24,6 @@ void main() {
   int b[8];
   send(a, b, 8);
   for (int i = 0; i < 8; i++) {
-    $assert(a[i] == b[i]);
+    $assert a[i] == b[i];
   }
 }

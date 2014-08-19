@@ -9,11 +9,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundLiteralObject;
+import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.LiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.ScalarLiteralObject;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
@@ -108,6 +110,7 @@ import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
+import edu.udel.cis.vsl.abc.util.IF.Pair;
 
 //TODO improve the printing of variable declarations when array type is involved.
 
@@ -264,21 +267,25 @@ public class CommonASTFactory implements ASTFactory {
 			FieldDeclarationNode field) {
 		String type;
 		StringBuffer result = new StringBuffer();
+		String fieldName = field.getName();
 
 		type = pPrintType(prefix, field.getTypeNode(), true).toString();
 		if (type.endsWith("]")) {
-			int start = type.indexOf("[");
-			String suffix = type.substring(start);
+			Pair<String, String> typeResult = processArrayType(type);
 
-			type = type.substring(0, start);
-			result.append(type);
+			result.append(typeResult.left);
 			result.append(" ");
-			result.append(field.getName());
-			result.append(suffix);
+			if (fieldName != null) {
+				result.append(" ");
+				result.append(fieldName);
+			}
+			result.append(typeResult.right);
 		} else {
 			result.append(type);
-			result.append(" ");
-			result.append(field.getName());
+			if (fieldName != null) {
+				result.append(" ");
+				result.append(field.getName());
+			}
 		}
 		return result;
 	}
@@ -560,9 +567,21 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	private static void pPrintChooseStatement(PrintStream out, String prefix,
-			ChooseStatementNode statement) {
-		// TODO Auto-generated method stub
+			ChooseStatementNode choose) {
+		int numChildren = choose.numChildren();
+		String myIndent = prefix + indention;
 
+		out.print(prefix);
+		out.println("$choose{");
+
+		for (int i = 0; i < numChildren; i++) {
+			StatementNode statement = choose.getSequenceChild(i);
+
+			pPrintStatement(out, myIndent, statement, false, true);
+			out.print("\n");
+		}
+		out.print(prefix);
+		out.print("}");
 	}
 
 	static void pPrintAssert(PrintStream out, String prefix,
@@ -938,7 +957,7 @@ public class CommonASTFactory implements ASTFactory {
 		out.print(prefix);
 		out.print(pPrintLabelNode(label));
 		out.print("\n");
-		pPrintStatement(out, myIndent, statement, false, false);
+		pPrintStatement(out, myIndent, statement, true, false);
 	}
 
 	private static StringBuffer pPrintLabelNode(LabelNode label) {
@@ -1102,7 +1121,7 @@ public class CommonASTFactory implements ASTFactory {
 		InitializerNode init = variable.getInitializer();
 		TypeNode typeNode = variable.getTypeNode();
 		String type;
-		IdentifierNode varName = variable.getIdentifier();
+		String varName = variable.getName();
 
 		result.append(prefix);
 		if (typeNode.isInputQualified())
@@ -1111,22 +1130,20 @@ public class CommonASTFactory implements ASTFactory {
 			result.append("$output ");
 		type = pPrintType(prefix, typeNode, false).toString();
 		if (type.endsWith("]")) {
-			int start = type.indexOf('[');
-			String suffix = type.substring(start);
+			Pair<String, String> typeResult = processArrayType(type);
 
-			type = type.substring(0, start);
-			result.append(type);
+			result.append(typeResult.left);
 			result.append(" ");
 			if (varName != null) {
 				result.append(" ");
-				result.append(variable.getName());
+				result.append(varName);
 			}
-			result.append(suffix);
+			result.append(typeResult.right);
 		} else {
 			result.append(type);
 			if (varName != null) {
 				result.append(" ");
-				result.append(variable.getName());
+				result.append(varName);
 			}
 		}
 		if (init != null) {
@@ -1134,6 +1151,27 @@ public class CommonASTFactory implements ASTFactory {
 			result.append(pPrintInitializer(init));
 		}
 		return result;
+	}
+
+	//TODO need to be improved for more complicated types
+	//currently works for multiple dimension arrays
+	// e.g. int a[4][5] 
+	private static Pair<String, String> processArrayType(String type) {
+		int start = type.indexOf('[');
+		String typeSuffix = type.substring(start);
+		int length = typeSuffix.length();
+		String newSuffix = "";
+
+		for (int i = length - 1; i >= 0; i--) {
+			char current = typeSuffix.charAt(i);
+
+			if (current == '[')
+				current = ']';
+			else if (current == ']')
+				current = '[';
+			newSuffix += current;
+		}
+		return new Pair<>(type.substring(0, start), newSuffix);
 	}
 
 	private static StringBuffer pPrintInitializer(InitializerNode init) {
@@ -1310,12 +1348,26 @@ public class CommonASTFactory implements ASTFactory {
 	private static StringBuffer pPrintCompoundLiteral(
 			CompoundLiteralNode compound) {
 		StringBuffer result = new StringBuffer();
-		@SuppressWarnings("unused")
 		CompoundInitializerNode list = compound.getInitializerList();
+		int numPairs = list.numChildren();
 
 		result.append("{");
+
+		for (int i = 0; i < numPairs; i++) {
+			PairNode<DesignationNode, InitializerNode> pair = list
+					.getSequenceChild(i);
+			DesignationNode left = pair.getLeft();
+			InitializerNode right = pair.getRight();
+
+			if (i != 0)
+				result.append(", ");
+			if (left != null) {
+				// TODO
+				result.append("=");
+			}
+			result.append(pPrintInitializer(right));
+		}
 		result.append("}");
-		// TODO
 		return result;
 	}
 

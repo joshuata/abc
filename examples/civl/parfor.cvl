@@ -1,4 +1,4 @@
-#include <civlc.h>
+#include <civlc.cvh>
 
 void main() {
   $domain(1) dom = ($domain){0 .. 5};
