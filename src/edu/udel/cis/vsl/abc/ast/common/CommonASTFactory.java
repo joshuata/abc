@@ -717,12 +717,13 @@ public class CommonASTFactory implements ASTFactory {
 			out.print("master ");
 			break;
 		case CRITICAL:
-			out.print("critical ");
+			out.print("critical");
 			if (ompSync.criticalName() != null) {
 				out.print("(");
 				out.print(ompSync.criticalName().name());
 				out.print(")");
 			}
+			out.print(" ");
 			break;
 		case BARRIER:
 			out.print("barrier ");
