@@ -691,10 +691,10 @@ public class CommonASTFactory implements ASTFactory {
 			if (collapse > 1) {
 				out.print("collapse(");
 				out.print(collapse);
-				out.print(")");
+				out.print(") ");
 			}
 			if (forNode.ordered())
-				out.print("ordered");
+				out.print("ordered ");
 			break;
 		}
 		case SECTIONS:
