@@ -39,7 +39,11 @@ public interface OmpForNode extends OmpWorksharingNode {
 	 * 
 	 */
 	public enum OmpScheduleKind {
-		AUTO, DYNAMIC, GUIDED, RUNTIME, STATIC
+		AUTO, DYNAMIC, GUIDED, RUNTIME, STATIC, 
+		/**
+		 * The schedule clause is absent
+		 */
+		NONE
 	};
 
 	/**

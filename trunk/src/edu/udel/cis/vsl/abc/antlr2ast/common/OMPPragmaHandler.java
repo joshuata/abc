@@ -296,11 +296,8 @@ public class OMPPragmaHandler implements PragmaHandler {
 			case GUIDED:
 				forNode.setSchedule(OmpScheduleKind.GUIDED);
 				break;
-			case RUNTIME:
+			default: // case RUNTIME:
 				forNode.setSchedule(OmpScheduleKind.RUNTIME);
-				break;
-			default:
-				throw new ABCRuntimeException("Unreachable");
 			}
 			if (forClause.getChildCount() > 1) {
 				CommonTree chunkSizeTree = (CommonTree) forClause.getChild(1);
