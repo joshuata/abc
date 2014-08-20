@@ -76,7 +76,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * The alignment specifiers fall into two categories: ALIGNAS ( type ) and
  * ALIGNAS ( expression ). There can be any number of both.
  * 
- * There are a lot of restrictions on the allowable combintations of specifiers.
+ * There are a lot of restrictions on the allowable combinations of specifiers.
  * See the C11 Standard for details.
  */
 public class SpecifierAnalysis {
@@ -136,7 +136,6 @@ public class SpecifierAnalysis {
 	boolean atomicQualifier = false; // _Atomic: has 0 children
 	boolean inputQualifier = false;
 	boolean outputQualifier = false;
-	boolean globalQualifier = false;
 	// storage class specifiers
 	int typedefCount = 0;
 	int externCount = 0;
@@ -148,6 +147,7 @@ public class SpecifierAnalysis {
 	boolean inlineSpecifier = false;
 	boolean noreturnSpecifier = false;
 	boolean abstractSpecifier = false;
+	boolean globalSpecifier = false;
 	// CIVL-C continuity for abstract functions: can occur only once
 	int continuity = 0;
 	// CIVL-C domain specifier: can occur only once
@@ -268,9 +268,6 @@ public class SpecifierAnalysis {
 			case OUTPUT:
 				outputQualifier = true;
 				break;
-			case GLOBAL:
-				globalQualifier = true;
-				break;
 			case TYPEDEF:
 				typedefCount++;
 				break;
@@ -294,6 +291,9 @@ public class SpecifierAnalysis {
 				break;
 			case NORETURN:
 				noreturnSpecifier = true;
+				break;
+			case GLOBAL:
+				globalSpecifier = true;
 				break;
 			case ALIGNAS: {
 				int alignKind = ((CommonTree) node.getChild(0)).getType();
