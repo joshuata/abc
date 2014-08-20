@@ -63,6 +63,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode.OmpScheduleKind;
@@ -296,11 +297,8 @@ public class OMPPragmaHandler implements PragmaHandler {
 			case GUIDED:
 				forNode.setSchedule(OmpScheduleKind.GUIDED);
 				break;
-			case RUNTIME:
+			default: // case RUNTIME:
 				forNode.setSchedule(OmpScheduleKind.RUNTIME);
-				break;
-			default:
-				throw new ABCRuntimeException("Unreachable");
 			}
 			if (forClause.getChildCount() > 1) {
 				CommonTree chunkSizeTree = (CommonTree) forClause.getChild(1);
@@ -314,8 +312,15 @@ public class OMPPragmaHandler implements PragmaHandler {
 			}
 
 			break;
-		case COLLAPSE:
+		case COLLAPSE: {
+			CommonTree constant = (CommonTree) forClause.getChild(0);
+			IntegerConstantNode constantNode = nodeFactory
+					.newIntegerConstantNode(null, constant.getText());
+
+			forNode.setCollapse(constantNode.getConstantValue()
+					.getIntegerValue().intValue());
 			break;
+		}
 		default:
 			throw new ABCRuntimeException("Unreachable");
 		}

@@ -33,6 +33,8 @@ import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
  */
 public class Transform {
 
+	private static CompareCombiner compareCombiner = new CompareCombiner();
+
 	/**
 	 * A list of the transformers available to the command line interface. Add
 	 * one entry here when you create a new transformer, following the same
@@ -82,7 +84,7 @@ public class Transform {
 	 * Adds a new transform to the collection of known ones. Use this method if
 	 * you don't want to hardwire your transform in to the ABC code base. You
 	 * will need to create an instance of TransformRecord, for example, in the
-	 * anonymous way done above with the build-in transforms. It can be added at
+	 * anonymous way done above with the built-in transforms. It can be added at
 	 * any time but usually it is done in some initialization phase.
 	 * 
 	 * @param record
@@ -171,12 +173,12 @@ public class Transform {
 	}
 
 	/**
-	 * Constructs a new compare combiner for combining two CIVL programs into
-	 * one which compares the two for functional equivalence.
+	 * Gets the compare combiner for combining two CIVL programs into one which
+	 * compares the two for functional equivalence.
 	 * 
 	 * @return the new compare combiner
 	 */
-	public static Combiner newCompareCombiner() {
-		return new CompareCombiner();
+	public static Combiner compareCombiner() {
+		return Transform.compareCombiner;
 	}
 }
