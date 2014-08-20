@@ -1544,7 +1544,7 @@ public class ASTPrettyPrinter {
 			break;
 		case MINUS:
 			result.append(argWtP0);
-			result.append(" － ");
+			result.append(" - ");
 			result.append(argWtP1);
 			break;
 		case MOD:
