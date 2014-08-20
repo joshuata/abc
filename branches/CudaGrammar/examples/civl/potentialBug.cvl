@@ -1,6 +1,6 @@
 //command: civl parse potentialBug.cvl
 
-#include<civlc.h>
+#include<civlc.cvh>
 //$input int L;
 //$assume 0<L && L<=3;
 int L =3;

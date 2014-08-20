@@ -15,7 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * 
  */
 public interface DesignatorNode extends ASTNode {
-
+	
 	@Override
 	DesignatorNode copy();
 }

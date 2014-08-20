@@ -1,4 +1,4 @@
-#include <civlc.h>
+#include <civlc.cvh>
 
 // void* $malloc($heap *h, int size);
 $scope r = $root;
@@ -8,8 +8,8 @@ void main() {
   double *p = (double *) $malloc(s, 5*sizeof(double));
   double *z = (double *) $malloc($scopeof(p),  5*sizeof(double));
   
-  $assert(r > s);
-  $assert(r == (r + s));
+  $assert r > s;
+  $assert r == (r + s);
   $free(p);
   $free(z);
 }   
