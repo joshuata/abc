@@ -20,6 +20,8 @@ public class CommonFunctionDeclarationNode extends
 
 	private boolean noreturnFunctionSpecifier = false;
 
+	private boolean globalFunctionSpecifier = false;
+
 	public CommonFunctionDeclarationNode(Source source,
 			IdentifierNode identifier, FunctionTypeNode type,
 			SequenceNode<ContractNode> contract) {
@@ -50,6 +52,16 @@ public class CommonFunctionDeclarationNode extends
 	@Override
 	public void setNoreturnFunctionSpecifier(boolean value) {
 		this.noreturnFunctionSpecifier = value;
+	}
+
+	@Override
+	public boolean hasGlobalFunctionSpecifier() {
+		return this.globalFunctionSpecifier ;
+	}
+
+	@Override
+	public void setGlobalFunctionSpecifier(boolean value) {
+		this.globalFunctionSpecifier = value;
 	}
 
 	protected void printKind(PrintStream out) {

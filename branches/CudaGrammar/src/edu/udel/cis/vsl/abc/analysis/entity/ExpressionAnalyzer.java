@@ -561,6 +561,14 @@ public class ExpressionAnalyzer {
 								+ "type or pointer to function type",
 						functionNode);
 		}
+		
+		// TODO: Sanity checks on kernel functions
+		// Check that context arg 0 is an int or dim3
+		// Check that context arg 1 is an int or dim3
+		// Check that context arg 2, if present, is a pointer to a stream
+		// It might be appropriate to factor out these Cuda-specific checks into
+		// a separate function
+		
 		expectedNumArgs = functionType.getNumParameters();
 		hasVariableNumArgs = functionType.hasVariableArgs();
 		if (hasVariableNumArgs) {
