@@ -34,7 +34,11 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
  * the dimension of the domain. For a Cartesian domain, n is the number of
  * ranges used to form the domain. The order on the domain is the dictionary
  * order. In a Caretesian domain literal, all the designation nodes are null,
- * each initializer node is an expression of range type.
+ * and each initializer node is an expression of range type. Moreover, the
+ * method {@link #getLiteralObject()} will return <code>null</code>, as there is
+ * not object associated to a Caretesian domain literal, only a type. The method
+ * {@link #getType()} returns (after analysis) all the information you need
+ * about the domain.
  * </p>
  * 
  * @see CompoundLiteralNode
@@ -59,7 +63,8 @@ public interface CompoundInitializerNode extends InitializerNode,
 	ObjectType getType();
 
 	/**
-	 * Sets the type of this initializer
+	 * Sets the type of this initializer. This method should only be called by
+	 * an Analyzer.
 	 * 
 	 * @param type
 	 *            the type of the thing being initialized
@@ -68,12 +73,20 @@ public interface CompoundInitializerNode extends InitializerNode,
 	void setType(ObjectType type);
 
 	/**
+	 * <p>
 	 * Returns the compound literal object obtained by analyzing the tree rooted
 	 * at this compound initializer node. The compound literal object provides
 	 * an abstract view of the literal which is very simple and easy to use.
 	 * This method will return <code>null</code> before the analysis has been
 	 * carried out. The analyzer will set the literal object value using method
 	 * {@link #setLiteralObject(CompoundLiteralObject)}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Note that for a CIVL-C Cartestian domain literal, this will always return
+	 * <code>null</code>, as there is no compound object associated to the
+	 * construct, only a type.
+	 * </p>
 	 * 
 	 * @return the compound literal object or null
 	 */
