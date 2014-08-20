@@ -155,7 +155,7 @@ civl_keyword	:	ASSERT | ASSUME | CHOOSE | COLLECTIVE
 		| 	WAIT | WHEN
 		;
 		
-cuda_keyword	:	GLOBAL
+cuda_keyword	:	GLOBAL | SHARED
 		;
 
 

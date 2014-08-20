@@ -798,7 +798,7 @@ initDeclarator
 /* 6.7.1 */
 storageClassSpecifier
 	: TYPEDEF {$DeclarationScope::isTypedef = true;}
-	| (EXTERN | STATIC | THREADLOCAL | AUTO | REGISTER)
+	| (EXTERN | STATIC | THREADLOCAL | AUTO | REGISTER | SHARED)
 	;
 
 /* 6.7.2 */
