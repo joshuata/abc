@@ -197,6 +197,7 @@ public interface CParser {
 	public static final int SChar = CivlCParser.SChar;
 	public static final int SELF = CivlCParser.SELF;
 	public static final int SEMI = CivlCParser.SEMI;
+	public static final int SHARED = CivlCParser.SHARED;
 	public static final int SHIFTLEFT = CivlCParser.SHIFTLEFT;
 	public static final int SHIFTLEFTEQ = CivlCParser.SHIFTLEFTEQ;
 	public static final int SHIFTRIGHT = CivlCParser.SHIFTRIGHT;

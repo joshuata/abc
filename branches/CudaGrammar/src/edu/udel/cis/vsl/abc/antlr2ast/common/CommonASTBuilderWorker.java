@@ -1417,6 +1417,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			declaration.setAutoStorage(true);
 		if (analysis.registerCount > 0)
 			declaration.setRegisterStorage(true);
+		if (analysis.sharedCount > 0)
+			declaration.setSharedStorage(true);
 	}
 
 	private void setStorageSpecifiers(FunctionDeclarationNode declaration,
@@ -1437,6 +1439,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		if (analysis.registerCount > 0)
 			throw new SyntaxException(
 					"Use of register in function declaration",
+					declaration.getSource());
+		if (analysis.sharedCount > 0)
+			throw new SyntaxException(
+					"Use of __shared__ in function declaration",
 					declaration.getSource());
 	}
 

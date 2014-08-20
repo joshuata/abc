@@ -24,6 +24,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.RANGE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.REAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.REGISTER;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESTRICT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHARED;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHORT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.SIGNED;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATIC;
@@ -143,6 +144,7 @@ public class SpecifierAnalysis {
 	int threadLocalCount = 0;
 	int autoCount = 0;
 	int registerCount = 0;
+	int sharedCount = 0;
 	// function specifiers: may appear multiple times
 	boolean inlineSpecifier = false;
 	boolean noreturnSpecifier = false;
@@ -285,6 +287,9 @@ public class SpecifierAnalysis {
 				break;
 			case REGISTER:
 				registerCount++;
+				break;
+			case SHARED:
+				sharedCount++;
 				break;
 			case INLINE:
 				inlineSpecifier = true;

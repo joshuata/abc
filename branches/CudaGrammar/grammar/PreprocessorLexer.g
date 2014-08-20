@@ -171,6 +171,7 @@ WHEN		:	'$when';
 /* Cuda-C keywords */
 
 GLOBAL	:	'__global__';
+SHARED	:	'__shared__';
 
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/
