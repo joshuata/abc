@@ -462,6 +462,8 @@ public class ASTPrettyPrinter {
 
 		if (function instanceof AbstractFunctionDefinitionNode)
 			out.print("$abstract ");
+		if (function.hasGlobalFunctionSpecifier())
+			out.print("__global__ ");
 		out.print(prefix);
 		out.print(type2Pretty(prefix, returnType, false));
 		out.print(" ");
