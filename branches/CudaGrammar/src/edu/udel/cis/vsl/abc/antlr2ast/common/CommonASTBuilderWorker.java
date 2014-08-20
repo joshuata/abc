@@ -34,6 +34,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
@@ -1344,6 +1345,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			declaration.setInlineFunctionSpecifier(true);
 		if (analysis.noreturnSpecifier)
 			declaration.setNoreturnFunctionSpecifier(true);
+		if (analysis.globalSpecifier)
+			declaration.setGlobalFunctionSpecifier(true);
 	}
 
 	private void checkFunctionSpecifiers(VariableDeclarationNode declaration,
@@ -2511,6 +2514,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				newSource(functionDefinitionTree), data.identifier,
 				(FunctionTypeNode) data.type,
 				getContract(contractTree, newScope), body);
+		// TODO: Should function specifiers actually be set here? I added this
+		// call because otherwise specifiers are not added to function
+		// definitions, only declarations
+		setFunctionSpecifiers((FunctionDefinitionNode) result, analysis);
 		if (scopeListNode != null)
 			result = nodeFactory.newScopeParameterizedDeclarationNode(
 					tokenFactory.join(scopeListNode.getSource(),
