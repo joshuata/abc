@@ -95,6 +95,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonKernelFunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
@@ -1423,6 +1424,16 @@ public class ASTPrettyPrinter {
 		StringBuffer result = new StringBuffer();
 
 		result.append(expression2Pretty(call.getFunction()));
+		if (call instanceof CommonKernelFunctionCallNode) {
+			CommonKernelFunctionCallNode kernelCall = (CommonKernelFunctionCallNode) call;
+			result.append("<<<");
+			for (int i = 0; i < kernelCall.getNumberOfContextArguments(); i++) {
+				if (i > 0)
+					result.append(", ");
+				result.append(expression2Pretty(kernelCall.getContextArgument(i)));
+			}
+			result.append(">>>");
+		}
 		result.append("(");
 		for (int i = 0; i < argNum; i++) {
 			if (i > 0)
