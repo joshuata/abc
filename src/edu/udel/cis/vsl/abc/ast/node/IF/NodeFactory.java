@@ -673,6 +673,36 @@ public interface NodeFactory {
 			SequenceNode<ExpressionNode> scopeList);
 
 	/**
+	 * Constructs a new kernel function call node. A kernel function call in
+	 * Cuda-C is an expression (with side effects) that has the form
+	 * <code>kernelF<<<cArg0, cArg1[, cArg2]>>>(arg0, arg1, ...)</code>. It
+	 * represents the enqueueing of a kernel to execute on the Cuda device.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire function
+	 *            call expression
+	 * @param function
+	 *            the expression of function type which evaluates to the
+	 *            function being called. Typically this is just an identifier
+	 *            expression (naming the function), but it can be a function
+	 *            pointer or any expression evaluating to a function type or
+	 *            pointer to function type
+	 * @param contextArguments
+	 *            the list of arguments passed as the execution context
+	 *            (appearing between <<< and >>>)
+	 * @param arguments
+	 *            the list of actual arguments to be evaluated and passed to the
+	 *            function in this function call
+	 * @param scopeList
+	 *            the optional scope list (to be deprecated)
+	 * @return the new function call node
+	 */
+	FunctionCallNode newFunctionCallNode(Source source,
+			ExpressionNode function, List<ExpressionNode> contextArguments,
+			List<ExpressionNode> arguments,
+			SequenceNode<ExpressionNode> scopeList);
+
+	/**
 	 * Constructs a new node for a "dot" expression, used in C for structure or
 	 * union field navigation, as in <code>myStruct.field</code>.
 	 * 

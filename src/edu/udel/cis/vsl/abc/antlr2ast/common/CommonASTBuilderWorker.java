@@ -570,6 +570,47 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	}
 
 	/**
+	 * Translates a function call expression.
+	 * 
+	 * @param callTree
+	 *            CommonTree node of type CALL, representing a function call
+	 * @return a FunctionCallNode corresponding to the ANTLR tree
+	 * @throws SyntaxException
+	 */
+	private FunctionCallNode translateKernelCall(Source source,
+			CommonTree callTree, SimpleScope scope) throws SyntaxException {
+		CommonTree functionTree = (CommonTree) callTree.getChild(1);
+		CommonTree contextArgumentListTree = (CommonTree) callTree.getChild(2);
+		CommonTree argumentListTree = (CommonTree) callTree.getChild(3);
+		ExpressionNode functionNode = translateExpression(functionTree, scope);
+		int numContextArgs = contextArgumentListTree.getChildCount();
+		int numArgs = argumentListTree.getChildCount();
+		List<ExpressionNode> contextArgumentList = new LinkedList<ExpressionNode>();
+		List<ExpressionNode> argumentList = new LinkedList<ExpressionNode>();
+		SequenceNode<ExpressionNode> scopeList = translateScopeListUse((CommonTree) callTree
+				.getChild(4));
+
+		for (int i = 0; i < numContextArgs; i++) {
+			CommonTree argumentTree = (CommonTree) contextArgumentListTree
+					.getChild(i);
+			ExpressionNode contextArgumentNode = translateExpression(
+					argumentTree, scope);
+
+			contextArgumentList.add(contextArgumentNode);
+		}
+
+		for (int i = 0; i < numArgs; i++) {
+			CommonTree argumentTree = (CommonTree) argumentListTree.getChild(i);
+			ExpressionNode argumentNode = translateExpression(argumentTree,
+					scope);
+
+			argumentList.add(argumentNode);
+		}
+		return nodeFactory.newFunctionCallNode(source, functionNode,
+				contextArgumentList, argumentList, scopeList);
+	}
+
+	/**
 	 * 
 	 * @param compoundLiteralTree
 	 * @return
@@ -818,6 +859,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					"Generic selections not yet implemented");
 		case CALL:
 			return translateCall(source, expressionTree, scope);
+		case KERNEL_CALL:
+			return translateKernelCall(source, expressionTree, scope);
 		case DOT:
 		case ARROW:
 			return translateDotOrArrow(source, expressionTree, scope);
@@ -1596,8 +1639,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	}
 
 	/**
-	 * Applies the qualifires in the given qualifier list to the given type.
-	 * Modifes the type accordingly.
+	 * Applies the qualifiers in the given qualifier list to the given type.
+	 * Modifies the type accordingly.
 	 * 
 	 * @param qualifierList
 	 *            CommonTree node which is root of list of qualifier nodes, or
@@ -1605,7 +1648,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 * @param type
 	 *            the type to modify by applying qualifiers
 	 * @throws SyntaxException
-	 *             if a childe of the qualifierList is not a type qualifier
+	 *             if a child of the qualifierList is not a type qualifier
 	 */
 	private void applyQualifiers(CommonTree qualifierList, TypeNode type)
 			throws SyntaxException {
@@ -2117,8 +2160,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
 		CommonTree newlineTree = (CommonTree) pragmaTree.getChild(2);
 		CToken newlineToken = (CToken) newlineTree.getToken();
-		CTokenSequence producer = parseTree
-				.getTokenSourceProducer(bodyTree);
+		CTokenSequence producer = parseTree.getTokenSourceProducer(bodyTree);
 		PragmaNode pragmaNode = nodeFactory.newPragmaNode(source, identifier,
 				producer, newlineToken);
 		PragmaHandler handler = getPragmaHandler(code);
@@ -2229,11 +2271,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				}
 			}
 		}
-		if(changed){
+		if (changed) {
 			List<BlockItemNode> newItems = new LinkedList<>();
-			for(int i = 0; i < numItems; i++){
+			for (int i = 0; i < numItems; i++) {
 				BlockItemNode item = items.get(i);
-				if(item != null)
+				if (item != null)
 					newItems.add(item);
 			}
 			items = newItems;

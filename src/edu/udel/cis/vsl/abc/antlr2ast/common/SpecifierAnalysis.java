@@ -13,6 +13,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOUBLE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENUM;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXTERN;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.FLOAT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.GLOBAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INLINE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INPUT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INT;
@@ -135,6 +136,7 @@ public class SpecifierAnalysis {
 	boolean atomicQualifier = false; // _Atomic: has 0 children
 	boolean inputQualifier = false;
 	boolean outputQualifier = false;
+	boolean globalQualifier = false;
 	// storage class specifiers
 	int typedefCount = 0;
 	int externCount = 0;
@@ -265,6 +267,9 @@ public class SpecifierAnalysis {
 				break;
 			case OUTPUT:
 				outputQualifier = true;
+				break;
+			case GLOBAL:
+				globalQualifier = true;
 				break;
 			case TYPEDEF:
 				typedefCount++;

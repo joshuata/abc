@@ -128,6 +128,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonFunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonHereOrRootNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonKernelFunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonQuantifiedExpressionNode;
@@ -404,6 +405,20 @@ public class CommonNodeFactory implements NodeFactory {
 
 		return new CommonFunctionCallNode(source, function,
 				argumentSequenceNode, scopeList);
+	}
+
+	@Override
+	public FunctionCallNode newFunctionCallNode(Source source,
+			ExpressionNode function, List<ExpressionNode> contextArguments,
+			List<ExpressionNode> arguments,
+			SequenceNode<ExpressionNode> scopeList) {
+		SequenceNode<ExpressionNode> contextArgumentSequenceNode = newSequenceNode(
+				source, "ActualContextParameterList", contextArguments);
+		SequenceNode<ExpressionNode> argumentSequenceNode = newSequenceNode(
+				source, "ActualParameterList", arguments);
+
+		return new CommonKernelFunctionCallNode(source, function,
+				contextArgumentSequenceNode, argumentSequenceNode, scopeList);
 	}
 
 	@Override

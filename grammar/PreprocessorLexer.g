@@ -170,7 +170,7 @@ WHEN		:	'$when';
 
 /* Cuda-C keywords */
 
-CUDA_GLOBAL	:	'__global__';
+GLOBAL	:	'__global__';
 
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/

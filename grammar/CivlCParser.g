@@ -759,7 +759,6 @@ declarationSpecifier
 	| typeSpecifierOrQualifier
 	| functionSpecifier
 	| alignmentSpecifier
-	| cudaTypeQualifier
 	;
 
 /* 
@@ -964,6 +963,7 @@ functionSpecifier
     | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
       -> ^(ABSTRACT INTEGER_CONSTANT)
     | ABSTRACT -> ^(ABSTRACT)
+    | GLOBAL
     ;
 
 /* 6.7.5
@@ -980,10 +980,6 @@ alignmentSpecifier
           -> ^(ALIGNAS EXPR constantExpression)
         )
     ;
-
-cudaTypeQualifier
-	: CUDA_GLOBAL
-	;
 	
 /* 6.7.6
  * Root: DECLARATOR
