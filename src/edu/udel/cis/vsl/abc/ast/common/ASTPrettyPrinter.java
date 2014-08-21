@@ -450,7 +450,7 @@ public class ASTPrettyPrinter {
 							.getSource().getLocation(false));
 		}
 		out.print("(");
-		out.print(sequenceExpression2Pretty(ompDeclarative.variables()));
+		out.print(pPrintSequenceExpression(ompDeclarative.variables()));
 		out.print(")");
 	}
 
@@ -691,36 +691,36 @@ public class ASTPrettyPrinter {
 			out.print("nowait");
 		if (privateList != null) {
 			out.print("private(");
-			out.print(sequenceExpression2Pretty(privateList));
+			out.print(pPrintSequenceExpression(privateList));
 			out.print(") ");
 		}
 		if (firstPrivateList != null) {
 			out.print("firstprivate(");
-			out.print(sequenceExpression2Pretty(firstPrivateList));
+			out.print(pPrintSequenceExpression(firstPrivateList));
 			out.print(") ");
 		}
 		if (sharedList != null) {
 			out.print("shared(");
-			out.print(sequenceExpression2Pretty(sharedList));
+			out.print(pPrintSequenceExpression(sharedList));
 			out.print(") ");
 		}
 		if (copyinList != null) {
 			out.print("copyin(");
-			out.print(sequenceExpression2Pretty(copyinList));
+			out.print(pPrintSequenceExpression(copyinList));
 			out.print(") ");
 		}
 		if (copyPrivateList != null) {
 			out.print("copyprivate(");
-			out.print(sequenceExpression2Pretty(copyPrivateList));
+			out.print(pPrintSequenceExpression(copyPrivateList));
 			out.print(") ");
 		}
 		if (lastPrivateList != null) {
 			out.print("lastprivate(");
-			out.print(sequenceExpression2Pretty(lastPrivateList));
+			out.print(pPrintSequenceExpression(lastPrivateList));
 			out.print(") ");
 		}
 		if (reductionList != null) {
-			out.print(sequenceReduction2Pretty(reductionList));
+			out.print(pPrintSequenceReduction(reductionList));
 		}
 
 		if (block != null) {
@@ -809,7 +809,7 @@ public class ASTPrettyPrinter {
 			out.print("flush ");
 			if (ompSync.flushedList() != null) {
 				out.print("(");
-				out.print(sequenceExpression2Pretty(ompSync.flushedList()));
+				out.print(pPrintSequenceExpression(ompSync.flushedList()));
 				out.print(")");
 			}
 			break;
@@ -841,7 +841,7 @@ public class ASTPrettyPrinter {
 			out.print("default(none) ");
 	}
 
-	private static StringBuffer sequenceReduction2Pretty(
+	private static StringBuffer pPrintSequenceReduction(
 			SequenceNode<OmpReductionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int num = sequence.numChildren();
@@ -905,12 +905,12 @@ public class ASTPrettyPrinter {
 		}
 		}
 		result.append(": ");
-		result.append(sequenceExpression2Pretty(reduction.variables()));
+		result.append(pPrintSequenceExpression(reduction.variables()));
 		result.append(")");
 		return result;
 	}
 
-	private static StringBuffer sequenceExpression2Pretty(
+	private static StringBuffer pPrintSequenceExpression(
 			SequenceNode<IdentifierExpressionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int numExpressions = sequence.numChildren();
@@ -1367,7 +1367,7 @@ public class ASTPrettyPrinter {
 					.getCall()));
 			break;
 		case REGULAR_RANGE:
-			result.append(regularRange2Pretty((RegularRangeNode) expression));
+			result.append(pPrintRegularRange((RegularRangeNode) expression));
 			break;
 		case SCOPEOF:
 			result.append("$scopeof(");
@@ -1399,7 +1399,7 @@ public class ASTPrettyPrinter {
 		return result;
 	}
 
-	private static StringBuffer regularRange2Pretty(RegularRangeNode range) {
+	private static StringBuffer pPrintRegularRange(RegularRangeNode range) {
 		StringBuffer result = new StringBuffer();
 		ExpressionNode step = range.getStep();
 
