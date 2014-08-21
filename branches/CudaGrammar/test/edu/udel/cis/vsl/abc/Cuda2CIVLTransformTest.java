@@ -17,7 +17,7 @@ public class Cuda2CIVLTransformTest {
 		FrontEnd frontEnd;
 		PrintStream err = System.err;
 
-		config = new TranslationTask(Language.CIVL_C, new File("../CIVL/examples/translation/cuda", "simple.cu"));
+		config = new TranslationTask(Language.CIVL_C, new File("../CIVL/examples/translation/cuda", "dot.cu"));
 		config.setPrettyPrint(true);
 		config.setVerbose(false);
 		frontEnd = new FrontEnd();
