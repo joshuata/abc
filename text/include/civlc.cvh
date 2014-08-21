@@ -5,9 +5,8 @@
 #ifdef __CIVLC__
 #else
 #define __CIVLC__
-#include <op.cvh>
+#include <op.h>
 /* *********************  Standard Constants and Types ********************* */
-
 #define $true 1
 
 #define $false 0
@@ -15,6 +14,8 @@
 #define NULL ((void*)0)
 
 typedef unsigned long int size_t;
+
+typedef enum Operation $operation;
 
 /* **************************  Basic CIVL-C Types ************************** */ 
 /* The CIVL-C process reference type */ 
