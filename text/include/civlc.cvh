@@ -5,7 +5,7 @@
 #ifdef __CIVLC__
 #else
 #define __CIVLC__
-
+#include <op.cvh>
 /* *********************  Standard Constants and Types ********************* */
 
 #define $true 1
@@ -16,28 +16,7 @@
 
 typedef unsigned long int size_t;
 
-/* **************************  Basic CIVL-C Types ************************** */
-
-// Operation for collective reductions or collective operations
-// Note: The order of following operations are consistent with CIVL implementations,
-// it's not recommended to change the order. 
-typedef enum {
-  CIVL_NO_OP,  // no operation
-  CIVL_MAX,    // maxinum
-  CIVL_MIN,    // minimun
-  CIVL_SUM,    // sum
-  CIVL_PROD,   // product
-  CIVL_LAND,   // logical and
-  CIVL_BAND,   // bit-wise and
-  CIVL_LOR,    // logical or
-  CIVL_BOR,    // bit-wise or
-  CIVL_LXOR,   // logical exclusive or
-  CIVL_BXOR,   // bit-wise exclusive or
-  CIVL_MINLOC, // min value and location
-  CIVL_MAXLOC, // max value and location
-  CIVL_REPLACE // replace ? TODO: Find definition for this operation
-}$operation;
- 
+/* **************************  Basic CIVL-C Types ************************** */ 
 /* The CIVL-C process reference type */ 
 typedef struct __proc__ $proc;
 
