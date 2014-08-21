@@ -7,6 +7,7 @@
 
 /* includes civlc.cvh because this library references $operation */
 #include<civlc.cvh>
+#include<op.cvh>
 
 /* *********************** Types *********************** */
 
