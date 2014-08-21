@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.antlr2ast.common;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -2516,6 +2517,39 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			}
 		}
 		body = translateCompoundStatement(compoundStatementTree, newScope);
+		if (analysis.globalSpecifier) {
+			Source source = newSource(compoundStatementTree);
+			// Add dummy declarations for implicit Cuda variables to prevent
+			// "Undeclared identifier" bugs
+			VariableDeclarationNode gridDimDecl = nodeFactory
+					.newVariableDeclarationNode(source, nodeFactory
+							.newIdentifierNode(source, "gridDim"), nodeFactory
+							.newTypedefNameNode(nodeFactory.newIdentifierNode(
+									source, "dim3"), null));
+			VariableDeclarationNode blockDimDecl = nodeFactory
+					.newVariableDeclarationNode(source, nodeFactory
+							.newIdentifierNode(source, "blockDim"), nodeFactory
+							.newTypedefNameNode(nodeFactory.newIdentifierNode(
+									source, "dim3"), null));
+			VariableDeclarationNode blockIdxDecl = nodeFactory
+					.newVariableDeclarationNode(source, nodeFactory
+							.newIdentifierNode(source, "blockIdx"), nodeFactory
+							.newTypedefNameNode(nodeFactory.newIdentifierNode(
+									source, "uint3"), null));
+			VariableDeclarationNode threadIdxDecl = nodeFactory
+					.newVariableDeclarationNode(source, nodeFactory
+							.newIdentifierNode(source, "threadIdx"),
+							nodeFactory.newTypedefNameNode(nodeFactory
+									.newIdentifierNode(source, "uint3"), null));
+			List<BlockItemNode> newItemsList = new ArrayList<BlockItemNode>(
+					Arrays.<BlockItemNode> asList(gridDimDecl, blockDimDecl,
+							blockIdxDecl, threadIdxDecl));
+			for (BlockItemNode item : body) {
+				item.parent().removeChild(item.childIndex());
+				newItemsList.add(item);
+			}
+			body = nodeFactory.newCompoundStatementNode(source, newItemsList);
+		}
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
 				(FunctionTypeNode) data.type,
@@ -2631,6 +2665,26 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				throw error("Unknown type of external definition",
 						definitionTree);
 		}
+
+		// TODO: maybe find a better way to handle this (e.g. only when Cuda
+		// flag specified so we don't have to rely on automatically detecting
+		// Cuda programs
+		for (ExternalDefinitionNode defNode : definitions) {
+			if (defNode instanceof FunctionDeclarationNode) {
+				if (((FunctionDeclarationNode) defNode)
+						.hasGlobalFunctionSpecifier()) {
+					// assume that the presence of __global__ means that
+					// this is a Cuda program -> act as if cuda.cvh header
+					// file has been included. other ways to check include
+					// cheacking for the presence of a __shared__ variable
+					// declaration, or a function call with an execution context
+					// <<<...>>>
+
+					break;
+				}
+			}
+		}
+
 		return nodeFactory.newTranslationUnitNode(newSource(translationUnit),
 				definitions);
 	}
