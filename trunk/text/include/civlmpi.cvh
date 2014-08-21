@@ -18,8 +18,12 @@ typedef enum __MPI_Sys_status__{
 /**************************** Redundent Definitions *******************************/
 /* The independence between civlmpi.cvh and mpi.h causes redundent definition */
 typedef struct MPI_Comm MPI_Comm;
+#ifdef __MPI__
+#else
 typedef struct MPI_Status MPI_Status;
-#ifdef __MPI_COMMON__
+#endif
+
+#ifdef __MPI_DATATYPE__
 #else
 #define __MPI_DATATYPE__
 typedef enum {
