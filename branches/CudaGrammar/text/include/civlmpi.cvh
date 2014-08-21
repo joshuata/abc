@@ -15,6 +15,45 @@ typedef enum __MPI_Sys_status__{
   __FINALIZED
 }__MPI_Sys_status__;
 
+/**************************** Redundent Definitions *******************************/
+/* The independence between civlmpi.cvh and mpi.h causes redundent definition */
+typedef struct MPI_Comm MPI_Comm;
+typedef struct MPI_Status MPI_Status;
+#ifdef __MPI_COMMON__
+#else
+#define __MPI_DATATYPE__
+typedef enum {
+    MPI_CHAR,           
+    MPI_SIGNED_CHAR,
+    MPI_UNSIGNED_CHAR,
+    MPI_BYTE,           
+    MPI_WCHAR,          
+    MPI_SHORT,          
+    MPI_UNSIGNED_SHORT,
+    MPI_INT,            
+    MPI_UNSIGNED,       
+    MPI_LONG,          
+    MPI_UNSIGNED_LONG, 
+    MPI_FLOAT,          
+    MPI_DOUBLE,         
+    MPI_LONG_DOUBLE,
+    MPI_LONG_LONG_INT,  
+    MPI_UNSIGNED_LONG_LONG,
+    MPI_LONG_LONG,
+    MPI_PACKED,
+    MPI_LB,
+    MPI_UB,
+    MPI_FLOAT_INT,        
+    MPI_DOUBLE_INT,       
+    MPI_LONG_INT,         
+    MPI_SHORT_INT,        
+    MPI_2INT,             
+    MPI_LONG_DOUBLE_INT,  
+    MPI_AINT,
+    MPI_OFFSET
+} MPI_Datatype;
+#endif
+
 /* Definition of CMPI_Gcomm and MPI_Comm */
 typedef struct __CMPI_Gcomm CMPI_Gcomm;
 

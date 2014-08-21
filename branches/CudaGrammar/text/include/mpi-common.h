@@ -13,6 +13,7 @@
 #define MPI_SIMILAR   2
 #define MPI_UNEQUAL   3
 
+#ifndef __MPI_DATATYPE__
 typedef enum {
     MPI_CHAR,           
     MPI_SIGNED_CHAR,
@@ -43,6 +44,7 @@ typedef enum {
     MPI_AINT,
     MPI_OFFSET
 } MPI_Datatype;
+#endif
 
 typedef long MPI_Aint;
 typedef int MPI_Fint;
