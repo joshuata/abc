@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.preproc.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.antlr.runtime.ANTLRFileStream;
+import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -19,6 +21,7 @@ import org.antlr.runtime.tree.Tree;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
@@ -286,6 +289,75 @@ public class CommonPreprocessor implements Preprocessor {
 		if (implicitMacros != null)
 			macroMap.putAll(implicitMacros);
 		return outputTokenSource(file, macroMap, tokenFactory);
+	}
+
+	/**
+	 * Find the file with the given name by looking through the directories in
+	 * the given list. Go through list from first to last. Returns first
+	 * instance found.
+	 * 
+	 * Note: the filename may itself containing directory structure, e.g.,
+	 * "sys/stdio.h".
+	 * 
+	 * @param paths
+	 *            list of directories to search
+	 * @param filename
+	 *            name of file
+	 * @return file named filename, or null if not found
+	 */
+	private File findFile(File[] paths, String filename) {
+		for (File path : paths) {
+			File result = new File(path, filename);
+
+			if (result.isFile())
+				return result;
+		}
+		return null;
+	}
+
+	@Override
+	public CTokenSource outputTokenSource(String filename)
+			throws PreprocessorException, IOException {
+		Map<String, Macro> macroMap = new HashMap<String, Macro>();
+
+		if (implicitMacros != null)
+			macroMap.putAll(implicitMacros);
+		
+		File file = null;
+		CharStream charStream;
+		PreprocessorParser parser;
+		PreprocessorLexer lexer;
+		int numErrors;
+
+		file = findFile(userIncludePaths, filename);
+		if (file == null)
+			file = findFile(systemIncludePaths, filename);
+		if (file == null) {
+			InputStream inputStream = this.getClass().getResourceAsStream(
+					"/" + filename);
+
+			if (inputStream == null)
+				return null;
+			charStream = new FilteredCharStream(new ANTLRInputStream(
+					inputStream));
+			file = new File(filename);
+		} else {
+			charStream = new FilteredCharStream(new ANTLRFileStream(
+					file.getAbsolutePath()));
+		}
+		lexer = new PreprocessorLexer(charStream);
+		parser = new PreprocessorParser(new CommonTokenStream(lexer));
+		numErrors = parser.getNumberOfSyntaxErrors();
+		if (numErrors != 0)
+			throw new PreprocessorException(numErrors
+					+ " syntax errors occurred while scanning included file "
+					+ file);
+
+		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
+				parser, systemIncludePaths, userIncludePaths, macroMap,
+				tokenFactory, this);
+
+		return tokenSource;
 	}
 
 	/**
