@@ -101,6 +101,14 @@ import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.util.IF.Pair;
 
+/**
+ * This class implements the pretty printing of AST nodes. The purpose is to
+ * print an AST in the original programming language and the output is expected
+ * to be compiled into an equivalent AST.
+ * 
+ * @author Manchun Zheng
+ * 
+ */
 public class ASTPrettyPrinter {
 
 	/* ************************ Private Static Fields ********************** */
@@ -260,7 +268,8 @@ public class ASTPrettyPrinter {
 			pPrintStaticAssertion(out, "", (StaticAssertionNode) extern);
 			out.print(";");
 		} else if (extern instanceof StructureOrUnionTypeNode) {
-			out.print(structOrUnion2Pretty("", (StructureOrUnionTypeNode) extern));
+			out.print(structOrUnion2Pretty("",
+					(StructureOrUnionTypeNode) extern));
 			out.print(";");
 		} else if (extern instanceof TypedefDeclarationNode) {
 			pPrintTypedefDeclaration(out, "", (TypedefDeclarationNode) extern);
@@ -556,7 +565,6 @@ public class ASTPrettyPrinter {
 
 		out.print(prefix);
 		out.print("typedef ");
-		out.print(" ");
 		out.print(type2Pretty(prefix, typedef.getTypeNode(), true));
 		out.print(" ");
 		out.print(typedef.getName());

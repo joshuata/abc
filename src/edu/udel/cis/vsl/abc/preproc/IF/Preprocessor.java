@@ -99,6 +99,21 @@ public interface Preprocessor {
 	CTokenSource outputTokenSource(File file) throws PreprocessorException;
 
 	/**
+	 * Given the name of a preprocessor source file, this returns a Token Source
+	 * that emits the tokens resulting from preprocessing the file.
+	 * 
+	 * @param filename
+	 *            The name of the file to be preprocessed.
+	 * @return a token source for the token resulting from preprocessing the
+	 *         file
+	 * @throws PreprocessorException
+	 *             if an I/O error occurs
+	 * @throws IOException 
+	 */
+	CTokenSource outputTokenSource(String filename)
+			throws PreprocessorException, IOException;
+
+	/**
 	 * Prints the list of tokens that result from preprocessing the file. One
 	 * token is printed per line, along with information on the origin of that
 	 * token. Useful mainly for debugging.
