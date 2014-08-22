@@ -43,6 +43,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -320,8 +321,9 @@ public class SideEffectRemover extends BaseTransformer {
 	 * @param type
 	 *            An AST type.
 	 * @return An AST type node corresponding to the type.
+	 * @throws SyntaxException
 	 */
-	private TypeNode typeNode(Source source, Type type) {
+	private TypeNode typeNode(Source source, Type type) throws SyntaxException {
 
 		switch (type.kind()) {
 		case ARRAY:
@@ -336,6 +338,17 @@ public class SideEffectRemover extends BaseTransformer {
 			StandardBasicType basicType = (StandardBasicType) type;
 			return nodeFactory.newBasicTypeNode(source,
 					basicType.getBasicTypeKind());
+		case DOMAIN: {
+			DomainType domainType = (DomainType) type;
+
+			if (domainType.hasDimension()) {
+				nodeFactory.newDomainTypeNode(
+						source,
+						nodeFactory.newIntegerConstantNode(source,
+								Integer.toString(domainType.getDimension())));
+			} else
+				return nodeFactory.newDomainTypeNode(source);
+		}
 		case POINTER: {
 			PointerType pointerType = (PointerType) type;
 
