@@ -101,4 +101,9 @@ public class CIVLTranslationTest {
 	public void parfor() throws ABCException, IOException {
 		check("parfor");
 	}
+
+	@Test
+	public void domainDecomp() throws ABCException, IOException {
+		check("domainDecomposition");
+	}
 }
