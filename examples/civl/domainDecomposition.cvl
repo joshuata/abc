@@ -1,0 +1,23 @@
+#include <civlc.cvh>
+#include <domain.cvh>
+#include <stdio.h>
+
+void decomp($domain domain, int n){
+  $domain_decomposition result;
+
+  result = $domain_partition(domain, ROUND_ROBIN, n);
+  for(int i = 0; i < n; i++){
+    printf("The %d'th sub-domain is: %s\n", i, result.subdomains[i]);
+  }
+}
+
+void main(){
+  $range r1 = 1 .. 5;
+  $range r2 = 0 .. 4#-2;
+  $range r3 = 3 .. 9#3;
+    $domain(3) dom = ($domain){r1, r2, r3};
+
+  decomp(dom, 5);
+}
+
+
