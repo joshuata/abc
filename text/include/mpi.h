@@ -591,7 +591,7 @@ extern int * const MPI_UNWEIGHTED;
 #define MPI_KEYVAL_INVALID 0
 
 /* MPI's error classes */
-#define MPI_SUCCESS          MPI_SUCCESS      /* Successful return code */
+#define MPI_SUCCESS          0      /* Successful return code */
 /* Communication argument parameters */
 #define MPI_ERR_BUFFER       1      /* Invalid buffer pointer */
 #define MPI_ERR_COUNT        2      /* Invalid count argument */
