@@ -105,4 +105,9 @@ public class MPITranslationTest {
 	public void ring1() throws ABCException, IOException {
 		check("ring1");
 	}
+	
+	@Test
+	public void diffusion1d() throws ABCException, IOException {
+		check("diffusion1d_spec_revision");
+	}
 }
