@@ -53,7 +53,8 @@ public class CIVLPragmaHandler implements PragmaHandler {
 		Source source = pragmaNode.getSource();
 
 		try {
-			ParseTree pragmaTree = parser.parse(RuleKind.BLOCK_ITEM, tokens);
+			ParseTree pragmaTree = parser.parse(RuleKind.BLOCK_ITEM, tokens,
+					scope.getScopeSymbolStack());
 			List<BlockItemNode> blockList = worker.translateBlockItem(
 					pragmaTree.getRoot(), scope);
 
