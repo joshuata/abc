@@ -1266,6 +1266,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 								newSource(enumeratorTree), enumeratorName,
 								constant);
 
+				scope.addEnumerationConstant(enumeratorName.name());
 				enumeratorList.add(decl);
 			}
 			enumerators = nodeFactory.newSequenceNode(
@@ -2117,8 +2118,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree bodyTree = (CommonTree) pragmaTree.getChild(1);
 		CommonTree newlineTree = (CommonTree) pragmaTree.getChild(2);
 		CToken newlineToken = (CToken) newlineTree.getToken();
-		CTokenSequence producer = parseTree
-				.getTokenSourceProducer(bodyTree);
+		CTokenSequence producer = parseTree.getTokenSourceProducer(bodyTree);
 		PragmaNode pragmaNode = nodeFactory.newPragmaNode(source, identifier,
 				producer, newlineToken);
 		PragmaHandler handler = getPragmaHandler(code);
@@ -2229,11 +2229,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				}
 			}
 		}
-		if(changed){
+		if (changed) {
 			List<BlockItemNode> newItems = new LinkedList<>();
-			for(int i = 0; i < numItems; i++){
+			for (int i = 0; i < numItems; i++) {
 				BlockItemNode item = items.get(i);
-				if(item != null)
+				if (item != null)
 					newItems.add(item);
 			}
 			items = newItems;

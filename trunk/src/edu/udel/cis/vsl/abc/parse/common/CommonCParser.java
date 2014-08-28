@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.parse.common;
 
+import java.util.Stack;
+
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -130,12 +132,13 @@ public class CommonCParser implements CParser {
 	 *             if something goes wrong parsing the input
 	 */
 	@Override
-	public ParseTree parse(RuleKind rule, CTokenSource tokenSource)
-			throws ParseException {
+	public ParseTree parse(RuleKind rule, CTokenSource tokenSource,
+			Stack<ScopeSymbols> symbols) throws ParseException {
 		TokenStream stream = new CommonTokenStream(tokenSource);
 		CivlCParser parser = new CivlCParser(stream);
 		CommonTree root;
-
+		
+		parser.setSymbols_stack(symbols);
 		try {
 			switch (rule) {
 			case TRANSLATION_UNIT:
@@ -161,7 +164,7 @@ public class CommonCParser implements CParser {
 
 	@Override
 	public ParseTree parse(CTokenSource tokenSource) throws ParseException {
-		return parse(RuleKind.TRANSLATION_UNIT, tokenSource);
+		return parse(RuleKind.TRANSLATION_UNIT, tokenSource, new Stack<ScopeSymbols>());
 	}
 
 }
