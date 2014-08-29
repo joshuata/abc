@@ -113,6 +113,19 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 }
 
 @members {
+    public void setSymbols_stack(Stack<ScopeSymbols> symbols){
+        this.Symbols_stack = new Stack();
+        while(!symbols.isEmpty()){
+            ScopeSymbols current = symbols.pop();
+            Symbols_scope mySymbols = new Symbols_scope();
+
+            mySymbols.types = current.types;
+            mySymbols.enumerationConstants = current.enumerationConstants;
+            mySymbols.scopeNames = new HashSet<>();
+            Symbols_stack.add(mySymbols);
+        }
+    }
+
 	@Override
 	public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
 		String hdr = getErrorHeader(e);
