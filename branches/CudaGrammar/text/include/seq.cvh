@@ -23,7 +23,7 @@ int $seq_length(void *array);
  */
 void $seq_init(void *array, int count, void *value);
 
-/* Given a pointer an object of type "incomplete-array-of-T",
+/* Given a pointer to an object of type "incomplete-array-of-T",
  * inserts count elements into the array starting at position
  * index.   The subsequence elements of the array are shifted up,
  * and the final length of the array will be its original length
@@ -55,7 +55,7 @@ void $seq_insert(void *array, int index, void *values, int count);
  */
 void $seq_remove(void *array, int index, void *values, int count);
 
-/* Given a pointer an object of type "incomplete-array-of-T",
+/* Given a pointer to an object of type "incomplete-array-of-T",
  * appends count elements at the end of the array.   
  * The final length of the array will be its original length
  * plus count.  The values to be inserted are taken from the

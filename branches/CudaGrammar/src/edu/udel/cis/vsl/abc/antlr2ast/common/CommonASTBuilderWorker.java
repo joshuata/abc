@@ -1311,6 +1311,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 								newSource(enumeratorTree), enumeratorName,
 								constant);
 
+				scope.addEnumerationConstant(enumeratorName.name());
 				enumeratorList.add(decl);
 			}
 			enumerators = nodeFactory.newSequenceNode(
