@@ -551,24 +551,12 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	private FunctionCallNode translateCall(Source source, CommonTree callTree,
 			SimpleScope scope) throws SyntaxException {
 		CommonTree functionTree = (CommonTree) callTree.getChild(1);
-		CommonTree contextArgumentListTree = (CommonTree) callTree.getChild(2);
-		CommonTree argumentListTree = (CommonTree) callTree.getChild(3);
+		CommonTree argumentListTree = (CommonTree) callTree.getChild(2);
 		ExpressionNode functionNode = translateExpression(functionTree, scope);
-		int numContextArgs = contextArgumentListTree.getChildCount();
 		int numArgs = argumentListTree.getChildCount();
-		List<ExpressionNode> contextArgumentList = new LinkedList<ExpressionNode>();
 		List<ExpressionNode> argumentList = new LinkedList<ExpressionNode>();
 		SequenceNode<ExpressionNode> scopeList = translateScopeListUse((CommonTree) callTree
 				.getChild(4));
-
-		for (int i = 0; i < numContextArgs; i++) {
-			CommonTree argumentTree = (CommonTree) contextArgumentListTree
-					.getChild(i);
-			ExpressionNode contextArgumentNode = translateExpression(
-					argumentTree, scope);
-
-			contextArgumentList.add(contextArgumentNode);
-		}
 
 		for (int i = 0; i < numArgs; i++) {
 			CommonTree argumentTree = (CommonTree) argumentListTree.getChild(i);
@@ -578,7 +566,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			argumentList.add(argumentNode);
 		}
 		return nodeFactory.newFunctionCallNode(source, functionNode,
-				contextArgumentList, argumentList, scopeList);
+				argumentList, scopeList);
 	}
 
 	/**

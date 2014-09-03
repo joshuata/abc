@@ -355,16 +355,12 @@ postfixExpression
 	  |	// function call with scope parameters:
 	    scopeListUse
 	    LPAREN argumentExpressionList RPAREN
-	    -> ^(CALL LPAREN $postfixExpression ABSENT argumentExpressionList
+	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
 	    	 RPAREN scopeListUse)
 	  |	// function call without scope modifier:
 	    LPAREN argumentExpressionList RPAREN
-	    -> ^(CALL LPAREN $postfixExpression ABSENT argumentExpressionList
+	    -> ^(CALL LPAREN $postfixExpression argumentExpressionList
 	    	 RPAREN ABSENT)
-	  |	// kernel function call:
-	    LEXCON args1=argumentExpressionList REXCON 
-	    LPAREN args2=argumentExpressionList RPAREN
-	    -> ^(CALL LPAREN $postfixExpression $args1 $args2 RPAREN ABSENT)
 	  | DOT IDENTIFIER
 	    -> ^(DOT $postfixExpression IDENTIFIER)
 	  | ARROW IDENTIFIER
@@ -810,7 +806,7 @@ initDeclarator
 /* 6.7.1 */
 storageClassSpecifier
 	: TYPEDEF {$DeclarationScope::isTypedef = true;}
-	| (EXTERN | STATIC | THREADLOCAL | AUTO | REGISTER | SHARED)
+	| (EXTERN | STATIC | THREADLOCAL | AUTO | REGISTER)
 	;
 
 /* 6.7.2 */
@@ -975,7 +971,6 @@ functionSpecifier
     | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
       -> ^(ABSTRACT INTEGER_CONSTANT)
     | ABSTRACT -> ^(ABSTRACT)
-    | GLOBAL
     ;
 
 /* 6.7.5
@@ -992,7 +987,7 @@ alignmentSpecifier
           -> ^(ALIGNAS EXPR constantExpression)
         )
     ;
-	
+
 /* 6.7.6
  * Root: DECLARATOR
  * Child 0: pointer or ABSENT
