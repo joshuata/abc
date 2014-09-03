@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 public class CIVLTranslationTest {
 
@@ -100,6 +101,16 @@ public class CIVLTranslationTest {
 	@Test
 	public void parfor() throws ABCException, IOException {
 		check("parfor");
+	}
+
+	@Test(expected = SyntaxException.class)
+	public void parfor_bad() throws ABCException, IOException {
+		check("parfor_bad");
+	}
+
+	@Test(expected = SyntaxException.class)
+	public void parfor_bad2() throws ABCException, IOException {
+		check("parfor_bad2");
 	}
 
 	@Test

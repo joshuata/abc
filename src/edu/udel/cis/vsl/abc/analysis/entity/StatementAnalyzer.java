@@ -287,6 +287,10 @@ public class StatementAnalyzer {
 
 	private void processCivlFor(CivlForNode node) throws SyntaxException {
 		ExpressionNode domainNode = node.getDomain();
+		int numVars = 0;
+		Type domainNodeType;
+		DomainType domainType;
+		int domainDimension;
 
 		for (VariableDeclarationNode child : node.getVariables()) {
 			Type type;
@@ -294,20 +298,30 @@ public class StatementAnalyzer {
 			entityAnalyzer.declarationAnalyzer
 					.processVariableDeclaration(child);
 			if (child.getInitializer() != null)
-				throw error(
-						"Loop variable in $for/$parfor statement has initializer",
-						child);
+				throw error("Loop variable " + numVars
+						+ " in $for/$parfor statement has initializer", child);
 			type = child.getTypeNode().getType();
 			if (!(type instanceof IntegerType))
-				throw error(
-						"Loop variable(s) in $for/$parfor have non-integer type: "
-								+ type, child.getTypeNode());
+				throw error("Loop variable " + numVars
+						+ " in $for/$parfor has non-integer type: " + type,
+						child.getTypeNode());
+			numVars++;
 		}
 		expressionAnalyzer.processExpression(domainNode);
-		if (!(domainNode.getConvertedType() instanceof DomainType))
+		domainNodeType = domainNode.getConvertedType();
+		if (!(domainNodeType instanceof DomainType))
 			throw error(
 					"Domain expression in $for/$parfor does not have $domain type",
 					domainNode);
+		domainType = (DomainType) domainNodeType;
+		if (!domainType.hasDimension())
+			throw error("Use of incomplete domain type in $for/$parfor",
+					domainNode);
+		domainDimension = domainType.getDimension();
+		if (domainDimension != numVars)
+			throw error("Dimension of domain (" + domainDimension + ") "
+					+ "does not equal number of loop variables (" + numVars
+					+ ")", domainNode);
 		processStatement(node.getBody());
 		processExpression(node.getInvariant());
 	}
@@ -361,9 +375,9 @@ public class StatementAnalyzer {
 			if (explanation != null) {
 				int numArgs = explanation.numChildren();
 
-				
-				for (int i = 0; i < numArgs; i++){
-					processExpression(explanation.getSequenceChild(i));}
+				for (int i = 0; i < numArgs; i++) {
+					processExpression(explanation.getSequenceChild(i));
+				}
 			}
 			break;
 		}
