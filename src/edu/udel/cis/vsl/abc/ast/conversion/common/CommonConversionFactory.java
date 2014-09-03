@@ -17,6 +17,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
@@ -205,6 +206,8 @@ public class CommonConversionFactory implements ConversionFactory {
 		Type oldType = rhs.getConvertedType();
 
 		if (newType.kind() == TypeKind.SCOPE || newType.equals(oldType))
+			return null;
+		if (oldType instanceof DomainType && newType instanceof DomainType)
 			return null;
 		if (oldType instanceof ArithmeticType
 				&& newType instanceof ArithmeticType) {

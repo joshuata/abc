@@ -7,6 +7,8 @@
 
 #define BCAST_TAG 999
 #define REDUCE_TAG 998
+#define GATHER_TAG 997
+#define SCATTER_TAG 996
 
 /* Definition of CIVL-MPI */
 typedef enum __MPI_Sys_status__{
@@ -27,14 +29,25 @@ typedef struct MPI_Status MPI_Status;
 #else
 #define __MPI_DATATYPE__
 typedef enum {
-    MPI_CHAR,           
-    MPI_SIGNED_CHAR,
+    MPI_CHAR,
+    MPI_CHARACTER,
+    MPI_SIGNED_CHAR,           
     MPI_UNSIGNED_CHAR,
     MPI_BYTE,           
     MPI_WCHAR,          
     MPI_SHORT,          
     MPI_UNSIGNED_SHORT,
     MPI_INT,            
+    MPI_INT16_T,
+    MPI_INT32_T,
+    MPI_INT64_T,
+    MPI_INT8_T,
+    MPI_INTEGER,
+    MPI_INTEGER1,
+    MPI_INTEGER16,
+    MPI_INTEGER2,
+    MPI_INTEGER4,
+    MPI_INTEGER8,
     MPI_UNSIGNED,       
     MPI_LONG,          
     MPI_UNSIGNED_LONG, 
@@ -47,6 +60,10 @@ typedef enum {
     MPI_PACKED,
     MPI_LB,
     MPI_UB,
+    MPI_UINT16_T,
+    MPI_UINT32_T,
+    MPI_UINT64_T,
+    MPI_UINT8_T,
     MPI_FLOAT_INT,        
     MPI_DOUBLE_INT,       
     MPI_LONG_INT,         
@@ -54,12 +71,30 @@ typedef enum {
     MPI_2INT,             
     MPI_LONG_DOUBLE_INT,  
     MPI_AINT,
-    MPI_OFFSET
+    MPI_OFFSET,
+    MPI_2DOUBLE_PRECISION,
+    MPI_2INTEGER,
+    MPI_2REAL,
+    MPI_C_BOOL,
+    MPI_C_COMPLEX,
+    MPI_C_DOUBLE_COMPLEX,
+    MPI_C_FLOAT_COMPLEX,
+    MPI_C_LONG_DOUBLE_COMPLEX,
+    MPI_COMPLEX,
+    MPI_COMPLEX16,
+    MPI_COMPLEX32,
+    MPI_COMPLEX4,
+    MPI_COMPLEX8,
+    MPI_REAL,
+    MPI_REAL16,
+    MPI_REAL2,
+    MPI_REAL4,
+    MPI_REAL8
 } MPI_Datatype;
 #endif
 
 /* Definition of CMPI_Gcomm and MPI_Comm */
-typedef struct __CMPI_Gcomm CMPI_Gcomm;
+typedef struct CMPI_Gcomm CMPI_Gcomm;
 
 /****************************** Helper Functions **********************************/
 int sizeofDatatype(MPI_Datatype);

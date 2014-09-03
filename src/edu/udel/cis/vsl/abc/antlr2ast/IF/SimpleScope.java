@@ -1,9 +1,13 @@
 package edu.udel.cis.vsl.abc.antlr2ast.IF;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
+import edu.udel.cis.vsl.abc.parse.common.ScopeSymbols;
 
 /**
  * A very simple notion of lexical scope used only in the process of translating
@@ -23,6 +27,8 @@ public class SimpleScope {
 	 * typedefs in this scope.
 	 */
 	private Map<String, TypeNode> typedefMap = new HashMap<String, TypeNode>();
+
+	private Set<String> enumerationConstants = new HashSet<>();
 
 	/**
 	 * Constructs new scope with specified parent scope.
@@ -49,14 +55,18 @@ public class SimpleScope {
 		this(parent, false);
 	}
 
+	public void addEnumerationConstant(String name) {
+		this.enumerationConstants.add(name);
+	}
+
 	/**
-	 * Declares that there is a typdef in this scope with given name and type
+	 * Declares that there is a typedef in this scope with given name and type
 	 * node.
 	 * 
 	 * @param name
 	 *            the typedef name
 	 * @param node
-	 *            the node representing the type in the typdef
+	 *            the node representing the type in the typedef
 	 */
 	public void putMapping(String name, TypeNode node) {
 		typedefMap.put(name, node);
@@ -72,6 +82,14 @@ public class SimpleScope {
 	 */
 	public TypeNode getReferencedType(String name) {
 		return typedefMap.get(name);
+	}
+
+	public Set<String> getTypes() {
+		return typedefMap.keySet();
+	}
+	
+	public Set<String> getEnumConstants() {
+		return this.enumerationConstants;
 	}
 
 	/**
@@ -92,5 +110,19 @@ public class SimpleScope {
 	 */
 	public boolean isFunctionScope() {
 		return isFunctionScope;
+	}
+	
+	public Stack<ScopeSymbols> getScopeSymbolStack() {
+		Stack<ScopeSymbols> stack = new Stack<>();
+		SimpleScope current = this;
+
+		while (current != null) {
+			Set<String> myTypes = current.getTypes();
+			Set<String> myEnumConsts = current.getEnumConstants();
+
+			stack.add(new ScopeSymbols(myTypes, myEnumConsts));
+			current = current.getParent();
+		}
+		return stack;
 	}
 }

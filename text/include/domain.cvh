@@ -1,0 +1,28 @@
+/* This header file contains the core definitions of the CIVL-C language,
+ * including standard types and function prototypes.
+ */
+
+#ifdef __DOMAIN__
+#else
+#define __DOMAIN__
+
+/* defines kinds of domain decomposition strategies. */
+typedef enum __decomposition_strategy__ {
+  ALL, // decomposition by round robin order
+  RANDOM, // random decomposition
+  ROUND_ROBIN // decomposition by round robin order
+} $DecompositionStrategy;
+
+/* the data structure for the decomposition result of a domain */
+typedef struct __domain_decomposition__{
+  int numSubdomains;
+  $domain subdomains[];
+} $domain_decomposition;
+
+/* takes a domain and some n>0 and returns some partition of the
+   domain into n sub-domains, according to the decomposition strategy
+   specified.
+*/
+$domain_decomposition $domain_partition($domain domain, $DecompositionStrategy strategy, int n);
+
+#endif
