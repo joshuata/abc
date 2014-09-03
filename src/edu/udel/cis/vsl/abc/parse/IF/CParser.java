@@ -134,7 +134,6 @@ public interface CParser {
 	public static final int INVARIANT = CivlCParser.INVARIANT;
 	public static final int IdentifierNonDigit = CivlCParser.IdentifierNonDigit;
 	public static final int IntegerSuffix = CivlCParser.IntegerSuffix;
-	public static final int KERNEL_CALL = CivlCParser.KERNEL_CALL;
 	public static final int LCURLY = CivlCParser.LCURLY;
 	public static final int LEXCON = CivlCParser.LEXCON;
 	public static final int LONG = CivlCParser.LONG;
