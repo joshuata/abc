@@ -20,7 +20,7 @@ public class CommonFunctionCallNode extends CommonExpressionNode
 			SequenceNode<ExpressionNode> contextArguments,
 			SequenceNode<ExpressionNode> arguments,
 			SequenceNode<ExpressionNode> scopeList) {
-		super(source, function, contextArguments, scopeList);
+		super(source, function, contextArguments, arguments, scopeList);
 	}
 
 	@Override
