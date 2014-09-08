@@ -553,35 +553,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	private FunctionCallNode translateCall(Source source, CommonTree callTree,
 			SimpleScope scope) throws SyntaxException {
 		CommonTree functionTree = (CommonTree) callTree.getChild(1);
-		CommonTree argumentListTree = (CommonTree) callTree.getChild(2);
-		ExpressionNode functionNode = translateExpression(functionTree, scope);
-		int numArgs = argumentListTree.getChildCount();
-		List<ExpressionNode> argumentList = new LinkedList<ExpressionNode>();
-		SequenceNode<ExpressionNode> scopeList = translateScopeListUse((CommonTree) callTree
-				.getChild(4));
-
-		for (int i = 0; i < numArgs; i++) {
-			CommonTree argumentTree = (CommonTree) argumentListTree.getChild(i);
-			ExpressionNode argumentNode = translateExpression(argumentTree,
-					scope);
-
-			argumentList.add(argumentNode);
-		}
-		return nodeFactory.newFunctionCallNode(source, functionNode,
-				argumentList, scopeList);
-	}
-
-	/**
-	 * Translates a function call expression.
-	 * 
-	 * @param callTree
-	 *            CommonTree node of type CALL, representing a function call
-	 * @return a FunctionCallNode corresponding to the ANTLR tree
-	 * @throws SyntaxException
-	 */
-	private FunctionCallNode translateKernelCall(Source source,
-			CommonTree callTree, SimpleScope scope) throws SyntaxException {
-		CommonTree functionTree = (CommonTree) callTree.getChild(1);
 		CommonTree contextArgumentListTree = (CommonTree) callTree.getChild(2);
 		CommonTree argumentListTree = (CommonTree) callTree.getChild(3);
 		ExpressionNode functionNode = translateExpression(functionTree, scope);
@@ -861,8 +832,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					"Generic selections not yet implemented");
 		case CALL:
 			return translateCall(source, expressionTree, scope);
-		case KERNEL_CALL:
-			return translateKernelCall(source, expressionTree, scope);
 		case DOT:
 		case ARROW:
 			return translateDotOrArrow(source, expressionTree, scope);

@@ -128,7 +128,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonFunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonHereOrRootNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonIntegerConstantNode;
-import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonKernelFunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonOperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonProcnullNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonQuantifiedExpressionNode;
@@ -403,7 +402,7 @@ public class CommonNodeFactory implements NodeFactory {
 		SequenceNode<ExpressionNode> argumentSequenceNode = newSequenceNode(
 				source, "ActualParameterList", arguments);
 
-		return new CommonFunctionCallNode(source, function,
+		return new CommonFunctionCallNode(source, function, null,
 				argumentSequenceNode, scopeList);
 	}
 
@@ -417,7 +416,7 @@ public class CommonNodeFactory implements NodeFactory {
 		SequenceNode<ExpressionNode> argumentSequenceNode = newSequenceNode(
 				source, "ActualParameterList", arguments);
 
-		return new CommonKernelFunctionCallNode(source, function,
+		return new CommonFunctionCallNode(source, function,
 				contextArgumentSequenceNode, argumentSequenceNode, scopeList);
 	}
 
