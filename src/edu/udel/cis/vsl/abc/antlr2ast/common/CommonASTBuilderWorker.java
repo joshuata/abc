@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.antlr2ast.common;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -35,7 +34,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
@@ -1304,8 +1302,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			declaration.setInlineFunctionSpecifier(true);
 		if (analysis.noreturnSpecifier)
 			declaration.setNoreturnFunctionSpecifier(true);
-		if (analysis.globalSpecifier)
-			declaration.setGlobalFunctionSpecifier(true);
 	}
 
 	private void checkFunctionSpecifiers(VariableDeclarationNode declaration,
@@ -1376,8 +1372,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			declaration.setAutoStorage(true);
 		if (analysis.registerCount > 0)
 			declaration.setRegisterStorage(true);
-		if (analysis.sharedCount > 0)
-			declaration.setSharedStorage(true);
 	}
 
 	private void setStorageSpecifiers(FunctionDeclarationNode declaration,
@@ -1398,10 +1392,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		if (analysis.registerCount > 0)
 			throw new SyntaxException(
 					"Use of register in function declaration",
-					declaration.getSource());
-		if (analysis.sharedCount > 0)
-			throw new SyntaxException(
-					"Use of __shared__ in function declaration",
 					declaration.getSource());
 	}
 
@@ -1607,8 +1597,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	}
 
 	/**
-	 * Applies the qualifiers in the given qualifier list to the given type.
-	 * Modifies the type accordingly.
+	 * Applies the qualifires in the given qualifier list to the given type.
+	 * Modifes the type accordingly.
 	 * 
 	 * @param qualifierList
 	 *            CommonTree node which is root of list of qualifier nodes, or
@@ -2475,47 +2465,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			}
 		}
 		body = translateCompoundStatement(compoundStatementTree, newScope);
-		if (analysis.globalSpecifier) {
-			Source source = newSource(compoundStatementTree);
-			// Add dummy declarations for implicit Cuda variables to prevent
-			// "Undeclared identifier" bugs
-			VariableDeclarationNode gridDimDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "gridDim"), nodeFactory
-							.newTypedefNameNode(nodeFactory.newIdentifierNode(
-									source, "dim3"), null));
-			VariableDeclarationNode blockDimDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "blockDim"), nodeFactory
-							.newTypedefNameNode(nodeFactory.newIdentifierNode(
-									source, "dim3"), null));
-			VariableDeclarationNode blockIdxDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "blockIdx"), nodeFactory
-							.newTypedefNameNode(nodeFactory.newIdentifierNode(
-									source, "uint3"), null));
-			VariableDeclarationNode threadIdxDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "threadIdx"),
-							nodeFactory.newTypedefNameNode(nodeFactory
-									.newIdentifierNode(source, "uint3"), null));
-			List<BlockItemNode> newItemsList = new ArrayList<BlockItemNode>(
-					Arrays.<BlockItemNode> asList(gridDimDecl, blockDimDecl,
-							blockIdxDecl, threadIdxDecl));
-			for (BlockItemNode item : body) {
-				item.parent().removeChild(item.childIndex());
-				newItemsList.add(item);
-			}
-			body = nodeFactory.newCompoundStatementNode(source, newItemsList);
-		}
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
 				(FunctionTypeNode) data.type,
 				getContract(contractTree, newScope), body);
-		// TODO: Should function specifiers actually be set here? I added this
-		// call because otherwise specifiers are not added to function
-		// definitions, only declarations
-		setFunctionSpecifiers((FunctionDefinitionNode) result, analysis);
 		if (scopeListNode != null)
 			result = nodeFactory.newScopeParameterizedDeclarationNode(
 					tokenFactory.join(scopeListNode.getSource(),
@@ -2623,26 +2576,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				throw error("Unknown type of external definition",
 						definitionTree);
 		}
-
-		// TODO: maybe find a better way to handle this (e.g. only when Cuda
-		// flag specified so we don't have to rely on automatically detecting
-		// Cuda programs
-		for (ExternalDefinitionNode defNode : definitions) {
-			if (defNode instanceof FunctionDeclarationNode) {
-				if (((FunctionDeclarationNode) defNode)
-						.hasGlobalFunctionSpecifier()) {
-					// assume that the presence of __global__ means that
-					// this is a Cuda program -> act as if cuda.cvh header
-					// file has been included. other ways to check include
-					// cheacking for the presence of a __shared__ variable
-					// declaration, or a function call with an execution context
-					// <<<...>>>
-
-					break;
-				}
-			}
-		}
-
 		return nodeFactory.newTranslationUnitNode(newSource(translationUnit),
 				definitions);
 	}
