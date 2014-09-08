@@ -1365,6 +1365,7 @@ public class ASTPrettyPrinter {
 			result.append("sizeof(");
 			result.append(sizeable2Pretty(((SizeofNode) expression)
 					.getArgument()));
+			result.append(")");
 			break;
 		case SPAWN:
 			result.append("$spawn ");
