@@ -402,22 +402,8 @@ public class CommonNodeFactory implements NodeFactory {
 		SequenceNode<ExpressionNode> argumentSequenceNode = newSequenceNode(
 				source, "ActualParameterList", arguments);
 
-		return new CommonFunctionCallNode(source, function, null,
-				argumentSequenceNode, scopeList);
-	}
-
-	@Override
-	public FunctionCallNode newFunctionCallNode(Source source,
-			ExpressionNode function, List<ExpressionNode> contextArguments,
-			List<ExpressionNode> arguments,
-			SequenceNode<ExpressionNode> scopeList) {
-		SequenceNode<ExpressionNode> contextArgumentSequenceNode = newSequenceNode(
-				source, "ActualContextParameterList", contextArguments);
-		SequenceNode<ExpressionNode> argumentSequenceNode = newSequenceNode(
-				source, "ActualParameterList", arguments);
-
 		return new CommonFunctionCallNode(source, function,
-				contextArgumentSequenceNode, argumentSequenceNode, scopeList);
+				argumentSequenceNode, scopeList);
 	}
 
 	@Override
