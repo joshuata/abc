@@ -9,6 +9,8 @@
 #define REDUCE_TAG 998
 #define GATHER_TAG 997
 #define SCATTER_TAG 996
+#define GATHERV_TAG 995
+#define SCATTERV_TAG 994
 
 /* Definition of CIVL-MPI */
 typedef enum __MPI_Sys_status__{
