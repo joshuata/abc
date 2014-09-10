@@ -1193,6 +1193,8 @@ public class ASTPrettyPrinter {
 			result.append("$input ");
 		if (typeNode.isOutputQualified())
 			result.append("$output ");
+		if (variable.hasSharedStorage())
+			result.append("__shared__ ");
 		type = type2Pretty(prefix, typeNode, false).toString();
 		if (type.endsWith("]")) {
 			Pair<String, String> typeResult = processArrayType(type);
