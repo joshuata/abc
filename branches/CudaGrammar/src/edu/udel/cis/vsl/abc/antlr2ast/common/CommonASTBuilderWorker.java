@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc.antlr2ast.common;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -2487,6 +2486,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			}
 		}
 		body = translateCompoundStatement(compoundStatementTree, newScope);
+		/*
 		if (analysis.globalSpecifier) {
 			Source source = newSource(compoundStatementTree);
 			// Add dummy declarations for implicit Cuda variables to prevent
@@ -2520,6 +2520,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			}
 			body = nodeFactory.newCompoundStatementNode(source, newItemsList);
 		}
+		*/
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
 				(FunctionTypeNode) data.type,
