@@ -49,7 +49,7 @@ public class NameTransformer extends BaseTransformer {
 		for (IdentifierNode identifierNode : identifierNameMap.keySet()) {
 			identifierNode.setName(identifierNameMap.get(identifierNode));
 		}
-		result = astFactory.newAST(rootNode);
+		result = astFactory.newAST(rootNode, unit.getSourceFiles());
 		return result;
 	}
 

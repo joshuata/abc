@@ -1,15 +1,14 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
-
 import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.ObjectMacro;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 public class CommonObjectMacro extends CommonMacro implements ObjectMacro {
 
-	public CommonObjectMacro(Tree definitionNode, File file, String shortFileName) {
-		super(definitionNode, file, shortFileName);
+	public CommonObjectMacro(Tree definitionNode, SourceFile file) {
+		super(definitionNode, file);
 	}
 
 	@Override

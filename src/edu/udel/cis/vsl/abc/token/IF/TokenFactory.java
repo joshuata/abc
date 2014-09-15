@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import java.io.File;
 import java.util.List;
 
 import org.antlr.runtime.Token;
@@ -37,13 +36,11 @@ public interface TokenFactory {
 	 * 
 	 * @param file
 	 *            the file which was included
-	 * @param shortName
-	 *            a short name for the file
 	 * @return a new inclusion record
 	 */
-	Inclusion newInclusion(File file, String shortName);
+	Inclusion newInclusion(SourceFile file);
 
-	Inclusion newInclusion(File file, Token includeToken, String shortName);
+	Inclusion newInclusion(SourceFile file, Token includeToken);
 
 	/**
 	 * Creates a new formation which represents some code added by the system
@@ -99,11 +96,9 @@ public interface TokenFactory {
 
 	// Macros...
 
-	ObjectMacro newObjectMacro(Tree definitionNode, File file,
-			String shortFileName);
+	ObjectMacro newObjectMacro(Tree definitionNode, SourceFile file);
 
-	FunctionMacro newFunctionMacro(Tree definitionNode, File file,
-			String shotFileName);
+	FunctionMacro newFunctionMacro(Tree definitionNode, SourceFile file);
 
 	// TokenSources...
 

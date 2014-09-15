@@ -1,12 +1,11 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
-
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Formation;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.TokenUtils;
 
 /**
@@ -169,7 +168,7 @@ public class CommonCToken extends CommonToken implements CToken {
 	}
 
 	@Override
-	public File getSourceFile() {
+	public SourceFile getSourceFile() {
 		return formation.getLastFile();
 	}
 
@@ -178,9 +177,9 @@ public class CommonCToken extends CommonToken implements CToken {
 		return formation;
 	}
 
-	@Override
-	public String getFileShortName() {
-		return formation.fileShortName();
-	}
+	// @Override
+	// public String getFileShortName() {
+	// return formation.fileShortName();
+	// }
 
 }

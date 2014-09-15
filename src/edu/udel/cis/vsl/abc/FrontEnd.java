@@ -466,5 +466,7 @@ public class FrontEnd {
 			}
 			frontEnd.printProgram(out, program, pretty, tables);
 		}
+		preprocessor.printSourceFiles(out);
+		out.flush();
 	}
 }

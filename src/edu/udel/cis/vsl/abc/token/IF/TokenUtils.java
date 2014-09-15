@@ -52,29 +52,30 @@ public class TokenUtils {
 	 * @return the short file name
 	 */
 	public static String getShortFilename(Token token, boolean abbreviated) {
-		String filename;
-		int separatorIndex;
-
 		if (token instanceof CToken) {
 			CToken ppToken = (CToken) token;
-			File file = ppToken.getSourceFile();
+			SourceFile file = ppToken.getSourceFile();
 
-			filename = file.getName();
-			if (abbreviated) {
-				return ppToken.getFileShortName();
-			}
+			if (abbreviated)
+				return file.getIndexName();
+			else
+				return file.getName();
 		} else {
 			CharStream stream = token.getInputStream();
 
 			if (stream == null)
-				filename = "<unknown file>";
-			else
-				filename = stream.getSourceName();
+				return "<unknown file>";
+			else {
+				String filename = stream.getSourceName();
+				int separatorIndex = filename
+						.lastIndexOf(File.pathSeparatorChar);
+
+				if (separatorIndex >= 0
+						&& separatorIndex < filename.length() - 1)
+					filename = filename.substring(separatorIndex + 1);
+				return filename;
+			}
 		}
-		separatorIndex = filename.lastIndexOf(File.pathSeparatorChar);
-		if (separatorIndex >= 0 && separatorIndex < filename.length() - 1)
-			filename = filename.substring(separatorIndex + 1);
-		return filename;
 	}
 
 	public static String summarizeRangeLocation(CToken first, CToken last,

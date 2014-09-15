@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Combiner;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
@@ -70,7 +72,11 @@ public class CompareCombiner implements Combiner {
 		Transformer nameTransformer;
 		TypedefDeclarationNode fileTypeDef = null;
 		FunctionDeclarationNode equalsFunc = null;
+		Collection<SourceFile> sourceFiles0 = unit0.getSourceFiles(), sourceFiles1 = unit1
+				.getSourceFiles(), allSourceFiles = new LinkedHashSet<>();
 
+		allSourceFiles.addAll(sourceFiles0);
+		allSourceFiles.addAll(sourceFiles1);
 		astFactory = unit0.getASTFactory();
 		unit0.release();
 		unit1.release();
@@ -83,8 +89,8 @@ public class CompareCombiner implements Combiner {
 			nodes.add(fileTypeDef);
 		equalsFunc = this.getAndRemoveEqualsFuncNode(specRoot);
 		nodes.add(equalsFunc);
-		unit0 = astFactory.newAST(specRoot);
-		unit1 = astFactory.newAST(implRoot);
+		unit0 = astFactory.newAST(specRoot, sourceFiles0);
+		unit1 = astFactory.newAST(implRoot, sourceFiles1);
 		specSource = this.getMainSource(specRoot);
 		implSource = this.getMainSource(implRoot);
 		factory = astFactory.getNodeFactory();
@@ -149,7 +155,7 @@ public class CompareCombiner implements Combiner {
 		newRoot = factory.newSequenceNode(
 				astFactory.getTokenFactory().join(specSource, implSource),
 				"Composite System", nodes);
-		return astFactory.newAST(newRoot);
+		return astFactory.newAST(newRoot, allSourceFiles);
 	}
 
 	private FunctionDeclarationNode equalsFunctionNode(Source specSource) {

@@ -4,11 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRInputStream;
@@ -23,6 +23,7 @@ import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
@@ -66,9 +67,9 @@ public class CommonPreprocessor implements Preprocessor {
 
 	private TokenFactory tokenFactory = Tokens.newTokenFactory();
 
-	private HashMap<String, Integer> fileNameMap = new LinkedHashMap<>();
+	private Map<File, SourceFile> sourceFileMap = new LinkedHashMap<>();
 
-	private Set<String> headers = new HashSet<>();
+	private ArrayList<SourceFile> sourceFiles = new ArrayList<>();
 
 	public CommonPreprocessor(File[] systemIncludePaths, File[] userIncludePaths) {
 		this.systemIncludePaths = systemIncludePaths;
@@ -78,6 +79,26 @@ public class CommonPreprocessor implements Preprocessor {
 	public CommonPreprocessor() {
 		this.systemIncludePaths = defaultSystemIncludes;
 		this.userIncludePaths = defaultUserIncludes;
+	}
+
+	/**
+	 * Looks to see if a {@link SourceFile} object has already been created for
+	 * the given {@link File}. If so, returns that one. Else creates a new one,
+	 * assigns it the next index, and stores it.
+	 * 
+	 * @param file
+	 *            a file that is being read to produce this token source
+	 * @return the {@link SourceFile} corresponding to the given file
+	 */
+	SourceFile getOrMakeSourceFile(File file) {
+		SourceFile result = sourceFileMap.get(file);
+
+		if (result == null) {
+			result = new SourceFile(file, sourceFiles.size());
+			sourceFiles.add(result);
+			sourceFileMap.put(file, result);
+		}
+		return result;
 	}
 
 	@Override
@@ -176,51 +197,52 @@ public class CommonPreprocessor implements Preprocessor {
 	public PreprocessorParser parser(File file) throws PreprocessorException {
 		PreprocessorLexer lexer = lexer(file);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-		String fileName = file.getName();
+		// String fileName = file.getName();
 
-		this.addHeaderFile(fileName);
-		this.addFileName(fileName);
+		// this.addHeaderFile(fileName);
+		// this.addFileName(fileName);
 		return new PreprocessorParser(tokenStream);
 	}
 
-	private void addFileName(String fileName) {
-		if (!fileNameMap.containsKey(fileName)) {
-			int index = fileNameMap.size();
+	// private void addFileName(String fileName) {
+	// if (!fileNameMap.containsKey(fileName)) {
+	// int index = fileNameMap.size();
+	//
+	// fileNameMap.put(fileName, index);
+	// }
+	// }
 
-			fileNameMap.put(fileName, index);
-		}
-	}
+	// @Override
+	// public String shortFileName(String fileName) {
+	// if (fileNameMap.containsKey(fileName)) {
+	// return SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName);
+	// } else {
+	// int index = fileNameMap.size();
+	//
+	// fileNameMap.put(fileName, index);
+	// return SHORT_FILE_NAME_PREFIX + index;
+	// }
+	// }
 
-	@Override
-	public String shortFileName(String fileName) {
-		if (fileNameMap.containsKey(fileName)) {
-			return SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName);
-		} else {
-			int index = fileNameMap.size();
-
-			fileNameMap.put(fileName, index);
-			return SHORT_FILE_NAME_PREFIX + index;
-		}
-	}
-
-	/**
-	 * Print the list of shorter file names and the corresponding original file
-	 * names
-	 * 
-	 * @param out
-	 *            The output stream to be used.
-	 */
-	@Override
-	public void printShorterFileNameMap(PrintStream out) {
-		if (fileNameMap.size() > 0) {
-			out.println();
-			out.println("File name list:");
-			for (String fileName : fileNameMap.keySet()) {
-				out.println(SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName)
-						+ "\t: " + fileName);
-			}
-		}
-	}
+	// /**
+	// * Print the list of shorter file names and the corresponding original
+	// file
+	// * names
+	// *
+	// * @param out
+	// * The output stream to be used.
+	// */
+	// @Override
+	// public void printShorterFileNameMap(PrintStream out) {
+	// if (fileNameMap.size() > 0) {
+	// out.println();
+	// out.println("File name list:");
+	// for (String fileName : fileNameMap.keySet()) {
+	// out.println(SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName)
+	// + "\t: " + fileName);
+	// }
+	// }
+	// }
 
 	/**
 	 * Scans and parses the given preprocessor source file, sending a textual
@@ -322,7 +344,7 @@ public class CommonPreprocessor implements Preprocessor {
 
 		if (implicitMacros != null)
 			macroMap.putAll(implicitMacros);
-		
+
 		File file = null;
 		CharStream charStream;
 		PreprocessorParser parser;
@@ -467,14 +489,34 @@ public class CommonPreprocessor implements Preprocessor {
 	}
 
 	@Override
-	public void addHeaderFile(String fileName) {
-		if (fileName.endsWith(".h") || fileName.endsWith(".cvh"))
-			this.headers.add(fileName);
+	public Collection<SourceFile> getSourceFiles() {
+		return sourceFiles;
 	}
 
 	@Override
-	public Set<String> headerFiles() {
-		return this.headers;
+	public SourceFile getSourceFile(File file) {
+		return sourceFileMap.get(file);
+	}
+
+	@Override
+	public int getNumSourceFiles() {
+		return sourceFiles.size();
+	}
+
+	@Override
+	public SourceFile getSourceFile(int index) {
+		return sourceFiles.get(index);
+	}
+
+	@Override
+	public void printSourceFiles(PrintStream out) {
+		out.println("Source files:");
+		for (SourceFile sourceFile : sourceFiles) {
+			out.println(sourceFile.getIndexName() + "\t: "
+					+ sourceFile.getPath());
+		}
+		out.println();
+		out.flush();
 	}
 
 }
