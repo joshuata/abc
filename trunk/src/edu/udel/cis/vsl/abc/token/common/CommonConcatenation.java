@@ -1,10 +1,10 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Concatenation;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 public class CommonConcatenation implements Concatenation {
 
@@ -27,7 +27,7 @@ public class CommonConcatenation implements Concatenation {
 	}
 
 	@Override
-	public File getLastFile() {
+	public SourceFile getLastFile() {
 		return constituents.get(0).getSourceFile();
 	}
 
@@ -41,9 +41,9 @@ public class CommonConcatenation implements Concatenation {
 		return constituents.get(index);
 	}
 
-	@Override
-	public String fileShortName() {
-		return constituents.get(0).getFileShortName();
-	}
+	// @Override
+	// public String fileShortName() {
+	// return constituents.get(0).getFileShortName();
+	// }
 
 }

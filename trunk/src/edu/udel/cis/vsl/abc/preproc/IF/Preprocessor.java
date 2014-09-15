@@ -3,12 +3,13 @@ package edu.udel.cis.vsl.abc.preproc.IF;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Set;
+import java.util.Collection;
 
 import org.antlr.runtime.Lexer;
 import org.antlr.runtime.Parser;
 
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 /**
@@ -108,7 +109,7 @@ public interface Preprocessor {
 	 *         file
 	 * @throws PreprocessorException
 	 *             if an I/O error occurs
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	CTokenSource outputTokenSource(String filename)
 			throws PreprocessorException, IOException;
@@ -174,35 +175,53 @@ public interface Preprocessor {
 	TokenFactory getTokenFactory();
 
 	/**
-	 * Gets the short name of a given file.
+	 * Returns the set of all source files processed by this preprocessor since
+	 * creation, including those that have been included through preprocessor
+	 * directives, recursively. Each file is assigned an index, numbered from 0,
+	 * and unique to this preprocessor instance.
 	 * 
-	 * @param fileName
-	 *            The original file name.
-	 * @return The short name of the given file.
+	 * @return the set of source files seen by this preprocessor
 	 */
-	String shortFileName(String fileName);
+	Collection<SourceFile> getSourceFiles();
 
 	/**
-	 * Shows the mapping of short names and original file names.
+	 * Returns the instance of {@link SourceFile} held by this preprocessor for
+	 * which the {@link File} field equals the given argument, or
+	 * <code>null</code> if no such file has been encountered by this
+	 * preprocessor.
+	 * 
+	 * @param file
+	 *            a file
+	 * @return the corresponding {@link SourceFile} or <code>null</code>
+	 */
+	SourceFile getSourceFile(File file);
+
+	/**
+	 * Returns the number of source files encountered by this preprocessor since
+	 * creation.
+	 * 
+	 * @return the number of source files encountered
+	 */
+	int getNumSourceFiles();
+
+	/**
+	 * Returns the index-th {@link SourceFile} object held by this preprocessor.
+	 * 
+	 * @param index
+	 *            an int in range [0, n-1], where n is the int returned by
+	 *            method {@link #getNumSourceFiles()}
+	 * @return the index-th {@link SourceFile}
+	 */
+	SourceFile getSourceFile(int index);
+
+	/**
+	 * Prints the source file objects for the files encountered by this
+	 * preprocessor since it was created. These are printed in a tabular form
+	 * showing the index and full path of each file.
 	 * 
 	 * @param out
-	 *            where to print the output
+	 *            stream to which to print
 	 */
-	void printShorterFileNameMap(PrintStream out);
-
-	/**
-	 * Adds a header file which is encountered during preprocessing.
-	 * 
-	 * @param fileName
-	 *            name of the header file to be added
-	 */
-	void addHeaderFile(String fileName);
-
-	/**
-	 * Returns all the names of header files encountered by this preprocessor.
-	 * 
-	 * @return all the names of header files encountered by this preprocessor.
-	 */
-	Set<String> headerFiles();
+	void printSourceFiles(PrintStream out);
 
 }

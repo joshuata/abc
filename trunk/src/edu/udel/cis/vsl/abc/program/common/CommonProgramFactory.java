@@ -2,7 +2,9 @@ package edu.udel.cis.vsl.abc.program.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,7 @@ import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
@@ -241,27 +244,30 @@ public class CommonProgramFactory implements ProgramFactory {
 		Source fakeSource = tokenFactory.newSource(fakeToken);
 		List<ExternalDefinitionNode> definitions = new LinkedList<>();
 		SequenceNode<ExternalDefinitionNode> newRoot;
-		// Collection<String> systemTypedefs = new HashSet<String>();
+		Collection<SourceFile> allSourceFiles = new LinkedHashSet<>();
 		AST result;
 
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < n; i++) {
 			roots.add(translationUnits[i].getRootNode());
+			allSourceFiles.addAll(translationUnits[i].getSourceFiles());
+		}
 		prepareASTs(translationUnits);
-
 		if (debug) {
 			out.println("Transformed translation units: ");
 			out.println();
 			for (int i = 0; i < n; i++) {
 				SequenceNode<ExternalDefinitionNode> root = roots.get(i);
 				SequenceNode<ExternalDefinitionNode> rootClone = root.copy();
-				AST ast = astFactory.newAST(rootClone);
+				Collection<SourceFile> sourceFiles = translationUnits[i]
+						.getSourceFiles();
+				AST ast = astFactory.newAST(rootClone, sourceFiles);
 
+				out.println(ast + ":");
 				ast.prettyPrint(out, false);
 				out.println();
 				out.flush();
 			}
 		}
-
 		for (SequenceNode<ExternalDefinitionNode> root : roots) {
 			int numChildren = root.numChildren();
 
@@ -269,25 +275,18 @@ public class CommonProgramFactory implements ProgramFactory {
 				ExternalDefinitionNode def = root.removeChild(i);
 
 				if (def != null) {
-					// if (def instanceof TypedefDeclarationNode) {
-					// Typedef typedef = ((TypedefDeclarationNode) def)
-					// .getEntity();
-					//
-					// if (typedef.isSystem()) {
-					// // only add these once...
-					// String name = typedef.getName();
-					//
-					// if (systemTypedefs.contains(name))
-					// continue;
-					// systemTypedefs.add(name);
-					// }
-					// }
 					definitions.add(def);
 				}
 			}
 		}
 		newRoot = nodeFactory.newProgramNode(fakeSource, definitions);
-		result = astFactory.newAST(newRoot);
+		result = astFactory.newAST(newRoot, allSourceFiles);
+		if (debug) {
+			out.println("Linked AST (raw):");
+			result.prettyPrint(out, false);
+			out.println();
+			out.flush();
+		}
 		return result;
 	}
 

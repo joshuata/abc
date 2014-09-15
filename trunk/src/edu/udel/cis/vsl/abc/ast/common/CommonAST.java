@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -39,11 +41,14 @@ public class CommonAST implements AST {
 
 	private ArrayList<OrdinaryEntity> externalEntities;
 
+	private Collection<SourceFile> sourceFiles;
+
 	public CommonAST(ASTFactory astFactory,
-			SequenceNode<ExternalDefinitionNode> root, boolean hasOmpPragma)
-			throws SyntaxException {
+			SequenceNode<ExternalDefinitionNode> root, boolean hasOmpPragma,
+			Collection<SourceFile> sourceFiles) throws SyntaxException {
 		this.root = root;
 		this.astFactory = astFactory;
+		this.sourceFiles = sourceFiles;
 		clearEntities();
 		initialize();
 	}
@@ -213,4 +218,24 @@ public class CommonAST implements AST {
 		return this.getRootNode().diff(that.getRootNode());
 	}
 
+	@Override
+	public Collection<SourceFile> getSourceFiles() {
+		return sourceFiles;
+	}
+
+	@Override
+	public String toString() {
+		String result = "AST[";
+		boolean first = true;
+
+		for (SourceFile sourceFile : sourceFiles) {
+			if (first)
+				first = false;
+			else
+				result += ",";
+			result += sourceFile.getName();
+		}
+		result += "]";
+		return result;
+	}
 }

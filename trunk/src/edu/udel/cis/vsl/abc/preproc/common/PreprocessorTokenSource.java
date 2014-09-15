@@ -3,12 +3,16 @@ package edu.udel.cis.vsl.abc.preproc.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import org.antlr.runtime.ANTLRFileStream;
@@ -22,7 +26,6 @@ import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.preproc.IF.IllegalMacroArgumentException;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
@@ -32,6 +35,7 @@ import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.FunctionMacro;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.ObjectMacro;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
@@ -66,7 +70,15 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	// Fields...
 
-	private File originalSourceFile;
+	private SourceFile originalSourceFile;
+
+	/**
+	 * The source files used to build this token stream only. These do not
+	 * necessarily include all of the source files seen by the preprocessor
+	 * creating this token source, because the preprocessor can be re-used
+	 * multiple times to create many token sources.
+	 */
+	private Set<SourceFile> sourceFiles = new LinkedHashSet<>();
 
 	private TokenFactory tokenFactory;
 
@@ -156,7 +168,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 */
 	private int outputTokenCount = 0;
 
-	private Preprocessor preprocessor;
+	private CommonPreprocessor preprocessor;
 
 	// Constructors...
 
@@ -180,22 +192,20 @@ public class PreprocessorTokenSource implements CTokenSource {
 	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macroMap, TokenFactory tokenFactory,
-			Preprocessor preprocessor) throws PreprocessorException {
+			CommonPreprocessor preprocessor) throws PreprocessorException {
 		assert systemIncludePaths != null;
 		assert userIncludePaths != null;
-		this.originalSourceFile = source;
 		this.tokenFactory = tokenFactory;
 		this.preprocessor = preprocessor;
+		this.originalSourceFile = getOrMakeSourceFile(source);
 		try {
 			Tree tree = (Tree) parser.file().getTree();
-			Formation history = tokenFactory.newInclusion(source,
-					preprocessor.shortFileName(source.getName()));
+			Formation history = tokenFactory.newInclusion(originalSourceFile);
 			PreprocessorSourceFileInfo fileInfo = new PreprocessorSourceFileInfo(
 					history, parser, tree, tree);
 			StringPredicate macroDefinedPredicate = new MacroDefinedPredicate(
 					macroMap);
 
-			preprocessor.addHeaderFile(source.getName());
 			this.macroMap = macroMap;
 			sourceStack.push(fileInfo);
 			incrementNextNode(); // skip root "FILE" node
@@ -215,13 +225,21 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
-			Preprocessor preprocessor) throws PreprocessorException {
+			TokenFactory tokenFactory, CommonPreprocessor preprocessor)
+			throws PreprocessorException {
 		this(source, parser, systemIncludePaths, userIncludePaths,
-				new HashMap<String, Macro>(), preprocessor.getTokenFactory(),
-				preprocessor);
+				new HashMap<String, Macro>(), tokenFactory, preprocessor);
 	}
 
 	// Implementation of methods from CTokenSource...
+
+	@Override
+	public void printShorterFileNameMap(PrintStream out) {
+		out.println();
+		out.println("File name list:");
+		for (SourceFile sourceFile : sourceFiles)
+			out.println(sourceFile.getIndex() + "\t: " + sourceFile.getName());
+	}
 
 	@Override
 	public TokenFactory getTokenFactory() {
@@ -233,7 +251,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 * 
 	 * @return current file or null
 	 */
-	private File getCurrentSource() {
+	private SourceFile getCurrentSource() {
 		if (sourceStack.isEmpty()) {
 			// only way this could happen is before initial push...
 			return originalSourceFile;
@@ -242,15 +260,31 @@ public class PreprocessorTokenSource implements CTokenSource {
 	}
 
 	/**
+	 * Looks to see if a {@link SourceFile} object has already been created for
+	 * the given {@link File}. If so, returns that one. Else creates a new one,
+	 * assigns it the next index, and stores it.
+	 * 
+	 * @param file
+	 *            a file that is being read to produce this token source
+	 * @return the {@link SourceFile} corresponding to the given file
+	 */
+	private SourceFile getOrMakeSourceFile(File file) {
+		SourceFile result = preprocessor.getOrMakeSourceFile(file);
+
+		sourceFiles.add(result);
+		return result;
+	}
+
+	/**
 	 * Returns name of current file being scanned. I.e., the name returned by
 	 * this method will change dynamically as new files are included.
 	 */
 	@Override
 	public String getSourceName() {
-		File file = getCurrentSource();
+		SourceFile sourceFile = getCurrentSource();
 
-		if (file != null)
-			return file.getAbsolutePath().toString();
+		if (sourceFile != null)
+			return sourceFile.getPath();
 		return "<unknown source>";
 	}
 
@@ -1014,15 +1048,14 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 *             if the macro has already been defined differently
 	 */
 	private void processMacroDefinition(Tree node) throws PreprocessorException {
-		File sourceFile = getCurrentSource();
-		String fileName = sourceFile.getName();
+		SourceFile sourceFile = getCurrentSource();
 
 		if (node.getChildCount() == 3)
 			processMacroDefinition(tokenFactory.newFunctionMacro(node,
-					sourceFile, preprocessor.shortFileName(fileName)));
+					sourceFile));
 		else
-			processMacroDefinition(tokenFactory.newObjectMacro(node,
-					sourceFile, preprocessor.shortFileName(fileName)));
+			processMacroDefinition(tokenFactory
+					.newObjectMacro(node, sourceFile));
 	}
 
 	/**
@@ -1266,7 +1299,8 @@ public class PreprocessorTokenSource implements CTokenSource {
 		if (!system) {
 			// first look in dir containing current file, then
 			// user's include paths
-			File currentDir = sourceStack.peek().getFile().getParentFile();
+			File currentDir = sourceStack.peek().getFile().getFile()
+					.getParentFile();
 
 			file = new File(currentDir, filename);
 			if (!file.isFile())
@@ -1298,10 +1332,9 @@ public class PreprocessorTokenSource implements CTokenSource {
 					+ " syntax errors occurred while scanning included file "
 					+ file);
 		tree = (Tree) fileReturn.getTree();
-		preprocessor.addHeaderFile(filename);
-		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(file,
-				filenameToken, preprocessor.shortFileName(filename)), parser,
-				tree, tree.getChild(0));
+		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(
+				getOrMakeSourceFile(file), filenameToken), parser, tree,
+				tree.getChild(0));
 	}
 
 	/**
@@ -1733,6 +1766,16 @@ public class PreprocessorTokenSource implements CTokenSource {
 		if (firstOutput == null)
 			lastOutput = null;
 		return result;
+	}
+
+	@Override
+	public Collection<SourceFile> getSourceFiles() {
+		return sourceFiles;
+	}
+
+	@Override
+	public String toString() {
+		return originalSourceFile.getName();
 	}
 
 }

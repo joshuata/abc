@@ -26,7 +26,7 @@ public class CommonASTBuilder implements ASTBuilder {
 	public AST getTranslationUnit(ParseTree tree) throws SyntaxException {
 		ASTBuilderWorker worker = getWorker(tree);
 		SequenceNode<ExternalDefinitionNode> rootNode = worker.translateRoot();
-		AST ast = astFactory.newAST(rootNode);
+		AST ast = astFactory.newAST(rootNode, tree.getSourceFiles());
 
 		return ast;
 	}

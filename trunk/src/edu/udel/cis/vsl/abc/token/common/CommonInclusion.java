@@ -1,19 +1,16 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
-
 import org.antlr.runtime.Token;
 
 import edu.udel.cis.vsl.abc.token.IF.Inclusion;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 public class CommonInclusion implements Inclusion {
 
 	/**
 	 * The file included. Always non-null;
 	 */
-	private File file;
-
-	private String shortName;
+	private SourceFile file;
 
 	/**
 	 * The token containing the file name in the include directive that named
@@ -22,18 +19,16 @@ public class CommonInclusion implements Inclusion {
 	 */
 	private Token includeToken;
 
-	public CommonInclusion(File file, String shortName) {
+	public CommonInclusion(SourceFile file) {
 		assert file != null;
 		this.file = file;
 		this.includeToken = null;
-		this.shortName = shortName;
 	}
 
-	public CommonInclusion(File file, Token includeToken, String shortName) {
+	public CommonInclusion(SourceFile file, Token includeToken) {
 		assert file != null;
 		this.file = file;
 		this.includeToken = includeToken;
-		this.shortName = shortName;
 	}
 
 	@Override
@@ -45,12 +40,12 @@ public class CommonInclusion implements Inclusion {
 	}
 
 	@Override
-	public File getLastFile() {
+	public SourceFile getLastFile() {
 		return file;
 	}
 
 	@Override
-	public File getFile() {
+	public SourceFile getFile() {
 		return file;
 	}
 
@@ -59,9 +54,9 @@ public class CommonInclusion implements Inclusion {
 		return includeToken;
 	}
 
-	@Override
-	public String fileShortName() {
-		return this.shortName;
-	}
+	// @Override
+	// public String fileShortName() {
+	// return this.shortName;
+	// }
 
 }

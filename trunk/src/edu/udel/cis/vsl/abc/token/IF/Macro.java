@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import java.io.File;
-
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
@@ -62,13 +60,13 @@ public interface Macro {
 	 * 
 	 * @return file containing this macro definition
 	 */
-	File getFile();
+	SourceFile getFile();
 
-	/**
-	 * Returns a shorter version of the file name which removes any path
-	 * sequence prefix.
-	 * 
-	 * @return shorter version of file name
-	 */
-	String shortFileName();
+	// /**
+	// * Returns a shorter version of the file name which removes any path
+	// * sequence prefix.
+	// *
+	// * @return shorter version of file name
+	// */
+	// String shortFileName();
 }

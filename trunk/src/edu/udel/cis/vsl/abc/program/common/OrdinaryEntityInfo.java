@@ -37,8 +37,8 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	}
 
 	/**
-	 * Is it the case that all of the enties are typedefs to types that are all
-	 * compatible with each other? Then just keep one typedef.
+	 * Is it the case that all of the entities are typedefs to types that are
+	 * all compatible with each other? Then just keep one typedef.
 	 * 
 	 * First, complete all tagged types that are incomplete but are deemed to be
 	 * consistent. Do that before doing this.
@@ -88,10 +88,20 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	// containing i in E; rename to newName(j). Else, rename to
 	// newName(i).
 
+	/**
+	 * Returns an array of length internals.size(). In position i will be the
+	 * new ID number to associate to the entity internals[i]. The new ID number
+	 * will be used to issue a new name to the entity. The exception is if all
+	 * are assigned the same ID number, then there is no need to rename
+	 * anything.
+	 * 
+	 * @param enumMergeMap
+	 * @return
+	 */
 	private int[] computeNewIDs(Map<EnumerationType, Integer> enumMergeMap) {
-		int n = getNumTranslationUnits();
-		int[] newIDs = new int[n];
+		// int n = getNumTranslationUnits();
 		int numInternals = internals.size();
+		int[] newIDs = new int[numInternals];
 
 		for (int i = 0; i < numInternals; i++) {
 			Pair<Integer, OrdinaryEntity> pair = internals.get(i);
@@ -163,11 +173,14 @@ public class OrdinaryEntityInfo extends EntityInfo {
 				if (externals.isEmpty() && isConstant(newIDs)) {
 					// no renaming necessary
 				} else {
-					for (Pair<Integer, OrdinaryEntity> pair : internals) {
+					int numInternals = internals.size();
+
+					for (int i = 0; i < numInternals; i++) {
+						Pair<Integer, OrdinaryEntity> pair = internals.get(i);
 						int tuid = pair.left;
 
 						plan[tuid].addRenameAction(pair.right,
-								newName(newIDs[tuid]));
+								newName(newIDs[i]));
 					}
 				}
 			}

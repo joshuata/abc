@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import java.io.File;
-
 import org.antlr.runtime.Token;
 
 /**
@@ -34,9 +32,9 @@ public interface CToken extends Token {
 	 * 
 	 * @return the source file
 	 */
-	File getSourceFile();
+	SourceFile getSourceFile();
 
-	String getFileShortName();
+	// String getFileShortName();
 
 	/**
 	 * Sets the next token in the sequence. The next token, if non-null, should
