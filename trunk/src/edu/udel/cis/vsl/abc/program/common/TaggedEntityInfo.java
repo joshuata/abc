@@ -18,6 +18,17 @@ import edu.udel.cis.vsl.abc.util.IF.Pair;
  * in different translation units sharing a common tag.
  * </p>
  * 
+ * <p>
+ * Once all the information has been added, the actions required to transform
+ * the AST are obtained from method {@link #computeActions}. There are at least
+ * two kinds of actions:
+ * <ol>
+ * <li>Renaming actions. These assign a new name to the entity.</li>
+ * <li>Definition deletion actions. These specify nullification of the complete
+ * part of the definition of a tagged entity in a translation unit.</li>
+ * </ol>
+ * </p>
+ * 
  * @author siegel
  */
 public class TaggedEntityInfo extends EntityInfo {
@@ -100,6 +111,17 @@ public class TaggedEntityInfo extends EntityInfo {
 		enumInfo.addActions(plans);
 	}
 
+	/**
+	 * This method attempts to determine which entities can be merged. Two
+	 * entities can be merged if they have the same kind (enum, struct, or
+	 * union), and their components can be merged. For example, for a struct,
+	 * the two structs must have the same number of fields, with the same names,
+	 * occurring in the same order, and the corresponding types must be the same
+	 * (perhaps after merging other types). The results of this analysis are
+	 * recorded in this object's internal state.
+	 * 
+	 * @return true if at least one merge was made
+	 */
 	public boolean merge() {
 		boolean result = false;
 
