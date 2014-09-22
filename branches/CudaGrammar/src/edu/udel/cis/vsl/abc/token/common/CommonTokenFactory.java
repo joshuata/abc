@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +7,8 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.CharacterToken;
 import edu.udel.cis.vsl.abc.token.IF.Concatenation;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
@@ -21,6 +20,7 @@ import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.MacroExpansion;
 import edu.udel.cis.vsl.abc.token.IF.ObjectMacro;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -54,19 +54,18 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public Inclusion newInclusion(File file, Token includeToken,
-			String shortName) {
-		return new CommonInclusion(file, includeToken, shortName);
+	public Inclusion newInclusion(SourceFile file, Token includeToken) {
+		return new CommonInclusion(file, includeToken);
 	}
 
 	@Override
-	public Inclusion newInclusion(File file, String shortName) {
-		return new CommonInclusion(file, shortName);
+	public Inclusion newInclusion(SourceFile file) {
+		return new CommonInclusion(file);
 	}
 
 	@Override
 	public Formation newSystemFormation(String identifier) {
-		return new SystemFormation(identifier);
+		return new SystemFormation(identifier, -1);
 	}
 
 	@Override
@@ -156,15 +155,13 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public ObjectMacro newObjectMacro(Tree definitionNode, File file,
-			String shortFileName) {
-		return new CommonObjectMacro(definitionNode, file, shortFileName);
+	public ObjectMacro newObjectMacro(Tree definitionNode, SourceFile file) {
+		return new CommonObjectMacro(definitionNode, file);
 	}
 
 	@Override
-	public FunctionMacro newFunctionMacro(Tree definitionNode, File file,
-			String shortFileName) {
-		return new CommonFunctionMacro(definitionNode, file, shortFileName);
+	public FunctionMacro newFunctionMacro(Tree definitionNode, SourceFile file) {
+		return new CommonFunctionMacro(definitionNode, file);
 	}
 
 	@Override
@@ -181,8 +178,7 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public CTokenSequence getEmptyTokenSubsequence(
-			CTokenSource originalSource) {
+	public CTokenSequence getEmptyTokenSubsequence(CTokenSource originalSource) {
 		return new CTokenSubSequence(originalSource, 0, -1);
 	}
 

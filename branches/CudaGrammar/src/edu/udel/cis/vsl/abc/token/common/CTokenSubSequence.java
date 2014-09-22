@@ -1,11 +1,15 @@
 package edu.udel.cis.vsl.abc.token.common;
 
+import java.io.PrintStream;
+import java.util.Collection;
+
 import org.antlr.runtime.Token;
 
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public class CTokenSubSequence implements CTokenSequence {
@@ -59,6 +63,16 @@ public class CTokenSubSequence implements CTokenSequence {
 		@Override
 		public TokenFactory getTokenFactory() {
 			return rootSource.getTokenFactory();
+		}
+
+		@Override
+		public void printShorterFileNameMap(PrintStream out) {
+			rootSource.printShorterFileNameMap(out);
+		}
+
+		@Override
+		public Collection<SourceFile> getSourceFiles() {
+			return rootSource.getSourceFiles();
 		}
 	}
 

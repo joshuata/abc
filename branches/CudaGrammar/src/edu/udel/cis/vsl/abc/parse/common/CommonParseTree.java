@@ -1,13 +1,16 @@
 package edu.udel.cis.vsl.abc.parse.common;
 
+import java.util.Collection;
+
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
-import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
@@ -80,6 +83,16 @@ public class CommonParseTree implements ParseTree {
 	@Override
 	public RuleKind getKind() {
 		return kind;
+	}
+
+	@Override
+	public Collection<SourceFile> getSourceFiles() {
+		return tokenSource.getSourceFiles();
+	}
+
+	@Override
+	public String toString() {
+		return tokenSource.toString();
 	}
 
 }

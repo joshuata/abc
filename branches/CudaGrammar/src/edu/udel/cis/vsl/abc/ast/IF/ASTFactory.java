@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.IF;
 
 import java.io.PrintStream;
+import java.util.Collection;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
@@ -10,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.token.IF.Inclusion;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
@@ -64,8 +66,8 @@ public interface ASTFactory {
 	 *             if something violating the syntax rules is found while
 	 *             traversing this AST
 	 */
-	AST newAST(SequenceNode<ExternalDefinitionNode> root)
-			throws SyntaxException;
+	AST newAST(SequenceNode<ExternalDefinitionNode> root,
+			Collection<SourceFile> sourceFiles) throws SyntaxException;
 
 	/**
 	 * Returns the node factory used by this AST factory. The node factory is

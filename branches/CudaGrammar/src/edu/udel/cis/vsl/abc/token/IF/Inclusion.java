@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import java.io.File;
-
 import org.antlr.runtime.Token;
 
 /**
@@ -18,7 +16,7 @@ public interface Inclusion extends Formation {
 	 * 
 	 * @return the included file
 	 */
-	File getFile();
+	SourceFile getFile();
 
 	/**
 	 * Returns the token containing the file name in the include directive. The

@@ -34,7 +34,8 @@ import edu.udel.cis.vsl.abc.token.common.SystemFormation;
 
 public class SimpleCudaAST {
 
-	private static Formation sysForm = new SystemFormation("System Formation");
+	private static Formation sysForm = new SystemFormation("System Formation",
+			-1);
 	private static CToken firstTok = new CommonCToken(0, "first", sysForm);
 	private static CToken lastTok = new CommonCToken(0, "first", sysForm);
 	private static Source source = new CommonSource(firstTok, lastTok);
@@ -251,7 +252,8 @@ public class SimpleCudaAST {
 
 		// build the AST
 		AST ast = astF.newAST(nodeF.newSequenceNode(source, "definitions",
-				Arrays.<ExternalDefinitionNode> asList(kernelDef, mainDef)));
+				Arrays.<ExternalDefinitionNode> asList(kernelDef, mainDef)),
+				Arrays.asList(sysForm.getLastFile()));
 
 		ast.print(System.out);
 	}

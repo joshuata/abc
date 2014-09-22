@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import java.io.File;
-
 /**
  * A formation is a record of the history of events that went into the formation
  * of a token. Examples of such events include preprocessor inclusion (
@@ -33,13 +31,5 @@ public interface Formation {
 	 * 
 	 * @return last file in inclusion sequence
 	 */
-	File getLastFile();
-
-	/**
-	 * Returns a shorter version of the name of the file containing the token,
-	 * leaving out the path component.
-	 * 
-	 * @return short name version of file
-	 */
-	String fileShortName();
+	SourceFile getLastFile();
 }

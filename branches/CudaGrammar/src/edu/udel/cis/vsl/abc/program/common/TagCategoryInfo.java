@@ -12,12 +12,34 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.util.IF.Pair;
 
+/**
+ * Information on a set of entities with the same tag and kind (struct, enum, or
+ * union) in different translation units.
+ * 
+ * Each {@link TagCategoryInfo} object deals with one particular category (kind)
+ * of tagged entities: either struct, enum, or union.
+ * 
+ * @author siegel
+ * 
+ */
 public class TagCategoryInfo {
 
+	/**
+	 * The parent entity of this which is a part. Each {@link TaggedEntityInfo}
+	 * comprises three {@link TagCategoryInfo} objects: one each for enums,
+	 * structs, and unions.
+	 */
 	private TaggedEntityInfo parent;
 
+	/**
+	 * The number of entities of this kind and with this tag.
+	 */
 	private int numEntities = 0;
 
+	/**
+	 * List of pairs (t,e), where t is the translation unit ID and e is an
+	 * incomplete entity in that translation unit.
+	 */
 	private ArrayList<Pair<Integer, TaggedEntity>> incompletes = new ArrayList<>();
 
 	private ArrayList<ArrayList<Pair<Integer, TaggedEntity>>> completeClasses = new ArrayList<>();
@@ -174,6 +196,8 @@ public class TagCategoryInfo {
 	 * containing e.
 	 * 
 	 * @param enumMergeMap
+	 *            the map which will be modified by this method. Entries for the
+	 *            form (e,j) will be added to this map.
 	 */
 	void addToEnumMergeMap(Map<EnumerationType, Integer> enumMergeMap) {
 		for (ArrayList<Pair<Integer, TaggedEntity>> completeClass : completeClasses) {
