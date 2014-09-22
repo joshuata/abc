@@ -13,6 +13,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOUBLE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENUM;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXTERN;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.FLOAT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.GLOBAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INLINE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INPUT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INT;
@@ -23,6 +24,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.RANGE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.REAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.REGISTER;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.RESTRICT;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHARED;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.SHORT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.SIGNED;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.STATIC;
@@ -75,7 +77,7 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * The alignment specifiers fall into two categories: ALIGNAS ( type ) and
  * ALIGNAS ( expression ). There can be any number of both.
  * 
- * There are a lot of restrictions on the allowable combintations of specifiers.
+ * There are a lot of restrictions on the allowable combinations of specifiers.
  * See the C11 Standard for details.
  */
 public class SpecifierAnalysis {
@@ -142,10 +144,12 @@ public class SpecifierAnalysis {
 	int threadLocalCount = 0;
 	int autoCount = 0;
 	int registerCount = 0;
+	int sharedCount = 0;
 	// function specifiers: may appear multiple times
 	boolean inlineSpecifier = false;
 	boolean noreturnSpecifier = false;
 	boolean abstractSpecifier = false;
+	boolean globalSpecifier = false;
 	// CIVL-C continuity for abstract functions: can occur only once
 	int continuity = 0;
 	// CIVL-C domain specifier: can occur only once
@@ -284,11 +288,17 @@ public class SpecifierAnalysis {
 			case REGISTER:
 				registerCount++;
 				break;
+			case SHARED:
+				sharedCount++;
+				break;
 			case INLINE:
 				inlineSpecifier = true;
 				break;
 			case NORETURN:
 				noreturnSpecifier = true;
+				break;
+			case GLOBAL:
+				globalSpecifier = true;
 				break;
 			case ALIGNAS: {
 				int alignKind = ((CommonTree) node.getChild(0)).getType();

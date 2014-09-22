@@ -69,6 +69,25 @@ public interface FunctionDeclarationNode extends OrdinaryDeclarationNode {
 	 * @see #hasNoreturnFunctionSpecifier()
 	 */
 	void setNoreturnFunctionSpecifier(boolean value);
+	
+	/**
+	 * Does the declaration include the <code>__global__</code> Cuda function specifier?
+	 * 
+	 * @return <code>true</code> iff declaration contains <code>__global__</code>
+	 * @see #setInlineFunctionSpecifier(boolean)
+	 */
+	boolean hasGlobalFunctionSpecifier();
+
+	/**
+	 * Set the global function specifier bit to the given value.
+	 * 
+	 * @param value
+	 *            if <code>true</code>, says that this function declaration
+	 *            contains the <code>__global__</code> specifier, if
+	 *            <code>false</code>, it doesn't
+	 * @see #hasInlineFunctionSpecifier()
+	 */
+	void setGlobalFunctionSpecifier(boolean value);
 
 	/**
 	 * Returns the contract node for this function declaration. May be

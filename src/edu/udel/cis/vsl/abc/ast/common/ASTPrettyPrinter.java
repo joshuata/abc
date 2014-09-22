@@ -471,6 +471,8 @@ public class ASTPrettyPrinter {
 
 		if (function instanceof AbstractFunctionDefinitionNode)
 			out.print("$abstract ");
+		if (function.hasGlobalFunctionSpecifier())
+			out.print("__global__ ");
 		out.print(prefix);
 		out.print(type2Pretty(prefix, returnType, false));
 		out.print(" ");
@@ -1191,6 +1193,8 @@ public class ASTPrettyPrinter {
 			result.append("$input ");
 		if (typeNode.isOutputQualified())
 			result.append("$output ");
+		if (variable.hasSharedStorage())
+			result.append("__shared__ ");
 		type = type2Pretty(prefix, typeNode, false).toString();
 		if (type.endsWith("]")) {
 			Pair<String, String> typeResult = processArrayType(type);
@@ -1430,6 +1434,15 @@ public class ASTPrettyPrinter {
 		StringBuffer result = new StringBuffer();
 
 		result.append(expression2Pretty(call.getFunction()));
+		if (call.getNumberOfContextArguments() > 0) {
+			result.append("<<<");
+			for (int i = 0; i < call.getNumberOfContextArguments(); i++) {
+				if (i > 0)
+					result.append(", ");
+				result.append(expression2Pretty(call.getContextArgument(i)));
+			}
+			result.append(">>>");
+		}
 		result.append("(");
 		for (int i = 0; i < argNum; i++) {
 			if (i > 0)

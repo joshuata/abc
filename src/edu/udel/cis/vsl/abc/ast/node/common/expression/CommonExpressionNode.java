@@ -52,6 +52,11 @@ public abstract class CommonExpressionNode extends CommonASTNode implements
 			ASTNode argument1, ASTNode argument2) {
 		super(source, argument0, argument1, argument2);
 	}
+	
+	public CommonExpressionNode(Source source, ASTNode argument0,
+			ASTNode argument1, ASTNode argument2, ASTNode argument3) {
+		super(source, argument0, argument1, argument2, argument3);
+	}
 
 	@Override
 	public int getNumConversions() {

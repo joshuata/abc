@@ -39,7 +39,7 @@ public interface VariableDeclarationNode extends OrdinaryDeclarationNode {
 	/**
 	 * <p>
 	 * Does the declaration include the <code>register</code> storage class
-	 * specifier?. Intially <code>false</code>, the value can be changed using
+	 * specifier?. Initially <code>false</code>, the value can be changed using
 	 * {@link #setRegisterStorage(boolean)}.
 	 * </p>
 	 * 
@@ -78,6 +78,25 @@ public interface VariableDeclarationNode extends OrdinaryDeclarationNode {
 	 *            <code>register</code>
 	 */
 	void setRegisterStorage(boolean value);
+
+	/**
+	 * Does this declaration have shared storage scope? Having shared scope
+	 * means that this declaration declares a variable with workgroup scope. It
+	 * can be access by threads inside the workgroup, but not outside the
+	 * workgroup. Each workgroup has its own copy.
+	 * 
+	 * @return <code>true</code> iff declaration contains <code>__shared__</code>
+	 */
+	boolean hasSharedStorage();
+
+	/**
+	 * Sets the value that will be returned by {@link #hasRSharedStorage()}.
+	 * 
+	 * @param value
+	 *            <code>true</code> iff declaration contains
+	 *            <code>register</code>
+	 */
+	void setSharedStorage(boolean value);
 
 	/**
 	 * Gets the (optional) initializer for the object being declared. Returns
