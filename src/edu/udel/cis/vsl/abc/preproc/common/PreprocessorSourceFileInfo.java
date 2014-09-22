@@ -1,10 +1,9 @@
 package edu.udel.cis.vsl.abc.preproc.common;
 
-import java.io.File;
-
 import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.Formation;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 /**
  * This class would be better named CppSourceFileInfo or something like that.
@@ -37,7 +36,7 @@ public class PreprocessorSourceFileInfo {
 		return history;
 	}
 
-	public File getFile() {
+	public SourceFile getFile() {
 		return history.getLastFile();
 	}
 

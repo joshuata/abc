@@ -49,7 +49,7 @@ public class CloneTest {
 				systemIncludes, userIncludes);
 		root1 = ast1.getRootNode();
 		root2 = root1.copy();
-		ast2 = fe.getASTFactory().newAST(root2);
+		ast2 = fe.getASTFactory().newAST(root2, ast1.getSourceFiles());
 		assertEquals(ast1.getNumberOfNodes(), ast2.getNumberOfNodes());
 	}
 

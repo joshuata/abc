@@ -1,5 +1,8 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
+import java.io.PrintStream;
+import java.util.Collection;
+
 import org.antlr.runtime.TokenSource;
 
 /**
@@ -52,5 +55,15 @@ public interface CTokenSource extends TokenSource {
 	 * @return the token factory used by this token source object
 	 */
 	TokenFactory getTokenFactory();
+
+	/**
+	 * Returns the set of source files that were used to create this token
+	 * source.
+	 * 
+	 * @return the set of source files
+	 */
+	Collection<SourceFile> getSourceFiles();
+
+	void printShorterFileNameMap(PrintStream out);
 
 }

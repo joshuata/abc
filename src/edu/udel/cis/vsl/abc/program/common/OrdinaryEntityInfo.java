@@ -14,12 +14,49 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.util.IF.Pair;
 
+/**
+ * <p>
+ * Records information about a set of ordinary entities from different
+ * translation units that have the same name. Ordinary entities have names in
+ * the ordinary name space; this includes variables, functions, typedefs, and
+ * enumerators, but not the tags used to name structs, unions, and enumerations.
+ * </p>
+ * 
+ * <p>
+ * All of the entities must exist in the file scope of the translation unit.
+ * Also, at most one entity can be associated to each translation unit (since
+ * there is at most one entity in that unit's global scope ordinary namespace
+ * with a given name).
+ * </p>
+ * 
+ * @author siegel
+ * 
+ */
 public class OrdinaryEntityInfo extends EntityInfo {
 
+	/**
+	 * The entities with external linkage. This is a list of translation unit
+	 * ID-entity pairs.
+	 */
 	private ArrayList<Pair<Integer, OrdinaryEntity>> externals = new ArrayList<>();
 
+	/**
+	 * The entities with internal or no linkage. This is a list of translation
+	 * unit ID-entity pairs.
+	 */
 	private ArrayList<Pair<Integer, OrdinaryEntity>> internals = new ArrayList<>();
 
+	/**
+	 * Constructs new info object with given name (which will be the name of all
+	 * the entities associated to this object).
+	 * 
+	 * @param name
+	 *            the name of entities
+	 * @param numTranslationUnits
+	 *            the total number of translation units in the system being
+	 *            analyzed (not all of these necessarily have an entity with
+	 *            this name)
+	 */
 	public OrdinaryEntityInfo(String name, int numTranslationUnits) {
 		super(name, numTranslationUnits);
 	}
@@ -37,14 +74,23 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	}
 
 	/**
-	 * Is it the case that all of the enties are typedefs to types that are all
-	 * compatible with each other? Then just keep one typedef.
+	 * <p>
+	 * Is it the case that all of the entities are typedefs to types that are
+	 * all compatible with each other? If so, you only need one typedef.
+	 * </p>
 	 * 
-	 * First, complete all tagged types that are incomplete but are deemed to be
-	 * consistent. Do that before doing this.
+	 * <p>
+	 * Note that the result returned by this method may change if the types are
+	 * changed. This could happen if an incomplete tagged type is completed, for
+	 * example. That could happen if an incomplete type is deemed to be
+	 * equivalent to a complete one in another translation and merged with it.
+	 * Hence it is recommended that First, complete all tagged types that are
+	 * incomplete but are deemed to be consistent. Do that before doing this.
+	 * </p>
 	 * 
 	 * 
-	 * @return
+	 * @return <code>true</code> iff all of the entities associated to this info
+	 *         object are typedefs for equivalent types
 	 */
 	private boolean areEquivTypedefs() {
 		if (!externals.isEmpty())
@@ -88,10 +134,22 @@ public class OrdinaryEntityInfo extends EntityInfo {
 	// containing i in E; rename to newName(j). Else, rename to
 	// newName(i).
 
+	/**
+	 * Returns an array of length internals.size(); in position i will be the
+	 * new ID number to associate to the entity internals[i]. The new ID number
+	 * will be used to issue a new name to the entity. The exception is if all
+	 * are assigned the same ID number, then there is no need to rename
+	 * anything.
+	 * 
+	 * @param enumMergeMap
+	 *            a map detailing which enumeration types have been merged.
+	 *            Read, not modified, by this method
+	 * 
+	 * @return array giving new ID number for each entity internals[i]
+	 */
 	private int[] computeNewIDs(Map<EnumerationType, Integer> enumMergeMap) {
-		int n = getNumTranslationUnits();
-		int[] newIDs = new int[n];
 		int numInternals = internals.size();
+		int[] newIDs = new int[numInternals];
 
 		for (int i = 0; i < numInternals; i++) {
 			Pair<Integer, OrdinaryEntity> pair = internals.get(i);
@@ -163,11 +221,14 @@ public class OrdinaryEntityInfo extends EntityInfo {
 				if (externals.isEmpty() && isConstant(newIDs)) {
 					// no renaming necessary
 				} else {
-					for (Pair<Integer, OrdinaryEntity> pair : internals) {
+					int numInternals = internals.size();
+
+					for (int i = 0; i < numInternals; i++) {
+						Pair<Integer, OrdinaryEntity> pair = internals.get(i);
 						int tuid = pair.left;
 
 						plan[tuid].addRenameAction(pair.right,
-								newName(newIDs[tuid]));
+								newName(newIDs[i]));
 					}
 				}
 			}

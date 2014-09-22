@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.IF;
 
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
@@ -8,6 +9,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 /**
  * <p>
@@ -137,4 +139,11 @@ public interface AST {
 	boolean equiv(AST that);
 
 	void clearEntities();
+
+	/**
+	 * Gets the set of {@link SourceFile}s that formed the source for this AST.
+	 * 
+	 * @return the source file objects for this AST
+	 */
+	Collection<SourceFile> getSourceFiles();
 }

@@ -2,7 +2,9 @@ package edu.udel.cis.vsl.abc.program.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -30,23 +32,49 @@ import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 public class CommonProgramFactory implements ProgramFactory {
 
+	/**
+	 * Print debugging information?
+	 */
 	public final static boolean debug = false;
 
+	/**
+	 * Where to send output, mainly for debugging.
+	 */
 	public final static PrintStream out = System.out;
 
 	// Fields...
 
+	/**
+	 * The factory that will be used to produce new {@link AST}s, for example,
+	 * when merging or transforming ASTs.
+	 */
 	private ASTFactory astFactory;
 
+	/**
+	 * The analyzer that will be used to analyze an AST before it is wrapped
+	 * into a program.
+	 */
 	private Analyzer standardAnalyzer;
 
 	// Constructors...
 
+	/**
+	 * Constructs a new program factory that will use the given AST factory and
+	 * analyzer.
+	 * 
+	 * @param factory
+	 *            the factory that will be used to produce new {@link AST}s, for
+	 *            example, when merging or transforming ASTs
+	 * @param standardAnalyzer
+	 *            the analyzer that will be used to analyze an AST before it is
+	 *            wrapped into a program
+	 */
 	public CommonProgramFactory(ASTFactory factory, Analyzer standardAnalyzer) {
 		this.astFactory = factory;
 		this.standardAnalyzer = standardAnalyzer;
@@ -70,6 +98,17 @@ public class CommonProgramFactory implements ProgramFactory {
 	 * transformed according to the plan but is not yet analyzed.
 	 * </p>
 	 * 
+	 * <p>
+	 * <strong>Implementation notes:</strong> the plan specifies entities which
+	 * need to be renamed before the merge can take place, because without the
+	 * renaming a name collision would occur. In addition the place specifies
+	 * tagged entities for which the "complete" part of their definitions should
+	 * be removed. This is because two compatible tagged entities from different
+	 * translation units will be merged into one, therefore only one AST will
+	 * keep the definition. System typedefs require some special handling, as
+	 * described in the comments in the code.
+	 * </p>
+	 * 
 	 * @param translationUnit
 	 *            an AST representing a translation unit
 	 * @param plan
@@ -80,9 +119,6 @@ public class CommonProgramFactory implements ProgramFactory {
 
 		for (TaggedEntity entity : plan.getMakeIncompleteActions()) {
 			DeclarationNode def = entity.getDefinition();
-
-			// System.out.println("Making incomplete: " + def);
-			// System.out.flush();
 
 			if (def instanceof StructureOrUnionTypeNode) {
 				((StructureOrUnionTypeNode) def).makeIncomplete();
@@ -101,7 +137,6 @@ public class CommonProgramFactory implements ProgramFactory {
 			// to remove the decl from one AST. We can tell if
 			// the decl belongs to the one AST because its parent
 			// will be root...
-
 			for (DeclarationNode decl : entity.getDeclarations()) {
 				ASTNode parent = decl.parent();
 
@@ -120,7 +155,24 @@ public class CommonProgramFactory implements ProgramFactory {
 	 * a merge is safe. Any incomplete type which is merged with a complete one
 	 * will be completed to be in accord with the complete version.
 	 * 
-	 * @return <code>true</code> iff at least one non-trivial merge occurs
+	 * <p>
+	 * This method first produces a map, the tagged info map, in which the keys
+	 * are all the non-null tags of tagged entities (structs, unions, or enums)
+	 * in the global scope of any AST. The value associated to a tag is a
+	 * {@link TaggedEntityInfo} object. That object records information about
+	 * the use of that tag in each AST.
+	 * </p>
+	 * 
+	 * <p>
+	 * Next, this method attempts to discover, for each tag T, which of the
+	 * entities with tag T can be merged to form a single entity. This modifies
+	 * the info objects.
+	 * </p>
+	 * 
+	 * @param asts
+	 *            the ASTs that are being merged
+	 * 
+	 * @return the tagged info map:
 	 */
 	private Map<String, TaggedEntityInfo> tagMerge(AST[] asts) {
 		int n = asts.length;
@@ -151,13 +203,6 @@ public class CommonProgramFactory implements ProgramFactory {
 		}
 		return taggedInfoMap;
 	}
-
-	// PROBLEM: it is the anonymous enums which are getting
-	// blended. they don't have infos. but the typedef
-	// ends up merging several enums because they are equivalent.
-	// only the first typedef is kept. The others are removed.
-	// The enumerations being remooved still need to be mapped back
-	// to the first one.
 
 	private void prepareASTs(AST[] translationUnits) throws SyntaxException {
 		int n = translationUnits.length;
@@ -241,27 +286,30 @@ public class CommonProgramFactory implements ProgramFactory {
 		Source fakeSource = tokenFactory.newSource(fakeToken);
 		List<ExternalDefinitionNode> definitions = new LinkedList<>();
 		SequenceNode<ExternalDefinitionNode> newRoot;
-		// Collection<String> systemTypedefs = new HashSet<String>();
+		Collection<SourceFile> allSourceFiles = new LinkedHashSet<>();
 		AST result;
 
-		for (int i = 0; i < n; i++)
+		for (int i = 0; i < n; i++) {
 			roots.add(translationUnits[i].getRootNode());
+			allSourceFiles.addAll(translationUnits[i].getSourceFiles());
+		}
 		prepareASTs(translationUnits);
-
 		if (debug) {
 			out.println("Transformed translation units: ");
 			out.println();
 			for (int i = 0; i < n; i++) {
 				SequenceNode<ExternalDefinitionNode> root = roots.get(i);
 				SequenceNode<ExternalDefinitionNode> rootClone = root.copy();
-				AST ast = astFactory.newAST(rootClone);
+				Collection<SourceFile> sourceFiles = translationUnits[i]
+						.getSourceFiles();
+				AST ast = astFactory.newAST(rootClone, sourceFiles);
 
+				out.println(ast + ":");
 				ast.prettyPrint(out, false);
 				out.println();
 				out.flush();
 			}
 		}
-
 		for (SequenceNode<ExternalDefinitionNode> root : roots) {
 			int numChildren = root.numChildren();
 
@@ -269,25 +317,18 @@ public class CommonProgramFactory implements ProgramFactory {
 				ExternalDefinitionNode def = root.removeChild(i);
 
 				if (def != null) {
-					// if (def instanceof TypedefDeclarationNode) {
-					// Typedef typedef = ((TypedefDeclarationNode) def)
-					// .getEntity();
-					//
-					// if (typedef.isSystem()) {
-					// // only add these once...
-					// String name = typedef.getName();
-					//
-					// if (systemTypedefs.contains(name))
-					// continue;
-					// systemTypedefs.add(name);
-					// }
-					// }
 					definitions.add(def);
 				}
 			}
 		}
 		newRoot = nodeFactory.newProgramNode(fakeSource, definitions);
-		result = astFactory.newAST(newRoot);
+		result = astFactory.newAST(newRoot, allSourceFiles);
+		if (debug) {
+			out.println("Linked AST (raw):");
+			result.prettyPrint(out, false);
+			out.println();
+			out.flush();
+		}
 		return result;
 	}
 

@@ -1,10 +1,13 @@
 package edu.udel.cis.vsl.abc.parse.IF;
 
+import java.util.Collection;
+
 import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.parse.IF.Parse.RuleKind;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -38,6 +41,13 @@ public interface ParseTree {
 	 *         code
 	 */
 	Source source(CommonTree tree);
+
+	/**
+	 * The source files from which this parse tree was derived.
+	 * 
+	 * @return the set of source files
+	 */
+	Collection<SourceFile> getSourceFiles();
 
 	/**
 	 * Creates a new syntax exception.

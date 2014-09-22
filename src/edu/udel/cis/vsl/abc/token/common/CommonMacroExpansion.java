@@ -1,12 +1,11 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
-
 import org.antlr.runtime.Token;
 
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.MacroExpansion;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 public class CommonMacroExpansion implements MacroExpansion {
 
@@ -66,13 +65,15 @@ public class CommonMacroExpansion implements MacroExpansion {
 	}
 
 	@Override
-	public File getLastFile() {
+	public SourceFile getLastFile() {
 		return macro.getFile();
 	}
 
-	@Override
-	public String fileShortName() {
-		return this.macro.shortFileName();
-	}
+	// //@Override
+	// public String fileShortName() {
+	// // TODO
+	// return null;
+	// // return this.macro.shortFileName();
+	// }
 
 }

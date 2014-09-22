@@ -1,12 +1,11 @@
 package edu.udel.cis.vsl.abc.token.common;
 
-import java.io.File;
-
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
 import edu.udel.cis.vsl.abc.token.IF.Macro;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 /**
  * Root class for representing preprocessor macros. This is an abstract class.
@@ -20,18 +19,15 @@ public abstract class CommonMacro implements Macro {
 
 	protected Tree definitionNode;
 
-	protected File file;
+	protected SourceFile file;
 
-	protected String fileShortName;
-
-	protected CommonMacro(Tree definitionNode, File file, String shortFileName) {
+	protected CommonMacro(Tree definitionNode, SourceFile file) {
 		this.definitionNode = definitionNode;
 		this.file = file;
-		this.fileShortName = shortFileName;
 	}
 
 	@Override
-	public File getFile() {
+	public SourceFile getFile() {
 		return file;
 	}
 
@@ -80,8 +76,8 @@ public abstract class CommonMacro implements Macro {
 		return false;
 	}
 
-	@Override
-	public String shortFileName() {
-		return this.fileShortName;
-	}
+	// // @Override
+	// public String shortFileName() {
+	// return this.fileShortName;
+	// }
 }
