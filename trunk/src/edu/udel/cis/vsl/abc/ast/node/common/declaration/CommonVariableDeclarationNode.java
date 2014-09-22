@@ -29,6 +29,8 @@ public class CommonVariableDeclarationNode extends
 
 	private boolean threadLocalStorage = false;
 
+	private boolean sharedStorage = false;
+
 	public CommonVariableDeclarationNode(Source source,
 			IdentifierNode identifier, TypeNode type) {
 		super(source, identifier, type);
@@ -96,6 +98,16 @@ public class CommonVariableDeclarationNode extends
 	@Override
 	public void setThreadLocalStorage(boolean value) {
 		threadLocalStorage = value;
+	}
+
+	@Override
+	public boolean hasSharedStorage() {
+		return sharedStorage;
+	}
+
+	@Override
+	public void setSharedStorage(boolean value) {
+		sharedStorage = value;
 	}
 
 	@SuppressWarnings("unchecked")

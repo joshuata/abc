@@ -109,6 +109,7 @@ public interface CParser {
 	public static final int FractionalConstant = CivlCParser.FractionalConstant;
 	public static final int GENERIC = CivlCParser.GENERIC;
 	public static final int GOTO = CivlCParser.GOTO;
+	public static final int GLOBAL = CivlCParser.GLOBAL;
 	public static final int GT = CivlCParser.GT;
 	public static final int GTE = CivlCParser.GTE;
 	public static final int HASH = CivlCParser.HASH;
@@ -134,6 +135,7 @@ public interface CParser {
 	public static final int IdentifierNonDigit = CivlCParser.IdentifierNonDigit;
 	public static final int IntegerSuffix = CivlCParser.IntegerSuffix;
 	public static final int LCURLY = CivlCParser.LCURLY;
+	public static final int LEXCON = CivlCParser.LEXCON;
 	public static final int LONG = CivlCParser.LONG;
 	public static final int LPAREN = CivlCParser.LPAREN;
 	public static final int LSLIST = CivlCParser.LSLIST;
@@ -180,6 +182,7 @@ public interface CParser {
 	public static final int PUNDEF = CivlCParser.PUNDEF;
 	public static final int QMARK = CivlCParser.QMARK;
 	public static final int RCURLY = CivlCParser.RCURLY;
+	public static final int REXCON = CivlCParser.REXCON;
 	public static final int RANGE = CivlCParser.RANGE;
 	public static final int REAL = CivlCParser.REAL;
 	public static final int REGISTER = CivlCParser.REGISTER;
@@ -196,6 +199,7 @@ public interface CParser {
 	public static final int SChar = CivlCParser.SChar;
 	public static final int SELF = CivlCParser.SELF;
 	public static final int SEMI = CivlCParser.SEMI;
+	public static final int SHARED = CivlCParser.SHARED;
 	public static final int SHIFTLEFT = CivlCParser.SHIFTLEFT;
 	public static final int SHIFTLEFTEQ = CivlCParser.SHIFTLEFTEQ;
 	public static final int SHIFTRIGHT = CivlCParser.SHIFTRIGHT;
