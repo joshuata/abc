@@ -437,7 +437,7 @@ unaryExpression
 spawnExpression
 	: SPAWN postfixExpressionRoot scopeListUse_opt LPAREN 
 	  argumentExpressionList RPAREN 
-	  -> ^(SPAWN LPAREN postfixExpressionRoot
+	  -> ^(SPAWN LPAREN postfixExpressionRoot ABSENT
 	       argumentExpressionList RPAREN scopeListUse_opt)
 	;
 
