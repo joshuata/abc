@@ -6,15 +6,20 @@
 #else
 #define __DOMAIN__
 
-/* defines kinds of domain decomposition strategies. */
-typedef enum __decomposition_strategy__ {
+/* An enumerated type used to specify how domains are decomposed.
+ * This is used, for example, to specify how a domain is partitioned
+ * among members of a thread team at OpenMP "for" loops.  The model
+ * checker can explore all possible partitions (very expensive), or
+ * use just one particular partition, or something inbetween.
+ * */
+typedef enum $domain_strategy {
   ALL, // decomposition by round robin order
   RANDOM, // random decomposition
   ROUND_ROBIN // decomposition by round robin order
-} $DecompositionStrategy;
+} $domain_strategy;
 
 /* the data structure for the decomposition result of a domain */
-typedef struct __domain_decomposition__{
+typedef struct $domain_decomposition {
   int numSubdomains;
   $domain subdomains[];
 } $domain_decomposition;
@@ -23,6 +28,7 @@ typedef struct __domain_decomposition__{
    domain into n sub-domains, according to the decomposition strategy
    specified.
 */
-$domain_decomposition $domain_partition($domain domain, $DecompositionStrategy strategy, int n);
+$domain_decomposition $domain_partition($domain domain, 
+      $domain_strategy strategy, int n);
 
 #endif
