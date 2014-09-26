@@ -986,7 +986,7 @@ public class SideEffectRemover extends BaseTransformer {
 			case DIVEQ:
 			case MODEQ:
 			case SHIFTLEFTEQ:
-			case SHIFTRIGHTEQ:
+			case SHIFTRIGHTEQ: {
 				StatementNode assignment;
 
 				left = ((OperatorNode) expression).getArgument(0);
@@ -1003,6 +1003,7 @@ public class SideEffectRemover extends BaseTransformer {
 				after.addAll(rightTriple.getAfter());
 				result = new SideEffectFreeTriple(before, left.copy(), after);
 				break;
+			}
 			case COMMA:
 				right = ((OperatorNode) expression).getArgument(1);
 				// Note that we consider errors as side effects for a comma
@@ -1048,6 +1049,31 @@ public class SideEffectRemover extends BaseTransformer {
 					}
 				}
 				break;
+			case CONDITIONAL: {
+				ExpressionNode condition = ((OperatorNode) expression)
+						.getArgument(0), trueExpr = ((OperatorNode) expression)
+						.getArgument(1), falseExpr = ((OperatorNode) expression)
+						.getArgument(2);
+
+				if (!trueExpr.isSideEffectFree(false)
+						|| !falseExpr.isSideEffectFree(false))
+					throw new SyntaxException(
+							"Side effect is not allowed in the second/third argument of a conditional expression.",
+							expression.getSource());
+
+				leftTriple = processExpression(condition);
+				operands.add(leftTriple.getExpression().copy());
+				operands.add(trueExpr.copy());
+				operands.add(falseExpr.copy());
+				sideEffectFreeExpression = nodeFactory.newOperatorNode(
+						expression.getSource(),
+						((OperatorNode) expression).getOperator(), operands);
+				before.addAll(leftTriple.getBefore());
+				after.addAll(leftTriple.getAfter());
+				result = new SideEffectFreeTriple(before,
+						sideEffectFreeExpression, after);
+				break;
+			}
 			default:// BIG_O, CONDITIONAL,
 				throw new ABCUnsupportedException(
 						"removing side effects from an expression with the operator "
