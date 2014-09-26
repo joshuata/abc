@@ -1318,6 +1318,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 				return null;
 			charStream = new FilteredCharStream(new ANTLRInputStream(
 					inputStream));
+			file = new File(filename);
 		} else {
 			charStream = new FilteredCharStream(new ANTLRFileStream(
 					file.getAbsolutePath()));
