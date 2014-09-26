@@ -6,6 +6,12 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
  * Node representing a function call. The children node include the expression
  * of function type and the sequence of actual arguments.
  * 
+ * <p>
+ * Note: the order of the children nodes is unspecified. Use the specific
+ * methods (e.g., {@link #setFunction(ExpressionNode)}) to read or change a
+ * child node.
+ * </p>
+ * 
  * @author siegel
  * 
  */
