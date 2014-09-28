@@ -3,6 +3,15 @@ package edu.udel.cis.vsl.abc.transform.IF;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 
+/**
+ * A very basic partial implementation of {@link Transformer}. Implements the
+ * book-keeping methods {@link #getCode()}, {@link #getShortDescription()},
+ * {@link #toString()}, and provides similar fields. Most implementations of
+ * {@link Transformer} can extend this class.
+ * 
+ * @author siegel
+ * 
+ */
 public abstract class BaseTransformer implements Transformer {
 
 	protected String code;
