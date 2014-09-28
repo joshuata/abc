@@ -117,4 +117,9 @@ public class CIVLTranslationTest {
 	public void domainDecomp() throws ABCException, IOException {
 		check("domainDecomposition");
 	}
+
+	@Test
+	public void cond() throws ABCException, IOException {
+		check("cond");
+	}
 }

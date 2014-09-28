@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
@@ -10,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
@@ -1050,26 +1052,95 @@ public class SideEffectRemover extends BaseTransformer {
 				}
 				break;
 			case CONDITIONAL: {
+				// x = cond ? a : b;
+				// ==>
+				// cond_before;
+				// if(cond_expr) a_before; else b_before;
+				// x = cond_expr? a_expr : b_expr;
+				// cond_after;
+				// if(cond_expr) a_after; else b_after;
 				ExpressionNode condition = ((OperatorNode) expression)
 						.getArgument(0), trueExpr = ((OperatorNode) expression)
 						.getArgument(1), falseExpr = ((OperatorNode) expression)
 						.getArgument(2);
+				SideEffectFreeTriple condTriple, trueTriple, falseTriple;
+				StatementNode trueOrFalseBefore, trueOrFalseAfter, trueBlock, falseBlock;
+				NodeFactory nodeFactory = this.astFactory.getNodeFactory();
+				List<BlockItemNode> trueList, falseList;
 
-				if (!trueExpr.isSideEffectFree(false)
-						|| !falseExpr.isSideEffectFree(false))
-					throw new SyntaxException(
-							"Side effect is not allowed in the second/third argument of a conditional expression.",
-							expression.getSource());
-
-				leftTriple = processExpression(condition);
-				operands.add(leftTriple.getExpression().copy());
-				operands.add(trueExpr.copy());
-				operands.add(falseExpr.copy());
+//				if (!trueExpr.isSideEffectFree(false)
+//						|| !falseExpr.isSideEffectFree(false))
+//					throw new SyntaxException(
+//							"Side effect is not allowed in the second/third argument of a conditional expression.",
+//							expression.getSource());
+				condTriple = processExpression(condition);
+				trueTriple = processExpression(trueExpr);
+				falseTriple = processExpression(falseExpr);
+				operands.add(condTriple.getExpression().copy());
+				operands.add(trueTriple.getExpression().copy());
+				operands.add(falseTriple.getExpression().copy());
 				sideEffectFreeExpression = nodeFactory.newOperatorNode(
 						expression.getSource(),
 						((OperatorNode) expression).getOperator(), operands);
-				before.addAll(leftTriple.getBefore());
-				after.addAll(leftTriple.getAfter());
+				before.addAll(condTriple.getBefore());
+
+				trueList = trueTriple.getBefore();
+				falseList = falseTriple.getBefore();
+				if (trueList.size() > 0)
+					trueBlock = nodeFactory.newCompoundStatementNode(
+							trueExpr.getSource(), trueList);
+				else
+					trueBlock = null;
+				if (falseList.size() > 0)
+					falseBlock = nodeFactory.newCompoundStatementNode(
+							falseExpr.getSource(), falseList);
+				else
+					falseBlock = null;
+				if (trueBlock != null || falseBlock != null) {
+					if (trueBlock == null)
+						trueOrFalseBefore = nodeFactory.newIfNode(condition
+								.getSource(), nodeFactory.newOperatorNode(
+								condition.getSource(), Operator.NOT,
+								Arrays.asList(condition.copy())), falseBlock);
+					else if (falseBlock == null)
+						trueOrFalseBefore = nodeFactory.newIfNode(
+								condition.getSource(), condition.copy(),
+								trueBlock);
+					else
+						trueOrFalseBefore = nodeFactory.newIfNode(
+								condition.getSource(), condition.copy(),
+								trueBlock, falseBlock);
+					before.add(trueOrFalseBefore);
+				}
+				after.addAll(condTriple.getAfter());
+				trueList = trueTriple.getAfter();
+				falseList = falseTriple.getAfter();
+				if (trueList.size() > 0)
+					trueBlock = nodeFactory.newCompoundStatementNode(
+							trueExpr.getSource(), trueList);
+				else
+					trueBlock = null;
+				if (falseList.size() > 0)
+					falseBlock = nodeFactory.newCompoundStatementNode(
+							falseExpr.getSource(), falseList);
+				else
+					falseBlock = null;
+				if (trueBlock != null || falseBlock != null) {
+					if (trueBlock == null)
+						trueOrFalseAfter = nodeFactory.newIfNode(condition
+								.getSource(), nodeFactory.newOperatorNode(
+								condition.getSource(), Operator.NOT,
+								Arrays.asList(condition.copy())), falseBlock);
+					else if (falseBlock == null)
+						trueOrFalseAfter = nodeFactory.newIfNode(
+								condition.getSource(), condition.copy(),
+								trueBlock);
+					else
+						trueOrFalseAfter = nodeFactory.newIfNode(
+								condition.getSource(), condition.copy(),
+								trueBlock, falseBlock);
+					after.add(trueOrFalseAfter);
+				}
 				result = new SideEffectFreeTriple(before,
 						sideEffectFreeExpression, after);
 				break;
