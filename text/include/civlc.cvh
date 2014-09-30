@@ -77,8 +77,10 @@ $int_iter $int_iter_create($scope scope, int *array, int size);
 /* Deletes an $int_iter object from the heap. */
 void $int_iter_destroy($int_iter iter);
 
+/* updates the leaf nodes of a status variable to the default value 0 */
 void $set_default(void *obj);
 
+/* applies the operation op on obj1 and obj2 and stores the result */
 void $apply(void *obj1, $operation op, void *obj2, void *result);
 
 #endif
