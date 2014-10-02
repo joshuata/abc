@@ -753,7 +753,7 @@ public class SideEffectRemover extends BaseTransformer {
 				// cast and do a recursive call.
 				result = expressionStatement(nodeFactory
 						.newExpressionStatementNode(((CastNode) expression)
-								.getArgument()));
+								.getArgument().copy()));
 			} else {
 				throw new ABCUnsupportedException(
 						"removing side effects from this expression statement: "
@@ -1083,7 +1083,6 @@ public class SideEffectRemover extends BaseTransformer {
 						expression.getSource(),
 						((OperatorNode) expression).getOperator(), operands);
 				before.addAll(condTriple.getBefore());
-
 				trueList = trueTriple.getBefore();
 				falseList = falseTriple.getBefore();
 				if (trueList.size() > 0)
