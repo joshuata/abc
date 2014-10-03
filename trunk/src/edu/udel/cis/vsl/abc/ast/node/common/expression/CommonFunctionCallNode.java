@@ -13,8 +13,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
-public class CommonFunctionCallNode extends CommonExpressionNode
-		implements FunctionCallNode {
+public class CommonFunctionCallNode extends CommonExpressionNode implements
+		FunctionCallNode {
 
 	public CommonFunctionCallNode(Source source, ExpressionNode function,
 			SequenceNode<ExpressionNode> contextArguments,
@@ -35,14 +35,16 @@ public class CommonFunctionCallNode extends CommonExpressionNode
 
 	@Override
 	public int getNumberOfContextArguments() {
-		return child(1).numChildren();
+		if (child(1) != null)
+			return child(1).numChildren();
+		return 0;
 	}
-	
+
 	@Override
 	public int getNumberOfArguments() {
 		return child(2).numChildren();
 	}
-	
+
 	@Override
 	public ExpressionNode getContextArgument(int index) {
 		return (ExpressionNode) child(1).child(index);
@@ -57,12 +59,12 @@ public class CommonFunctionCallNode extends CommonExpressionNode
 	public void setContextArgument(int index, ExpressionNode value) {
 		((CommonASTNode) child(1)).setChild(index, value);
 	}
-	
+
 	@Override
 	public void setArgument(int index, ExpressionNode value) {
 		((CommonASTNode) child(2)).setChild(index, value);
 	}
-	
+
 	@Override
 	public void setContextArguments(SequenceNode<ExpressionNode> arguments) {
 		this.setChild(1, arguments);
