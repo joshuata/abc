@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.token.IF;
 
-import org.antlr.runtime.Token;
-
 /**
  * An Inclusion represents the application of a preprocessor
  * <code>#include</code> directive.
@@ -26,6 +24,6 @@ public interface Inclusion extends Formation {
 	 * 
 	 * @return the token containing the file name from the include directive
 	 */
-	Token getIncludeToken();
+	CToken getIncludeToken();
 
 }

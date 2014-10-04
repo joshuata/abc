@@ -40,7 +40,7 @@ public interface TokenFactory {
 	 */
 	Inclusion newInclusion(SourceFile file);
 
-	Inclusion newInclusion(SourceFile file, Token includeToken);
+	Inclusion newInclusion(SourceFile file, CToken includeToken);
 
 	/**
 	 * Creates a new formation which represents some code added by the system

@@ -33,9 +33,4 @@ public class SystemFormation implements Formation {
 		return file;
 	}
 
-	// @Override
-	// public String fileShortName() {
-	// return identifier;
-	// }
-
 }
