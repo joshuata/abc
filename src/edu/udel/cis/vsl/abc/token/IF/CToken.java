@@ -11,7 +11,9 @@ import org.antlr.runtime.Token;
  * </p>
  * 
  * <p>
- * A token also carries detailed information about its formation history.
+ * A token also carries detailed information about its formation history. This
+ * can be obtained by method {@link #getFormation()}, which returns a
+ * {@link Formation}.
  * </p>
  * 
  * @author siegel
@@ -33,8 +35,6 @@ public interface CToken extends Token {
 	 * @return the source file
 	 */
 	SourceFile getSourceFile();
-
-	// String getFileShortName();
 
 	/**
 	 * Sets the next token in the sequence. The next token, if non-null, should
