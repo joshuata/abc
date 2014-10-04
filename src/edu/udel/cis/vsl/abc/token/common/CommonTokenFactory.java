@@ -54,7 +54,7 @@ public class CommonTokenFactory implements TokenFactory {
 	}
 
 	@Override
-	public Inclusion newInclusion(SourceFile file, Token includeToken) {
+	public Inclusion newInclusion(SourceFile file, CToken includeToken) {
 		return new CommonInclusion(file, includeToken);
 	}
 

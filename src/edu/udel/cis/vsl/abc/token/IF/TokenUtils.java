@@ -150,11 +150,14 @@ public class TokenUtils {
 		}
 		excerpt = quoteText(excerpt);
 		result = result + " " + excerpt;
+		{ // experimental
+			Formation formation = first.getFormation();
+
+			if (formation != null)
+				result += formation.suffix();
+		}
 		return result;
 	}
-
-	// what we want:
-	//
 
 	/**
 	 * A utility function to return the text of a token surrounded by double
@@ -183,17 +186,6 @@ public class TokenUtils {
 	public static TokenSource makeTokenSourceFromList(CToken first) {
 		return new ListTokenSource(first);
 	}
-
-	// /**
-	// * Given a CommonTree node, forms a token source from the children of that
-	// * node. Adds an EOF token to the end of the source.
-	// *
-	// *
-	// * @param node
-	// */
-	// public static TokenSource makeTokenSourceFromChildren(CommonTree node) {
-	// return new NodeTokenSource(node);
-	// }
 
 }
 

@@ -104,8 +104,12 @@ public class CommonCToken extends CommonToken implements CToken {
 		if (this.getType() == Token.EOF)
 			return "EOF";
 		else {
-			String result = TokenUtils.quotedText(this) + " in "
-					+ TokenUtils.location(this, false);
+			// String result = TokenUtils.quotedText(this) + " in "
+			// + TokenUtils.location(this, false);
+			String result = TokenUtils
+					.summarizeRangeLocation(this, this, false)
+					+ " "
+					+ TokenUtils.quotedText(this);
 
 			if (formation != null)
 				result += formation.suffix();

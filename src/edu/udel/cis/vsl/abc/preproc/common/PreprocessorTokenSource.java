@@ -1250,7 +1250,10 @@ public class PreprocessorTokenSource implements CTokenSource {
 					+ fullName, filenameToken);
 		}
 		try {
-			newInfo = findInclude(filenameToken, name, system);
+			CToken amplifiedFilenameToken = tokenFactory.newCToken(
+					filenameToken, getIncludeHistory());
+
+			newInfo = findInclude(amplifiedFilenameToken, name, system);
 		} catch (IOException e) {
 			throw new PreprocessorException(
 					"I/O error when attempting to include " + name + ":\n" + e,
@@ -1286,7 +1289,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 * @throws PreprocessorException
 	 *             if some other syntax error occurs in processing the file
 	 */
-	private PreprocessorSourceFileInfo findInclude(Token filenameToken,
+	private PreprocessorSourceFileInfo findInclude(CToken filenameToken,
 			String filename, boolean system) throws IOException,
 			RecognitionException, PreprocessorException {
 		File file = null;
@@ -1644,8 +1647,8 @@ public class PreprocessorTokenSource implements CTokenSource {
 	private void addOutput(CToken token) throws PreprocessorException {
 		int type = token.getType();
 
-		// TODO: BUG: the string literals will be separated by some white
-		// space tokens, and this will break the concatenation here....
+		// The string literals will be separated by some white
+		// space tokens, and this would break the concatenation here, so...
 
 		// if this is white space (other than \n at end of #pragma)
 		// and stringLiteralBuffer is not empty, add the token
