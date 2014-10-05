@@ -55,6 +55,8 @@ public interface TokenFactory {
 	 */
 	Formation newSystemFormation(String identifier);
 
+	Formation newTransformFormation(String transformerName, String method);
+
 	// Basic token creation...
 
 	CToken newCToken(Token token, Formation formation);

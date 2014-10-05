@@ -1,7 +1,10 @@
 package edu.udel.cis.vsl.abc.token.common;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
@@ -32,6 +35,8 @@ public class CommonTokenFactory implements TokenFactory {
 	private CommonCharacterFactory characterFactory;
 
 	private CommonSourceFactory sourceFactory;
+
+	private Map<String, SourceFile> transformerMap = new HashMap<>();
 
 	public CommonTokenFactory() {
 		characterFactory = new CommonCharacterFactory(this);
@@ -66,6 +71,17 @@ public class CommonTokenFactory implements TokenFactory {
 	@Override
 	public Formation newSystemFormation(String identifier) {
 		return new SystemFormation(identifier, -1);
+	}
+
+	@Override
+	public Formation newTransformFormation(String transformerName, String method) {
+		SourceFile transformer = transformerMap.get(transformerName);
+
+		if (transformer == null) {
+			transformer = new SourceFile(new File("transformerName"), -1);
+			transformerMap.put(transformerName, transformer);
+		}
+		return new CommonTransformFormation(transformer, method);
 	}
 
 	@Override

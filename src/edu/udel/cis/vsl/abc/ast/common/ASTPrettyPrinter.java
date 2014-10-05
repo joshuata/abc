@@ -117,7 +117,9 @@ public class ASTPrettyPrinter {
 
 	/* ******************* Package-private Static Methods ****************** */
 
-	static void prettyPrint(ASTNode node, PrintStream out) {
+	// FIX ME : I am public now
+
+	public static void prettyPrint(ASTNode node, PrintStream out) {
 		NodeKind kind = node.nodeKind();
 
 		switch (kind) {
