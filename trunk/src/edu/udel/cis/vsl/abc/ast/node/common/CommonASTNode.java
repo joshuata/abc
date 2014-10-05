@@ -12,6 +12,7 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
+import edu.udel.cis.vsl.abc.ast.common.ASTPrettyPrinter;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -402,6 +403,42 @@ public abstract class CommonASTNode implements ASTNode {
 	public String toString() {
 		return "Node[" + id + ", " + instanceId + ", "
 				+ source.getSummary(false) + "]";
+	}
+
+	@Override
+	public ASTNode nextDFS() {
+		// look for a child...
+		for (ASTNode child : children) {
+			if (child != null)
+				return child;
+		}
+		// if no child, backtrack...
+		{
+			ASTNode node = this;
+
+			while (true) {
+				int index = node.childIndex();
+
+				node = node.parent();
+				if (node == null)
+					return null;
+				else {
+					int numChildren = node.numChildren();
+
+					for (int i = index + 1; i < numChildren; i++) {
+						ASTNode child = node.child(i);
+
+						if (child != null)
+							return child;
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public void prettyPrint(PrintStream out) {
+		ASTPrettyPrinter.prettyPrint(this, out);
 	}
 
 }

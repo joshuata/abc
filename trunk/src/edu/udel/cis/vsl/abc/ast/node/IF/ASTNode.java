@@ -565,4 +565,20 @@ public interface ASTNode {
 	 * @return short textual representation of this node
 	 * */
 	String toString();
+
+	/**
+	 * Finds next non-null node in AST in DFS order.
+	 * 
+	 * @return next non-null node in DFS order or null if there is none
+	 */
+	ASTNode nextDFS();
+
+	/**
+	 * Pretty-prints this AST node (and its descendants) in a form that should
+	 * be similar to the actual programming language.
+	 * 
+	 * @param out
+	 *            stream to which output should be sent
+	 */
+	void prettyPrint(PrintStream out);
 }

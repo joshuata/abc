@@ -181,9 +181,4 @@ public class CommonCToken extends CommonToken implements CToken {
 		return formation;
 	}
 
-	// @Override
-	// public String getFileShortName() {
-	// return formation.fileShortName();
-	// }
-
 }
