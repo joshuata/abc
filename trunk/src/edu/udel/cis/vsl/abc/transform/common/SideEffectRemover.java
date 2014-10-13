@@ -24,6 +24,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
@@ -195,8 +196,9 @@ public class SideEffectRemover extends BaseTransformer {
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
-		// TODO assertNode
-		if (statement instanceof AssumeNode) {
+		if (statement instanceof AssertNode) {
+			result = assertStatement((AssertNode) statement);
+		} else if (statement instanceof AssumeNode) {
 			result = assumeStatement((AssumeNode) statement);
 		} else if (statement instanceof ChooseStatementNode) {
 			result = chooseStatement((ChooseStatementNode) statement);
@@ -224,6 +226,53 @@ public class SideEffectRemover extends BaseTransformer {
 			result = civlForStatement((CivlForNode) statement);
 		} else {
 			result = statement;
+		}
+		return result;
+	}
+
+	private StatementNode assertStatement(AssertNode statement)
+			throws SyntaxException {
+		StatementNode result;
+		ExpressionNode condition = statement.getCondition();
+		SequenceNode<ExpressionNode> explanation = statement.getExplanation();
+		boolean sideEffectFree = condition.isSideEffectFree(false);
+
+		if (explanation != null)
+			for (int i = 0; i < explanation.numChildren(); i++) {
+				sideEffectFree = sideEffectFree
+						&& explanation.getSequenceChild(i).isSideEffectFree(
+								false);
+			}
+		if (sideEffectFree) {
+			result = statement;
+		} else {
+			List<BlockItemNode> newStatements = new ArrayList<BlockItemNode>();
+			SideEffectFreeTriple triple;
+			List<BlockItemNode> before = new ArrayList<>(), after = new ArrayList<>();
+			ExpressionNode newCondition;
+			List<ExpressionNode> newExplanationArgs = new ArrayList<>();
+			SequenceNode<ExpressionNode> newExplanation;
+
+			triple = processExpression(condition);
+			newCondition = triple.getExpression();
+			before.addAll(triple.getBefore());
+			after.addAll(triple.getAfter());
+			if (explanation != null)
+				for (int i = 0; i < explanation.numChildren(); i++) {
+					triple = processExpression(explanation.getSequenceChild(i));
+					newExplanationArgs.add(triple.getExpression());
+					before.addAll(triple.getBefore());
+					after.addAll(triple.getAfter());
+				}
+			newExplanation = explanation != null ? nodeFactory.newSequenceNode(
+					explanation.getSource(), "Explanation", newExplanationArgs)
+					: null;
+			newStatements.addAll(before);
+			newStatements.add(nodeFactory.newAssertNode(statement.getSource(),
+					newCondition, newExplanation));
+			newStatements.addAll(after);
+			result = nodeFactory.newCompoundStatementNode(
+					statement.getSource(), newStatements);
 		}
 		return result;
 	}
@@ -465,7 +514,6 @@ public class SideEffectRemover extends BaseTransformer {
 		if (expression.isSideEffectFree(false)) {
 			result = statement;
 		} else {
-			// expression.parent().removeChild(expression.childIndex());
 			if (expression instanceof FunctionCallNode) {
 				boolean sideEffectFree = true;
 
@@ -1068,11 +1116,11 @@ public class SideEffectRemover extends BaseTransformer {
 				NodeFactory nodeFactory = this.astFactory.getNodeFactory();
 				List<BlockItemNode> trueList, falseList;
 
-//				if (!trueExpr.isSideEffectFree(false)
-//						|| !falseExpr.isSideEffectFree(false))
-//					throw new SyntaxException(
-//							"Side effect is not allowed in the second/third argument of a conditional expression.",
-//							expression.getSource());
+				// if (!trueExpr.isSideEffectFree(false)
+				// || !falseExpr.isSideEffectFree(false))
+				// throw new SyntaxException(
+				// "Side effect is not allowed in the second/third argument of a conditional expression.",
+				// expression.getSource());
 				condTriple = processExpression(condition);
 				trueTriple = processExpression(trueExpr);
 				falseTriple = processExpression(falseExpr);
