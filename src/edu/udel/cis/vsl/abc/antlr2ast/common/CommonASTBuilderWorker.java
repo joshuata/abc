@@ -30,7 +30,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
@@ -202,61 +201,63 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		return nodeFactory.newIdentifierNode(source, token.getText());
 	}
 
-	private SequenceNode<VariableDeclarationNode> translateScopeListDef(
-			CommonTree list) {
-		int kind = list.getType();
+	// private SequenceNode<VariableDeclarationNode> translateScopeListDef(
+	// CommonTree list) {
+	// int kind = list.getType();
+	//
+	// if (kind == ABSENT) {
+	// return null;
+	// } else {
+	// int numChildren = list.getChildCount();
+	// LinkedList<VariableDeclarationNode> nodeList = new
+	// LinkedList<VariableDeclarationNode>();
+	// SequenceNode<VariableDeclarationNode> result;
+	// Source source = newSource(list);
+	//
+	// for (int i = 0; i < numChildren; i++) {
+	// CommonTree child = (CommonTree) list.getChild(i);
+	// IdentifierNode identifierNode = translateIdentifier(child);
+	// Source childSource = identifierNode.getSource();
+	// TypeNode typeNode = nodeFactory.newScopeTypeNode(childSource);
+	// VariableDeclarationNode declNode = nodeFactory
+	// .newVariableDeclarationNode(childSource,
+	// identifierNode, typeNode);
+	//
+	// nodeList.add(declNode);
+	// }
+	// result = nodeFactory.newSequenceNode(source, "scope list def",
+	// nodeList);
+	// return result;
+	// }
+	// }
 
-		if (kind == ABSENT) {
-			return null;
-		} else {
-			int numChildren = list.getChildCount();
-			LinkedList<VariableDeclarationNode> nodeList = new LinkedList<VariableDeclarationNode>();
-			SequenceNode<VariableDeclarationNode> result;
-			Source source = newSource(list);
-
-			for (int i = 0; i < numChildren; i++) {
-				CommonTree child = (CommonTree) list.getChild(i);
-				IdentifierNode identifierNode = translateIdentifier(child);
-				Source childSource = identifierNode.getSource();
-				TypeNode typeNode = nodeFactory.newScopeTypeNode(childSource);
-				VariableDeclarationNode declNode = nodeFactory
-						.newVariableDeclarationNode(childSource,
-								identifierNode, typeNode);
-
-				nodeList.add(declNode);
-			}
-			result = nodeFactory.newSequenceNode(source, "scope list def",
-					nodeList);
-			return result;
-		}
-	}
-
-	private SequenceNode<ExpressionNode> translateScopeListUse(CommonTree list) {
-		int kind = list.getType();
-
-		if (kind == ABSENT) {
-			return null;
-		} else {
-			int numChildren = list.getChildCount();
-			LinkedList<ExpressionNode> nodeList = new LinkedList<ExpressionNode>();
-			SequenceNode<ExpressionNode> result;
-			Source source = newSource(list);
-
-			for (int i = 0; i < numChildren; i++) {
-				CommonTree child = (CommonTree) list.getChild(i);
-				IdentifierNode identifierNode = translateIdentifier(child);
-				Source childSource = identifierNode.getSource();
-				IdentifierExpressionNode exprNode = nodeFactory
-						.newIdentifierExpressionNode(childSource,
-								identifierNode);
-
-				nodeList.add(exprNode);
-			}
-			result = nodeFactory.newSequenceNode(source, "scope list use",
-					nodeList);
-			return result;
-		}
-	}
+	// private SequenceNode<ExpressionNode> translateScopeListUse(CommonTree
+	// list) {
+	// int kind = list.getType();
+	//
+	// if (kind == ABSENT) {
+	// return null;
+	// } else {
+	// int numChildren = list.getChildCount();
+	// LinkedList<ExpressionNode> nodeList = new LinkedList<ExpressionNode>();
+	// SequenceNode<ExpressionNode> result;
+	// Source source = newSource(list);
+	//
+	// for (int i = 0; i < numChildren; i++) {
+	// CommonTree child = (CommonTree) list.getChild(i);
+	// IdentifierNode identifierNode = translateIdentifier(child);
+	// Source childSource = identifierNode.getSource();
+	// IdentifierExpressionNode exprNode = nodeFactory
+	// .newIdentifierExpressionNode(childSource,
+	// identifierNode);
+	//
+	// nodeList.add(exprNode);
+	// }
+	// result = nodeFactory.newSequenceNode(source, "scope list use",
+	// nodeList);
+	// return result;
+	// }
+	// }
 
 	// Translation of Expressions...
 
@@ -559,8 +560,9 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		int numArgs = argumentListTree.getChildCount();
 		List<ExpressionNode> contextArgumentList = new LinkedList<ExpressionNode>();
 		List<ExpressionNode> argumentList = new LinkedList<ExpressionNode>();
-		SequenceNode<ExpressionNode> scopeList = translateScopeListUse((CommonTree) callTree
-				.getChild(4));
+		// SequenceNode<ExpressionNode> scopeList =
+		// translateScopeListUse((CommonTree) callTree
+		// .getChild(4));
 
 		for (int i = 0; i < numContextArgs; i++) {
 			CommonTree argumentTree = (CommonTree) contextArgumentListTree
@@ -579,7 +581,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			argumentList.add(argumentNode);
 		}
 		return nodeFactory.newFunctionCallNode(source, functionNode,
-				contextArgumentList, argumentList, scopeList);
+				contextArgumentList, argumentList, null);
 	}
 
 	/**
@@ -916,17 +918,17 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		return typeNode;
 	}
 
-	private VariableDeclarationNode translateScopeDeclaration(
-			CommonTree scopeDeclTree, SimpleScope scope) throws SyntaxException {
-		CommonTree identifierTree = (CommonTree) scopeDeclTree.getChild(0);
-		IdentifierNode identifierNode = translateIdentifier(identifierTree);
-		Source source = newSource(scopeDeclTree);
-		TypeNode scopeType = nodeFactory.newScopeTypeNode(source);
-		VariableDeclarationNode result = nodeFactory
-				.newVariableDeclarationNode(source, identifierNode, scopeType);
-
-		return result;
-	}
+	// private VariableDeclarationNode translateScopeDeclaration(
+	// CommonTree scopeDeclTree, SimpleScope scope) throws SyntaxException {
+	// CommonTree identifierTree = (CommonTree) scopeDeclTree.getChild(0);
+	// IdentifierNode identifierNode = translateIdentifier(identifierTree);
+	// Source source = newSource(scopeDeclTree);
+	// TypeNode scopeType = nodeFactory.newScopeTypeNode(source);
+	// VariableDeclarationNode result = nodeFactory
+	// .newVariableDeclarationNode(source, identifierNode, scopeType);
+	//
+	// return result;
+	// }
 
 	/**
 	 * Returns a list consisting of the following kinds of external definitions:
@@ -953,13 +955,14 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree initDeclaratorList = (CommonTree) declarationTree
 				.getChild(1);
 		CommonTree contractTree = (CommonTree) declarationTree.getChild(2);
-		CommonTree scopeListTree = (CommonTree) declarationTree.getChild(3);
+		// CommonTree scopeListTree = (CommonTree) declarationTree.getChild(3);
 		SequenceNode<ContractNode> contract = getContract(contractTree, scope);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(declarationSpecifiers);
 		int numDeclarators = initDeclaratorList.getChildCount();
 		ArrayList<ExternalDefinitionNode> definitionList = new ArrayList<ExternalDefinitionNode>();
 		Source source = newSource(declarationTree);
-		SequenceNode<VariableDeclarationNode> scopeList = translateScopeListDef(scopeListTree);
+		// SequenceNode<VariableDeclarationNode> scopeList =
+		// translateScopeListDef(scopeListTree);
 
 		if (numDeclarators == 0) {
 			TypeNode baseType;
@@ -1052,12 +1055,12 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				checkFunctionSpecifiers(declaration, analysis);
 				definition = declaration;
 			}
-			if (scopeList != null) {
-				definition = nodeFactory.newScopeParameterizedDeclarationNode(
-						tokenFactory.join(scopeList.getSource(),
-								definition.getSource()), scopeList,
-						(DeclarationNode) definition);
-			}
+			// if (scopeList != null) {
+			// definition = nodeFactory.newScopeParameterizedDeclarationNode(
+			// tokenFactory.join(scopeList.getSource(),
+			// definition.getSource()), scopeList,
+			// (DeclarationNode) definition);
+			// }
 			definitionList.add(definition);
 		}
 		return definitionList;
@@ -1094,12 +1097,13 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			CommonTree typedefNameTree = (CommonTree) analysis.typeSpecifierNode;
 			CommonTree identifierTree = (CommonTree) typedefNameTree
 					.getChild(0);
-			CommonTree scopeListTree = (CommonTree) typedefNameTree.getChild(1);
+			// CommonTree scopeListTree = (CommonTree)
+			// typedefNameTree.getChild(1);
 			IdentifierNode identifierNode = translateIdentifier(identifierTree);
-			SequenceNode<ExpressionNode> scopeListNode = translateScopeListUse(scopeListTree);
+			// SequenceNode<ExpressionNode> scopeListNode =
+			// translateScopeListUse(scopeListTree);
 
-			result = nodeFactory.newTypedefNameNode(identifierNode,
-					scopeListNode);
+			result = nodeFactory.newTypedefNameNode(identifierNode, null);
 			break;
 		}
 		case STRUCTURE_OR_UNION:
@@ -2174,8 +2178,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				for (ExternalDefinitionNode declaration : translateDeclaration(
 						childTree, newScope))
 					items.add((BlockItemNode) declaration);
-			} else if (kind == SCOPE) {
-				items.add(translateScopeDeclaration(childTree, newScope));
+				// } else if (kind == SCOPE) {
+				// items.add(translateScopeDeclaration(childTree, newScope));
 			} else if (kind == STATICASSERT) {
 				items.add(translateStaticAssertion(childTree, newScope));
 			} else if (kind == FUNCTION_DEFINITION) {
@@ -2407,9 +2411,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				.getChild(3);
 		CommonTree contractTree = (CommonTree) functionDefinitionTree
 				.getChild(4);
-		CommonTree scopeListTree = (CommonTree) functionDefinitionTree
-				.getChild(5);
-		SequenceNode<VariableDeclarationNode> scopeListNode = translateScopeListDef(scopeListTree);
+		// CommonTree scopeListTree = (CommonTree) functionDefinitionTree
+		// .getChild(5);
+		// SequenceNode<VariableDeclarationNode> scopeListNode =
+		// translateScopeListDef(scopeListTree);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(specifiers);
 		TypeNode baseType = newSpecifierType(analysis, newScope);
 		DeclaratorData data = processDeclarator(declarator, baseType, newScope);
@@ -2487,40 +2492,32 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		}
 		body = translateCompoundStatement(compoundStatementTree, newScope);
 		/*
-		if (analysis.globalSpecifier) {
-			Source source = newSource(compoundStatementTree);
-			// Add dummy declarations for implicit Cuda variables to prevent
-			// "Undeclared identifier" bugs
-			VariableDeclarationNode gridDimDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "gridDim"), nodeFactory
-							.newTypedefNameNode(nodeFactory.newIdentifierNode(
-									source, "dim3"), null));
-			VariableDeclarationNode blockDimDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "blockDim"), nodeFactory
-							.newTypedefNameNode(nodeFactory.newIdentifierNode(
-									source, "dim3"), null));
-			VariableDeclarationNode blockIdxDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "blockIdx"), nodeFactory
-							.newTypedefNameNode(nodeFactory.newIdentifierNode(
-									source, "uint3"), null));
-			VariableDeclarationNode threadIdxDecl = nodeFactory
-					.newVariableDeclarationNode(source, nodeFactory
-							.newIdentifierNode(source, "threadIdx"),
-							nodeFactory.newTypedefNameNode(nodeFactory
-									.newIdentifierNode(source, "uint3"), null));
-			List<BlockItemNode> newItemsList = new ArrayList<BlockItemNode>(
-					Arrays.<BlockItemNode> asList(gridDimDecl, blockDimDecl,
-							blockIdxDecl, threadIdxDecl));
-			for (BlockItemNode item : body) {
-				item.parent().removeChild(item.childIndex());
-				newItemsList.add(item);
-			}
-			body = nodeFactory.newCompoundStatementNode(source, newItemsList);
-		}
-		*/
+		 * if (analysis.globalSpecifier) { Source source =
+		 * newSource(compoundStatementTree); // Add dummy declarations for
+		 * implicit Cuda variables to prevent // "Undeclared identifier" bugs
+		 * VariableDeclarationNode gridDimDecl = nodeFactory
+		 * .newVariableDeclarationNode(source, nodeFactory
+		 * .newIdentifierNode(source, "gridDim"), nodeFactory
+		 * .newTypedefNameNode(nodeFactory.newIdentifierNode( source, "dim3"),
+		 * null)); VariableDeclarationNode blockDimDecl = nodeFactory
+		 * .newVariableDeclarationNode(source, nodeFactory
+		 * .newIdentifierNode(source, "blockDim"), nodeFactory
+		 * .newTypedefNameNode(nodeFactory.newIdentifierNode( source, "dim3"),
+		 * null)); VariableDeclarationNode blockIdxDecl = nodeFactory
+		 * .newVariableDeclarationNode(source, nodeFactory
+		 * .newIdentifierNode(source, "blockIdx"), nodeFactory
+		 * .newTypedefNameNode(nodeFactory.newIdentifierNode( source, "uint3"),
+		 * null)); VariableDeclarationNode threadIdxDecl = nodeFactory
+		 * .newVariableDeclarationNode(source, nodeFactory
+		 * .newIdentifierNode(source, "threadIdx"),
+		 * nodeFactory.newTypedefNameNode(nodeFactory .newIdentifierNode(source,
+		 * "uint3"), null)); List<BlockItemNode> newItemsList = new
+		 * ArrayList<BlockItemNode>( Arrays.<BlockItemNode> asList(gridDimDecl,
+		 * blockDimDecl, blockIdxDecl, threadIdxDecl)); for (BlockItemNode item
+		 * : body) { item.parent().removeChild(item.childIndex());
+		 * newItemsList.add(item); } body =
+		 * nodeFactory.newCompoundStatementNode(source, newItemsList); }
+		 */
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
 				(FunctionTypeNode) data.type,
@@ -2529,11 +2526,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		// call because otherwise specifiers are not added to function
 		// definitions, only declarations
 		setFunctionSpecifiers((FunctionDefinitionNode) result, analysis);
-		if (scopeListNode != null)
-			result = nodeFactory.newScopeParameterizedDeclarationNode(
-					tokenFactory.join(scopeListNode.getSource(),
-							result.getSource()), scopeListNode,
-					(DeclarationNode) result);
+		// if (scopeListNode != null)
+		// result = nodeFactory.newScopeParameterizedDeclarationNode(
+		// tokenFactory.join(scopeListNode.getSource(),
+		// result.getSource()), scopeListNode,
+		// (DeclarationNode) result);
 		return result;
 	}
 
@@ -2610,9 +2607,9 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 
 			if (definitionType == DECLARATION)
 				definitions.addAll(translateDeclaration(definitionTree, scope));
-			else if (definitionType == SCOPE)
-				definitions
-						.add(translateScopeDeclaration(definitionTree, scope));
+			// else if (definitionType == SCOPE)
+			// definitions
+			// .add(translateScopeDeclaration(definitionTree, scope));
 			else if (definitionType == FUNCTION_DEFINITION)
 				definitions.add(translateFunctionDefinition(definitionTree,
 						scope));
@@ -2669,8 +2666,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			for (ExternalDefinitionNode declaration : translateDeclaration(
 					blockItemTree, scope))
 				items.add((BlockItemNode) declaration);
-		} else if (kind == SCOPE) {
-			items.add(translateScopeDeclaration(blockItemTree, scope));
+			// } else if (kind == SCOPE) {
+			// items.add(translateScopeDeclaration(blockItemTree, scope));
 		} else if (kind == STATICASSERT) {
 			items.add(translateStaticAssertion(blockItemTree, scope));
 		} else if (kind == FUNCTION_DEFINITION) {
