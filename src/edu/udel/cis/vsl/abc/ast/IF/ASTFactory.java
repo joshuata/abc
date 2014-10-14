@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.IF;
 
-import java.io.PrintStream;
 import java.util.Collection;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -93,15 +92,4 @@ public interface ASTFactory {
 	 * @return the type factory
 	 */
 	TypeFactory getTypeFactory();
-
-	/**
-	 * Prints an AST node in the form of the original programming language.
-	 * 
-	 * @param node
-	 *            the AST node to be printed
-	 * @param out
-	 *            the print stream to be used for printing
-	 */
-	void prettyPrint(ASTNode node, PrintStream out);
-
 }

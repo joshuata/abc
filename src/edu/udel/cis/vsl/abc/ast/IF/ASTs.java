@@ -1,5 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.IF;
 
+import java.io.PrintStream;
+
+import edu.udel.cis.vsl.abc.ast.common.ASTPrettyPrinter;
 import edu.udel.cis.vsl.abc.ast.common.CommonASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
@@ -36,6 +39,18 @@ public class ASTs {
 	public static ASTFactory newASTFactory(NodeFactory nodeFactory,
 			TokenFactory tokenFactory, TypeFactory typeFactory) {
 		return new CommonASTFactory(nodeFactory, tokenFactory, typeFactory);
+	}
+	
+	/**
+	 * Prints an AST node in the form of the original programming language.
+	 * 
+	 * @param node
+	 *            the AST node to be printed
+	 * @param out
+	 *            the print stream to be used for printing
+	 */
+	public static void prettyPrint(ASTNode node, PrintStream out){
+		ASTPrettyPrinter.prettyPrint(node, out);
 	}
 
 }
