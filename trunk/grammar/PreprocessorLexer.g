@@ -162,7 +162,6 @@ RSLIST		:	'|>';  // LSLIST and RSLIST enclose a scope list
 SCOPEOF		:	'$scopeof';
 SELF		:	'$self';
 ROOT		:	'$root';
-SCOPE		:	'$scopeDUPLICATE'; // CAN THIS BE DELETED?
 SPAWN		:	'$spawn';
 TRUE		:	'$true';
 UNIFORM		:	'$uniform';

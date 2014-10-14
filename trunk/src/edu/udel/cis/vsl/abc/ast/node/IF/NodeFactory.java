@@ -96,6 +96,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
+import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
@@ -340,6 +341,7 @@ public interface NodeFactory {
 	 *            instantiate a scope-parameterized typedef
 	 * @return the new typedef name node wrapping the given identifier node
 	 */
+	// TODO get rid of scopeList
 	TypedefNameNode newTypedefNameNode(IdentifierNode name,
 			SequenceNode<ExpressionNode> scopeList);
 
@@ -668,6 +670,7 @@ public interface NodeFactory {
 	 *            the optional scope list (to be deprecated)
 	 * @return the new function call node
 	 */
+	// TODO get rid of scopeList
 	FunctionCallNode newFunctionCallNode(Source source,
 			ExpressionNode function, List<ExpressionNode> arguments,
 			SequenceNode<ExpressionNode> scopeList);
@@ -697,6 +700,7 @@ public interface NodeFactory {
 	 *            the optional scope list (to be deprecated)
 	 * @return the new function call node
 	 */
+	// TODO get rid of scopeList
 	FunctionCallNode newFunctionCallNode(Source source,
 			ExpressionNode function, List<ExpressionNode> contextArguments,
 			List<ExpressionNode> arguments,
