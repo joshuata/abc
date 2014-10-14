@@ -10,9 +10,9 @@ import java.util.NoSuchElementException;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
+import edu.udel.cis.vsl.abc.ast.IF.ASTs;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject.DiffKind;
-import edu.udel.cis.vsl.abc.ast.common.ASTPrettyPrinter;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
@@ -438,7 +438,7 @@ public abstract class CommonASTNode implements ASTNode {
 
 	@Override
 	public void prettyPrint(PrintStream out) {
-		ASTPrettyPrinter.prettyPrint(this, out);
+		ASTs.prettyPrint(this, out);
 	}
 
 }

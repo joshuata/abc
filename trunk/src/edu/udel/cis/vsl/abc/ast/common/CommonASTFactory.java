@@ -1,11 +1,9 @@
 package edu.udel.cis.vsl.abc.ast.common;
 
-import java.io.PrintStream;
 import java.util.Collection;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
@@ -53,10 +51,5 @@ public class CommonASTFactory implements ASTFactory {
 
 		// do some preparation?
 		return unit;
-	}
-
-	@Override
-	public void prettyPrint(ASTNode node, PrintStream out) {
-		ASTPrettyPrinter.prettyPrint(node, out);
 	}
 }
