@@ -4,7 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import org.junit.Ignore;
+import org.junit.Test;
+
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
+import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
@@ -12,12 +16,35 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 public class Cuda2CIVLTransformTest {
 
+	// TOOD: add cuda.h to ABC's text/include. It should not
+	// contain implementation code, only header code. It should
+	// not have any CIVL code.
+	@Ignore
+	@Test
+	public void sum() throws ABCException, IOException {
+		TranslationTask config = null;
+		FrontEnd frontEnd;
+
+		config = new TranslationTask(Language.CIVL_C, new File(new File(
+				new File("examples"), "cuda"), "sum.cu"));
+		config.setPrettyPrint(true);
+		config.setVerbose(false);
+		frontEnd = new FrontEnd();
+		frontEnd.showTranslation(config);
+		config.getOut().close();
+	}
+
+	// TODO: is this necessary?
 	public static void main(String[] args) {
 		TranslationTask config = null;
 		FrontEnd frontEnd;
 		PrintStream err = System.err;
 
-		config = new TranslationTask(Language.CIVL_C, new File("../CIVL/examples/translation/cuda", "sum.cu"));
+		// TODO: use Java's File constructor to create the File
+		// path in a platform-independent way (i.e., instead of using
+		// '/')
+		config = new TranslationTask(Language.CIVL_C, new File(
+				"../CIVL/examples/translation/cuda", "sum.cu"));
 		config.setPrettyPrint(true);
 		config.setVerbose(false);
 		frontEnd = new FrontEnd();
