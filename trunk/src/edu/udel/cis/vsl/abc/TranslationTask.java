@@ -12,6 +12,8 @@ import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
  * A translation task specifies all of the options and parameters which specify
  * a complete translation task.
  * 
+ * TODO: add preproc directives -D and -D=
+ * 
  * @author siegel
  * 
  */

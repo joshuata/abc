@@ -258,7 +258,7 @@ public class ABC {
 		PrintStream err = System.err, out = System.out;
 
 		out.println("ABC v" + version + " of " + date
-				+ " -- http://vsl.cis.udel.edu\n");
+				+ " -- http://vsl.cis.udel.edu/abc\n");
 		out.flush();
 		try {
 			config = parseCommandLine(args);
