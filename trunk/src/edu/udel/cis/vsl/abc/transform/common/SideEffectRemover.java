@@ -822,7 +822,7 @@ public class SideEffectRemover extends BaseTransformer {
 		if (invariant != null) {
 			invariant.parent().removeChild(invariant.childIndex());
 		}
-		if (!condition.isSideEffectFree(false)) {
+		if (condition != null && !condition.isSideEffectFree(false)) {
 			// If a side effect exists in a condition, convert from
 			// while (e) {S;} to while (true) {int tmp_X = e; if (!e) break; S;}
 			SideEffectFreeTriple sefCondition = processExpression(condition);
@@ -864,11 +864,13 @@ public class SideEffectRemover extends BaseTransformer {
 			// This removes ++, +=, etc. from the AST and also provides the
 			// opportunity to modify this for loop into a while loop if
 			// necessary for a complex incrementer.
-			StatementNode modifiedIncrementer;
+			StatementNode modifiedIncrementer = null;
 
-			incrementer.parent().removeChild(incrementer.childIndex());
-			modifiedIncrementer = expressionStatement(nodeFactory
-					.newExpressionStatementNode(incrementer));
+			if (incrementer != null) {
+				incrementer.parent().removeChild(incrementer.childIndex());
+				modifiedIncrementer = expressionStatement(nodeFactory
+						.newExpressionStatementNode(incrementer));
+			}
 			// If initializer is not null, work on a copy to maintain tree
 			// structure.
 			if (initializer != null) {
@@ -904,33 +906,37 @@ public class SideEffectRemover extends BaseTransformer {
 				StatementNode loop;
 
 				bodyItems.add(newBody);
-				bodyItems.add(modifiedIncrementer);
+				if (modifiedIncrementer != null)
+					bodyItems.add(modifiedIncrementer);
 				loop = nodeFactory.newWhileLoopNode(
 						statement.getSource(),
-						condition.copy(),
+						condition != null ? condition.copy() : null,
 						nodeFactory.newCompoundStatementNode(
 								newBody.getSource(), bodyItems), invariant);
-				if (initializer instanceof ExpressionNode) {
-					if (((ExpressionNode) initializer).isSideEffectFree(false)) {
-						allItems.add(nodeFactory
-								.newExpressionStatementNode((ExpressionNode) initializer));
+				if (initializer != null) {
+					if (initializer instanceof ExpressionNode) {
+						if (((ExpressionNode) initializer)
+								.isSideEffectFree(false)) {
+							allItems.add(nodeFactory
+									.newExpressionStatementNode((ExpressionNode) initializer));
+						} else {
+							SideEffectFreeTriple initTriple = processExpression((ExpressionNode) initializer);
+
+							allItems.addAll(initTriple.getBefore());
+							allItems.addAll(initTriple.getAfter());
+						}
+					} else if (initializer instanceof DeclarationListNode) {
+						DeclarationListNode declarationList = (DeclarationListNode) initializer;
+
+						for (VariableDeclarationNode child : declarationList) {
+							child.parent().removeChild(child.childIndex());
+							allItems.add(child);
+						}
 					} else {
-						SideEffectFreeTriple initTriple = processExpression((ExpressionNode) initializer);
-
-						allItems.addAll(initTriple.getBefore());
-						allItems.addAll(initTriple.getAfter());
+						throw new ABCUnsupportedException(
+								"converting initializer declaration to statement list.",
+								initializer.getSource().getSummary(false));
 					}
-				} else if (initializer instanceof DeclarationListNode) {
-					DeclarationListNode declarationList = (DeclarationListNode) initializer;
-
-					for (VariableDeclarationNode child : declarationList) {
-						child.parent().removeChild(child.childIndex());
-						allItems.add(child);
-					}
-				} else {
-					throw new ABCUnsupportedException(
-							"converting initializer declaration to statement list.",
-							initializer.getSource().getSummary(false));
 				}
 				allItems.add(loop);
 				result = nodeFactory.newCompoundStatementNode(
