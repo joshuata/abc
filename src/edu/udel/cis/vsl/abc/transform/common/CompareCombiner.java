@@ -302,6 +302,9 @@ public class CompareCombiner implements Combiner {
 				VariableDeclarationNode var = (VariableDeclarationNode) child;
 
 				if (var.getTypeNode().isOutputQualified()) {
+					// String name = var.getIdentifier().name();
+					//
+					// if(!name.equals("CIVL_output_filesystem"))
 					outputs.put(var.getName(), var);
 				}
 			}
@@ -311,11 +314,15 @@ public class CompareCombiner implements Combiner {
 
 	private void checkOutputs(Map<String, VariableDeclarationNode> specOutputs,
 			Map<String, VariableDeclarationNode> implOutputs) {
-		if (specOutputs.size() != implOutputs.size()) {
-			throw new ASTException(
-					"Specification and implementation must have the same output variables.");
-		}
+		// if (specOutputs.size() != implOutputs.size()) {
+		// throw new ASTException(
+		// "Specification and implementation must have the same output variables.");
+		// }
 		for (String name : specOutputs.keySet()) {
+			// allow CIVL_output_filesystem to exist in only one program
+			// TODO better solution for IO transformer
+			if (name.equals("CIVL_output_filesystem"))
+				continue;
 			if (!implOutputs.containsKey(name)) {
 				throw new ASTException(
 						"No implementation output variable matching specification outputs variable "
@@ -422,6 +429,12 @@ public class CompareCombiner implements Combiner {
 			VariableDeclarationNode specOutput = specOutputs.get(outputName);
 			VariableDeclarationNode implOutput = implOutputs.get(outputName);
 
+			// don't compare outputs if only one program has output
+			// CIVL_output_system
+			// TODO better solution from IO transformer
+			if (outputName.equals("CIVL_output_filesystem")
+					&& (specOutput == null || implOutput == null))
+				continue;
 			args.add(factory.newOperatorNode(specOutput.getSource(),
 					Operator.ADDRESSOF, Arrays.asList((ExpressionNode) factory
 							.newIdentifierExpressionNode(
