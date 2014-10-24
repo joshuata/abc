@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -10,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
 public class CompareTest {
@@ -32,11 +34,11 @@ public class CompareTest {
 		AST combinedAST;
 
 		program0 = f.compileAndLink(new File[] { file0 }, Language.CIVL_C,
-				systemIncludes, userIncludes);
+				systemIncludes, userIncludes, new HashMap<String, Macro>());
 		if (debug)
 			program0.prettyPrint(out);
 		program1 = f.compileAndLink(new File[] { file1 }, Language.CIVL_C,
-				systemIncludes, userIncludes);
+				systemIncludes, userIncludes, new HashMap<String, Macro>());
 		if (debug)
 			program1.prettyPrint(out);
 		combinedAST = Transform.compareCombiner().combine(program0.getAST(),

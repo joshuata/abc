@@ -1,8 +1,13 @@
 package edu.udel.cis.vsl.abc;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analysis;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
@@ -40,6 +45,7 @@ import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.program.IF.Programs;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
@@ -122,16 +128,10 @@ public class FrontEnd {
 	 * files repeatedly. The method {@link Preprocessor#outputTokenSource(File)}
 	 * is used to obtain the stream of tokens emanating from the preprocessor.
 	 * 
-	 * @param systemIncludePaths
-	 *            the system include paths to search for included system headers
-	 * @param userIncludePaths
-	 *            the user include paths to search for included user headers
 	 * @return the new Preprocessor
 	 */
-	public Preprocessor getPreprocessor(File[] systemIncludePaths,
-			File[] userIncludePaths) {
-		return preprocessorFactory.newPreprocessor(systemIncludePaths,
-				userIncludePaths);
+	public Preprocessor getPreprocessor() {
+		return preprocessorFactory.newPreprocessor();
 	}
 
 	/**
@@ -229,11 +229,11 @@ public class FrontEnd {
 	 *             language
 	 * */
 	public AST parse(File file, File[] systemIncludePaths,
-			File[] userIncludePaths) throws PreprocessorException,
-			SyntaxException, ParseException {
-		Preprocessor preprocessor = getPreprocessor(systemIncludePaths,
-				userIncludePaths);
-		CTokenSource tokens = preprocessor.outputTokenSource(file);
+			File[] userIncludePaths, Map<String, Macro> implicitMacros)
+			throws PreprocessorException, SyntaxException, ParseException {
+		Preprocessor preprocessor = getPreprocessor();
+		CTokenSource tokens = preprocessor.outputTokenSource(
+				systemIncludePaths, userIncludePaths, implicitMacros, file);
 		ParseTree parseTree = parser.parse(tokens);
 		AST ast = builder.getTranslationUnit(parseTree);
 
@@ -266,9 +266,10 @@ public class FrontEnd {
 	 *             language
 	 */
 	public AST compile(File file, Language language, File[] systemIncludePaths,
-			File[] userIncludePaths) throws PreprocessorException,
-			SyntaxException, ParseException {
-		AST result = parse(file, systemIncludePaths, userIncludePaths);
+			File[] userIncludePaths, Map<String, Macro> implicitMacros)
+			throws PreprocessorException, SyntaxException, ParseException {
+		AST result = parse(file, systemIncludePaths, userIncludePaths,
+				implicitMacros);
 		Analyzer analyzer = getStandardAnalyzer(language);
 
 		analyzer.analyze(result);
@@ -325,10 +326,10 @@ public class FrontEnd {
 	 *             reason
 	 */
 	public Program compileAndLink(File[] files, Language language,
-			File[] systemIncludePaths, File[] userIncludePaths)
-			throws PreprocessorException, SyntaxException, ParseException {
-		Preprocessor preprocessor = getPreprocessor(systemIncludePaths,
-				userIncludePaths);
+			File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros) throws PreprocessorException,
+			SyntaxException, ParseException {
+		Preprocessor preprocessor = getPreprocessor();
 		Analyzer analyzer = getStandardAnalyzer(language);
 		ProgramFactory programFactory = getProgramFactory(analyzer);
 		int n = files.length;
@@ -336,7 +337,9 @@ public class FrontEnd {
 		Program result;
 
 		for (int i = 0; i < n; i++) {
-			CTokenSource tokens = preprocessor.outputTokenSource(files[i]);
+			CTokenSource tokens = preprocessor.outputTokenSource(
+					systemIncludePaths, userIncludePaths, implicitMacros,
+					files[i]);
 			ParseTree parseTree = parser.parse(tokens);
 
 			asts[i] = builder.getTranslationUnit(parseTree);
@@ -402,10 +405,26 @@ public class FrontEnd {
 		boolean tables = task.doShowTables();
 		int nfiles = task.getFiles().length;
 		FrontEnd frontEnd = new FrontEnd();
-		Preprocessor preprocessor = frontEnd.getPreprocessor(
-				task.getSystemIncludes(), task.getUserIncludes());
+		Preprocessor preprocessor = frontEnd.getPreprocessor();
 		AST[] asts = new AST[nfiles];
+		List<String> macroNames = task.getMacroNames();
+		Map<String, Macro> implicitMacros = new HashMap<String, Macro>();
 
+		if (macroNames != null && macroNames.size() > 0) {
+			File temp = File.createTempFile("tmp" + System.currentTimeMillis(),
+					".h");
+			// Write to temp file
+			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
+
+			// Delete temp file when program exits.
+			temp.deleteOnExit();
+			for (String macroName : macroNames) {
+				tmpOut.write("#define " + macroName + "\r\n");
+			}
+//			tmpOut.write('\u001a');
+			tmpOut.close();
+			implicitMacros = preprocessor.getMacros(temp);
+		}
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
 			String filename = file.getName();
@@ -417,11 +436,13 @@ public class FrontEnd {
 				out.println();
 				out.flush();
 			}
-			tokens = preprocessor.outputTokenSource(file);
+			tokens = preprocessor.outputTokenSource(task.getSystemIncludes(),
+					task.getUserIncludes(), implicitMacros, file);
 			if (verbose) {
 				out.println(bar + " Preprocessor output for " + filename + " "
 						+ bar);
-				preprocessor.printOutputDebug(out, file);
+				preprocessor.printOutputDebug(task.getSystemIncludes(),
+						task.getUserIncludes(), implicitMacros, out, file);
 				out.println();
 				out.flush();
 			}

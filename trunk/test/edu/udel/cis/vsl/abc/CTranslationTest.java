@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 
 /**
  * Checks a number of simple C programs to make sure they pass on the parsing
@@ -57,7 +59,8 @@ public class CTranslationTest {
 			fe.showTranslation(config);
 		} else {
 			fe.compileAndLink(new File[] { file }, Language.CIVL_C,
-					systemIncludes, userIncludes).applyTransformers(codes);
+					systemIncludes, userIncludes, new HashMap<String, Macro>())
+					.applyTransformers(codes);
 		}
 	}
 

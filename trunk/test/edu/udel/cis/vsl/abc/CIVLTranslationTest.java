@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Ignore;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 public class CIVLTranslationTest {
@@ -35,7 +37,8 @@ public class CIVLTranslationTest {
 			f.showTranslation(config);
 		} else {
 			f.compileAndLink(new File[] { file }, Language.CIVL_C,
-					systemIncludes, userIncludes).applyTransformers(codes);
+					systemIncludes, userIncludes, new HashMap<String, Macro>())
+					.applyTransformers(codes);
 		}
 	}
 

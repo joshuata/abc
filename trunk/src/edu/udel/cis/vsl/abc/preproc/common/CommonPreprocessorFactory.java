@@ -1,7 +1,5 @@
 package edu.udel.cis.vsl.abc.preproc.common;
 
-import java.io.File;
-
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 
@@ -18,11 +16,11 @@ public class CommonPreprocessorFactory implements PreprocessorFactory {
 	// return new CommonCToken(token, includeHistory);
 	// }
 
-	@Override
-	public Preprocessor newPreprocessor(File[] systemIncludePaths,
-			File[] userIncludePaths) {
-		return new CommonPreprocessor(systemIncludePaths, userIncludePaths);
-	}
+	// @Override
+	// public Preprocessor newPreprocessor(File[] systemIncludePaths,
+	// File[] userIncludePaths) {
+	// return new CommonPreprocessor();
+	// }
 
 	@Override
 	public Preprocessor newPreprocessor() {

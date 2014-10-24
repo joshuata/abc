@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -16,6 +17,7 @@ import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -65,7 +67,7 @@ public class OmpTranslationTest {
 			fe.showTranslation(config);
 		} else {
 			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C,
-					systemIncludes, userIncludes);
+					systemIncludes, userIncludes, new HashMap<String, Macro>());
 
 			p.applyTransformers(codes);
 		}
@@ -75,7 +77,8 @@ public class OmpTranslationTest {
 	public void dijkstra_openmp_compile() throws PreprocessorException,
 			SyntaxException, ParseException {
 		AST ast = fe.compile(new File(root, "dijkstra_openmp.c"),
-				Language.CIVL_C, systemIncludes, userIncludes);
+				Language.CIVL_C, systemIncludes, userIncludes,
+				new HashMap<String, Macro>());
 		Program p = fe.getProgramFactory(
 				fe.getStandardAnalyzer(Language.CIVL_C)).newProgram(ast);
 

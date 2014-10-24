@@ -148,7 +148,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 * added to this map whenever a '#define' directive is processed. An entry
 	 * is removed by a '#undef'
 	 */
-	private Map<String, Macro> macroMap;
+	Map<String, Macro> macroMap;
 
 	/** Is the current node inside a text block ? */
 	private boolean inTextBlock = false;
@@ -192,12 +192,13 @@ public class PreprocessorTokenSource implements CTokenSource {
 	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macroMap, TokenFactory tokenFactory,
-			CommonPreprocessor preprocessor) throws PreprocessorException {
+			CommonPreprocessor preprocessor, boolean tmpFile)
+			throws PreprocessorException {
 		assert systemIncludePaths != null;
 		assert userIncludePaths != null;
 		this.tokenFactory = tokenFactory;
 		this.preprocessor = preprocessor;
-		this.originalSourceFile = getOrMakeSourceFile(source);
+		this.originalSourceFile = getOrMakeSourceFile(source, tmpFile);
 		try {
 			Tree tree = (Tree) parser.file().getTree();
 			Formation history = tokenFactory.newInclusion(originalSourceFile);
@@ -225,10 +226,11 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
-			TokenFactory tokenFactory, CommonPreprocessor preprocessor)
-			throws PreprocessorException {
+			TokenFactory tokenFactory, CommonPreprocessor preprocessor,
+			boolean tmpFile) throws PreprocessorException {
 		this(source, parser, systemIncludePaths, userIncludePaths,
-				new HashMap<String, Macro>(), tokenFactory, preprocessor);
+				new HashMap<String, Macro>(), tokenFactory, preprocessor,
+				tmpFile);
 	}
 
 	// Implementation of methods from CTokenSource...
@@ -268,8 +270,8 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 *            a file that is being read to produce this token source
 	 * @return the {@link SourceFile} corresponding to the given file
 	 */
-	private SourceFile getOrMakeSourceFile(File file) {
-		SourceFile result = preprocessor.getOrMakeSourceFile(file);
+	private SourceFile getOrMakeSourceFile(File file, boolean tmpFile) {
+		SourceFile result = preprocessor.getOrMakeSourceFile(file, tmpFile);
 
 		sourceFiles.add(result);
 		return result;
@@ -1336,7 +1338,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 					+ file);
 		tree = (Tree) fileReturn.getTree();
 		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(
-				getOrMakeSourceFile(file), filenameToken), parser, tree,
+				getOrMakeSourceFile(file, false), filenameToken), parser, tree,
 				tree.getChild(0));
 	}
 
