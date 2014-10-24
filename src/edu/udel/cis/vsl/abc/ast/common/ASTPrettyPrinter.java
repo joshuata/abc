@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.common;
 
 import java.io.PrintStream;
+import java.util.Stack;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -1224,21 +1225,26 @@ public class ASTPrettyPrinter {
 
 	// TODO need to be improved for more complicated types
 	// currently works for multiple dimension arrays
-	// e.g. int a[4][5]
+	// e.g. translating (int [20])[10] into int [10][20]
 	private static Pair<String, String> processArrayType(String type) {
 		int start = type.indexOf('[');
 		String typeSuffix = type.substring(start);
 		int length = typeSuffix.length();
+		Stack<String> extents = new Stack<>();
 		String newSuffix = "";
+		String extent = "";
 
-		for (int i = length - 1; i >= 0; i--) {
+		for (int i = 0; i < length; i++) {
 			char current = typeSuffix.charAt(i);
 
-			if (current == '[')
-				current = ']';
-			else if (current == ']')
-				current = '[';
-			newSuffix += current;
+			extent += current;
+			if (current == ']') {
+				extents.push(extent);
+				extent = "";
+			}
+		}
+		while (!extents.empty()) {
+			newSuffix += extents.pop();
 		}
 		return new Pair<>(type.substring(0, start), newSuffix);
 	}
