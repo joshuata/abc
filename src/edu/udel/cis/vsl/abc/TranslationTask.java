@@ -3,8 +3,10 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 
@@ -35,9 +37,9 @@ public class TranslationTask {
 	private File[] userIncludes;
 
 	/**
-	 * List of defined macro names.
+	 * Map of macros: (name, object).
 	 */
-	private List<String> macroNames;
+	private Map<String, String> macros;
 
 	/**
 	 * Output stream: where to print human-readable descriptions of translation
@@ -94,6 +96,7 @@ public class TranslationTask {
 		files = null;
 		transformCodes = new LinkedList<>();
 		showTables = false;
+		macros = new HashMap<String, String>();
 	}
 
 	public TranslationTask(Language language, File[] files) {
@@ -107,6 +110,8 @@ public class TranslationTask {
 		prettyPrint = false;
 		transformCodes = new LinkedList<>();
 		showTables = false;
+		macros = new HashMap<String, String>();
+
 	}
 
 	public TranslationTask(Language language, File file) {
@@ -162,8 +167,8 @@ public class TranslationTask {
 	 * 
 	 * @return the macro names that are predefined.
 	 */
-	public List<String> getMacroNames() {
-		return this.macroNames;
+	public Map<String, String> getMacros() {
+		return this.macros;
 	}
 
 	/**
@@ -171,8 +176,8 @@ public class TranslationTask {
 	 * 
 	 * @param macros
 	 */
-	public void setMacroNames(List<String> macros) {
-		this.macroNames = macros;
+	public void setMacroNames(Map<String, String> macros) {
+		this.macros = macros;
 	}
 
 	/**

@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analysis;
@@ -407,21 +406,22 @@ public class FrontEnd {
 		FrontEnd frontEnd = new FrontEnd();
 		Preprocessor preprocessor = frontEnd.getPreprocessor();
 		AST[] asts = new AST[nfiles];
-		List<String> macroNames = task.getMacroNames();
+		Map<String, String> macroNames = task.getMacros();
 		Map<String, Macro> implicitMacros = new HashMap<String, Macro>();
 
 		if (macroNames != null && macroNames.size() > 0) {
+			//use temporary file to store the command line macros
 			File temp = File.createTempFile("tmp" + System.currentTimeMillis(),
 					".h");
 			// Write to temp file
 			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
 
-			for (String macroName : macroNames) {
-				tmpOut.write("#define " + macroName + "\r\n");
-			}
-			// tmpOut.write('\u001a');
+			for (String macro : macroNames.keySet())
+				tmpOut.write("#define " + macro + " " + macroNames.get(macro)
+						+ "\r\n");
 			tmpOut.close();
 			implicitMacros = preprocessor.getMacros(temp);
+			//delete the temporary file
 			temp.delete();
 		}
 		for (int i = 0; i < nfiles; i++) {

@@ -5,8 +5,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
@@ -95,7 +97,7 @@ public class ABC {
 		out.println("  add path to system include list");
 		out.println("-iquote <path>");
 		out.println("  add path to user include list");
-		out.println("-D <macro>");
+		out.println("-D<macro> or -D<macro>=<object>");
 		out.println("  define a macro for compilation");
 		out.println("-o <filename>");
 		out.println("  send output to filename");
@@ -138,7 +140,7 @@ public class ABC {
 		// the following are updated by -iquote
 		ArrayList<File> userIncludeList = new ArrayList<>();
 		// the following are updated by -D
-		ArrayList<String> macroNames = new ArrayList<>();
+		Map<String, String> macros = new HashMap<String, String>();
 		boolean preprocOnly = false;
 		boolean verbose = false;
 		boolean pretty = true;
@@ -168,15 +170,22 @@ public class ABC {
 					err("More than one use of -o");
 			} else if (arg.startsWith("-D")) {
 				String name;
+				String object = "";
 
-				if (arg.length() == 2) {
-					i++;
-					if (i >= args.length)
-						err("Macro must follow -D");
-					name = args[i];
-				} else
+				if (arg.contains("=")) {
+					// -D<macro>=<object>
+					int indexOfEqual = arg.indexOf('=');
+
+					name = arg.substring(2, indexOfEqual - 1);
+					object = arg.substring(indexOfEqual + 1);
+				} else {
+					// -D<macro>
 					name = arg.substring(2);
-				macroNames.add(name);
+				}
+				if (macros.containsKey(name))
+					err("Duplicated macro definition of " + name);
+				else
+					macros.put(name, object);
 			} else if (arg.startsWith("-I")) {
 				String name;
 
@@ -238,7 +247,7 @@ public class ABC {
 			result.getFiles()[i] = new File(infileNames.get(i));
 		result.setUserIncludes(userIncludeList.toArray(new File[0]));
 		result.setSystemIncludes(systemIncludeList.toArray(new File[0]));
-		result.setMacroNames(macroNames);
+		result.setMacroNames(macros);
 		if (outfileName == null)
 			result.setOut(System.out);
 		else
