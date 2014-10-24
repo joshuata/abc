@@ -24,6 +24,8 @@ public class MacroTest {
 
 	@Test
 	public void intro() {
-		run("-DNAME=Joseph", "-E", "-v", "examples/macro/intro.txt");
+		run("-DNAME=Joseph", "-DCOUNTRY=United States", 
+				"-DCITY=Newark", "-DSTATE=Delaware",
+				"-E", "-v", "examples/macro/intro.txt");
 	}
 }
