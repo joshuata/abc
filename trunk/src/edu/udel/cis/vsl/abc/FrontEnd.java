@@ -416,14 +416,13 @@ public class FrontEnd {
 			// Write to temp file
 			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
 
-			// Delete temp file when program exits.
-			temp.deleteOnExit();
 			for (String macroName : macroNames) {
 				tmpOut.write("#define " + macroName + "\r\n");
 			}
-//			tmpOut.write('\u001a');
+			// tmpOut.write('\u001a');
 			tmpOut.close();
 			implicitMacros = preprocessor.getMacros(temp);
+			temp.delete();
 		}
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
