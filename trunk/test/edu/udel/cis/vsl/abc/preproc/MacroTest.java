@@ -11,7 +11,17 @@ public class MacroTest {
 	}
 
 	@Test
-	public void testMacro() {
-		run("-D", "MYCIVL", "-p", "examples/macro/adder.c");
+	public void adder1() {
+		run("-DCIVL_PROG", "-p", "examples/macro/adder.c");
+	}
+	
+	@Test
+	public void adder2() {
+		run("-DNVALUE=50", "-p", "examples/macro/adder.c");
+	}
+
+	@Test
+	public void intro() {
+		run("-DNAME=Joseph", "-E", "-v", "examples/macro/intro.txt");
 	}
 }
