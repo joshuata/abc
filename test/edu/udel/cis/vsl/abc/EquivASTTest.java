@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
@@ -14,6 +15,7 @@ import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 
 public class EquivASTTest {
 
@@ -36,11 +38,11 @@ public class EquivASTTest {
 		DifferenceObject diff;
 
 		program1 = f.compileAndLink(new File[] { file1 }, Language.C,
-				systemIncludes, userIncludes);
+				systemIncludes, userIncludes, new HashMap<String, Macro>());
 		program1.applyTransformers(codes);
 
 		program2 = f.compileAndLink(new File[] { file2 }, Language.C,
-				systemIncludes, userIncludes);
+				systemIncludes, userIncludes, new HashMap<String, Macro>());
 		program2.applyTransformers(codes);
 		if (debug) {
 			System.out.println("First program is: ");

@@ -95,6 +95,8 @@ public class ABC {
 		out.println("  add path to system include list");
 		out.println("-iquote <path>");
 		out.println("  add path to user include list");
+		out.println("-D <macro>");
+		out.println("  define a macro for compilation");
 		out.println("-o <filename>");
 		out.println("  send output to filename");
 		out.println("-E");
@@ -132,9 +134,11 @@ public class ABC {
 		ArrayList<String> infileNames = new ArrayList<>();
 		String outfileName = null;
 		// the following are updated by -I
-		ArrayList<File> systemIncludeList = new ArrayList<File>();
+		ArrayList<File> systemIncludeList = new ArrayList<>();
 		// the following are updated by -iquote
-		ArrayList<File> userIncludeList = new ArrayList<File>();
+		ArrayList<File> userIncludeList = new ArrayList<>();
+		// the following are updated by -D
+		ArrayList<String> macroNames = new ArrayList<>();
 		boolean preprocOnly = false;
 		boolean verbose = false;
 		boolean pretty = true;
@@ -162,6 +166,17 @@ public class ABC {
 					outfileName = name;
 				else
 					err("More than one use of -o");
+			} else if (arg.startsWith("-D")) {
+				String name;
+
+				if (arg.length() == 2) {
+					i++;
+					if (i >= args.length)
+						err("Macro must follow -D");
+					name = args[i];
+				} else
+					name = arg.substring(2);
+				macroNames.add(name);
 			} else if (arg.startsWith("-I")) {
 				String name;
 
@@ -223,6 +238,7 @@ public class ABC {
 			result.getFiles()[i] = new File(infileNames.get(i));
 		result.setUserIncludes(userIncludeList.toArray(new File[0]));
 		result.setSystemIncludes(systemIncludeList.toArray(new File[0]));
+		result.setMacroNames(macroNames);
 		if (outfileName == null)
 			result.setOut(System.out);
 		else

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,6 +17,7 @@ import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -52,13 +54,14 @@ public class PruneTest {
 			throws PreprocessorException, SyntaxException, ParseException {
 		FrontEnd fe = new FrontEnd();
 		Program program = fe.compileAndLink(inputs, Language.C,
-				systemIncludePaths, userIncludePaths);
+				systemIncludePaths, userIncludePaths,
+				new HashMap<String, Macro>());
 		AST actual, expected;
 
 		program.applyTransformer("prune");
 		actual = program.getAST();
 		expected = fe.compile(oracle, Language.C, systemIncludePaths,
-				userIncludePaths);
+				userIncludePaths, new HashMap<String, Macro>());
 		if (debug) {
 			expected.prettyPrint(out, false);
 			out.println();

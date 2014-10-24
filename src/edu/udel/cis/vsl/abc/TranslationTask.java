@@ -35,6 +35,11 @@ public class TranslationTask {
 	private File[] userIncludes;
 
 	/**
+	 * List of defined macro names.
+	 */
+	private List<String> macroNames;
+
+	/**
 	 * Output stream: where to print human-readable descriptions of translation
 	 * artifacts.
 	 */
@@ -151,6 +156,23 @@ public class TranslationTask {
 	 */
 	public void setUserIncludes(File[] userIncludes) {
 		this.userIncludes = userIncludes;
+	}
+
+	/**
+	 * 
+	 * @return the macro names that are predefined.
+	 */
+	public List<String> getMacroNames() {
+		return this.macroNames;
+	}
+
+	/**
+	 * updates the predefined macros.
+	 * 
+	 * @param macros
+	 */
+	public void setMacroNames(List<String> macros) {
+		this.macroNames = macros;
 	}
 
 	/**

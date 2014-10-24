@@ -3,6 +3,8 @@ package edu.udel.cis.vsl.abc.preproc;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
@@ -14,6 +16,7 @@ import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
 import edu.udel.cis.vsl.abc.preproc.common.CommonPreprocessor;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 
 public class PreprocessorTest {
 
@@ -31,11 +34,13 @@ public class PreprocessorTest {
 
 	private static File[] userIncludes = new File[] { dir1, dir11 };
 
+	private static Map<String, Macro> implicitMacros = new HashMap<>();
+
 	private CommonPreprocessor p;
 
 	@Before
 	public void setUp() throws Exception {
-		p = new CommonPreprocessor(systemIncludes, userIncludes);
+		p = new CommonPreprocessor();
 	}
 
 	private void readSource(TokenSource source) throws PreprocessorException {
@@ -56,8 +61,10 @@ public class PreprocessorTest {
 		TokenSource source;
 
 		if (debug)
-			p.debug(System.out, sourceFile);
-		source = p.outputTokenSource(sourceFile);
+			p.debug(systemIncludes, userIncludes, implicitMacros, System.out,
+					sourceFile);
+		source = p.outputTokenSource(systemIncludes, userIncludes,
+				implicitMacros, sourceFile);
 		readSource(source);
 	}
 
@@ -97,9 +104,11 @@ public class PreprocessorTest {
 		File solutionFile = new File(root, rootName + ".sol.txt");
 
 		if (debug)
-			p.debug(System.out, sourceFile);
+			p.debug(systemIncludes, userIncludes, implicitMacros, System.out,
+					sourceFile);
 
-		TokenSource actualSource = p.outputTokenSource(sourceFile);
+		TokenSource actualSource = p.outputTokenSource(systemIncludes,
+				userIncludes, implicitMacros, sourceFile);
 		TokenSource expectedSource = p.lexer(solutionFile);
 
 		compare(actualSource, expectedSource);

@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -13,6 +14,7 @@ import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -50,7 +52,8 @@ public class CIVLLinkageTest {
 		}
 		try {
 			program = fe.compileAndLink(files, Language.CIVL_C,
-					systemIncludePaths, new File[0]);
+					systemIncludePaths, new File[0],
+					new HashMap<String, Macro>());
 		} catch (Exception ex) {
 			if (debug)
 				throw ex;

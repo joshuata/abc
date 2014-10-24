@@ -4,13 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.Map;
 
 import org.antlr.runtime.Lexer;
 import org.antlr.runtime.Parser;
 
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
-import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 /**
  * A Preprocessor is used to preprocess source files. A single Preprocessor
@@ -21,15 +22,15 @@ import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
  */
 public interface Preprocessor {
 
-	/**
-	 * Read these files to get their macros. Store the macros and use them as
-	 * the starting point when parsing any subsequent file.
-	 * 
-	 * @param implicitIncludes
-	 * @throws PreprocessorException
-	 */
-	void setImplicitIncludes(File[] implicitIncludes)
-			throws PreprocessorException;
+	// /**
+	// * Read these files to get their macros. Store the macros and use them as
+	// * the starting point when parsing any subsequent file.
+	// *
+	// * @param implicitIncludes
+	// * @throws PreprocessorException
+	// */
+	// void setImplicitIncludes(File[] implicitIncludes)
+	// throws PreprocessorException;
 
 	/**
 	 * Returns a lexer for the given preprocessor source file. The lexer removes
@@ -87,22 +88,41 @@ public interface Preprocessor {
 	 */
 	void parse(PrintStream out, File file) throws PreprocessorException;
 
+	Map<String, Macro> getMacros(File file) throws PreprocessorException;
+
 	/**
 	 * Given a preprocessor source file, this returns a Token Source that emits
 	 * the tokens resulting from preprocessing the file.
 	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
+	 * @param implicitMacros
+	 *            the predefined macros, including those specified in command
+	 *            line
 	 * @param file
+	 *            the file to be preprocessed
 	 * @return a token source for the token resulting from preprocessing the
 	 *         file
 	 * @throws PreprocessorException
 	 *             if an I/O error occurs
 	 */
-	CTokenSource outputTokenSource(File file) throws PreprocessorException;
+	CTokenSource outputTokenSource(File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> implicitMacros,
+			File file) throws PreprocessorException;
 
 	/**
 	 * Given the name of a preprocessor source file, this returns a Token Source
 	 * that emits the tokens resulting from preprocessing the file.
 	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
+	 * @param implicitMacros
+	 *            the predefined macros, including those specified in command
+	 *            line
 	 * @param filename
 	 *            The name of the file to be preprocessed.
 	 * @return a token source for the token resulting from preprocessing the
@@ -111,14 +131,22 @@ public interface Preprocessor {
 	 *             if an I/O error occurs
 	 * @throws IOException
 	 */
-	CTokenSource outputTokenSource(String filename)
-			throws PreprocessorException, IOException;
+	CTokenSource outputTokenSource(File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> implicitMacros,
+			String filename) throws PreprocessorException, IOException;
 
 	/**
 	 * Prints the list of tokens that result from preprocessing the file. One
 	 * token is printed per line, along with information on the origin of that
 	 * token. Useful mainly for debugging.
 	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
+	 * @param implicitMacros
+	 *            the predefined macros, including those specified in command
+	 *            line
 	 * @param out
 	 *            where to send output list
 	 * @param file
@@ -127,12 +155,20 @@ public interface Preprocessor {
 	 *             if the file fails to adhere to the preprocessor grammar, or
 	 *             an I/O occurs
 	 */
-	void printOutputTokens(PrintStream out, File file)
+	void printOutputTokens(File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros, PrintStream out, File file)
 			throws PreprocessorException;
 
 	/**
 	 * Prints the result of preprocessing the file.
 	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
+	 * @param implicitMacros
+	 *            the predefined macros, including those specified in command
+	 *            line
 	 * @param out
 	 *            where to send the output
 	 * @param file
@@ -141,13 +177,22 @@ public interface Preprocessor {
 	 *             if the file fails to adhere to the preprocessor grammar, or
 	 *             an I/O occurs
 	 */
-	void printOutput(PrintStream out, File file) throws PreprocessorException;
+	void printOutput(File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros, PrintStream out, File file)
+			throws PreprocessorException;
 
 	/**
 	 * Prints the result of preprocessing the file, but surrounding the output
 	 * with some lines to clearly delineate the beginning and ending of the
 	 * output, and specifying the file name.
 	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
+	 * @param implicitMacros
+	 *            the predefined macros, including those specified in command
+	 *            line
 	 * @param out
 	 *            where to send the output
 	 * @param file
@@ -156,12 +201,17 @@ public interface Preprocessor {
 	 *             if the file fails to adhere to the preprocessor grammar, or
 	 *             an I/O occurs
 	 */
-	void printOutputDebug(PrintStream out, File file)
+	void printOutputDebug(File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros, PrintStream out, File file)
 			throws PreprocessorException;
 
 	/**
 	 * Show the processing of the file in stages. Useful for debugging.
 	 * 
+	 * @param systemIncludePaths
+	 *            the system include paths to search for included system headers
+	 * @param userIncludePaths
+	 *            the user include paths to search for included user headers
 	 * @param out
 	 *            where to print the output
 	 * @param file
@@ -170,9 +220,9 @@ public interface Preprocessor {
 	 *             if there is an I/O error the source file does not conform to
 	 *             the preprocessor syntax
 	 */
-	void debug(PrintStream out, File file) throws PreprocessorException;
-
-	TokenFactory getTokenFactory();
+	void debug(File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros, PrintStream out, File file)
+			throws PreprocessorException;
 
 	/**
 	 * Returns the set of all source files processed by this preprocessor since
@@ -223,5 +273,4 @@ public interface Preprocessor {
 	 *            stream to which to print
 	 */
 	void printSourceFiles(PrintStream out);
-
 }

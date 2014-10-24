@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -46,7 +48,7 @@ public class CloneTest {
 		FrontEnd fe = new FrontEnd();
 
 		ast1 = fe.compile(new File(root, filenameRoot + ".c"), Language.C,
-				systemIncludes, userIncludes);
+				systemIncludes, userIncludes, new HashMap<String, Macro>());
 		root1 = ast1.getRootNode();
 		root2 = root1.copy();
 		ast2 = fe.getASTFactory().newAST(root2, ast1.getSourceFiles());

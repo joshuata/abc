@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -48,7 +50,8 @@ public class CLinkageTest {
 	private AST getAST(File file) throws ParseException, SyntaxException,
 			PreprocessorException {
 		FrontEnd fe = new FrontEnd();
-		AST ast = fe.compile(file, Language.C, new File[0], new File[0]);
+		AST ast = fe.compile(file, Language.C, new File[0], new File[0],
+				new HashMap<String, Macro>());
 
 		return ast;
 	}

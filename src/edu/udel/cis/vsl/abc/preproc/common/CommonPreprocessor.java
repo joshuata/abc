@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.preproc.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,7 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -24,8 +22,6 @@ import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
-import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
-import edu.udel.cis.vsl.abc.token.IF.Tokens;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 
 /**
@@ -33,7 +29,8 @@ import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
  * (a la Facade Pattern). It includes a main method which preprocesses the file
  * and sends result to stdout.
  * 
- * TODO: support -D, i.e., object macros defined at command line
+ * TODO: support -D, i.e., object macros defined at command line TODO: reduce
+ * the state of this class
  * 
  * @author Stephen F. Siegel, University of Delaware
  * 
@@ -44,88 +41,46 @@ public class CommonPreprocessor implements Preprocessor {
 
 	public final static boolean debug = true;
 
-	/**
-	 * Default value for system include path list.
-	 */
-	private static File[] defaultSystemIncludes = new File[] {};
-
-	/**
-	 * Default value for user include path list. Currently, it consists of one
-	 * directory, namely, the working directory.
-	 */
-	private static File[] defaultUserIncludes = new File[] { new File(
-			System.getProperty("user.dir")) };
-
-	private File[] systemIncludePaths;
-
-	private File[] userIncludePaths;
-
-	/**
-	 * The macros generated from reading the implicit include files.
-	 */
-	private Map<String, Macro> implicitMacros;
-
-	private TokenFactory tokenFactory = Tokens.newTokenFactory();
-
 	private Map<File, SourceFile> sourceFileMap = new LinkedHashMap<>();
 
 	private ArrayList<SourceFile> sourceFiles = new ArrayList<>();
 
-	public CommonPreprocessor(File[] systemIncludePaths, File[] userIncludePaths) {
-		this.systemIncludePaths = systemIncludePaths;
-		this.userIncludePaths = userIncludePaths;
-	}
-
-	public CommonPreprocessor() {
-		this.systemIncludePaths = defaultSystemIncludes;
-		this.userIncludePaths = defaultUserIncludes;
-	}
-
-	/**
-	 * Looks to see if a {@link SourceFile} object has already been created for
-	 * the given {@link File}. If so, returns that one. Else creates a new one,
-	 * assigns it the next index, and stores it.
-	 * 
-	 * @param file
-	 *            a file that is being read to produce this token source
-	 * @return the {@link SourceFile} corresponding to the given file
-	 */
-	SourceFile getOrMakeSourceFile(File file) {
-		SourceFile result = sourceFileMap.get(file);
-
-		if (result == null) {
-			result = new SourceFile(file, sourceFiles.size());
-			sourceFiles.add(result);
-			sourceFileMap.put(file, result);
-		}
-		return result;
-	}
+	// /**
+	// * Read these files to get their macros. Store the macros and use them as
+	// * the starting point when parsing any subsequent file.
+	// *
+	// * @param implicitIncludes
+	// * @throws PreprocessorException
+	// */
+	// @Override
+	// public void setImplicitIncludes(File[] implicitIncludes)
+	// throws PreprocessorException {
+	// this.implicitMacros = new HashMap<String, Macro>();
+	// for (File file : implicitIncludes) {
+	// PreprocessorTokenSource tokenSource = outputTokenSource(file,
+	// implicitMacros, tokenFactory);
+	// Token token;
+	//
+	// do {
+	// token = tokenSource.nextToken();
+	// } while (token.getType() != PreprocessorLexer.EOF);
+	// }
+	// }
 
 	@Override
-	public TokenFactory getTokenFactory() {
-		return tokenFactory;
-	}
+	public Map<String, Macro> getMacros(File file) throws PreprocessorException {
+		PreprocessorWorker worker = new PreprocessorWorker(
+				PreprocessorWorker.defaultSystemIncludes,
+				PreprocessorWorker.defaultSystemIncludes,
+				new HashMap<String, Macro>());
+		PreprocessorTokenSource tokenSource = worker.outputTokenSource(file,
+				this, true);
+		Token token;
 
-	/**
-	 * Read these files to get their macros. Store the macros and use them as
-	 * the starting point when parsing any subsequent file.
-	 * 
-	 * @param implicitIncludes
-	 * @throws PreprocessorException
-	 */
-	@Override
-	public void setImplicitIncludes(File[] implicitIncludes)
-			throws PreprocessorException {
-		this.implicitMacros = new HashMap<String, Macro>();
-		for (File file : implicitIncludes) {
-			PreprocessorTokenSource tokenSource = outputTokenSource(file,
-					implicitMacros, tokenFactory);
-			Token token;
-
-			do {
-				token = tokenSource.nextToken();
-			} while (token.getType() != PreprocessorLexer.EOF);
-		}
+		do {
+			token = tokenSource.nextToken();
+		} while (token.getType() != PreprocessorLexer.EOF);
+		return tokenSource.macroMap;
 	}
 
 	/**
@@ -197,10 +152,7 @@ public class CommonPreprocessor implements Preprocessor {
 	public PreprocessorParser parser(File file) throws PreprocessorException {
 		PreprocessorLexer lexer = lexer(file);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
-		// String fileName = file.getName();
 
-		// this.addHeaderFile(fileName);
-		// this.addFileName(fileName);
 		return new PreprocessorParser(tokenStream);
 	}
 
@@ -282,17 +234,6 @@ public class CommonPreprocessor implements Preprocessor {
 		}
 	}
 
-	private PreprocessorTokenSource outputTokenSource(File file,
-			Map<String, Macro> macroMap, TokenFactory tokenFactory)
-			throws PreprocessorException {
-		PreprocessorParser parser = parser(file);
-		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
-				parser, systemIncludePaths, userIncludePaths, macroMap,
-				tokenFactory, this);
-
-		return tokenSource;
-	}
-
 	/**
 	 * Given a preprocessor source file, this returns a Token Source that emits
 	 * the tokens resulting from preprocessing the file.
@@ -304,82 +245,23 @@ public class CommonPreprocessor implements Preprocessor {
 	 *             if an I/O error occurs
 	 */
 	@Override
-	public PreprocessorTokenSource outputTokenSource(File file)
-			throws PreprocessorException {
-		Map<String, Macro> macroMap = new HashMap<String, Macro>();
+	public PreprocessorTokenSource outputTokenSource(File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> implicitMacros,
+			File file) throws PreprocessorException {
+		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
+				userIncludePaths, implicitMacros);
 
-		if (implicitMacros != null)
-			macroMap.putAll(implicitMacros);
-		return outputTokenSource(file, macroMap, tokenFactory);
-	}
-
-	/**
-	 * Find the file with the given name by looking through the directories in
-	 * the given list. Go through list from first to last. Returns first
-	 * instance found.
-	 * 
-	 * Note: the filename may itself containing directory structure, e.g.,
-	 * "sys/stdio.h".
-	 * 
-	 * @param paths
-	 *            list of directories to search
-	 * @param filename
-	 *            name of file
-	 * @return file named filename, or null if not found
-	 */
-	private File findFile(File[] paths, String filename) {
-		for (File path : paths) {
-			File result = new File(path, filename);
-
-			if (result.isFile())
-				return result;
-		}
-		return null;
+		return worker.outputTokenSource(file, this, false);
 	}
 
 	@Override
-	public CTokenSource outputTokenSource(String filename)
-			throws PreprocessorException, IOException {
-		Map<String, Macro> macroMap = new HashMap<String, Macro>();
+	public CTokenSource outputTokenSource(File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> implicitMacros,
+			String filename) throws PreprocessorException, IOException {
+		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
+				userIncludePaths, implicitMacros);
 
-		if (implicitMacros != null)
-			macroMap.putAll(implicitMacros);
-
-		File file = null;
-		CharStream charStream;
-		PreprocessorParser parser;
-		PreprocessorLexer lexer;
-		int numErrors;
-
-		file = findFile(userIncludePaths, filename);
-		if (file == null)
-			file = findFile(systemIncludePaths, filename);
-		if (file == null) {
-			InputStream inputStream = this.getClass().getResourceAsStream(
-					"/" + filename);
-
-			if (inputStream == null)
-				return null;
-			charStream = new FilteredCharStream(new ANTLRInputStream(
-					inputStream));
-			file = new File(filename);
-		} else {
-			charStream = new FilteredCharStream(new ANTLRFileStream(
-					file.getAbsolutePath()));
-		}
-		lexer = new PreprocessorLexer(charStream);
-		parser = new PreprocessorParser(new CommonTokenStream(lexer));
-		numErrors = parser.getNumberOfSyntaxErrors();
-		if (numErrors != 0)
-			throw new PreprocessorException(numErrors
-					+ " syntax errors occurred while scanning included file "
-					+ file);
-
-		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
-				parser, systemIncludePaths, userIncludePaths, macroMap,
-				tokenFactory, this);
-
-		return tokenSource;
+		return worker.outputTokenSource(filename, this);
 	}
 
 	/**
@@ -396,9 +278,13 @@ public class CommonPreprocessor implements Preprocessor {
 	 *             an I/O occurs
 	 */
 	@Override
-	public void printOutputTokens(PrintStream out, File file)
-			throws PreprocessorException {
-		PreprocessorTokenSource source = outputTokenSource(file);
+	public void printOutputTokens(File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> implicitMacros,
+			PrintStream out, File file) throws PreprocessorException {
+		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
+				userIncludePaths, implicitMacros);
+		PreprocessorTokenSource source = worker.outputTokenSource(file, this,
+				false);
 
 		out.println("Post-preprocessing token stream for " + file + ":\n");
 		PreprocessorUtils.printTokenSource(out, source);
@@ -417,9 +303,13 @@ public class CommonPreprocessor implements Preprocessor {
 	 *             an I/O occurs
 	 */
 	@Override
-	public void printOutput(PrintStream out, File file)
+	public void printOutput(File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros, PrintStream out, File file)
 			throws PreprocessorException {
-		PreprocessorTokenSource source = outputTokenSource(file);
+		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
+				userIncludePaths, implicitMacros);
+		PreprocessorTokenSource source = worker.outputTokenSource(file, this,
+				false);
 
 		PreprocessorUtils.sourceTokenSource(out, source);
 		out.flush();
@@ -439,11 +329,13 @@ public class CommonPreprocessor implements Preprocessor {
 	 *             an I/O occurs
 	 */
 	@Override
-	public void printOutputDebug(PrintStream out, File file)
-			throws PreprocessorException {
+	public void printOutputDebug(File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> implicitMacros,
+			PrintStream out, File file) throws PreprocessorException {
 		out.println("Post-preprocessing output for " + file + ":\n");
 		out.println("----------------------------------->");
-		printOutput(out, file);
+		printOutput(systemIncludePaths, userIncludePaths, implicitMacros, out,
+				file);
 		out.println("<-----------------------------------");
 		out.flush();
 	}
@@ -460,32 +352,21 @@ public class CommonPreprocessor implements Preprocessor {
 	 *             the preprocessor syntax
 	 */
 	@Override
-	public void debug(PrintStream out, File file) throws PreprocessorException {
+	public void debug(File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> implicitMacros, PrintStream out, File file)
+			throws PreprocessorException {
 		PreprocessorUtils.source(out, file);
 		out.println();
 		lex(out, file);
 		out.println();
 		parse(out, file);
 		out.println();
-		printOutputTokens(out, file);
+		printOutputTokens(systemIncludePaths, userIncludePaths, implicitMacros,
+				out, file);
 		out.println();
-		printOutputDebug(out, file);
+		printOutputDebug(systemIncludePaths, userIncludePaths, implicitMacros,
+				out, file);
 		out.println();
-	}
-
-	/**
-	 * This main method is just here for simple tests. The real main method is
-	 * in the main class, ABC.java.
-	 */
-	public final static void main(String[] args) throws PreprocessorException {
-		String filename = args[0];
-		CommonPreprocessor p = new CommonPreprocessor();
-		File file = new File(filename);
-
-		if (debug)
-			p.debug(System.out, file);
-		else
-			p.printOutput(System.out, file);
 	}
 
 	@Override
@@ -517,6 +398,49 @@ public class CommonPreprocessor implements Preprocessor {
 		}
 		out.println();
 		out.flush();
+	}
+
+	/**
+	 * Looks to see if a {@link SourceFile} object has already been created for
+	 * the given {@link File}. If so, returns that one. Else creates a new one,
+	 * assigns it the next index, and stores it.
+	 * 
+	 * @param file
+	 *            a file that is being read to produce this token source
+	 * @return the {@link SourceFile} corresponding to the given file
+	 */
+	SourceFile getOrMakeSourceFile(File file, boolean tmpFile) {
+		SourceFile result = sourceFileMap.get(file);
+
+		if (result == null) {
+			result = new SourceFile(file, sourceFiles.size());
+			if (!tmpFile) {
+				// don't keep track of temp files created by parsing command
+				// line macros
+				sourceFiles.add(result);
+				sourceFileMap.put(file, result);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * This main method is just here for simple tests. The real main method is
+	 * in the main class, ABC.java.
+	 */
+	public final static void main(String[] args) throws PreprocessorException {
+		String filename = args[0];
+		CommonPreprocessor p = new CommonPreprocessor();
+		File file = new File(filename);
+
+		if (debug)
+			p.debug(PreprocessorWorker.defaultSystemIncludes,
+					PreprocessorWorker.defaultUserIncludes,
+					PreprocessorWorker.defaultImplicitMacros, System.out, file);
+		else
+			p.printOutput(PreprocessorWorker.defaultSystemIncludes,
+					PreprocessorWorker.defaultUserIncludes,
+					PreprocessorWorker.defaultImplicitMacros, System.out, file);
 	}
 
 }

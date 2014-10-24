@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 
 /**
  * Checks a number of simple C programs to make sure they pass on the parsing
@@ -60,7 +62,7 @@ public class MPITranslationTest {
 			fe.showTranslation(config);
 		} else {
 			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C,
-					systemIncludes, userIncludes);
+					systemIncludes, userIncludes, new HashMap<String, Macro>());
 
 			p.applyTransformers(codes);
 		}
@@ -105,7 +107,7 @@ public class MPITranslationTest {
 	public void ring1() throws ABCException, IOException {
 		check("ring1");
 	}
-	
+
 	@Test
 	public void diffusion1d() throws ABCException, IOException {
 		check("diffusion1d_spec_revision");
