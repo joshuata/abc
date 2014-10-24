@@ -176,7 +176,7 @@ public class ABC {
 					// -D<macro>=<object>
 					int indexOfEqual = arg.indexOf('=');
 
-					name = arg.substring(2, indexOfEqual - 1);
+					name = arg.substring(2, indexOfEqual);
 					object = arg.substring(indexOfEqual + 1);
 				} else {
 					// -D<macro>

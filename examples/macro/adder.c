@@ -2,8 +2,6 @@
 #include <civlc.cvh>
 $input int N;
 $assume 0 < N && N < 10;
-#else
-#define N NVALUE
 #endif
 
 int input[N];
