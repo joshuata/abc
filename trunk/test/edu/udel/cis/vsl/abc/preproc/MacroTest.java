@@ -10,11 +10,13 @@ public class MacroTest {
 		ABC.main(args);
 	}
 
+	//-D<name>
 	@Test
 	public void adder1() {
 		run("-DCIVL_PROG", "-p", "examples/macro/adder.c");
 	}
 	
+	//-D<name>=<object>
 	@Test
 	public void adder2() {
 		run("-DNVALUE=50", "-p", "examples/macro/adder.c");
