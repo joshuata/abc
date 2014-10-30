@@ -88,7 +88,7 @@ public interface Preprocessor {
 	 */
 	void parse(PrintStream out, File file) throws PreprocessorException;
 
-	Map<String, Macro> getMacros(File file) throws PreprocessorException;
+	Map<String, Macro> getMacros(Map<String, String> macroDefs) throws PreprocessorException;
 
 	/**
 	 * Given a preprocessor source file, this returns a Token Source that emits

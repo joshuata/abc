@@ -1,11 +1,8 @@
 package edu.udel.cis.vsl.abc;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analysis;
@@ -407,23 +404,8 @@ public class FrontEnd {
 		Preprocessor preprocessor = frontEnd.getPreprocessor();
 		AST[] asts = new AST[nfiles];
 		Map<String, String> macroNames = task.getMacros();
-		Map<String, Macro> implicitMacros = new HashMap<String, Macro>();
+		Map<String, Macro> implicitMacros = preprocessor.getMacros(macroNames);
 
-		if (macroNames != null && macroNames.size() > 0) {
-			//use temporary file to store the command line macros
-			File temp = File.createTempFile("tmp" + System.currentTimeMillis(),
-					".h");
-			// Write to temp file
-			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
-
-			for (String macro : macroNames.keySet())
-				tmpOut.write("#define " + macro + " " + macroNames.get(macro)
-						+ "\r\n");
-			tmpOut.close();
-			implicitMacros = preprocessor.getMacros(temp);
-			//delete the temporary file
-			temp.delete();
-		}
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
 			String filename = file.getName();

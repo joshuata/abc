@@ -489,7 +489,7 @@ public class DeclarationAnalyzer {
 			if (oldInitializer != null)
 				throw error(
 						"Re-initialization of variable " + variable.getName()
-								+ ". First was at" + oldInitializer.getSource()
+								+ ". First was at " + oldInitializer.getSource()
 								+ ".", initializer);
 			variable.setInitializer(initializer);
 			variable.setDefinition(declaration);
