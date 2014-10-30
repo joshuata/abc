@@ -1,6 +1,8 @@
 package edu.udel.cis.vsl.abc.preproc.common;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -68,19 +70,40 @@ public class CommonPreprocessor implements Preprocessor {
 	// }
 
 	@Override
-	public Map<String, Macro> getMacros(File file) throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(
-				PreprocessorWorker.defaultSystemIncludes,
-				PreprocessorWorker.defaultSystemIncludes,
-				new HashMap<String, Macro>());
-		PreprocessorTokenSource tokenSource = worker.outputTokenSource(file,
-				this, true);
-		Token token;
+	public Map<String, Macro> getMacros(Map<String, String> macroDefs)
+			throws PreprocessorException {
+		if (macroDefs != null && macroDefs.size() > 0) {
+			try {
+				// use temporary file to store the macro definitions
+				File temp = File.createTempFile(
+						"tmp" + System.currentTimeMillis(), ".h");
+				// Write to temp file
+				BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
+				PreprocessorWorker worker;
+				PreprocessorTokenSource tokenSource;
+				Token token;
 
-		do {
-			token = tokenSource.nextToken();
-		} while (token.getType() != PreprocessorLexer.EOF);
-		return tokenSource.macroMap;
+				for (String macro : macroDefs.keySet())
+					tmpOut.write("#define " + macro + " "
+							+ macroDefs.get(macro) + "\r\n");
+				tmpOut.close();
+				worker = new PreprocessorWorker(
+						PreprocessorWorker.defaultSystemIncludes,
+						PreprocessorWorker.defaultSystemIncludes,
+						new HashMap<String, Macro>());
+				tokenSource = worker.outputTokenSource(temp, this, true);
+				do {
+					token = tokenSource.nextToken();
+				} while (token.getType() != PreprocessorLexer.EOF);
+				// delete the temporary file
+				temp.delete();
+				return tokenSource.macroMap;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				return new HashMap<String, Macro>();
+			}
+		} else
+			return new HashMap<String, Macro>();
 	}
 
 	/**
