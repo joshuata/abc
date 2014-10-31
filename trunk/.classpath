@@ -7,6 +7,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="var" path="VSL/lib/junit.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SARL"/>
-	<classpathentry kind="var" path="VSL/lib/antlr-3.4-complete.jar" sourcepath="/VSL/src/antlr-runtime-3.4-sources.jar"/>
+	<classpathentry kind="var" path="VSL/lib/antlr-complete.jar" sourcepath="/VSL/src/antlr-runtime-3.4-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
