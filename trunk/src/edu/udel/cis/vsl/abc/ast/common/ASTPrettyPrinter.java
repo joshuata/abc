@@ -38,6 +38,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
@@ -461,7 +462,7 @@ public class ASTPrettyPrinter {
 							.getSource().getLocation(false));
 		}
 		out.print("(");
-		out.print(pPrintSequenceExpression(ompDeclarative.variables()));
+		out.print(sequenceExpression2Pretty(ompDeclarative.variables()));
 		out.print(")");
 	}
 
@@ -701,36 +702,36 @@ public class ASTPrettyPrinter {
 			out.print("nowait");
 		if (privateList != null) {
 			out.print("private(");
-			out.print(pPrintSequenceExpression(privateList));
+			out.print(sequenceExpression2Pretty(privateList));
 			out.print(") ");
 		}
 		if (firstPrivateList != null) {
 			out.print("firstprivate(");
-			out.print(pPrintSequenceExpression(firstPrivateList));
+			out.print(sequenceExpression2Pretty(firstPrivateList));
 			out.print(") ");
 		}
 		if (sharedList != null) {
 			out.print("shared(");
-			out.print(pPrintSequenceExpression(sharedList));
+			out.print(sequenceExpression2Pretty(sharedList));
 			out.print(") ");
 		}
 		if (copyinList != null) {
 			out.print("copyin(");
-			out.print(pPrintSequenceExpression(copyinList));
+			out.print(sequenceExpression2Pretty(copyinList));
 			out.print(") ");
 		}
 		if (copyPrivateList != null) {
 			out.print("copyprivate(");
-			out.print(pPrintSequenceExpression(copyPrivateList));
+			out.print(sequenceExpression2Pretty(copyPrivateList));
 			out.print(") ");
 		}
 		if (lastPrivateList != null) {
 			out.print("lastprivate(");
-			out.print(pPrintSequenceExpression(lastPrivateList));
+			out.print(sequenceExpression2Pretty(lastPrivateList));
 			out.print(") ");
 		}
 		if (reductionList != null) {
-			out.print(pPrintSequenceReduction(reductionList));
+			out.print(sequenceReduction2Pretty(reductionList));
 		}
 
 		if (block != null) {
@@ -819,7 +820,7 @@ public class ASTPrettyPrinter {
 			out.print("flush ");
 			if (ompSync.flushedList() != null) {
 				out.print("(");
-				out.print(pPrintSequenceExpression(ompSync.flushedList()));
+				out.print(sequenceExpression2Pretty(ompSync.flushedList()));
 				out.print(")");
 			}
 			break;
@@ -851,7 +852,7 @@ public class ASTPrettyPrinter {
 			out.print("default(none) ");
 	}
 
-	private static StringBuffer pPrintSequenceReduction(
+	private static StringBuffer sequenceReduction2Pretty(
 			SequenceNode<OmpReductionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int num = sequence.numChildren();
@@ -915,12 +916,12 @@ public class ASTPrettyPrinter {
 		}
 		}
 		result.append(": ");
-		result.append(pPrintSequenceExpression(reduction.variables()));
+		result.append(sequenceExpression2Pretty(reduction.variables()));
 		result.append(")");
 		return result;
 	}
 
-	private static StringBuffer pPrintSequenceExpression(
+	private static StringBuffer sequenceExpression2Pretty(
 			SequenceNode<IdentifierExpressionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int numExpressions = sequence.numChildren();
@@ -1343,8 +1344,7 @@ public class ASTPrettyPrinter {
 			break;
 		}
 		case COMPOUND_LITERAL:
-			result.append(compoundLiteral2Pretty((CompoundLiteralNode) expression));
-			break;
+			return compoundLiteral2Pretty((CompoundLiteralNode) expression);
 		case CONSTANT: {
 			String constant = ((ConstantNode) expression)
 					.getStringRepresentation();
@@ -1371,8 +1371,9 @@ public class ASTPrettyPrinter {
 					.getIdentifier().name());
 			break;
 		case OPERATOR:
-			result = operator2Pretty((OperatorNode) expression);
-			break;
+			return operator2Pretty((OperatorNode) expression);
+		case QUANTIFIED_EXPRESSION:
+			return quantifiedExpression2Pretty((QuantifiedExpressionNode) expression);
 		case SIZEOF:
 			result.append("sizeof(");
 			result.append(sizeable2Pretty(((SizeofNode) expression)
@@ -1385,8 +1386,7 @@ public class ASTPrettyPrinter {
 					.getCall()));
 			break;
 		case REGULAR_RANGE:
-			result.append(pPrintRegularRange((RegularRangeNode) expression));
-			break;
+			return regularRange2Pretty((RegularRangeNode) expression);
 		case SCOPEOF:
 			result.append("$scopeof(");
 			result.append(expression2Pretty(((ScopeOfNode) expression)
@@ -1397,6 +1397,38 @@ public class ASTPrettyPrinter {
 			throw new ABCUnsupportedException(
 					"pretty print of expression node of " + kind + " kind");
 		}
+		return result;
+	}
+
+	private static StringBuffer quantifiedExpression2Pretty(
+			QuantifiedExpressionNode quantified) {
+		StringBuffer result = new StringBuffer();
+		String quantifier;
+
+		switch (quantified.quantifier()) {
+		case FORALL:
+			quantifier = "$forall";
+			break;
+		case EXISTS:
+			quantifier = "$exists";
+			break;
+		default:// UNIFORM
+			quantifier = "$uniform";
+		}
+		result.append(quantifier);
+		result.append(" {");
+		result.append(variableDeclaration2Pretty("", quantified.variable()));
+		if (quantified.isRange()) {
+			result.append(": ");
+			result.append(expression2Pretty(quantified.lower()));
+			result.append(" .. ");
+			result.append(expression2Pretty(quantified.upper()));
+		} else {
+			result.append(" | ");
+			result.append(expression2Pretty(quantified.restriction()));
+		}
+		result.append("} ");
+		result.append(expression2Pretty(quantified.expression()));
 		return result;
 	}
 
@@ -1417,7 +1449,7 @@ public class ASTPrettyPrinter {
 		return result;
 	}
 
-	private static StringBuffer pPrintRegularRange(RegularRangeNode range) {
+	private static StringBuffer regularRange2Pretty(RegularRangeNode range) {
 		StringBuffer result = new StringBuffer();
 		ExpressionNode step = range.getStep();
 
