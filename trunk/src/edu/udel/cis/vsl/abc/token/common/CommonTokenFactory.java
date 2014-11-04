@@ -78,7 +78,7 @@ public class CommonTokenFactory implements TokenFactory {
 		SourceFile transformer = transformerMap.get(transformerName);
 
 		if (transformer == null) {
-			transformer = new SourceFile(new File("transformerName"), -1);
+			transformer = new SourceFile(new File(transformerName), -1);
 			transformerMap.put(transformerName, transformer);
 		}
 		return new CommonTransformFormation(transformer, method);
