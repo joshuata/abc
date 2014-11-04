@@ -27,15 +27,18 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode.OrdinaryDeclarationKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.DerivativeExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode.ExpressionKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
@@ -1315,6 +1318,13 @@ public class ASTPrettyPrinter {
 		ExpressionKind kind = expression.expressionKind();
 
 		switch (kind) {
+		case ALIGNOF: {
+			AlignOfNode align = (AlignOfNode) expression;
+
+			result.append("_Alignof(");
+			result.append(type2Pretty("", align.getArgument(), false));
+			break;
+		}
 		case ARROW: {
 			ArrowNode arrow = (ArrowNode) expression;
 
@@ -1343,6 +1353,9 @@ public class ASTPrettyPrinter {
 				result.append(")");
 			break;
 		}
+		// TODO
+		// case COLLECTIVE:
+		// break;
 		case COMPOUND_LITERAL:
 			return compoundLiteral2Pretty((CompoundLiteralNode) expression);
 		case CONSTANT: {
@@ -1356,6 +1369,8 @@ public class ASTPrettyPrinter {
 			result.append(constant);
 			break;
 		}
+		case DERIVATIVE_EXPRESSION:
+			return derivative2Pretty((DerivativeExpressionNode) expression);
 		case DOT: {
 			DotNode dot = (DotNode) expression;
 
@@ -1366,6 +1381,9 @@ public class ASTPrettyPrinter {
 		}
 		case FUNCTION_CALL:
 			return functionCall2Pretty((FunctionCallNode) expression);
+			// TODO
+			// case GENERIC_SELECTION:
+			// break;
 		case IDENTIFIER_EXPRESSION:
 			result.append(((IdentifierExpressionNode) expression)
 					.getIdentifier().name());
@@ -1374,6 +1392,17 @@ public class ASTPrettyPrinter {
 			return operator2Pretty((OperatorNode) expression);
 		case QUANTIFIED_EXPRESSION:
 			return quantifiedExpression2Pretty((QuantifiedExpressionNode) expression);
+		case REGULAR_RANGE:
+			return regularRange2Pretty((RegularRangeNode) expression);
+			// TODO
+			// case REMOTE_REFERENCE:
+			// break;
+		case SCOPEOF:
+			result.append("$scopeof(");
+			result.append(expression2Pretty(((ScopeOfNode) expression)
+					.expression()));
+			result.append(")");
+			break;
 		case SIZEOF:
 			result.append("sizeof(");
 			result.append(sizeable2Pretty(((SizeofNode) expression)
@@ -1385,18 +1414,39 @@ public class ASTPrettyPrinter {
 			result.append(functionCall2Pretty(((SpawnNode) expression)
 					.getCall()));
 			break;
-		case REGULAR_RANGE:
-			return regularRange2Pretty((RegularRangeNode) expression);
-		case SCOPEOF:
-			result.append("$scopeof(");
-			result.append(expression2Pretty(((ScopeOfNode) expression)
-					.expression()));
-			result.append(")");
-			break;
 		default:
 			throw new ABCUnsupportedException(
 					"pretty print of expression node of " + kind + " kind");
 		}
+		return result;
+	}
+
+	private static StringBuffer derivative2Pretty(DerivativeExpressionNode deriv) {
+		StringBuffer result = new StringBuffer();
+		int numPartials = deriv.getNumberOfPartials();
+		int numArgs = deriv.getNumberOfArguments();
+
+		result.append("$D[");
+		result.append(expression2Pretty(deriv.getFunction()));
+		for (int i = 0; i < numPartials; i++) {
+			PairNode<IdentifierExpressionNode, IntegerConstantNode> partial = deriv
+					.getPartial(i);
+
+			result.append(", {");
+			result.append(partial.getLeft().getIdentifier().name());
+			result.append(",");
+			result.append(partial.getRight().getConstantValue());
+			result.append("}");
+		}
+		result.append("](");
+		for (int i = 0; i < numArgs; i++) {
+			ExpressionNode arg = deriv.getArgument(i);
+
+			if (i != 0)
+				result.append(", ");
+			result.append(expression2Pretty(arg));
+		}
+		result.append(")");
 		return result;
 	}
 
@@ -1417,13 +1467,14 @@ public class ASTPrettyPrinter {
 		}
 		result.append(quantifier);
 		result.append(" {");
-		result.append(variableDeclaration2Pretty("", quantified.variable()));
 		if (quantified.isRange()) {
-			result.append(": ");
+			result.append(quantified.variable().getName());
+			result.append(" = ");
 			result.append(expression2Pretty(quantified.lower()));
 			result.append(" .. ");
 			result.append(expression2Pretty(quantified.upper()));
 		} else {
+			result.append(variableDeclaration2Pretty("", quantified.variable()));
 			result.append(" | ");
 			result.append(expression2Pretty(quantified.restriction()));
 		}
