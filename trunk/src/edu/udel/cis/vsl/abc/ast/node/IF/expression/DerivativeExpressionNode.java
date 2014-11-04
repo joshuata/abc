@@ -38,9 +38,9 @@ public interface DerivativeExpressionNode extends ExpressionNode {
 	/**
 	 * Computes the number of parameters which have at least one partial
 	 * derivative taken. Note that each parameter may have a partial taken more
-	 * than once (e.g. <code>$D[rho,{x,3},{y,2})]</code>, so this is not the
+	 * than once (e.g. <code>$D[rho,{x,3},{y,2}]</code>, so this is not the
 	 * same thing as the total times a partial derivative is taken. That is, for
-	 * <code>$D[rho,{x,3},{y,2})]</code>, this returns 2, not 5.
+	 * <code>$D[rho,{x,3},{y,2}]</code>, this returns 2, not 5.
 	 * 
 	 * @return the number of parameters that have a partial of degree at least 1
 	 */
