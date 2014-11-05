@@ -24,5 +24,40 @@ Verified Software Laboratory, University of Delaware.  It is
 distributed under the terms of the GNU Lessor General Public
 License (LGPL).
 
-ABC is distributed as a jar file.  For most users, this is all you
-will need.  For installation instructions from source see INSTALL.
+------------------------- Binary Installation -------------------------
+
+For most users, this will be the easiest way to install and use CIVL.
+
+1. Install a Java 7 SDK if you have not already.  Go to
+http://www.oracle.com/technetwork/java/javase/downloads/ for the
+latest from Oracle.  On linux, you can optionally sudo apt-get install
+openjdk-7-jdk.
+
+2. If you already have the VSL dependencies library, you may
+skip this step.  Otherwise, download the archive of VSL
+dependencies from http://vsl.cis.udel.edu/tools/vsl_depend,
+choosing the version for your OS type (32-bit linux,
+64-bit linux, or 64-bit OS X).  Unzip and untar the
+downloaded .tgz file and you will have a folder named "vsl".
+If you do not already have a directory /opt, create one with
+"mkdir /opt".  Move vsl into /opt.  Use sudo as needed.
+
+3. Download the ABC distribution from http://vsl.cis.udel.edu/abc.
+
+4. Unzip and untar the downloaded file if this does not happen
+automatically.  This should result in a folder named
+ABC-TAG, where TAG is some version id string.  This folder
+contains the following:
+
+ - README   : this file
+ - bin      : containing one executable sh script called "civl"
+ - lib      : containing civl-TAG.jar
+ - licenses : licenses for CIVL and included libraries
+ - examples : some example CIVL programs
+
+5. Move ABC-TAG into /opt.
+
+6. Put the abc script in your path however you like to put things
+in your path.   Either move it to a directory in your path,
+or create a symlink to it, or edit your .profile or equivalent
+to put it in your path.
