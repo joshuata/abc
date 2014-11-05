@@ -490,6 +490,8 @@ public class ASTPrettyPrinter {
 				out.print(", ");
 			out.print(variableDeclaration2Pretty("", paras.getSequenceChild(i)));
 		}
+		if(typeNode.hasVariableArgs())
+			out.print(", ...");
 		out.print(")");
 
 		if (function instanceof FunctionDefinitionNode) {
