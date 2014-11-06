@@ -16,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -165,6 +166,9 @@ public class ScopeAnalyzer implements Analyzer {
 			return;
 		if (parentScope == null) {
 			parentScope = scopeFactory.newScope(ScopeKind.FILE, null, node);
+		} else if (node instanceof QuantifiedExpressionNode) {			
+			parentScope = scopeFactory.newScope(ScopeKind.BLOCK,
+					parentScope, node);
 		} else if (node instanceof ScopeParameterizedDeclarationNode) {
 			DeclarationNode base = ((ScopeParameterizedDeclarationNode) node)
 					.baseDeclaration();
