@@ -120,6 +120,8 @@ public class ASTPrettyPrinter {
 
 	private static String indention = "  ";
 
+	private static int headerLength = 60;
+
 	/* ******************* Package-private Static Methods ****************** */
 
 	// FIX ME : I am public now
@@ -244,16 +246,30 @@ public class ASTPrettyPrinter {
 						continue;
 					default:
 					}
-
 				if (currentFile == null || !currentFile.equals(sourceFile)) {
-					out.print("//================ ");
+					int fileLength = sourceFile.length();
+					int leftBarLength, rightBarLength;
+
+					rightBarLength = (headerLength - fileLength - 4) / 2;
+					leftBarLength = headerLength - fileLength - 4
+							- rightBarLength;
+					out.print("//");
+					printBar(leftBarLength, '=', out);
+					out.print(" ");
 					out.print(sourceFile);
-					out.println(" ================");
+					out.print(" ");
+					printBar(rightBarLength, '=', out);
+					out.print("\n");
 					currentFile = sourceFile;
 				}
 				pPrintExternalDef(out, child);
 			}
 		}
+	}
+
+	private static void printBar(int length, char symbol, PrintStream out) {
+		for (int i = 0; i < length; i++)
+			out.print(symbol);
 	}
 
 	/* *************************** Private Methods ************************* */
@@ -490,7 +506,7 @@ public class ASTPrettyPrinter {
 				out.print(", ");
 			out.print(variableDeclaration2Pretty("", paras.getSequenceChild(i)));
 		}
-		if(typeNode.hasVariableArgs())
+		if (typeNode.hasVariableArgs())
 			out.print(", ...");
 		out.print(")");
 
