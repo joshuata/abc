@@ -508,6 +508,8 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode result = null;
 		ExpressionNode expression = statement.getExpression();
 
+		if(expression == null)
+			return statement;
 		if (statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
