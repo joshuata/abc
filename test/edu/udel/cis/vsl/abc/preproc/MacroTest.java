@@ -19,7 +19,7 @@ public class MacroTest {
 	//-D<name>=<object>
 	@Test
 	public void adder2() {
-		run("-DN=50", "-p", "examples/macro/adder.c");
+		run("-p", "examples/macro/adder.c");
 	}
 
 	@Test
