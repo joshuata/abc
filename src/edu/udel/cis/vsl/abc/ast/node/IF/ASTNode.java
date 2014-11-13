@@ -581,4 +581,14 @@ public interface ASTNode {
 	 *            stream to which output should be sent
 	 */
 	void prettyPrint(PrintStream out);
+
+	/**
+	 * Returns the pretty representation of this AST node (and its descendants)
+	 * in a form that should be similar to the actual programming language.
+	 * 
+	 * @return the pretty representation of this AST node (and its descendants)
+	 *         in a form that should be similar to the actual programming
+	 *         language.
+	 */
+	StringBuffer prettyRepresentation();
 }

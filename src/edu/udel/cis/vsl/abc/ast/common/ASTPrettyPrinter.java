@@ -126,6 +126,7 @@ public class ASTPrettyPrinter {
 
 	// FIX ME : I am public now
 
+	@SuppressWarnings("unchecked")
 	public static void prettyPrint(ASTNode node, PrintStream out) {
 		NodeKind kind = node.nodeKind();
 
@@ -177,13 +178,45 @@ public class ASTPrettyPrinter {
 			out.print(variableDeclaration2Pretty("",
 					(VariableDeclarationNode) node));
 			break;
-		case PAIR:
 		case SEQUENCE:
+			pPrintSequenceNode((SequenceNode<ASTNode>) node, out);
+			break;
+		case PAIR:
+			pPrintPairNode((PairNode<ASTNode, ASTNode>) node, out);
+			break;
 		default:
 			throw new ABCUnsupportedException(
-					"The pretty printing of AST node of " + kind
+					"the pretty printing of AST node of " + kind
 							+ " kind is not supported yet.", node.getSource()
 							.getLocation(false));
+		}
+	}
+
+	private static void pPrintPairNode(PairNode<ASTNode, ASTNode> pair,
+			PrintStream out) {
+		ASTNode left = pair.getLeft(), right = pair.getRight();
+
+		out.print("(");
+		if (left != null)
+			prettyPrint(left, out);
+		else
+			out.print("NULL");
+		out.print(",");
+		if (right != null)
+			prettyPrint(right, out);
+		else
+			out.print("NULL");
+	}
+
+	private static void pPrintSequenceNode(SequenceNode<ASTNode> sequence,
+			PrintStream out) {
+		int numChildren = sequence.numChildren();
+		for (int i = 0; i < numChildren; i++) {
+			ASTNode node = sequence.getSequenceChild(i);
+
+			if (node != null)
+				prettyPrint(node, out);
+
 		}
 	}
 
@@ -527,7 +560,8 @@ public class ASTPrettyPrinter {
 		String myPrefix = prefix;
 
 		if (isBody) {
-			myPrefix = prefix.substring(0, prefix.length() - 2);
+			myPrefix = prefix.substring(0,
+					prefix.length() - 2 > 0 ? prefix.length() - 2 : 0);
 			out.print(myPrefix);
 		} else {
 			out.print(myPrefix);
