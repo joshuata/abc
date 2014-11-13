@@ -213,10 +213,10 @@ public class ASTPrettyPrinter {
 		int numChildren = sequence.numChildren();
 		for (int i = 0; i < numChildren; i++) {
 			ASTNode node = sequence.getSequenceChild(i);
-
+			if(i != 0)
+				out.print(", ");
 			if (node != null)
 				prettyPrint(node, out);
-
 		}
 	}
 
