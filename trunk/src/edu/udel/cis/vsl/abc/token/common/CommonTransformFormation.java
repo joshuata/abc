@@ -83,7 +83,7 @@ public class CommonTransformFormation implements TransformFormation {
 
 	@Override
 	public String suffix() {
-		String result = "inserted by " + transformer.getName() + "." + method;
+		String result = " inserted by " + transformer.getName() + "." + method;
 
 		if (preToken != null)
 			result += " after " + preToken;
