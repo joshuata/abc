@@ -210,7 +210,7 @@ class ListTokenSource implements TokenSource {
 		Token result = current;
 
 		if (result == null)
-			result = Token.EOF_TOKEN;
+			result = Token.INVALID_TOKEN;
 
 		else
 			current = current.getNext();
