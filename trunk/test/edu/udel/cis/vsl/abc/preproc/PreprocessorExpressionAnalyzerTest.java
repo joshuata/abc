@@ -293,7 +293,7 @@ public class PreprocessorExpressionAnalyzerTest {
 		TokenSource badSource1 = new TokenSource() {
 			@Override
 			public Token nextToken() {
-				return Token.EOF_TOKEN;
+				return Token.INVALID_TOKEN;
 			}
 
 			@Override
