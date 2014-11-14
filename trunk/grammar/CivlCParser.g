@@ -92,13 +92,11 @@ tokens
 scope Symbols {
     Set<String> types; // to keep track of typedefs
     Set<String> enumerationConstants; // to keep track of enum constants
-    Set<String> scopeNames; // to keep track of CIVL-C scope names
     boolean isFunctionDefinition; // "function scope": entire function definition
 }
 
 scope DeclarationScope {
     boolean isTypedef; // is the current declaration a typedef
-    Set<String> scopeNames; // to keep track of CIVL-C scope names
 }
 
 @header
@@ -119,7 +117,6 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 
             mySymbols.types = current.types;
             mySymbols.enumerationConstants = current.enumerationConstants;
-            mySymbols.scopeNames = new HashSet<>();
             Symbols_stack.add(mySymbols);
         }
     }
@@ -140,21 +137,6 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 	boolean isTypeName(String name) {
 		for (Object scope : Symbols_stack)
 			if (((Symbols_scope)scope).types.contains(name)) return true;
-		return false;
-	}
-	
-	boolean isScopeName(String name) {
-		for (Object scope : Symbols_stack)
-			if (((Symbols_scope)scope).scopeNames.contains(name)) {
-				//System.err.println("Found scope "+name+" in symbol stack");
-				return true;				
-			}
-		for (Object scope : DeclarationScope_stack)
-			if (((DeclarationScope_scope)scope).scopeNames.contains(name)) {
-				//System.err.println("Found scope "+name+" in decl stack");
-				return true; 
-			}
-		//System.err.println("Did not find scope "+name);
 		return false;
 	}
 
@@ -235,7 +217,7 @@ postfixExpression
 	           INDEX[$l]
 	           ^(ARGUMENT_LIST $postfixExpression expression)
 	           RSQUARE)
-	  |	// function call without scope modifier:
+	  |	// function call:
 	    LPAREN argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression ABSENT argumentExpressionList
 	    	 RPAREN ABSENT)
@@ -555,17 +537,13 @@ quantifier
 
 /* 6.7.
  *
- * This rule will construct either a SCOPE, DECLARATION, or
+ * This rule will construct either a DECLARATION, or
  * STATICASSERT tree:
- *
- * Root: SCOPE
- * Child 0: Identifier
  *
  * Root: DECLARATION
  * Child 0: declarationSpecifiers
  * Child 1: initDeclaratorList or ABSENT
  * Child 2: contract or ABSENT
- * Child 3: scopeParameterList or ABSENT
  *
  * Root: STATICASSERT
  * Child 0: constantExpression
@@ -583,7 +561,6 @@ declaration
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
-  $DeclarationScope::scopeNames = new HashSet<String>();
 }
 	: d=declarationSpecifiers
 	  ( 
@@ -727,7 +704,6 @@ structDeclaration
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
-  $DeclarationScope::scopeNames = new HashSet<String>();
 }
     : s=specifierQualifierList
       ( -> ^(STRUCT_DECLARATION $s ABSENT)
@@ -964,11 +940,10 @@ pointer
 /*
  * Root: STAR
  * child 0: TYPE_QUALIFIER_LIST
- * child 1 : SCOPE_MODIFIER or ABSENT
  */
 pointer_part
-	: STAR /*scopeUse_opt*/ typeQualifierList_opt
-	-> ^(STAR typeQualifierList_opt /*scopeUse_opt*/)
+	: STAR typeQualifierList_opt
+	-> ^(STAR typeQualifierList_opt)
 	;
 
 /* 6.7.6
@@ -1000,7 +975,6 @@ scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
-	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::isFunctionDefinition = false;
 }
 	: parameterTypeListWithoutScope
@@ -1032,7 +1006,6 @@ parameterDeclaration
 scope DeclarationScope;
 @init {
 	$DeclarationScope::isTypedef = false;
-	$DeclarationScope::scopeNames = new HashSet<String>();
 }
     : declarationSpecifiers
       ( -> ^(PARAMETER_DECLARATION declarationSpecifiers ABSENT)
@@ -1134,8 +1107,7 @@ directAbstractDeclarator
 typedefName
     : {isTypeName(input.LT(1).getText())}?
       IDENTIFIER
-      //scopeUse_opt
-      -> ^(TYPEDEF_NAME IDENTIFIER /*scopeUse_opt*/)
+      -> ^(TYPEDEF_NAME IDENTIFIER)
     ;
 
 /* 6.7.7
@@ -1250,7 +1222,6 @@ statementWithScope
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
-	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1292,7 +1263,6 @@ compoundStatement
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
-	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1318,13 +1288,11 @@ blockItem
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
-  $DeclarationScope::scopeNames = new HashSet<String>();
 }
-	: //scopeListDef_opt!
-		( (declarationSpecifiers declarator contract_opt
+	: 	( (declarationSpecifiers declarator contract_opt
 	   	    declarationList_opt LCURLY)=>
-		  functionDefinition/*[(CommonTree)$scopeListDef_opt.tree]*/
-		| declarationList/*[(CommonTree)$scopeListDef_opt.tree]*/
+		  functionDefinition
+		| declarationList
 		) 
 	| statement
 	;
@@ -1356,7 +1324,6 @@ selectionStatement
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
-	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1392,7 +1359,6 @@ iterationStatement
 scope Symbols;
 @init {
 	$Symbols::types = new HashSet<String>();
-	$Symbols::scopeNames = new HashSet<String>();
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
@@ -1513,11 +1479,9 @@ scope Symbols; // the global scope
 scope DeclarationScope; // just to have an outermost one with isTypedef false
 @init {
     $Symbols::types = new HashSet<String>();
-    $Symbols::scopeNames = new HashSet<String>();
     $Symbols::enumerationConstants = new HashSet<String>();
     $Symbols::isFunctionDefinition = false;
     $DeclarationScope::isTypedef = false;
-    $DeclarationScope::scopeNames = new HashSet<String>();
 }
 	:	externalDeclaration* EOF
 		-> ^(TRANSLATION_UNIT externalDeclaration*)
@@ -1532,14 +1496,12 @@ externalDeclaration
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
-  $DeclarationScope::scopeNames = new HashSet<String>();
 }
-	: //scopeListDef_opt!
-		( (declarationSpecifiers declarator contract_opt
-	   	    declarationList_opt LCURLY)=>
-		  functionDefinition//[(CommonTree)$scopeListDef_opt.tree]
-		| declarationList//[(CommonTree)$scopeListDef_opt.tree]
-		) 
+	: ( (declarationSpecifiers declarator contract_opt
+	       declarationList_opt LCURLY)=>
+	     functionDefinition
+	  | declarationList
+	  ) 
 	| pragma
 	| assumeStatement
 	| assertStatement
@@ -1548,7 +1510,6 @@ scope DeclarationScope;
 
 /* 6.9.1
  *
- * Takes as argument a scope list tree s, which may be ABSENT.
  *
  * Root: FUNCTION_DEFINITION
  * Child 0: declarationSpecifiers
@@ -1556,14 +1517,12 @@ scope DeclarationScope;
  * Child 2: declarationList or ABSENT (formal parameters)
  * Child 3: compound statement (body)
  * Child 4: contract or ABSENT (code contract)
- * Child 5: scope parameter list or ABSENT (scope formal params)
  */
-functionDefinition//[CommonTree s]
+functionDefinition
 scope Symbols; // "function scope"
 @init {
     $Symbols::types = new HashSet<String>();
     $Symbols::enumerationConstants = new HashSet<String>();
-    $Symbols::scopeNames = new HashSet<String>();
     $Symbols::isFunctionDefinition = true;
 }
 	: declarationSpecifiers
@@ -1573,7 +1532,7 @@ scope Symbols; // "function scope"
 	  compoundStatement
 	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
 	       declarationList_opt compoundStatement contract_opt
-	       /*{$s}*/)
+	      )
 	;
 
 
