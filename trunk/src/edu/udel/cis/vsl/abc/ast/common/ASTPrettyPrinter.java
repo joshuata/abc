@@ -146,6 +146,9 @@ public class ASTPrettyPrinter {
 		case FUNCTION_DECLARATION:
 			pPrintFunctionDeclaration(out, "", (FunctionDeclarationNode) node);
 			break;
+		case FUNCTION_DEFINITION:
+			pPrintFunctionDeclaration(out, "", (FunctionDeclarationNode) node);
+			break;
 		case IDENTIFIER:
 			out.print(((IdentifierNode) node).name());
 			break;
@@ -213,7 +216,7 @@ public class ASTPrettyPrinter {
 		int numChildren = sequence.numChildren();
 		for (int i = 0; i < numChildren; i++) {
 			ASTNode node = sequence.getSequenceChild(i);
-			if(i != 0)
+			if (i != 0)
 				out.print(", ");
 			if (node != null)
 				prettyPrint(node, out);
