@@ -572,16 +572,6 @@ scope DeclarationScope;
 	| staticAssertDeclaration
 	;
 
-declarationList
-	: staticAssertDeclaration
-	| d=declarationSpecifiers
-	  ( 
-	    i=initDeclaratorList contract_opt SEMI
-	    -> ^(DECLARATION $d $i contract_opt)
-	  | SEMI
-	    -> ^(DECLARATION $d ABSENT ABSENT)
-	  )
-	;
 
 /* 6.7
  * Root: DECLARATION_SPECIFIERS
@@ -1281,18 +1271,25 @@ blockItemList
 
 /* 6.8.2 */
 
-// Overkill: create new DeclarationScope for every little
-// statement???
 
-blockItem
+/* A block item which can be called from the external world.
+ * This requires a scope.
+ */
+blockItemWithScope
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
 }
+	: blockItem;
+
+/* A block item: declaration list, function definition,
+ * or statement.
+ */
+blockItem
 	: 	( (declarationSpecifiers declarator contract_opt
 	   	    declarationList_opt LCURLY)=>
 		  functionDefinition
-		| declarationList
+		| declaration
 		) 
 	| statement
 	;
@@ -1500,7 +1497,7 @@ scope DeclarationScope;
 	: ( (declarationSpecifiers declarator contract_opt
 	       declarationList_opt LCURLY)=>
 	     functionDefinition
-	  | declarationList
+	  | declaration
 	  ) 
 	| pragma
 	| assumeStatement
