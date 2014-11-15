@@ -137,7 +137,7 @@ public class CommonCParser implements CParser {
 		TokenStream stream = new CommonTokenStream(tokenSource);
 		CivlCParser parser = new CivlCParser(stream);
 		CommonTree root;
-		
+
 		parser.setSymbols_stack(symbols);
 		try {
 			switch (rule) {
@@ -148,7 +148,7 @@ public class CommonCParser implements CParser {
 				root = (CommonTree) parser.externalDeclaration().getTree();
 				break;
 			case BLOCK_ITEM:
-				root = (CommonTree) parser.blockItem().getTree();
+				root = (CommonTree) parser.blockItemWithScope().getTree();
 				break;
 			default:
 				throw new ABCRuntimeException("Unreachable");
@@ -164,7 +164,8 @@ public class CommonCParser implements CParser {
 
 	@Override
 	public ParseTree parse(CTokenSource tokenSource) throws ParseException {
-		return parse(RuleKind.TRANSLATION_UNIT, tokenSource, new Stack<ScopeSymbols>());
+		return parse(RuleKind.TRANSLATION_UNIT, tokenSource,
+				new Stack<ScopeSymbols>());
 	}
 
 }
