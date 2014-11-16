@@ -121,6 +121,7 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
         }
     }
 
+
 	@Override
 	public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
 		String hdr = getErrorHeader(e);
@@ -133,6 +134,7 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 	public void emitErrorMessage(String msg) { // don't try to recover!
 	    throw new RuntimeParseException(msg);
 	}
+
 
 	boolean isTypeName(String name) {
 		for (Object scope : Symbols_stack)
@@ -858,6 +860,7 @@ directDeclaratorPrefix
 directDeclaratorSuffix
 	: directDeclaratorArraySuffix
 	| directDeclaratorFunctionSuffix
+
 	;
 
 /*
@@ -1188,6 +1191,269 @@ domainSpecifier
 	;
 
 
+
+/* A rule which returns either a declaration (including
+ * a possible static assert declaration) or function
+ * definition.
+ *
+ * The fundamental problem is that it is hard to tell
+ * whether you are parsing a function definition until
+ * you get to the left curly brace which begins the
+ * function body.
+ *
+ * It is possible to do this in a simpler way using syntactic
+ * predicates, but the performance penalty for doing so is
+ * high.  This rule solves the problem with no syntactic
+ * predicates or special look-ahead techniques.
+ *
+ * A rule with name that ends in "tail" consumes
+ * some suffix of a declaration/definition and returns
+ * the final result, i.e., either a declaration or
+ * function definition tree.  These rules take
+ * as input trees for the preceding components of 
+ * the declaration.
+ */
+declarationOrFunctionDef
+scope DeclarationScope;
+@init {
+  $DeclarationScope::isTypedef = false;
+}
+  :	s=declarationSpecifiers
+	( SEMI -> ^(DECLARATION $s ABSENT ABSENT)
+	| p=pointer_opt
+	  d=directDeclaratorTail[$s.tree, $p.tree]
+	  -> $d
+	)
+  |	staticAssertDeclaration
+  ;
+
+/* Matches a possible pointer portion of the declaration.
+ * This is sequence of pointer_part.  Returns
+ * either ABSENT or a tree of the form
+ * ^(POINTER pointer_part+).
+ */
+pointer_opt
+  :	-> ABSENT
+  |	pointer_part+ ->^(POINTER pointer_part+)
+  ;
+
+/* Mathes a possible initializer portion of a declaration.
+ * That is an ASSIGN followed by an initializer.
+ * Returns either ABSENT or the an initializer tree.
+ */
+initializer_opt
+  :	-> ABSENT
+  |	ASSIGN i=initializer -> $i
+  ;
+
+
+identifierInDecl:
+	IDENTIFIER 
+	{ 
+			if ($DeclarationScope::isTypedef) {
+				$Symbols::types.add($IDENTIFIER.text);
+				//System.err.println("define type "+$IDENTIFIER.text);
+			}
+	}
+	-> ^(IDENTIFIER)
+  ;
+
+
+/* Consume the suffix of the declaration that begins
+ * with the direct declarator.  Takes as input
+ * the declaration specifier tree and the pointer
+ * portion tree.  Returns the final result: a DECLARATION
+ * or a FUNCTION_DEFINITION tree.
+ */
+directDeclaratorTail[
+	Object declarationSpecifiers,
+	Object pointer]
+  :
+	i=identifierInDecl
+	( SEMI -> 
+	  ^(DECLARATION
+	    {$declarationSpecifiers} 
+	    ^(INIT_DECLARATOR_LIST 
+	      ^(INIT_DECLARATOR 
+	        ^(DECLARATOR {$pointer} ^(DIRECT_DECLARATOR $i))
+	        ABSENT)) // no initializer
+	    ABSENT) // no contract
+	| c=commaTail[declarationSpecifiers, pointer, $i.tree] -> $c
+	| e=equalsTail[declarationSpecifiers, pointer, $i.tree] -> $e
+	| a=arraySuffixTail[declarationSpecifiers, pointer, $i.tree] -> $a
+	| f=functionSuffixTail[declarationSpecifiers, pointer, $i.tree] -> $f
+	)
+  |	LPAREN d=declarator RPAREN
+	dd=suffixes_to_directDeclarator[$d.tree]
+	init=initializer_opt
+	( SEMI
+	  ->
+	  ^(DECLARATION
+	   {$declarationSpecifiers} 
+	   ^(INIT_DECLARATOR_LIST 
+	     ^(INIT_DECLARATOR 
+	       ^(DECLARATOR {$pointer} $dd)
+	       $init))
+	   ABSENT) // no contract
+	| (COMMA id+=initDeclarator)+ SEMI
+	  -> 
+	  ^(DECLARATION
+	   {$declarationSpecifiers} 
+	   ^(INIT_DECLARATOR_LIST 
+	     ^(INIT_DECLARATOR 
+	       ^(DECLARATOR {$pointer} $dd)
+	       $init)
+	     $id+)
+	   ABSENT) // no contract
+	)
+  ;
+
+/* Matches a possibly empty sequence of direct
+ * declarator suffixes.  Takes as argument tree
+ * for a directo declarator prefix.  Returns
+ * a direct declarator tree formed from the
+ * prefix and the suffixes. */
+suffixes_to_directDeclarator[Object prefix]
+  : 	s+=directDeclaratorSuffix+
+	-> ^(DIRECT_DECLARATOR {$prefix} $s+)
+  |	-> ^(DIRECT_DECLARATOR {$prefix})
+  ;
+
+arraySuffixTail[
+	Object declarationSpecifiers,
+	Object pointer,
+	Object identifier] :
+  a=directDeclaratorArraySuffix
+  d=directDeclaratorSuffixTail[declarationSpecifiers, pointer,
+    identifier, $a.tree, adaptor.create(ABSENT, "ABSENT")]
+  -> $d
+  ;
+
+
+functionSuffixTail[
+	Object declarationSpecifiers,
+	Object pointer,
+	Object identifier] :
+  f=directDeclaratorFunctionSuffix
+  c=contract_opt
+  ( dd=directDeclaratorSuffixTail[declarationSpecifiers, pointer,
+      identifier, $f.tree, $c.tree]
+    -> $dd
+  | d=declarationList_opt
+    body=compoundStatement
+    -> 
+    ^(FUNCTION_DEFINITION
+      {$declarationSpecifiers}
+      ^(DECLARATOR
+        {$pointer}
+        ^(DIRECT_DECLARATOR {$identifier} $f))
+      $d
+      $body
+      $c)
+  )
+  ;
+
+/* Takes trees for the declarationSpecifiers, pointer portion
+ * of the declaration, and the declaration prefix.  Matches an
+ * initialization: ASSIGN followd by initializer expression.
+ * Returns the INIT_DECLARATOR tree formed by the given trees
+ * and the new elements. */
+initializer_to_initDeclarator[
+	Object declarationSpecifiers,
+	Object pointer,
+	Object prefix]
+  :	ASSIGN init=initializer
+	->
+	  ^(INIT_DECLARATOR
+	    ^(DECLARATOR
+	      {$pointer}
+	      ^(DIRECT_DECLARATOR {$prefix}))
+	    $init)
+  ;
+
+/* Consumes the suffix of a declaration that begins
+ * with the first '=' symbol.  Such a declaration
+ * must be an ordinary declaration, not a function
+ * definition.   Takes as input trees for the
+ * declaration specifiers, pointer portion, and the
+ * declaration prefix.  Returns the DECLARATION tree.
+ */	
+equalsTail[
+	Object declarationSpecifiers,
+	Object pointer,
+	Object prefix]
+  :
+	i=initializer_to_initDeclarator[
+	  declarationSpecifiers, pointer, prefix]
+	idl=initDeclaratorList_extend[$i.tree]
+	SEMI
+	-> ^(DECLARATION {$declarationSpecifiers} $idl ABSENT)
+  ;
+
+
+comma_to_initDeclarator[Object pointer, Object prefix]
+  :	COMMA ->
+	^(INIT_DECLARATOR
+	  ^(DECLARATOR
+	    {$pointer}
+	    ^(DIRECT_DECLARATOR {$prefix}))
+	  ABSENT)
+  ;
+
+commaTail[
+	Object declarationSpecifiers,
+	Object pointer,
+	Object prefix]
+  :
+	id+=comma_to_initDeclarator[pointer, prefix]
+	id+=initDeclarator
+	(COMMA id+=initDeclarator)*
+	SEMI
+	->
+	^(DECLARATION
+	   {$declarationSpecifiers}
+	   ^(INIT_DECLARATOR_LIST $id+)
+	   ABSENT) // no contract
+  ;
+
+directDeclaratorSuffixTail[
+	Object declarationSpecifiers,
+	Object pointer,
+	Object identifier,
+	Object suffix,
+	Object contract]
+  :
+	dd=directDeclarator_extend[identifier, suffix]
+	id=initDeclarator_extend[pointer, $dd.tree]
+	idl=initDeclaratorList_extend[$id.tree]
+	SEMI 
+	-> ^(DECLARATION {$declarationSpecifiers} $idl {$contract})
+  ;
+
+directDeclarator_extend[
+	Object identifier,
+	Object suffix]
+  :
+	dds+=directDeclaratorSuffix+
+	-> ^(DIRECT_DECLARATOR {$identifier} {$suffix} $dds+)
+  |	-> ^(DIRECT_DECLARATOR {$identifier} {$suffix})
+  ;
+
+initDeclarator_extend[
+	Object pointer,
+	Object directDeclarator]
+  :
+	i=initializer_opt
+	-> ^(INIT_DECLARATOR
+	     ^(DECLARATOR {$pointer} {$directDeclarator}) $i)
+  ;
+	
+initDeclaratorList_extend[Object initDeclarator]
+  :	(COMMA d+=initDeclarator)+
+	-> ^(INIT_DECLARATOR_LIST {$initDeclarator} $d+)
+  |	-> ^(INIT_DECLARATOR_LIST {$initDeclarator})
+  ;
+
 /* ***** A.2.3: Statements ***** */
 
 /* 6.8 */
@@ -1285,11 +1551,7 @@ scope DeclarationScope;
  * or statement.
  */
 blockItem
-	: 	( (declarationSpecifiers declarator contract_opt
-	   	    declarationList_opt LCURLY)=>
-		  functionDefinition
-		| declaration
-		) 
+	: declarationOrFunctionDef
 	| statement
 	;
 
@@ -1493,11 +1755,7 @@ scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
 }
-	: ( (declarationSpecifiers declarator contract_opt
-	       declarationList_opt LCURLY)=>
-	     functionDefinition
-	  | declaration
-	  ) 
+	: declarationOrFunctionDef
 	| pragma
 	| assumeStatement
 	| assertStatement
@@ -1514,6 +1772,8 @@ scope DeclarationScope;
  * Child 3: compound statement (body)
  * Child 4: contract or ABSENT (code contract)
  */
+ 
+ /*
 functionDefinition
 scope Symbols; // "function scope"
 @init {
@@ -1531,6 +1791,7 @@ scope Symbols; // "function scope"
 	      )
 	;
 
+*/
 
 /* 6.9.1
  * Root: DECLARATION_LIST
