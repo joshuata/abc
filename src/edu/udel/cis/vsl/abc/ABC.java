@@ -145,6 +145,7 @@ public class ABC {
 		boolean verbose = false;
 		boolean pretty = true;
 		boolean tables = false; // show symbol and type tables
+		boolean showTime = false;
 		List<String> transformCodes = new LinkedList<>();
 		Language language = null;
 		TranslationTask result = new TranslationTask();
@@ -220,7 +221,9 @@ public class ABC {
 				pretty = false;
 			} else if (arg.equals("-t")) {
 				tables = true;
-			} else if (arg.startsWith("-lang")) {
+			} else if(arg.equals("-s")){
+				showTime = true;
+			}else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
 					language = Language.C;
 				else if (arg.equals("-lang=civlc"))
@@ -257,6 +260,7 @@ public class ABC {
 		result.setVerbose(verbose);
 		result.setPrettyPrint(pretty);
 		result.setShowTables(tables);
+		result.setShowTime(showTime);
 		result.setPreprocOnly(preprocOnly);
 		result.addAllTransformCodes(transformCodes);
 		return result;

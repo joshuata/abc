@@ -399,12 +399,14 @@ public class FrontEnd {
 		boolean verbose = task.isVerbose();
 		boolean pretty = task.doPrettyPrint();
 		boolean tables = task.doShowTables();
+		boolean showTime = task.doShowTime();
 		int nfiles = task.getFiles().length;
 		FrontEnd frontEnd = new FrontEnd();
 		Preprocessor preprocessor = frontEnd.getPreprocessor();
 		AST[] asts = new AST[nfiles];
 		Map<String, String> macroNames = task.getMacros();
 		Map<String, Macro> implicitMacros = preprocessor.getMacros(macroNames);
+		long start = 0, used;
 
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
@@ -417,8 +419,15 @@ public class FrontEnd {
 				out.println();
 				out.flush();
 			}
+			if (showTime) {
+				start = System.currentTimeMillis();
+			}
 			tokens = preprocessor.outputTokenSource(task.getSystemIncludes(),
 					task.getUserIncludes(), implicitMacros, file);
+			if (showTime) {
+				used = System.currentTimeMillis() - start;
+				out.println(used + "ms: \tpreprocessing " + filename);
+			}
 			if (verbose) {
 				out.println(bar + " Preprocessor output for " + filename + " "
 						+ bar);
@@ -428,15 +437,31 @@ public class FrontEnd {
 				out.flush();
 			}
 			if (!task.isPreprocOnly()) {
-				ParseTree parseTree = parser.parse(tokens);
+				ParseTree parseTree;
 
+				if (showTime) {
+					start = System.currentTimeMillis();
+				}
+				parseTree = parser.parse(tokens);
+				if (showTime) {
+					used = System.currentTimeMillis() - start;
+					out.println(used + "ms: \tobtaining ANTLR tree for  "
+							+ filename);
+				}
 				if (verbose) {
 					out.println(bar + " ANTLR Tree for " + filename + " " + bar);
 					ANTLRUtils.printTree(out, parseTree.getRoot());
 					out.println();
 					out.flush();
 				}
+				if (showTime) {
+					start = System.currentTimeMillis();
+				}
 				asts[i] = builder.getTranslationUnit(parseTree);
+				if (showTime) {
+					used = System.currentTimeMillis() - start;
+					out.println(used + "ms: \tbuilding AST for " + filename);
+				}
 				if (verbose) {
 					out.println(bar + " Raw Translation Unit for " + filename
 							+ " " + bar);
@@ -450,8 +475,17 @@ public class FrontEnd {
 			}
 		}
 		if (!task.isPreprocOnly()) {
-			Program program = frontEnd.link(asts, task.getLanguage());
+			Program program;
 
+			if (showTime) {
+				start = System.currentTimeMillis();
+			}
+			program = frontEnd.link(asts, task.getLanguage());
+			if (showTime) {
+				used = System.currentTimeMillis() - start;
+				out.println(used + "ms: \tlinking " + asts.length
+						+ " translation units");
+			}
 			if (verbose)
 				out.println(bar + " Program " + bar);
 			for (String code : task.getTransformCodes()) {
@@ -464,11 +498,21 @@ public class FrontEnd {
 							+ bar);
 					out.flush();
 				}
+				if (showTime) {
+					start = System.currentTimeMillis();
+				}
 				program.apply(transformer);
+				if (showTime) {
+					used = System.currentTimeMillis() - start;
+					out.println(used + "ms: \tapplying transformer "
+							+ transformer.getShortDescription());
+				}
 			}
-			frontEnd.printProgram(out, program, pretty, tables);
+			if (!showTime)
+				frontEnd.printProgram(out, program, pretty, tables);
 		}
-		preprocessor.printSourceFiles(out);
+		if (!showTime)
+			preprocessor.printSourceFiles(out);
 		out.flush();
 	}
 }
