@@ -81,7 +81,12 @@ public class TranslationTask {
 	private boolean showTables;
 
 	/**
-	 * Construcs a new task with language C, empty system and user include
+	 * Show the timing of each phase.
+	 */
+	private boolean showTime;
+
+	/**
+	 * Constructs a new task with language C, empty system and user include
 	 * paths, output stream {@link System#out}, not preproc only, verbose, no
 	 * files, no transform codes.
 	 */
@@ -266,6 +271,14 @@ public class TranslationTask {
 
 	public void setShowTables(boolean value) {
 		this.showTables = value;
+	}
+
+	public boolean doShowTime() {
+		return showTime;
+	}
+
+	public void setShowTime(boolean showTime) {
+		this.showTime = showTime;
 	}
 
 }
