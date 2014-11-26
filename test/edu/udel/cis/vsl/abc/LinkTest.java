@@ -163,4 +163,15 @@ public class LinkTest {
 		check(new String[] { "structunion_0.c", "structunion_1.c",
 				"structunion_2.c" }, "structunion.c");
 	}
+
+	/**
+	 * Tests linkage when there are two distinct quantified scopes with same
+	 * variable name.
+	 * 
+	 * @throws ABCException
+	 */
+	@Test
+	public void quantifier() throws ABCException {
+		check(new String[] { "quantifier.cvl" }, "quantifier.cvl");
+	}
 }
