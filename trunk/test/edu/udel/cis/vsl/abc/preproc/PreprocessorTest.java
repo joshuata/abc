@@ -89,10 +89,11 @@ public class PreprocessorTest {
 					token2 = expectedSource.nextToken();
 					type2 = token2.getType();
 				} while (PreprocessorUtils.isWhiteSpace(token2));
-				assertEquals(token2.getText(), token1.getText());
 				assertEquals(type2, type1);
 				if (type1 == PreprocessorParser.EOF)
 					break;
+				assertEquals(token2.getText(), token1.getText());
+
 			}
 		} catch (PreprocessorRuntimeException e) {
 			throw new PreprocessorException(e.toString());

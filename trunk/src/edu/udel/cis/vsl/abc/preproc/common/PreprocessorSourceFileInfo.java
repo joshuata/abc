@@ -6,10 +6,8 @@ import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 /**
- * This class would be better named CppSourceFileInfo or something like that.
- * 
- * A class which records information related to each source file that is parsed
- * by the C preprocessor.
+ * A class which records information related to a source file that is parsed by
+ * the preprocessor.
  * 
  * @author siegel
  * 

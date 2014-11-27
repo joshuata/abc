@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.token.IF;
 import java.io.File;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
 
@@ -13,6 +14,8 @@ import org.antlr.runtime.TokenSource;
  * 
  */
 public class TokenUtils {
+
+	public final static Token eofToken = new CommonToken(Token.EOF);
 
 	/**
 	 * The maximum number of tokens that will be printed when summarizing a
@@ -192,7 +195,7 @@ public class TokenUtils {
 /**
  * A simple TokenSource formed from a linked list of PreprocessorTokens, given
  * the first element in the list. The token source appends an infinite number of
- * EOFs after the last token in the list.
+ * invalid tokens???? after the last token in the list.
  * 
  * @author siegel
  * 
@@ -210,7 +213,7 @@ class ListTokenSource implements TokenSource {
 		Token result = current;
 
 		if (result == null)
-			result = Token.EOF_TOKEN;
+			result = TokenUtils.eofToken;
 
 		else
 			current = current.getNext();
@@ -236,59 +239,3 @@ class ListTokenSource implements TokenSource {
 	}
 
 }
-
-// /**
-// * A simple TokenSource formed by iterating over the children of a CommonTree
-// * node.
-// *
-// * @author siegel
-// *
-// */
-// class NodeTokenSource implements TokenSource {
-//
-// private CommonTree root;
-//
-// /**
-// * Index of the next child that will be returned by a call to nextToken().
-// */
-// private int position = 0;
-//
-// private int numChildren;
-//
-// NodeTokenSource(CommonTree root) {
-// this.root = root;
-// this.numChildren = root.getChildCount();
-// }
-//
-// @Override
-// public Token nextToken() {
-// if (position >= numChildren)
-// return Token.EOF_TOKEN;
-// else {
-// Token result = ((CommonTree) root.getChild(position)).getToken();
-//
-// position++;
-// return result;
-// }
-// }
-//
-// @Override
-// public String getSourceName() {
-// Token token = root.getToken();
-//
-// if (token == null)
-// return "unknown";
-//
-// CharStream stream = token.getInputStream();
-//
-// if (stream == null)
-// return "unknown";
-//
-// String name = stream.getSourceName();
-//
-// if (name == null)
-// return "unknown";
-//
-// return name;
-// }
-// }

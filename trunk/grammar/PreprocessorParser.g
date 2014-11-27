@@ -43,8 +43,8 @@ public void emitErrorMessage(String msg) { // don't try to recover!
 }
 }
 
-/**  The whole file consists of 1 block followed by EOF */
-file		:	block EOF -> ^(FILE block? EOF)
+/**  The whole file consists of 1 block */
+file		:	block -> ^(FILE block)
 		;
 
 /** A block is a sequence of directives and text blocks.

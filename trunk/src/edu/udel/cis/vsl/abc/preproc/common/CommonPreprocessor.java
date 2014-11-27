@@ -47,28 +47,6 @@ public class CommonPreprocessor implements Preprocessor {
 
 	private ArrayList<SourceFile> sourceFiles = new ArrayList<>();
 
-	// /**
-	// * Read these files to get their macros. Store the macros and use them as
-	// * the starting point when parsing any subsequent file.
-	// *
-	// * @param implicitIncludes
-	// * @throws PreprocessorException
-	// */
-	// @Override
-	// public void setImplicitIncludes(File[] implicitIncludes)
-	// throws PreprocessorException {
-	// this.implicitMacros = new HashMap<String, Macro>();
-	// for (File file : implicitIncludes) {
-	// PreprocessorTokenSource tokenSource = outputTokenSource(file,
-	// implicitMacros, tokenFactory);
-	// Token token;
-	//
-	// do {
-	// token = tokenSource.nextToken();
-	// } while (token.getType() != PreprocessorLexer.EOF);
-	// }
-	// }
-
 	@Override
 	public Map<String, Macro> getMacros(Map<String, String> macroDefs)
 			throws PreprocessorException {
@@ -100,6 +78,7 @@ public class CommonPreprocessor implements Preprocessor {
 				return tokenSource.macroMap;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
+				// why?????
 				return new HashMap<String, Macro>();
 			}
 		} else
@@ -178,46 +157,6 @@ public class CommonPreprocessor implements Preprocessor {
 
 		return new PreprocessorParser(tokenStream);
 	}
-
-	// private void addFileName(String fileName) {
-	// if (!fileNameMap.containsKey(fileName)) {
-	// int index = fileNameMap.size();
-	//
-	// fileNameMap.put(fileName, index);
-	// }
-	// }
-
-	// @Override
-	// public String shortFileName(String fileName) {
-	// if (fileNameMap.containsKey(fileName)) {
-	// return SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName);
-	// } else {
-	// int index = fileNameMap.size();
-	//
-	// fileNameMap.put(fileName, index);
-	// return SHORT_FILE_NAME_PREFIX + index;
-	// }
-	// }
-
-	// /**
-	// * Print the list of shorter file names and the corresponding original
-	// file
-	// * names
-	// *
-	// * @param out
-	// * The output stream to be used.
-	// */
-	// @Override
-	// public void printShorterFileNameMap(PrintStream out) {
-	// if (fileNameMap.size() > 0) {
-	// out.println();
-	// out.println("File name list:");
-	// for (String fileName : fileNameMap.keySet()) {
-	// out.println(SHORT_FILE_NAME_PREFIX + fileNameMap.get(fileName)
-	// + "\t: " + fileName);
-	// }
-	// }
-	// }
 
 	/**
 	 * Scans and parses the given preprocessor source file, sending a textual
@@ -314,17 +253,6 @@ public class CommonPreprocessor implements Preprocessor {
 		out.flush();
 	}
 
-	/**
-	 * Prints the result of preprocessing the file.
-	 * 
-	 * @param out
-	 *            where to send the output
-	 * @param file
-	 *            a preprocessor source file
-	 * @throws PreprocessorException
-	 *             if the file fails to adhere to the preprocessor grammar, or
-	 *             an I/O occurs
-	 */
 	@Override
 	public void printOutput(File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> implicitMacros, PrintStream out, File file)
@@ -338,19 +266,6 @@ public class CommonPreprocessor implements Preprocessor {
 		out.flush();
 	}
 
-	/**
-	 * Prints the result of preprocessing the file, but surrounding the output
-	 * with some lines to clearly delineate the beginning and ending of the
-	 * output, and specifying the file name.
-	 * 
-	 * @param out
-	 *            where to send the output
-	 * @param file
-	 *            a preprocessor source file
-	 * @throws PreprocessorException
-	 *             if the file fails to adhere to the preprocessor grammar, or
-	 *             an I/O occurs
-	 */
 	@Override
 	public void printOutputDebug(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
@@ -363,17 +278,6 @@ public class CommonPreprocessor implements Preprocessor {
 		out.flush();
 	}
 
-	/**
-	 * Show the processing of the file in stages. Useful for debugging.
-	 * 
-	 * @param out
-	 *            where to print the output
-	 * @param file
-	 *            a preprocessor source file
-	 * @throws PreprocessorException
-	 *             if there is an I/O error the source file does not conform to
-	 *             the preprocessor syntax
-	 */
 	@Override
 	public void debug(File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> implicitMacros, PrintStream out, File file)

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 
+import org.antlr.runtime.CommonToken;
+
 import edu.udel.cis.vsl.abc.analysis.IF.Analysis;
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilder;
@@ -37,6 +39,8 @@ import edu.udel.cis.vsl.abc.preproc.IF.Preprocess;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
+import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser;
+import edu.udel.cis.vsl.abc.preproc.common.PreprocessorTokenSource;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.program.IF.Programs;
@@ -419,25 +423,39 @@ public class FrontEnd {
 				ANTLRUtils.source(out, file);
 				out.println();
 				out.flush();
-				timer.markTime("print source");
+				timer.markTime("print source for " + filename);
 			}
 			tokens = preprocessor.outputTokenSource(task.getSystemIncludes(),
 					task.getUserIncludes(), implicitMacros, file);
 			timer.markTime("construct preprocess tree");
-			if (verbose) {
-				out.println(bar + " Preprocessor output for " + filename + " "
-						+ bar);
-				preprocessor.printOutputDebug(task.getSystemIncludes(),
-						task.getUserIncludes(), implicitMacros, out, file);
+			if (task.isPreprocOnly()) {
+				CommonToken token;
+				int type;
+
+				if (verbose)
+					out.println(bar + " Preprocessor output for " + filename
+							+ " " + bar);
+				while (true) {
+					token = (CommonToken) tokens.nextToken();
+					type = token.getType();
+					if (type == PreprocessorParser.EOF)
+						break;
+					if (type == PreprocessorParser.COMMENT)
+						out.print(" ");
+					else {
+						out.print(token.getText());
+						// out.println(); // debugging
+					}
+					out.flush();
+				}
 				out.println();
 				out.flush();
-			}
-			timer.markTime("complete preprocessing");
-			if (!task.isPreprocOnly()) {
+				timer.markTime("preprocess and write " + filename);
+			} else { // not preproc only
 				ParseTree parseTree;
 
 				parseTree = parser.parse(tokens);
-				timer.markTime("parse and build ANTLR tree");
+				timer.markTime("preprocess, parse, and build ANTLR tree");
 				if (verbose) {
 					out.println(bar + " ANTLR Tree for " + filename + " " + bar);
 					ANTLRUtils.printTree(out, parseTree.getRoot());
@@ -488,6 +506,11 @@ public class FrontEnd {
 		}
 		if (!showTime)
 			preprocessor.printSourceFiles(out);
+		if (showTime) {
+			// also show counts for now:
+			out.println("Calls to PreprocessorTokenSource.nextToken(): "
+					+ PreprocessorTokenSource.nextToken_calls);
+		}
 		out.flush();
 	}
 }
