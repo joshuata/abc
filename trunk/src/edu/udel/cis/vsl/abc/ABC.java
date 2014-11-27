@@ -111,6 +111,8 @@ public class ABC {
 		out.println("  print the AST(s) using a hierarchical representation");
 		out.println("-t");
 		out.println("  show symbol and type tables");
+		out.println("-time");
+		out.println("  show time for each phase");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
 		for (String code : Transform.getCodes()) {
@@ -221,9 +223,9 @@ public class ABC {
 				pretty = false;
 			} else if (arg.equals("-t")) {
 				tables = true;
-			} else if(arg.equals("-s")){
+			} else if (arg.equals("-time")) {
 				showTime = true;
-			}else if (arg.startsWith("-lang")) {
+			} else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
 					language = Language.C;
 				else if (arg.equals("-lang=civlc"))
@@ -265,10 +267,6 @@ public class ABC {
 		result.addAllTransformCodes(transformCodes);
 		return result;
 	}
-
-	// TODO:
-	// add -D support. Need to create a token with "source" the command line.
-	// may treat command line as (virtual) file called "commandline"?
 
 	/**
 	 * Executes the commands specified by the command line.
