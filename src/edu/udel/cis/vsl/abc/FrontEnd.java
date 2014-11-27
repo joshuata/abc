@@ -48,6 +48,7 @@ import edu.udel.cis.vsl.abc.token.IF.Tokens;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
+import edu.udel.cis.vsl.abc.util.IF.Timer;
 
 /**
  * <p>
@@ -399,14 +400,14 @@ public class FrontEnd {
 		boolean verbose = task.isVerbose();
 		boolean pretty = task.doPrettyPrint();
 		boolean tables = task.doShowTables();
-		boolean showTime = task.doShowTime();
 		int nfiles = task.getFiles().length;
 		FrontEnd frontEnd = new FrontEnd();
 		Preprocessor preprocessor = frontEnd.getPreprocessor();
 		AST[] asts = new AST[nfiles];
 		Map<String, String> macroNames = task.getMacros();
 		Map<String, Macro> implicitMacros = preprocessor.getMacros(macroNames);
-		long start = 0, used;
+		boolean showTime = task.doShowTime();
+		Timer timer = showTime ? new Timer(out) : new Timer();
 
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
@@ -418,16 +419,11 @@ public class FrontEnd {
 				ANTLRUtils.source(out, file);
 				out.println();
 				out.flush();
-			}
-			if (showTime) {
-				start = System.currentTimeMillis();
+				timer.markTime("print source");
 			}
 			tokens = preprocessor.outputTokenSource(task.getSystemIncludes(),
 					task.getUserIncludes(), implicitMacros, file);
-			if (showTime) {
-				used = System.currentTimeMillis() - start;
-				out.println(used + "ms: \tpreprocessing " + filename);
-			}
+			timer.markTime("construct preprocess tree");
 			if (verbose) {
 				out.println(bar + " Preprocessor output for " + filename + " "
 						+ bar);
@@ -436,32 +432,21 @@ public class FrontEnd {
 				out.println();
 				out.flush();
 			}
+			timer.markTime("complete preprocessing");
 			if (!task.isPreprocOnly()) {
 				ParseTree parseTree;
 
-				if (showTime) {
-					start = System.currentTimeMillis();
-				}
 				parseTree = parser.parse(tokens);
-				if (showTime) {
-					used = System.currentTimeMillis() - start;
-					out.println(used + "ms: \tobtaining ANTLR tree for  "
-							+ filename);
-				}
+				timer.markTime("parse and build ANTLR tree");
 				if (verbose) {
 					out.println(bar + " ANTLR Tree for " + filename + " " + bar);
 					ANTLRUtils.printTree(out, parseTree.getRoot());
 					out.println();
 					out.flush();
-				}
-				if (showTime) {
-					start = System.currentTimeMillis();
+					timer.markTime("print ANTLR tree");
 				}
 				asts[i] = builder.getTranslationUnit(parseTree);
-				if (showTime) {
-					used = System.currentTimeMillis() - start;
-					out.println(used + "ms: \tbuilding AST for " + filename);
-				}
+				timer.markTime("build AST for " + filename);
 				if (verbose) {
 					out.println(bar + " Raw Translation Unit for " + filename
 							+ " " + bar);
@@ -471,23 +456,19 @@ public class FrontEnd {
 						asts[i].print(out);
 					out.println();
 					out.flush();
+					timer.markTime("print AST for " + filename);
 				}
 			}
 		}
 		if (!task.isPreprocOnly()) {
 			Program program;
 
-			if (showTime) {
-				start = System.currentTimeMillis();
-			}
 			program = frontEnd.link(asts, task.getLanguage());
-			if (showTime) {
-				used = System.currentTimeMillis() - start;
-				out.println(used + "ms: \tlinking " + asts.length
-						+ " translation units");
-			}
-			if (verbose)
+			timer.markTime("link " + asts.length + " translation units");
+			if (verbose) {
 				out.println(bar + " Program " + bar);
+				timer.markTime("print linked program");
+			}
 			for (String code : task.getTransformCodes()) {
 				Transformer transformer = frontEnd.getTransformer(code);
 
@@ -498,15 +479,9 @@ public class FrontEnd {
 							+ bar);
 					out.flush();
 				}
-				if (showTime) {
-					start = System.currentTimeMillis();
-				}
 				program.apply(transformer);
-				if (showTime) {
-					used = System.currentTimeMillis() - start;
-					out.println(used + "ms: \tapplying transformer "
-							+ transformer.getShortDescription());
-				}
+				timer.markTime("apply transformer "
+						+ transformer.getShortDescription());
 			}
 			if (!showTime)
 				frontEnd.printProgram(out, program, pretty, tables);

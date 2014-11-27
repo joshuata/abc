@@ -44,26 +44,161 @@
 		<pathelement location="${antlr.jar}" />
 	</path>
 
-	<target name="parsers" depends="OmpParser, OmpLexer, CivlCParser,PreprocessorExpressionParser,PreprocessorParser,PreprocessorLexer">
+	<target name="parsers" depends="PreprocessorExpressionParser,CivlCParser,OmpParser">
 	</target>
 
-	<!-- Building OpenMP parser -->
+	<!--
+		PreprocessorLexer.java should be built if PreprocessorLexer.g
+		is newer than PreprocessorLexer.java
+	-->
 
-	<target name="checkOmpParserChanges">
-		<uptodate property="noOmpParserChanges">
-			<srcfiles file="${grammar.dir}/OmpParser.g" />
-			<srcfiles file="${grammar.dir}/CivlCParser.g" />
-			<srcfiles file="${grammar.dir}/CivlCParser.tokens" />
-			<srcfiles file="${grammar.dir}/OmpLexer.g" />
-			<srcfiles file="${grammar.dir}/OmpLexer.tokens" />
-			<compositemapper>
-				<mapper type="merge" to="${real.src.dir}/parse/common/OmpParser.java" />
-				<mapper type="merge" to="${real.src.dir}/parse/common/OmpParser_CivlCParser.java" />
-			</compositemapper>
-		</uptodate>
+	<target name="PreprocessorLexerDependencies">
+		<uptodate property="PreprocessorLexerUpToDate" srcfile="${grammar.dir}/PreprocessorLexer.g" targetfile="${real.src.dir}/preproc/common/PreprocessorLexer.java" />
 	</target>
 
-	<target name="OmpParser" depends="CivlCParser, OmpLexer, checkOmpParserChanges" unless="noOmpParserChanges">
+	<target name="PreprocessorLexer" depends="PreprocessorLexerDependencies" unless="PreprocessorLexerUpToDate">
+		<delete file="${grammar.dir}/PreprocessorParser.tokens" />
+		<delete file="${real.src.dir}/preproc/common/PreprocessorLexer.java" />
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="PreprocessorLexer.g" />
+		</java>
+		<move file="${grammar.dir}/PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />
+	</target>
+
+	<!--
+		PreprocessorParser.java should be built if PreprocessorParser.g
+		is newer than PreprocessorParser.java OR PreprocessorLexer.java
+		is newer than PreprocessorParser.java.
+		
+		BUT: you only want to check if PreprocessorLexer.java is newer
+		than PreprocessorParser.java AFTER the lexer things happens.
+	-->
+
+	<target name="PreprocessorParserDependencies" depends="PreprocessorLexer">
+		<uptodate property="unchangedPreprocessorParserGrammar" srcfile="${grammar.dir}/PreprocessorParser.g" targetfile="${real.src.dir}/preproc/common/PreprocessorParser.java" />
+		<uptodate property="PreprocessorLexerBeforePreprocessorParser" srcfile="${real.src.dir}/preproc/common/PreprocessorLexer.java" targetfile="${real.src.dir}/preproc/common/PreprocessorParser.java" />
+		<condition property="PreprocessorParserUpToDate">
+			<and>
+				<isset property="unchangedPreprocessorParserGrammar" />
+				<isset property="PreprocessorLexerBeforePreprocessorParser" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="PreprocessorParser" depends="PreprocessorParserDependencies" unless="PreprocessorParserUpToDate">
+		<delete file="${grammar.dir}/PreprocessorParser.tokens" />
+		<delete file="${real.src.dir}/preproc/common/PreprocessorParser.java" />
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="PreprocessorParser.g" />
+		</java>
+		<move file="${grammar.dir}/PreprocessorParser.java" todir="${real.src.dir}/preproc/common" />
+	</target>
+
+	<!--
+		PreprocessorExpressionParser.java should be built if PreprocessorExpressionParser.g
+		is newer than PreprocessorExpressionParser.java OR PreprocessorLexer.java
+		is newer than PreprocessorExpressionParser.java.
+	-->
+
+	<target name="PreprocessorExpressionParserDependencies" depends="PreprocessorLexer">
+		<uptodate property="unchangedPreprocessorExpressionParserGrammar" srcfile="${grammar.dir}/PreprocessorExpressionParser.g" targetfile="${real.src.dir}/preproc/common/PreprocessorExpressionParser.java" />
+		<uptodate property="PreprocessorLexerBeforePreprocessorExpressionParser" srcfile="${real.src.dir}/preproc/common/PreprocessorLexer.java" targetfile="${real.src.dir}/preproc/common/PreprocessorExpressionParser.java" />
+		<condition property="PreprocessorExpressionParserUpToDate">
+			<and>
+				<isset property="unchangedPreprocessorExpressionParserGrammar" />
+				<isset property="PreprocessorLexerBeforePreprocessorExpressionParser" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="PreprocessorExpressionParser" depends="PreprocessorExpressionParserDependencies" unless="PreprocessorExpressionParserUpToDate">
+		<delete file="${grammar.dir}/PreprocessorExpressionParser.tokens" />
+		<delete file="${real.src.dir}/preproc/common/PreprocessorExpressionParser.java" />
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="PreprocessorExpressionParser.g" />
+		</java>
+		<move file="${grammar.dir}/PreprocessorExpressionParser.java" todir="${real.src.dir}/preproc/common" />
+	</target>
+
+
+	<!--
+		CivlCParser.java depends on CivlCParser.g and PreprocessorParser.java
+	-->
+
+	<target name="CivlCParserDependencies" depends="PreprocessorParser">
+		<uptodate property="unchangedCivlCParserGrammar" srcfile="${grammar.dir}/CivlCParser.g" targetfile="${real.src.dir}/parse/common/CivlCParser.java" />
+		<uptodate property="PreprocessorParserBeforeCivlCParser" srcfile="${real.src.dir}/preproc/common/PreprocessorParser.java" targetfile="${real.src.dir}/parse/common/CivlCParser.java" />
+		<condition property="CivlCParserUpToDate">
+			<and>
+				<isset property="unchangedCivlCParserGrammar" />
+				<isset property="PreprocessorParserBeforeCivlCParser" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="CivlCParser" depends="CivlCParserDependencies" unless="CivlCParserUpToDate">
+		<delete file="${grammar.dir}/CivlCParser.tokens" />
+		<delete file="${real.src.dir}/parse/common/CivlCParser.java" />
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="CivlCParser.g" />
+		</java>
+		<move file="${grammar.dir}/CivlCParser.java" todir="${real.src.dir}/parse/common" />
+	</target>
+
+
+	<!--
+		OmpLexer is a composite grammar.
+		It is needed only for its tokens.  The java file can be
+		thrown away.
+		OmpLexer.tokens depends on OmpLexer.g and PreprocessorLexer.java.
+	-->
+
+	<target name="OmpLexerDependencies" depends="PreprocessorLexer">
+		<uptodate property="unchangedOmpLexerGrammar" srcfile="${grammar.dir}/OmpLexer.g" targetfile="${grammar.dir}/OmpLexer.tokens" />
+		<uptodate property="PreprocessorLexerBeforeOmpLexer" srcfile="${real.src.dir}/preproc/common/PreprocessorLexer.java" targetfile="${grammar.dir}/OmpLexer.tokens" />
+		<condition property="OmpLexerUpToDate">
+			<and>
+				<isset property="unchangedOmpLexerGrammar" />
+				<isset property="PreprocessorLexerBeforeOmpLexer" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="OmpLexer" depends="OmpLexerDependencies" unless="OmpLexerUpToDate">
+		<delete file="${grammar.dir}/OmpLexer.tokens" />
+		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
+			<arg value="-verbose" />
+			<arg value="OmpLexer.g" />
+		</java>
+		<delete file="${grammar.dir}/OmpLexer.java" />
+		<delete file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" />
+	</target>
+
+	<!--
+		OmpParser is a composite grammar.
+		OmpParser.java depends on OmpParser.g, OmpLexer.tokens,
+		and CivlCParser.java.  It also requires inserting some text
+		at beginning manually.
+	-->
+
+	<target name="OmpParserDependencies" depends="OmpLexer,CivlCParser">
+		<uptodate property="unchangedOmpParserGrammar" srcfile="${grammar.dir}/OmpParser.g" targetfile="${real.src.dir}/parse/common/OmpParser.java" />
+		<uptodate property="OmpLexerBeforeOmpParser" srcfile="${grammar.dir}/OmpLexer.tokens" targetfile="${real.src.dir}/parse/common/OmpParser.java" />
+		<uptodate property="CivlCParserBeforeOmpParser" srcfile="${real.src.dir}/parse/common/CivlCParser.java" targetfile="${real.src.dir}/parse/common/OmpParser.java" />
+		<condition property="OmpParserUpToDate">
+			<and>
+				<isset property="unchangedOmpParserGrammar" />
+				<isset property="OmpLexerBeforeOmpParser" />
+				<isset property="CivlCParserBeforeOmpParser" />
+			</and>
+		</condition>
+	</target>
+
+	<target name="OmpParser" depends="OmpParserDependencies" unless="OmpParserUpToDate">
 		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
 			<arg value="-verbose" />
 			<arg value="OmpParser.g" />
@@ -76,98 +211,9 @@
 		<delete file="${grammar.dir}/OmpParser2.java" />
 		<move file="${grammar.dir}/OmpParser.java" todir="${real.src.dir}/parse/common" />
 		<move file="${grammar.dir}/OmpParser_CivlCParser.java" todir="${real.src.dir}/parse/common" />
+
 	</target>
 
-	<target name="checkOmpLexerChanges">
-		<uptodate property="noOmpLexerChanges">
-			<srcfiles file="${grammar.dir}/OmpLexer.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
-			<!--<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" /> not neccessary because it is already checked by PrerocessorParser-->
-			<mapper type="merge" to="${grammar.dir}/OmpLexer.tokens" />
-		</uptodate>
-	</target>
-
-	<target name="OmpLexer" depends="PreprocessorLexer,checkOmpLexerChanges" unless="noOmpLexerChanges">
-		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
-			<arg value="-verbose" />
-			<arg value="OmpLexer.g" />
-		</java>
-		<delete file="${grammar.dir}/OmpLexer.java" />
-		<delete file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" />
-	</target>
-
-	<!-- Building CivlC parser -->
-
-	<target name="checkCivlCParserChanges">
-		<uptodate property="noCivlCParserChanges">
-			<srcfiles file="${grammar.dir}/CivlCParser.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" />
-			<srcfiles file="${grammar.dir}/PreprocessorParser.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorParser.tokens" />
-			<mapper type="merge" to="${real.src.dir}/parse/common/CivlCParser.java" />
-		</uptodate>
-	</target>
-
-	<target name="CivlCParser" depends="PreprocessorParser,checkCivlCParserChanges" unless="noCivlCParserChanges">
-		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
-			<arg value="-verbose" />
-			<arg value="CivlCParser.g" />
-		</java>
-		<move file="${grammar.dir}/CivlCParser.java" todir="${real.src.dir}/parse/common" />
-	</target>
-
-	<target name="checkExpressionParserChanges">
-		<uptodate property="noExpressionParserChanges">
-			<srcfiles file="${grammar.dir}/PreprocessorExpressionParser.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" />
-			<mapper type="merge" to="${real.src.dir}/preproc/common/PreprocessorExpressionParser.java" />
-		</uptodate>
-	</target>
-
-	<target name="PreprocessorExpressionParser" depends="PreprocessorLexer,checkExpressionParserChanges" unless="noExpressionParserChanges">
-		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
-			<arg value="-verbose" />
-			<arg value="PreprocessorExpressionParser.g" />
-		</java>
-		<move file="${grammar.dir}/PreprocessorExpressionParser.java" todir="${real.src.dir}/preproc/common" />
-	</target>
-
-	<target name="checkParserChanges">
-		<uptodate property="noParserChanges">
-			<srcfiles file="${grammar.dir}/PreprocessorParser.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.tokens" />
-			<mapper type="merge" to="${real.src.dir}/preproc/common/PreprocessorParser.java" />
-		</uptodate>
-	</target>
-
-	<target name="PreprocessorParser" depends="PreprocessorLexer,checkParserChanges" unless="noParserChanges">
-		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
-			<arg value="-verbose" />
-			<arg value="PreprocessorParser.g" />
-		</java>
-		<move file="${grammar.dir}/PreprocessorParser.java" todir="${real.src.dir}/preproc/common" />
-	</target>
-
-	<target name="checkLexerChanges">
-		<uptodate property="noLexerChanges">
-			<srcfiles file="${grammar.dir}/PreprocessorLexer.g" />
-			<compositemapper>
-				<mapper type="merge" to="${grammar.dir}/PreprocessorLexer.tokens" />
-				<mapper type="merge" to="${real.src.dir}/preproc/common/PreprocessorLexer.java" />
-			</compositemapper>
-		</uptodate>
-	</target>
-
-	<target name="PreprocessorLexer" depends="checkLexerChanges" unless="noLexerChanges">
-		<java classname="org.antlr.Tool" classpathref="antlr.class.path" fork="true" failonerror="true" dir="${grammar.dir}">
-			<arg value="-verbose" />
-			<arg value="PreprocessorLexer.g" />
-		</java>
-		<move file="${grammar.dir}/PreprocessorLexer.java" todir="${real.src.dir}/preproc/common" />
-	</target>
 
 	<!-- Source compilation and JAR construction -->
 
