@@ -55,20 +55,19 @@ import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
  * pragmas?, (3) output #line tokens?, (4) parse formatted comments that use
  * '@'?
  * 
- * TODO: For each pragma category, provide a handler. Could be just ignore and
- * filter out (default). Could be, tokenize, macro expand, and include in output
- * source. Could be something else.
- * 
  * TODO: deal with '#' and '##'.
- * 
- * TODO: need to support pre-defined macros. From command line? (-D ...)
- * __x86_64__ on Mac.
  * 
  * @author Stephen F. Siegel
  */
 public class PreprocessorTokenSource implements CTokenSource {
 
 	// Fields...
+
+	/**
+	 * For performance analysis: the number of calls to method
+	 * {@link #nextToken()}.
+	 */
+	public static long nextToken_calls = 0;
 
 	private SourceFile originalSourceFile;
 
@@ -200,15 +199,15 @@ public class PreprocessorTokenSource implements CTokenSource {
 		this.preprocessor = preprocessor;
 		this.originalSourceFile = getOrMakeSourceFile(source, tmpFile);
 		try {
-			Tree tree = (Tree) parser.file().getTree();
+			CommonTree tree = (CommonTree) parser.file().getTree();
 			Formation history = tokenFactory.newInclusion(originalSourceFile);
-			PreprocessorSourceFileInfo fileInfo = new PreprocessorSourceFileInfo(
-					history, parser, tree, tree);
 			StringPredicate macroDefinedPredicate = new MacroDefinedPredicate(
 					macroMap);
 
+			addEofNodeToTree(tree, source.getName());
 			this.macroMap = macroMap;
-			sourceStack.push(fileInfo);
+			sourceStack.push(new PreprocessorSourceFileInfo(history, parser,
+					tree, tree));
 			incrementNextNode(); // skip root "FILE" node
 			this.systemIncludePaths = systemIncludePaths;
 			this.userIncludePaths = userIncludePaths;
@@ -231,6 +230,17 @@ public class PreprocessorTokenSource implements CTokenSource {
 		this(source, parser, systemIncludePaths, userIncludePaths,
 				new HashMap<String, Macro>(), tokenFactory, preprocessor,
 				tmpFile);
+	}
+
+	// Helper
+
+	private void addEofNodeToTree(Tree tree, String filename) {
+		Formation eofFormation = tokenFactory.newSystemFormation("EOF");
+		CToken eofToken = tokenFactory.newCToken(Token.EOF, "EndOfFile<"
+				+ filename + ">", eofFormation);
+		CommonTree eofNode = new CommonTree(eofToken);
+
+		tree.addChild(eofNode);
 	}
 
 	// Implementation of methods from CTokenSource...
@@ -304,6 +314,9 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 */
 	@Override
 	public CToken nextToken() {
+
+		nextToken_calls++;
+
 		if (finalToken != null)
 			return finalToken;
 		while (firstOutput == null
@@ -1337,6 +1350,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 					+ " syntax errors occurred while scanning included file "
 					+ file);
 		tree = (Tree) fileReturn.getTree();
+		addEofNodeToTree(tree, filename);
 		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(
 				getOrMakeSourceFile(file, false), filenameToken), parser, tree,
 				tree.getChild(0));
@@ -1606,38 +1620,6 @@ public class PreprocessorTokenSource implements CTokenSource {
 	}
 
 	// Methods modifying the output list...
-
-	// /**
-	// * Prereq: stringLiteralBuffer is not empty.
-	// *
-	// * @return
-	// */
-	// private StringToken processStringLiteralBuffer()
-	// throws PreprocessorException {
-	// int size = stringLiteralBuffer.size();
-	//
-	// if (size == 1) {
-	// CToken token = stringLiteralBuffer.remove(0);
-	//
-	// try {
-	// return tokenFactory.newStringToken(token);
-	// } catch (SyntaxException e) {
-	// throw new PreprocessorException(e.getMessage(), token);
-	// }
-	// } else if (size > 1) {
-	// try {
-	// StringToken result = tokenFactory
-	// .newStringToken(stringLiteralBuffer);
-	//
-	// stringLiteralBuffer.clear();
-	// return result;
-	// } catch (SyntaxException e) {
-	// throw new PreprocessorException(e.getMessage(),
-	// stringLiteralBuffer.get(0));
-	// }
-	// } else
-	// throw new RuntimeException("unreachable");
-	// }
 
 	/**
 	 * Adds a single token to output buffer.

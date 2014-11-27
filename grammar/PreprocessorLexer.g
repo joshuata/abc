@@ -343,19 +343,9 @@ SChar		:	~('"' | '\\' | '\n') | EscapeSequence ;
 
 /****** Punctuators: C11 Sec. 6.4.6 ******/
 
-fragment ELLIPSIS :;
-
-fragment DOTDOT :;
-
-DOT		:	'.'
-			(   ('..')=> '..' { $type  = ELLIPSIS; }
-			|
-				('.')=> '.' {$type = DOTDOT; }
-			|
-			)
-			NotLineStart
-		;
-		
+ELLIPSIS	: '...' NotLineStart;
+DOTDOT		: '..' NotLineStart;
+DOT			:	'.' NotLineStart;
 AMPERSAND	:	'&'		NotLineStart;
 AND		:	'&&'		NotLineStart;
 ARROW		:	'->'		NotLineStart;
