@@ -13,6 +13,14 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.preproc.common.FilteredANTLRFileStream;
 import edu.udel.cis.vsl.abc.preproc.common.FilteredANTLRInputStream;
 
+/**
+ * Tests the removal of backslash-newline sequences from character streams in
+ * the two classes {@link FilteredANTLRFileStream} and
+ * {@link FilteredANTLRInputStream}.
+ * 
+ * @author siegel
+ *
+ */
 public class FilteredCharStreamTest {
 
 	private static boolean debug = false;
@@ -27,18 +35,9 @@ public class FilteredCharStreamTest {
 	public void tearDown() throws Exception {
 	}
 
-	private String filter(String original, boolean useFileStream)
-			throws IOException {
-		if (debug)
-			out.print("Input---->" + original + "<--");
-
-		CharStream output = useFileStream ? new FilteredANTLRFileStream(
-				original) : new FilteredANTLRInputStream("test", original);
+	private String filter(CharStream output) throws IOException {
 		String result = "";
 		int index0 = 0;
-
-		if (debug)
-			out.println(" (size=" + original.length() + ")");
 
 		while (index0 == output.index()) {
 			int number = output.LA(1);
@@ -58,65 +57,68 @@ public class FilteredCharStreamTest {
 		return result;
 	}
 
-	private String filter1(String original) throws IOException {
-		return filter(original, true);
+	String fileFilter(String original) throws IOException {
+		return filter(new FilteredANTLRFileStream(original));
 	}
 
-	private String filter2(String original) throws IOException {
-		return filter(original, false);
+	String streamFilter(String original, int chunkSize) throws IOException {
+		return filter(new FilteredANTLRInputStream("test", original, chunkSize));
+	}
+
+	private void test(String expected, String original) throws IOException {
+		if (debug) {
+			out.print("Input---->" + original + "<--");
+			out.println(" (size=" + original.length() + ")");
+			out.println();
+		}
+		assertEquals(expected, fileFilter(original));
+		assertEquals(expected, streamFilter(original, 1));
+		assertEquals(expected, streamFilter(original, 2));
+		assertEquals(expected, streamFilter(original, 8192));
 	}
 
 	@Test
 	public void testNone() throws IOException {
-		assertEquals("abc", filter1("abc"));
-		assertEquals("abc", filter2("abc"));
+		test("abc", "abc");
 	}
 
 	@Test
 	public void testMiddle() throws IOException {
-		assertEquals("ab", filter1("a\\\nb"));
-		assertEquals("ab", filter2("a\\\nb"));
+		test("ab", "a\\\nb");
 	}
 
 	@Test
 	public void testBegin() throws IOException {
-		assertEquals("ab", filter1("\\\nab"));
-		assertEquals("ab", filter2("\\\nab"));
+		test("ab", "\\\nab");
 	}
 
 	@Test
 	public void testEnd() throws IOException {
-		assertEquals("ab", filter1("ab\\\n"));
-		assertEquals("ab", filter2("ab\\\n"));
+		test("ab", "ab\\\n");
 	}
 
 	@Test
 	public void testEmpty() throws IOException {
-		assertEquals("", filter1("\\\n"));
-		assertEquals("", filter2("\\\n"));
+		test("", "\\\n");
 	}
 
 	@Test
 	public void testDouble() throws IOException {
-		assertEquals("ab", filter1("a\\\n\\\nb"));
-		assertEquals("ab", filter2("a\\\n\\\nb"));
+		test("ab", "a\\\n\\\nb");
 	}
 
 	@Test
 	public void testBackslashOnly() throws IOException {
-		assertEquals("a\\b", filter1("a\\b"));
-		assertEquals("a\\b", filter2("a\\b"));
+		test("a\\b", "a\\b");
 	}
 
 	@Test
 	public void testNewlineOnly() throws IOException {
-		assertEquals("a\nb", filter1("a\nb"));
-		assertEquals("a\nb", filter2("a\nb"));
+		test("a\nb", "a\nb");
 	}
 
 	@Test
 	public void testDoubleBegin() throws IOException {
-		assertEquals("x", filter1("\\\n\\\nx"));
-		assertEquals("x", filter2("\\\n\\\nx"));
+		test("x", "\\\n\\\nx");
 	}
 }

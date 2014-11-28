@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 
 import org.antlr.runtime.ANTLRStringStream;
 
@@ -16,7 +15,6 @@ import org.antlr.runtime.ANTLRStringStream;
  * translation process.
  * 
  * @author siegel
- *
  */
 public class FilteredANTLRFileStream extends ANTLRStringStream {
 
@@ -54,14 +52,17 @@ public class FilteredANTLRFileStream extends ANTLRStringStream {
 			for (int i = 0; i < numUnfilteredChars; i++) {
 				char c = data[i];
 
-				if (c == '\\' && i < numUnfilteredChars && data[i + 1] == '\n') {
+				if (c == '\\' && i < numUnfilteredChars - 1
+						&& data[i + 1] == '\n') {
 					i++;
 				} else {
 					data[numFilteredChars] = c;
 					numFilteredChars++;
 				}
 			}
-			data = Arrays.copyOf(data, numFilteredChars);
+			// I believe the following truncation of array data is
+			// unnecessary. It suffices to set n.
+			// super.data = Arrays.copyOf(data, numFilteredChars);
 			super.n = numFilteredChars;
 		} finally {
 			isr.close();
