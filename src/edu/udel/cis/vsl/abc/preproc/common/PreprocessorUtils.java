@@ -2,8 +2,10 @@ package edu.udel.cis.vsl.abc.preproc.common;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 
+import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.TokenSource;
@@ -238,6 +240,21 @@ public class PreprocessorUtils {
 			e.printStackTrace(out);
 			throw new PreprocessorException(e.toString());
 		}
+	}
+
+	public static CharStream newFilteredCharStreamFromFile(File file)
+			throws IOException {
+		return new FilteredANTLRFileStream(file);
+	}
+
+	public static CharStream newFilteredCharStreamFromResource(String name,
+			String resource) throws IOException {
+		InputStream inputStream = PreprocessorUtils.class
+				.getResourceAsStream(resource);
+
+		if (inputStream == null)
+			return null;
+		return new FilteredANTLRInputStream(name, inputStream);
 	}
 
 }

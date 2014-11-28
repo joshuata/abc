@@ -2,7 +2,6 @@ package edu.udel.cis.vsl.abc.preproc.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,8 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -63,11 +60,11 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	// Fields...
 
-	/**
-	 * For performance analysis: the number of calls to method
-	 * {@link #nextToken()}.
-	 */
-	public static long nextToken_calls = 0;
+	// /**
+	// * For performance analysis: the number of calls to method
+	// * {@link #nextToken()}.
+	// */
+	// public static long nextToken_calls = 0;
 
 	private SourceFile originalSourceFile;
 
@@ -314,9 +311,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 */
 	@Override
 	public CToken nextToken() {
-
-		nextToken_calls++;
-
+		// nextToken_calls++;
 		if (finalToken != null)
 			return finalToken;
 		while (firstOutput == null
@@ -1031,7 +1026,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	// processTextBlock...
 
 	/**
-	 * Prcoesses a text block node by moving the current position to the first
+	 * Processes a text block node by moving the current position to the first
 	 * child (the first token in the text block).
 	 * 
 	 * A text block consists of a sequence of tokens that do not contain any
@@ -1327,19 +1322,13 @@ public class PreprocessorTokenSource implements CTokenSource {
 		if (file == null)
 			file = findFile(systemIncludePaths, filename);
 		if (file == null) {
-			// InputStream inputStream = this.getClass().getResourceAsStream(
-			// "/include/" + filename);
-			InputStream inputStream = this.getClass().getResourceAsStream(
-					"/" + filename);
-
-			if (inputStream == null)
+			charStream = PreprocessorUtils.newFilteredCharStreamFromResource(
+					filename, "/" + filename);
+			if (charStream == null)
 				return null;
-			charStream = new FilteredCharStream(new ANTLRInputStream(
-					inputStream));
 			file = new File(filename);
 		} else {
-			charStream = new FilteredCharStream(new ANTLRFileStream(
-					file.getAbsolutePath()));
+			charStream = PreprocessorUtils.newFilteredCharStreamFromFile(file);
 		}
 		lexer = new PreprocessorLexer(charStream);
 		parser = new PreprocessorParser(new CommonTokenStream(lexer));

@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
@@ -31,11 +30,7 @@ import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
  * (a la Facade Pattern). It includes a main method which preprocesses the file
  * and sends result to stdout.
  * 
- * TODO: support -D, i.e., object macros defined at command line TODO: reduce
- * the state of this class
- * 
  * @author Stephen F. Siegel, University of Delaware
- * 
  */
 public class CommonPreprocessor implements Preprocessor {
 
@@ -78,7 +73,7 @@ public class CommonPreprocessor implements Preprocessor {
 				return tokenSource.macroMap;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				// why?????
+				// why doesn't this throw an exception????????
 				return new HashMap<String, Macro>();
 			}
 		} else
@@ -100,8 +95,8 @@ public class CommonPreprocessor implements Preprocessor {
 	@Override
 	public PreprocessorLexer lexer(File file) throws PreprocessorException {
 		try {
-			CharStream charStream = new FilteredCharStream(new ANTLRFileStream(
-					file.getAbsolutePath()));
+			CharStream charStream = PreprocessorUtils
+					.newFilteredCharStreamFromFile(file);
 
 			return new PreprocessorLexer(charStream);
 		} catch (IOException e) {

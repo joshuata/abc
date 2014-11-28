@@ -40,7 +40,6 @@ import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorFactory;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser;
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorTokenSource;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.program.IF.ProgramFactory;
 import edu.udel.cis.vsl.abc.program.IF.Programs;
@@ -435,22 +434,32 @@ public class FrontEnd {
 				if (verbose)
 					out.println(bar + " Preprocessor output for " + filename
 							+ " " + bar);
-				while (true) {
-					token = (CommonToken) tokens.nextToken();
-					type = token.getType();
-					if (type == PreprocessorParser.EOF)
-						break;
-					if (type == PreprocessorParser.COMMENT)
-						out.print(" ");
-					else {
-						out.print(token.getText());
-						// out.println(); // debugging
+				if (showTime) {
+					while (true) {
+						token = (CommonToken) tokens.nextToken();
+						type = token.getType();
+						if (type == PreprocessorParser.EOF)
+							break;
 					}
+					timer.markTime("preprocess " + filename);
+				} else {
+					while (true) {
+						token = (CommonToken) tokens.nextToken();
+						type = token.getType();
+						if (type == PreprocessorParser.EOF)
+							break;
+						if (type == PreprocessorParser.COMMENT)
+							out.print(" ");
+						else {
+							out.print(token.getText());
+							// out.println(); // debugging
+						}
+						out.flush();
+					}
+					out.println();
 					out.flush();
+					timer.markTime("preprocess and write " + filename);
 				}
-				out.println();
-				out.flush();
-				timer.markTime("preprocess and write " + filename);
 			} else { // not preproc only
 				ParseTree parseTree;
 
@@ -506,11 +515,11 @@ public class FrontEnd {
 		}
 		if (!showTime)
 			preprocessor.printSourceFiles(out);
-		if (showTime) {
-			// also show counts for now:
-			out.println("Calls to PreprocessorTokenSource.nextToken(): "
-					+ PreprocessorTokenSource.nextToken_calls);
-		}
+		// if (showTime) {
+		// // also show counts for now:
+		// out.println("Calls to PreprocessorTokenSource.nextToken(): "
+		// + PreprocessorTokenSource.nextToken_calls);
+		// }
 		out.flush();
 	}
 }

@@ -2,12 +2,9 @@ package edu.udel.cis.vsl.abc.preproc.common;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 
@@ -153,17 +150,14 @@ public class PreprocessorWorker {
 		if (file == null)
 			file = findFile(systemIncludePaths, filename);
 		if (file == null) {
-			InputStream inputStream = this.getClass().getResourceAsStream(
-					"/" + filename);
+			charStream = PreprocessorUtils.newFilteredCharStreamFromResource(
+					filename, "/" + filename);
 
-			if (inputStream == null)
+			if (charStream == null)
 				return null;
-			charStream = new FilteredCharStream(new ANTLRInputStream(
-					inputStream));
 			file = new File(filename);
 		} else {
-			charStream = new FilteredCharStream(new ANTLRFileStream(
-					file.getAbsolutePath()));
+			charStream = PreprocessorUtils.newFilteredCharStreamFromFile(file);
 		}
 		lexer = new PreprocessorLexer(charStream);
 		parser = new PreprocessorParser(new CommonTokenStream(lexer));
