@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashMap;
 
 import org.junit.Test;
 
@@ -11,15 +10,10 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
 public class CompareTest {
 	private static boolean debug = false;
-
-	private static File[] systemIncludes = new File[0];
-
-	private static File[] userIncludes = new File[0];
 
 	private File root = new File(new File("examples"), "compare");
 
@@ -33,12 +27,10 @@ public class CompareTest {
 		Program program0, program1, compositeProgram;
 		AST combinedAST;
 
-		program0 = f.compileAndLink(new File[] { file0 }, Language.CIVL_C,
-				systemIncludes, userIncludes, new HashMap<String, Macro>());
+		program0 = f.compileAndLink(new File[] { file0 }, Language.CIVL_C);
 		if (debug)
 			program0.prettyPrint(out);
-		program1 = f.compileAndLink(new File[] { file1 }, Language.CIVL_C,
-				systemIncludes, userIncludes, new HashMap<String, Macro>());
+		program1 = f.compileAndLink(new File[] { file1 }, Language.CIVL_C);
 		if (debug)
 			program1.prettyPrint(out);
 		combinedAST = Transform.compareCombiner().combine(program0.getAST(),

@@ -3,18 +3,13 @@ package edu.udel.cis.vsl.abc;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -25,21 +20,9 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  */
 public class CIVLLinkageTest {
 
-	private File root = new File("examples/link");
+	public final static boolean debug = false;
 
-	private boolean debug = false;
-
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception {
-	}
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
+	private File root = new File(new File("examples"), "link");
 
 	private boolean compileAndLink(String[] filenames, File[] systemIncludePaths)
 			throws ParseException, SyntaxException, PreprocessorException {
@@ -52,8 +35,8 @@ public class CIVLLinkageTest {
 		}
 		try {
 			program = fe.compileAndLink(files, Language.CIVL_C,
-					systemIncludePaths, new File[0],
-					new HashMap<String, Macro>());
+					systemIncludePaths, ABC.DEFAULT_USER_INCLUDE_PATHS,
+					ABC.DEFAULT_IMPLICIT_MACROS);
 		} catch (Exception ex) {
 			if (debug)
 				throw ex;

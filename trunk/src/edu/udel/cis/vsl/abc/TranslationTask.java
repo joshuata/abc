@@ -11,13 +11,10 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 
 /**
- * A translation task specifies all of the options and parameters which specify
- * a complete translation task.
- * 
- * TODO: add preproc directives -D and -D=
+ * A {@link TranslationTask} object specifies all of the options and parameters
+ * needed to perform a complete translation task.
  * 
  * @author siegel
- * 
  */
 public class TranslationTask {
 
@@ -92,8 +89,8 @@ public class TranslationTask {
 	 */
 	public TranslationTask() {
 		language = Language.C;
-		systemIncludes = new File[0];
-		userIncludes = new File[0];
+		systemIncludes = ABC.DEFAULT_SYSTEM_INCLUDE_PATHS;
+		userIncludes = ABC.DEFAULT_USER_INCLUDE_PATHS;
 		out = System.out;
 		preprocOnly = false;
 		verbose = true;
