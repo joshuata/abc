@@ -4,6 +4,8 @@ import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.ABC;
 
+// TODO: fix these so they test something and don't write output
+
 public class MacroTest {
 
 	private void run(String... args) {

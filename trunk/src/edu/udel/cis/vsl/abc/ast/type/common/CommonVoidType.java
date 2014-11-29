@@ -54,4 +54,9 @@ public class CommonVoidType extends CommonObjectType implements
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return "void";
+	}
+
 }

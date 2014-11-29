@@ -151,14 +151,22 @@ public class CommonProgramFactory implements ProgramFactory {
 	}
 
 	/**
-	 * Merges non-anonymous tagged classes for which it has been determined that
-	 * a merge is safe. Any incomplete type which is merged with a complete one
-	 * will be completed to be in accord with the complete version.
+	 * <p>
+	 * Determines which non-anonymous tagged classes can be safely merged. This
+	 * information can be used so that any incomplete type which can be merged
+	 * with a complete one will be completed to be in accord with the complete
+	 * version.
+	 * </p>
+	 * 
+	 * <p>
+	 * This method does not modify the ASTs. It only creates a set of
+	 * {@link TaggedEntityInfo} objects which record the result of the analysis.
+	 * </p>
 	 * 
 	 * <p>
 	 * This method first produces a map, the tagged info map, in which the keys
 	 * are all the non-null tags of tagged entities (structs, unions, or enums)
-	 * in the global scope of any AST. The value associated to a tag is a
+	 * in the file scope of any AST. The value associated to a tag is a
 	 * {@link TaggedEntityInfo} object. That object records information about
 	 * the use of that tag in each AST.
 	 * </p>
@@ -204,6 +212,17 @@ public class CommonProgramFactory implements ProgramFactory {
 		return taggedInfoMap;
 	}
 
+	/**
+	 * Prepares a sequence of ASTs for merging.
+	 * 
+	 * Clears any previous analysis results from the ASTs. Performs the standard
+	 * analysis upon each of them.
+	 * 
+	 * 
+	 * @param translationUnits
+	 *            the ASTs of distinct translation units
+	 * @throws SyntaxException
+	 */
 	private void prepareASTs(AST[] translationUnits) throws SyntaxException {
 		int n = translationUnits.length;
 		Plan[] plans = new Plan[n];

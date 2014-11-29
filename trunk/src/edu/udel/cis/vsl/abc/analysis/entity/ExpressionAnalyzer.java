@@ -561,14 +561,14 @@ public class ExpressionAnalyzer {
 								+ "type or pointer to function type",
 						functionNode);
 		}
-		
+
 		// TODO: Sanity checks on kernel functions
 		// Check that context arg 0 is an int or dim3
 		// Check that context arg 1 is an int or dim3
 		// Check that context arg 2, if present, is a pointer to a stream
 		// It might be appropriate to factor out these Cuda-specific checks into
 		// a separate function
-		
+
 		expectedNumArgs = functionType.getNumParameters();
 		hasVariableNumArgs = functionType.hasVariableArgs();
 		if (hasVariableNumArgs) {
@@ -1146,7 +1146,11 @@ public class ExpressionAnalyzer {
 				&& isPointerToCompleteObjectType(type1))
 			node.setInitialType(type1);
 		else
-			throw error("Arguments cannot be added", node);
+			throw error(
+					"Invalid arguments for +.  C requires either (1) both arguments\n"
+							+ "are numeric, or (2) one argument is numeric and the other is a pointer\n"
+							+ "to a complete object type.  The argument types are:\n"
+							+ type0 + "\n" + type1, node);
 	}
 
 	/**

@@ -110,6 +110,13 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 
 	private Map<String, PragmaHandler> pragmaMap = new HashMap<>();
 
+	/**
+	 * The number of anonymous tagged entities (structs, unions, enums)
+	 * encountered so far. Used to assign a unique name to each anonymous
+	 * entity.
+	 */
+	private int anonymousTagCount = 0;
+
 	/* *************************** Constructors *************************** */
 
 	/**
@@ -955,14 +962,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree initDeclaratorList = (CommonTree) declarationTree
 				.getChild(1);
 		CommonTree contractTree = (CommonTree) declarationTree.getChild(2);
-		// CommonTree scopeListTree = (CommonTree) declarationTree.getChild(3);
 		SequenceNode<ContractNode> contract = getContract(contractTree, scope);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(declarationSpecifiers);
 		int numDeclarators = initDeclaratorList.getChildCount();
 		ArrayList<ExternalDefinitionNode> definitionList = new ArrayList<ExternalDefinitionNode>();
 		Source source = newSource(declarationTree);
-		// SequenceNode<VariableDeclarationNode> scopeList =
-		// translateScopeListDef(scopeListTree);
 
 		if (numDeclarators == 0) {
 			TypeNode baseType;
@@ -996,6 +1000,15 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					.getChild(1);
 			InitializerNode initializer = translateInitializer(initializerTree,
 					scope);
+
+			// TODO: the following won't work if the struct or union
+			// is anonymous. Need to give it a temp name.
+			// Could give a unique name to every anonymous thing in
+			// this translation unit, but might create problem with linking
+			// if two different translation units have anonymous things
+			// with same name. Linker will have to recognize this and
+			// perhaps change names of anonymous things. At least in file scope.
+
 			TypeNode baseType = i == 0 ? newSpecifierType(analysis, scope)
 					: makeIncomplete(newSpecifierType(analysis, scope));
 			DeclaratorData data = processDeclarator(declaratorTree, baseType,
@@ -1055,12 +1068,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				checkFunctionSpecifiers(declaration, analysis);
 				definition = declaration;
 			}
-			// if (scopeList != null) {
-			// definition = nodeFactory.newScopeParameterizedDeclarationNode(
-			// tokenFactory.join(scopeList.getSource(),
-			// definition.getSource()), scopeList,
-			// (DeclarationNode) definition);
-			// }
 			definitionList.add(definition);
 		}
 		return definitionList;
@@ -1162,6 +1169,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 */
 	private StructureOrUnionTypeNode translateStructOrUnionType(
 			CommonTree structTree, SimpleScope scope) throws SyntaxException {
+		Source wholeSource = newSource(structTree);
 		int kind = structTree.getType();
 		boolean isStruct = kind == STRUCT;
 		CommonTree tagTree = (CommonTree) structTree.getChild(0);
@@ -1170,7 +1178,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		SequenceNode<FieldDeclarationNode> structDeclList;
 
 		if (tagTree.getType() == ABSENT) {
-			tag = null;
+			tag = nodeFactory
+					.newIdentifierNode(wholeSource, "$anon_"
+							+ (isStruct ? "struct" : "union") + "_"
+							+ anonymousTagCount);
+			anonymousTagCount++;
 		} else {
 			tag = translateIdentifier(tagTree);
 		}
@@ -1190,8 +1202,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			structDeclList = nodeFactory.newSequenceNode(
 					newSource(declListTree), "FieldDeclarations", fieldDecls);
 		}
-		return nodeFactory.newStructOrUnionTypeNode(newSource(structTree),
-				isStruct, tag, structDeclList);
+		return nodeFactory.newStructOrUnionTypeNode(wholeSource, isStruct, tag,
+				structDeclList);
 	}
 
 	private List<FieldDeclarationNode> translateFieldDeclaration(
@@ -1250,6 +1262,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	private EnumerationTypeNode translateEnumerationType(
 			CommonTree enumerationTree, SimpleScope scope)
 			throws SyntaxException {
+		Source wholeSource = newSource(enumerationTree);
 		// tagTree may be ABSENT:
 		CommonTree tagTree = (CommonTree) enumerationTree.getChild(0);
 		// enumeratorListTree may be ABSENT:
@@ -1258,10 +1271,13 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		IdentifierNode tag;
 		SequenceNode<EnumeratorDeclarationNode> enumerators;
 
-		if (tagTree.getType() == ABSENT)
-			tag = null;
-		else
+		if (tagTree.getType() == ABSENT) {
+			tag = nodeFactory.newIdentifierNode(wholeSource, "$anon_enum_"
+					+ anonymousTagCount);
+			anonymousTagCount++;
+		} else {
 			tag = translateIdentifier(tagTree);
+		}
 		if (enumeratorListTree.getType() == ABSENT) {
 			enumerators = null;
 		} else {
@@ -1290,8 +1306,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					newSource(enumeratorListTree), "EnumeratorList",
 					enumeratorList);
 		}
-		return nodeFactory.newEnumerationTypeNode(newSource(enumerationTree),
-				tag, enumerators);
+		return nodeFactory
+				.newEnumerationTypeNode(wholeSource, tag, enumerators);
 	}
 
 	/**
@@ -2491,33 +2507,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			}
 		}
 		body = translateCompoundStatement(compoundStatementTree, newScope);
-		/*
-		 * if (analysis.globalSpecifier) { Source source =
-		 * newSource(compoundStatementTree); // Add dummy declarations for
-		 * implicit Cuda variables to prevent // "Undeclared identifier" bugs
-		 * VariableDeclarationNode gridDimDecl = nodeFactory
-		 * .newVariableDeclarationNode(source, nodeFactory
-		 * .newIdentifierNode(source, "gridDim"), nodeFactory
-		 * .newTypedefNameNode(nodeFactory.newIdentifierNode( source, "dim3"),
-		 * null)); VariableDeclarationNode blockDimDecl = nodeFactory
-		 * .newVariableDeclarationNode(source, nodeFactory
-		 * .newIdentifierNode(source, "blockDim"), nodeFactory
-		 * .newTypedefNameNode(nodeFactory.newIdentifierNode( source, "dim3"),
-		 * null)); VariableDeclarationNode blockIdxDecl = nodeFactory
-		 * .newVariableDeclarationNode(source, nodeFactory
-		 * .newIdentifierNode(source, "blockIdx"), nodeFactory
-		 * .newTypedefNameNode(nodeFactory.newIdentifierNode( source, "uint3"),
-		 * null)); VariableDeclarationNode threadIdxDecl = nodeFactory
-		 * .newVariableDeclarationNode(source, nodeFactory
-		 * .newIdentifierNode(source, "threadIdx"),
-		 * nodeFactory.newTypedefNameNode(nodeFactory .newIdentifierNode(source,
-		 * "uint3"), null)); List<BlockItemNode> newItemsList = new
-		 * ArrayList<BlockItemNode>( Arrays.<BlockItemNode> asList(gridDimDecl,
-		 * blockDimDecl, blockIdxDecl, threadIdxDecl)); for (BlockItemNode item
-		 * : body) { item.parent().removeChild(item.childIndex());
-		 * newItemsList.add(item); } body =
-		 * nodeFactory.newCompoundStatementNode(source, newItemsList); }
-		 */
 		result = nodeFactory.newFunctionDefinitionNode(
 				newSource(functionDefinitionTree), data.identifier,
 				(FunctionTypeNode) data.type,
@@ -2526,11 +2515,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		// call because otherwise specifiers are not added to function
 		// definitions, only declarations
 		setFunctionSpecifiers((FunctionDefinitionNode) result, analysis);
-		// if (scopeListNode != null)
-		// result = nodeFactory.newScopeParameterizedDeclarationNode(
-		// tokenFactory.join(scopeListNode.getSource(),
-		// result.getSource()), scopeListNode,
-		// (DeclarationNode) result);
 		return result;
 	}
 

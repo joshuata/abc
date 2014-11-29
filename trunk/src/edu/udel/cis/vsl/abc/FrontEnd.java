@@ -171,7 +171,7 @@ public class FrontEnd {
 	 * Returns a standard {@link Analyzer}, which is used to analyze an AST,
 	 * leaving behind information such as (1) the {@link Scope} of every node,
 	 * (2) the {@link Type} of every expression, (3) the {@link Entity}
-	 * asssociated to every identifier.
+	 * associated to every identifier.
 	 * 
 	 * @param language
 	 *            the language of the AST being analyzed

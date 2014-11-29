@@ -59,7 +59,10 @@ public class TaggedEntityInfo extends EntityInfo {
 	 * all information is empty.
 	 * 
 	 * @param tag
-	 *            the tag
+	 *            the tag, i.e., the name shared by the tagged entities this
+	 *            object deals with
+	 * @param numTransitionUnits
+	 *            the number of translation units under consideration
 	 */
 	public TaggedEntityInfo(String tag, int numTranslationUnits) {
 		super(tag, numTranslationUnits);
@@ -112,6 +115,7 @@ public class TaggedEntityInfo extends EntityInfo {
 	}
 
 	/**
+	 * <p>
 	 * This method attempts to determine which entities can be merged. Two
 	 * entities can be merged if they have the same kind (enum, struct, or
 	 * union), and their components can be merged. For example, for a struct,
@@ -119,6 +123,7 @@ public class TaggedEntityInfo extends EntityInfo {
 	 * occurring in the same order, and the corresponding types must be the same
 	 * (perhaps after merging other types). The results of this analysis are
 	 * recorded in this object's internal state.
+	 * </p>
 	 * 
 	 * @return true if at least one merge was made
 	 */

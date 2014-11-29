@@ -9,6 +9,8 @@ package edu.udel.cis.vsl.abc.err.IF;
  */
 public class ABCRuntimeException extends RuntimeException {
 
+	private String location;
+
 	/**
 	 * Generated ID for serialization.
 	 */
@@ -19,7 +21,16 @@ public class ABCRuntimeException extends RuntimeException {
 	}
 
 	public ABCRuntimeException(String message, String location) {
-		super(message + " at " + location);
+		super(message);
+		this.location = location;
+	}
+
+	public String toString() {
+		String result = "Error: " + getMessage();
+
+		if (location != null)
+			result += "\nat " + location;
+		return result;
 	}
 
 }
