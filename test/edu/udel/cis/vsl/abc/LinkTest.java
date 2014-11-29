@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,7 +15,6 @@ import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -36,10 +34,6 @@ public class LinkTest {
 
 	public final static boolean debug = false;
 
-	public final static File[] systemIncludePaths = new File[0];
-
-	public final static File[] userIncludePaths = new File[0];
-
 	private File root = new File(new File("examples"), "link");
 
 	@BeforeClass
@@ -57,11 +51,8 @@ public class LinkTest {
 	private void check(File[] inputs, File oracle)
 			throws PreprocessorException, SyntaxException, ParseException {
 		FrontEnd fe = new FrontEnd();
-		AST actual = fe.compileAndLink(inputs, Language.CIVL_C,
-				systemIncludePaths, userIncludePaths,
-				new HashMap<String, Macro>()).getAST();
-		AST expected = fe.compile(oracle, Language.CIVL_C, systemIncludePaths,
-				userIncludePaths, new HashMap<String, Macro>());
+		AST actual = fe.compileAndLink(inputs, Language.CIVL_C).getAST();
+		AST expected = fe.compile(oracle, Language.CIVL_C);
 
 		if (debug) {
 			expected.prettyPrint(out, false);

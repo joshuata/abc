@@ -9,12 +9,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
+import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.Transform;
 
@@ -63,6 +65,22 @@ public class ABC {
 	 * The date of this release of ABC: {@value} .
 	 */
 	public final static String date = "31-mar-2014";
+
+	/**
+	 * The default list of system include paths.
+	 */
+	public final static File[] DEFAULT_SYSTEM_INCLUDE_PATHS = new File[] {};
+
+	/**
+	 * The default list of user include paths.
+	 */
+	public final static File[] DEFAULT_USER_INCLUDE_PATHS = new File[] {};
+
+	/**
+	 * The default list of pre-defined macros, specifies as a mapping from
+	 * Strings (macro name) to macros.
+	 */
+	public final static Map<String, Macro> DEFAULT_IMPLICIT_MACROS = new TreeMap<>();
 
 	/**
 	 * Determines language from filename. If it ends in ".cvl" or ".cvh", it's
@@ -320,4 +338,5 @@ public class ABC {
 		}
 		config.getOut().close();
 	}
+
 }

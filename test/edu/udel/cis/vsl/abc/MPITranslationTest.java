@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -13,7 +12,6 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
 
 /**
  * Checks a number of simple C programs to make sure they pass on the parsing
@@ -30,10 +28,6 @@ public class MPITranslationTest {
 	 * local copy. Be sure to set it back to false before committing!
 	 */
 	private static boolean debug = false;
-
-	private static File[] systemIncludes = new File[] {};
-
-	private static File[] userIncludes = new File[] {};
 
 	private static File root = new File(new File("examples"), "mpi");
 
@@ -57,12 +51,9 @@ public class MPITranslationTest {
 			TranslationTask config = new TranslationTask(Language.CIVL_C, file);
 
 			config.addAllTransformCodes(codes);
-			config.setSystemIncludes(systemIncludes);
-			config.setUserIncludes(userIncludes);
 			fe.showTranslation(config);
 		} else {
-			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C,
-					systemIncludes, userIncludes, new HashMap<String, Macro>());
+			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C);
 
 			p.applyTransformers(codes);
 		}

@@ -3,7 +3,6 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.junit.After;
@@ -17,7 +16,6 @@ import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
-import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -36,11 +34,7 @@ public class OmpTranslationTest {
 	 */
 	private static boolean debug = false;
 
-	private static File[] systemIncludes = new File[] { new File("examples/omp") };
-
-	private static File[] userIncludes = new File[] { new File("examples/omp") };
-
-	private static File root = new File("examples/omp");
+	private static File root = new File(new File("examples"), "omp");
 
 	private static List<String> codes = Arrays.asList("prune", "sef");
 
@@ -62,12 +56,9 @@ public class OmpTranslationTest {
 			TranslationTask config = new TranslationTask(Language.CIVL_C, file);
 
 			config.addAllTransformCodes(codes);
-			config.setSystemIncludes(systemIncludes);
-			config.setUserIncludes(userIncludes);
 			fe.showTranslation(config);
 		} else {
-			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C,
-					systemIncludes, userIncludes, new HashMap<String, Macro>());
+			Program p = fe.compileAndLink(new File[] { file }, Language.CIVL_C);
 
 			p.applyTransformers(codes);
 		}
@@ -77,8 +68,7 @@ public class OmpTranslationTest {
 	public void dijkstra_openmp_compile() throws PreprocessorException,
 			SyntaxException, ParseException {
 		AST ast = fe.compile(new File(root, "dijkstra_openmp.c"),
-				Language.CIVL_C, systemIncludes, userIncludes,
-				new HashMap<String, Macro>());
+				Language.CIVL_C);
 		Program p = fe.getProgramFactory(
 				fe.getStandardAnalyzer(Language.CIVL_C)).newProgram(ast);
 

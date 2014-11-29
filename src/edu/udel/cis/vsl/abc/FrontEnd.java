@@ -59,7 +59,7 @@ import edu.udel.cis.vsl.abc.util.IF.Timer;
  * main functionality of ABC. It provides two different families of methods: (1)
  * methods to get or create individual components of the ABC tool chain, such as
  * factories, {@link Preprocessor}s, {@link CParser}s, etc., and (2)
- * higher-level methods which marshall together these different components in
+ * higher-level methods which marshal together these different components in
  * order to carry out a complete translation task, such as compiling a
  * translation unit, or linking several translation units to form a complete
  * {@link Program}.
@@ -215,9 +215,16 @@ public class FrontEnd {
 	 * @param file
 	 *            the file to parse
 	 * @param systemIncludePaths
-	 *            the system include paths to search for included system headers
+	 *            the system include paths to search for included system
+	 *            headers; may use {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS}
 	 * @param userIncludePaths
-	 *            the user include paths to search for included user headers
+	 *            the user include paths to search for included user headers;
+	 *            may use {@link ABC#DEFAULT_USER_INCLUDE_PATHS}
+	 * @param implicitMacros
+	 *            map from macro names to macros that are to be incorporated
+	 *            before preprocessing each file; such macros might be defined
+	 *            on the command line via -DMACRO=VALUE, for example; may use
+	 *            {@link ABC#DEFAULT_IMPLICIT_MACROS}
 	 * @return the raw translation unit obtained by parsing the file
 	 * @throws PreprocessorException
 	 *             if the file contains a preprocessor error
@@ -251,10 +258,16 @@ public class FrontEnd {
 	 * @param language
 	 *            the language in which the file is written
 	 * @param systemIncludePaths
-	 *            the system include paths to search for included system headers
+	 *            the system include paths to search for included system
+	 *            headers; may use {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS}
 	 * @param userIncludePaths
-	 *            the user include paths to search for included user headers
-	 * 
+	 *            the user include paths to search for included user headers;
+	 *            may use {@link ABC#DEFAULT_USER_INCLUDE_PATHS}
+	 * @param implicitMacros
+	 *            map from macro names to macros that are to be incorporated
+	 *            before preprocessing each file; such macros might be defined
+	 *            on the command line via -DMACRO=VALUE, for example; may use
+	 *            {@link ABC#DEFAULT_IMPLICIT_MACROS}
 	 * @return the analyzed AST representing the translation unit
 	 * @throws PreprocessorException
 	 *             if the file contains a preprocessor error
@@ -274,6 +287,35 @@ public class FrontEnd {
 
 		analyzer.analyze(result);
 		return result;
+	}
+
+	/**
+	 * Compiles the given file, producing an AST representation with full
+	 * analysis results. Equivalent to invoking
+	 * {@link #compile(File, Language, File[], File[], Map) with the default
+	 * values {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS},
+	 * {@link ABC#DEFAULT_USER_INCLUDE_PATHS}, {@link ABC#DEFAULT_IMPLICIT_MACROS} for
+	 * the last three arguments.
+	 * 
+	 * @param file
+	 *            the file to compile
+	 * @param language
+	 *            the language in which the file is written
+	 * @return the analyzed AST representing the translation unit
+	 * @throws PreprocessorException
+	 *             if the file contains a preprocessor error
+	 * @throws ParseException
+	 *             if the token stream emanating from the preprocessor does not
+	 *             satisfy the grammar of the language
+	 * @throws SyntaxException
+	 *             if the file violates some aspect of the syntax of the
+	 *             language
+	 */
+	public AST compile(File file, Language language)
+			throws PreprocessorException, SyntaxException, ParseException {
+		return compile(file, language, ABC.DEFAULT_SYSTEM_INCLUDE_PATHS,
+				ABC.DEFAULT_USER_INCLUDE_PATHS,
+				ABC.DEFAULT_IMPLICIT_MACROS);
 	}
 
 	/**
@@ -311,9 +353,16 @@ public class FrontEnd {
 	 * @param language
 	 *            the language to use when compiling the source files
 	 * @param systemIncludePaths
-	 *            the system include paths to search for included system headers
+	 *            the system include paths to search for included system
+	 *            headers; may use {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS}
 	 * @param userIncludePaths
-	 *            the user include paths to search for included user headers
+	 *            the user include paths to search for included user headers;
+	 *            may use {@link ABC#DEFAULT_USER_INCLUDE_PATHS}
+	 * @param implicitMacros
+	 *            map from macro names to macros that are to be incorporated
+	 *            before preprocessing each file; such macros might be defined
+	 *            on the command line via -DMACRO=VALUE, for example; may use
+	 *            {@link ABC#DEFAULT_IMPLICIT_MACROS}
 	 * @return the Program that results from compiling and linking
 	 * @throws PreprocessorException
 	 *             if any file contains a preprocessor error
@@ -346,6 +395,36 @@ public class FrontEnd {
 		}
 		result = programFactory.newProgram(asts);
 		return result;
+	}
+
+	/**
+	 * Compiles and links the specified files. Equivalent to invoking
+	 * {@link #compileAndLink(File[], Language, File[], File[], Map)} with the
+	 * default values {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS},
+	 * {@link ABC#DEFAULT_USER_INCLUDE_PATHS}, {@link ABC#DEFAULT_IMPLICIT_MACROS} for
+	 * the last three arguments.
+	 * 
+	 * @param files
+	 *            the source files to compile
+	 * @param language
+	 *            the language to use when compiling the source files
+	 * @return the Program that results from compiling and linking
+	 * @throws PreprocessorException
+	 *             if any file contains a preprocessor error
+	 * @throws ParseException
+	 *             if the token stream emanating from the preprocessing of a
+	 *             file does not satisfy the grammar of the language
+	 * @throws SyntaxException
+	 *             if any file violates some aspect of the syntax of the
+	 *             language or the translation units cannot be linked for some
+	 *             reason
+	 */
+	public Program compileAndLink(File[] files, Language language)
+			throws PreprocessorException, SyntaxException, ParseException {
+		return compileAndLink(files, language,
+				ABC.DEFAULT_SYSTEM_INCLUDE_PATHS,
+				ABC.DEFAULT_USER_INCLUDE_PATHS,
+				ABC.DEFAULT_IMPLICIT_MACROS);
 	}
 
 	/**
@@ -435,12 +514,10 @@ public class FrontEnd {
 					out.println(bar + " Preprocessor output for " + filename
 							+ " " + bar);
 				if (showTime) {
-					while (true) {
+					do {
 						token = (CommonToken) tokens.nextToken();
 						type = token.getType();
-						if (type == PreprocessorParser.EOF)
-							break;
-					}
+					} while (type != PreprocessorParser.EOF);
 					timer.markTime("preprocess " + filename);
 				} else {
 					while (true) {
@@ -452,9 +529,7 @@ public class FrontEnd {
 							out.print(" ");
 						else {
 							out.print(token.getText());
-							// out.println(); // debugging
 						}
-						out.flush();
 					}
 					out.println();
 					out.flush();
