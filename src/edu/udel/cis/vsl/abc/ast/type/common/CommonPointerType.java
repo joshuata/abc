@@ -91,9 +91,8 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 
 	@Override
 	public String toString() {
-		String result = "pointer<";
+		String result = "(" + referencedType + ") *";
 
-		result += ">[" + referencedType + "]";
 		return result;
 	}
 

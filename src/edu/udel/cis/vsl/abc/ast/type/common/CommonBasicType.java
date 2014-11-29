@@ -125,7 +125,48 @@ public class CommonBasicType extends CommonObjectType implements
 
 	@Override
 	public String toString() {
-		return basicTypeKind.toString();
+		switch (basicTypeKind) {
+		case BOOL:
+			return "_Bool";
+		case CHAR:
+			return "char";
+		case DOUBLE:
+			return "double";
+		case DOUBLE_COMPLEX:
+			return "double _Complex";
+		case FLOAT:
+			return "float";
+		case FLOAT_COMPLEX:
+			return "float _Complex";
+		case INT:
+			return "int";
+		case LONG:
+			return "long";
+		case LONG_DOUBLE:
+			return "long double";
+		case LONG_DOUBLE_COMPLEX:
+			return "long double _Complex";
+		case LONG_LONG:
+			return "long long";
+		case REAL:
+			return "$real";
+		case SHORT:
+			return "short";
+		case SIGNED_CHAR:
+			return "signed char";
+		case UNSIGNED:
+			return "unsigned";
+		case UNSIGNED_CHAR:
+			return "usigned char";
+		case UNSIGNED_LONG:
+			return "unsigned long";
+		case UNSIGNED_LONG_LONG:
+			return "unsigned long long";
+		case UNSIGNED_SHORT:
+			return "unsignd short";
+		default:
+			throw new RuntimeException("Unreachable");
+		}
 	}
 
 	@Override

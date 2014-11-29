@@ -334,11 +334,6 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	// Options...
 
-	// @Override
-	// public Map<String, Macro> getMacroMap() {
-	// return macroMap;
-	// }
-
 	@Override
 	public int getNumTokens() {
 		return theTokens.size();
@@ -1274,8 +1269,8 @@ public class PreprocessorTokenSource implements CTokenSource {
 							+ ":\n" + e, filenameToken);
 		}
 		if (newInfo == null)
-			throw new PreprocessorException("Cannot find file " + name,
-					filenameToken);
+			throw new PreprocessorException(
+					"Cannot find included file " + name, filenameToken);
 		sourceStack.push(newInfo);
 	}
 

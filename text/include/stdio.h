@@ -1,15 +1,12 @@
 /* stdio.h: The ABC representation of standard C library stdio.
  * Based on C11 Standard.
  */
- #ifdef __STDIO__
- #else
- #define __STDIO__
+#ifndef __STDIO__
+#define __STDIO__
 
 /* Needed from stdarg.h: */
 
-typedef struct _ABC_va_list {
-  int x;
-} va_list;
+#include <stdarg.h>
 
 /* Types */
 

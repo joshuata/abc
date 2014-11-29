@@ -31,11 +31,11 @@ public class MPITranslationTest {
 	 */
 	private static boolean debug = false;
 
-	private static File[] systemIncludes = new File[] { new File("examples/mpi") };
+	private static File[] systemIncludes = new File[] {};
 
-	private static File[] userIncludes = new File[] { new File("examples/mpi") };
+	private static File[] userIncludes = new File[] {};
 
-	private static File root = new File("examples/mpi");
+	private static File root = new File(new File("examples"), "mpi");
 
 	private static List<String> codes = Arrays.asList("prune", "sef");
 

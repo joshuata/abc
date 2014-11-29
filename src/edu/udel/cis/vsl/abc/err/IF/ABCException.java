@@ -9,6 +9,8 @@ package edu.udel.cis.vsl.abc.err.IF;
  */
 public class ABCException extends Exception {
 
+	private String location;
+
 	/**
 	 * Generated if for serialization.
 	 */
@@ -25,7 +27,16 @@ public class ABCException extends Exception {
 	}
 
 	public ABCException(String message, String location) {
-		super(message + " at " + location);
+		super(message);
+		this.location = location;
+	}
+
+	public String toString() {
+		String result = "Error: " + getMessage();
+
+		if (location != null)
+			result += "\nat " + location;
+		return result;
 	}
 
 }

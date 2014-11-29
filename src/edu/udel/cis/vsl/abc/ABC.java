@@ -290,7 +290,7 @@ public class ABC {
 		try {
 			config = parseCommandLine(args);
 		} catch (FileNotFoundException e) {
-			err.println(e.getMessage());
+			err.println(e.toString());
 			err.flush();
 			System.exit(1);
 		}
@@ -298,23 +298,23 @@ public class ABC {
 		try {
 			frontEnd.showTranslation(config);
 		} catch (PreprocessorException e) {
-			err.println(e.getMessage());
+			err.println(e.toString());
 			err.flush();
 			System.exit(2);
 		} catch (PreprocessorRuntimeException e) {
-			err.println(e.getMessage());
+			err.println(e.toString());
 			err.flush();
 			System.exit(2);
 		} catch (ParseException e) {
-			err.println(e.getMessage());
+			err.println(e.toString());
 			err.flush();
 			System.exit(3);
 		} catch (SyntaxException e) {
-			err.println(e.getMessage());
+			err.println(e.toString());
 			err.flush();
 			System.exit(4);
 		} catch (IOException e) {
-			err.println(e.getMessage());
+			err.println(e.toString());
 			err.flush();
 			System.exit(5);
 		}
