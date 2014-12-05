@@ -508,7 +508,7 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode result = null;
 		ExpressionNode expression = statement.getExpression();
 
-		if(expression == null)
+		if (expression == null)
 			return statement;
 		if (statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
@@ -779,10 +779,16 @@ public class SideEffectRemover extends BaseTransformer {
 					break;
 				case COMMA:
 					SideEffectFreeTriple triple = processExpression(expression);
+					ExpressionNode expr = triple.getExpression();
 					List<BlockItemNode> commaStatements = new ArrayList<BlockItemNode>();
 
 					commaStatements.addAll(triple.getBefore());
-					if (!triple.getExpression().isSideEffectFree(true)) {
+					if (!expr.isSideEffectFree(true)) {
+						ASTNode parent = expr.parent();
+
+						if (parent != null) {
+							parent.removeChild(expr.childIndex());
+						}
 						commaStatements.add(nodeFactory
 								.newExpressionStatementNode(triple
 										.getExpression()));

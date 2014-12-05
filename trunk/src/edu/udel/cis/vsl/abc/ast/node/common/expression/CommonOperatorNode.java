@@ -104,41 +104,75 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
-		boolean result = true;
 		switch (getOperator()) {
+		// always have side effects:
 		case ASSIGN:
-		case BITANDEQ:
-		case BITOREQ:
-		case BITXOREQ:
-		case DIVEQ:
 		case MINUSEQ:
-		case MODEQ:
 		case PLUSEQ:
 		case POSTDECREMENT:
 		case POSTINCREMENT:
 		case PREDECREMENT:
 		case PREINCREMENT:
+		case DIVEQ:
+		case MODEQ:
+		case TIMESEQ:
+		case BITANDEQ:
+		case BITOREQ:
+		case BITXOREQ:
 		case SHIFTLEFTEQ:
 		case SHIFTRIGHTEQ:
-		case TIMESEQ:
-			result = false;
-			break;
+			return false;
+			// possible numeric arithmetic error only:
 		case DIV:
 		case MOD:
+		case TIMES:
+		case UNARYMINUS:
+			if (errorsAreSideEffects) {
+				// perhaps check if expressions are constants that are not 0,
+				// for example. But overflow could also be a problem.
+				return false;
+			}
+			// possible pointer or numeric arithmetic error:
+		case MINUS:
+		case PLUS:
+			if (errorsAreSideEffects) {
+				return false;
+			}
+			// always a problem:
 		case DEREFERENCE:
 		case SUBSCRIPT:
 			if (errorsAreSideEffects) {
-				result = false;
-				break;
+				return false;
 			}
-		default:
-			for (int i = 0; i < getNumberOfArguments(); i++) {
-				result = result
-						&& getArgument(i)
-								.isSideEffectFree(errorsAreSideEffects);
-			}
+			// innocuous unless operands have side effects...
+		case ADDRESSOF:
+		case BIG_O:
+		case BITAND:
+		case BITCOMPLEMENT:
+		case BITOR:
+		case BITXOR:
+		case COMMA:
+		case CONDITIONAL:
+		case EQUALS:
+		case GT:
+		case GTE:
+		case IMPLIES:
+		case LAND:
+		case LOR:
+		case LT:
+		case LTE:
+		case NEQ:
+		case NOT:
+		case SHIFTLEFT:
+		case SHIFTRIGHT:
+		case UNARYPLUS:
+		} // end of switch
+			// now check operands...
+		for (int i = 0; i < getNumberOfArguments(); i++) {
+			if (!getArgument(i).isSideEffectFree(errorsAreSideEffects))
+				return false;
 		}
-		return result;
+		return true;
 	}
 
 	@Override
