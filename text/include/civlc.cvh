@@ -83,4 +83,8 @@ void $set_default(void *obj);
 /* applies the operation op on obj1 and obj2 and stores the result */
 void $apply(void *obj1, $operation op, void *obj2, void *result);
 
+/* *************************** Elaborate tricks ************************** */
+/* elaborating a given variable */
+void elaborate(int x);
+
 #endif
