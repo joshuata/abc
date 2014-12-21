@@ -101,6 +101,11 @@ typedef struct CMPI_Gcomm CMPI_Gcomm;
 /****************************** Helper Functions **********************************/
 int sizeofDatatype(MPI_Datatype);
 
+/* ****** System helper functions ****** */
+void CMPI_Set_status(__MPI_Sys_status__ newStatus);
+
+__MPI_Sys_status__ CMPI_Get_status();
+
 /************************** MPI LIB Implementations *******************************/
 $abstract double CMPI_time(int i);
 
