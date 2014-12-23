@@ -101,10 +101,9 @@ typedef struct CMPI_Gcomm CMPI_Gcomm;
 /****************************** Helper Functions **********************************/
 int sizeofDatatype(MPI_Datatype);
 
-/* ****** System helper functions ****** */
 void CMPI_Set_status(__MPI_Sys_status__ newStatus);
 
-__MPI_Sys_status__ CMPI_Get_status();
+__MPI_Sys_status__ CMPI_Get_status(void);
 
 /************************** MPI LIB Implementations *******************************/
 $abstract double CMPI_time(int i);
@@ -117,9 +116,9 @@ MPI_Comm CMPI_Comm_create($scope, CMPI_Gcomm , int);
 
 void CMPI_Comm_destroy(MPI_Comm);
 
-int __MPI_Init(MPI_Comm *);
+int __MPI_Init(void);
 
-int __MPI_Finalize(MPI_Comm *);
+int __MPI_Finalize(void);
 
 int CMPI_Send(const void *, int, MPI_Datatype, int, int, $comm);
 
