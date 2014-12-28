@@ -15,6 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -57,6 +58,33 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
+/**
+ * A transformer which modifies an AST so that no expressions other than
+ * assignments have side effects.
+ * 
+ * TODO: search for race conditions.   Need a way to represent the set
+ * read-set and write-set of a statement or expression.  This is a subset of the
+ * variables in scope.
+ * 
+ * i++: equivalent to i=i+1, this is a read and write of i.
+ * 
+ * a[i]: reads of a, i
+ * 
+ * function call: reads arguments, then go to function.
+ * 
+ * If function pointer, get type, go over all functions with that type.
+ * 
+ * *p : reads p, and also (in absence of pointer analysis) anything visible
+ * with same type as *p.
+ * 
+ * *p=...; reads p and writes to *p
+ * 
+ * system functions: in absence of contracts, can read or write anything
+ * in scope
+ * 
+ * @author zirkel
+ *
+ */
 public class SideEffectRemover extends BaseTransformer {
 
 	public final static String CODE = "sef";
@@ -73,6 +101,7 @@ public class SideEffectRemover extends BaseTransformer {
 		super(CODE, LONG_NAME, SHORT_DESCRIPTION, astFactory);
 	}
 
+	@Override
 	public AST transform(AST unit) throws SyntaxException {
 		SequenceNode<ExternalDefinitionNode> rootNode = unit.getRootNode();
 
@@ -115,43 +144,34 @@ public class SideEffectRemover extends BaseTransformer {
 			} else if (item instanceof StatementNode) {
 				items.add(processStatement((StatementNode) item));
 			} else if (item instanceof VariableDeclarationNode) {
-				if (((VariableDeclarationNode) item).getInitializer() == null) {
+				VariableDeclarationNode vdecl = (VariableDeclarationNode) item;
+				InitializerNode initNode = vdecl.getInitializer();
+
+				if (initNode == null) {
 					items.add(item);
 				} else {
-					if (((VariableDeclarationNode) item).getInitializer() instanceof CompoundInitializerNode) {
-						if (((VariableDeclarationNode) item).getInitializer()
-								.isSideEffectFree(false)) {
+					if (initNode instanceof CompoundInitializerNode) {
+						if (initNode.isSideEffectFree(false)) {
 							items.add(item);
 						} else {
 							throw new ABCUnsupportedException(
 									"removing side effects from compound initializers:  "
-											+ ((VariableDeclarationNode) item)
-													.getInitializer(),
-									((VariableDeclarationNode) item)
-											.getInitializer().getSource()
+											+ initNode, initNode.getSource()
 											.getSummary(false));
 						}
-					} else if ((((VariableDeclarationNode) item)
-							.getInitializer()).isSideEffectFree(false)) {
+					} else if (initNode.isSideEffectFree(false)) {
 						// Only modify things if we need to.
 						items.add(item);
 					} else {
-						ExpressionNode initializer;
-						ExpressionNode initializerAssignment;
+						ExpressionNode initializer = (ExpressionNode) initNode;
 						List<ExpressionNode> assignmentArguments = new ArrayList<>();
-						IdentifierNode variable = ((VariableDeclarationNode) item)
-								.getIdentifier();
-						TypeNode type = ((VariableDeclarationNode) item)
-								.getTypeNode().copy();
+						IdentifierNode variable = vdecl.getIdentifier();
+						TypeNode type = vdecl.getTypeNode().copy();
+						ExpressionNode initializerAssignment;
 						VariableDeclarationNode newDeclaration;
 
-						assert (((VariableDeclarationNode) item)
-								.getInitializer() instanceof ExpressionNode);
 						variable.parent().removeChild(variable.childIndex());
-						initializer = (ExpressionNode) ((VariableDeclarationNode) item)
-								.getInitializer();
-						((VariableDeclarationNode) item).setInitializer(null);
-						// type.parent().removeChild(type.childIndex());
+						vdecl.setInitializer(null);
 						newDeclaration = nodeFactory
 								.newVariableDeclarationNode(
 										item.getSource(),
@@ -192,6 +212,8 @@ public class SideEffectRemover extends BaseTransformer {
 	private StatementNode processStatement(StatementNode statement)
 			throws SyntaxException {
 		StatementNode result = null;
+
+		// TODO: switch to switch:
 
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
@@ -379,14 +401,17 @@ public class SideEffectRemover extends BaseTransformer {
 		switch (type.kind()) {
 		case ARRAY:
 			ArrayType arrayType = (ArrayType) type;
+
 			return nodeFactory.newArrayTypeNode(source,
 					typeNode(source, arrayType.getElementType()), null);
 		case ATOMIC:
 			AtomicType atomicType = (AtomicType) type;
+
 			return nodeFactory.newAtomicTypeNode(source,
 					typeNode(source, atomicType.getBaseType()));
 		case BASIC:
 			StandardBasicType basicType = (StandardBasicType) type;
+
 			return nodeFactory.newBasicTypeNode(source,
 					basicType.getBasicTypeKind());
 		case DOMAIN: {
@@ -471,12 +496,10 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode result;
 		ExpressionNode guard = statement.getGuard().copy();
 
-		// TODO: throw error if guard has side effects
-		// guard.parent().removeChild(guard.childIndex());
 		if (!guard.isSideEffectFree(false))
 			throw new SyntaxException(
-					"The guard of a $when statement must be side-effect free but "
-							+ guard + " is not.", guard.getSource());
+					"Possible side-effect in $when statement guard: " + guard,
+					guard.getSource());
 		result = nodeFactory.newWhenNode(statement.getSource(), guard,
 				processStatement(statement.getBody()));
 		return result;
@@ -1342,6 +1365,10 @@ public class SideEffectRemover extends BaseTransformer {
 
 	private SideEffectFreeTriple assign(OperatorNode assign)
 			throws SyntaxException {
+
+		// here and possibly in other cases one must check
+		// for race conditions between the two arguments.
+
 		List<BlockItemNode> before = new ArrayList<>();
 		List<BlockItemNode> after = new ArrayList<>();
 		ExpressionNode lhs;
