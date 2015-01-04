@@ -164,7 +164,10 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 */
 	private int outputTokenCount = 0;
 
-	private CommonPreprocessor preprocessor;
+	/**
+	 * The worker who created this token source.
+	 */
+	private PreprocessorWorker worker;
 
 	// Constructors...
 
@@ -188,12 +191,12 @@ public class PreprocessorTokenSource implements CTokenSource {
 	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macroMap, TokenFactory tokenFactory,
-			CommonPreprocessor preprocessor, boolean tmpFile)
+			PreprocessorWorker worker, boolean tmpFile)
 			throws PreprocessorException {
 		assert systemIncludePaths != null;
 		assert userIncludePaths != null;
 		this.tokenFactory = tokenFactory;
-		this.preprocessor = preprocessor;
+		this.worker = worker;
 		this.originalSourceFile = getOrMakeSourceFile(source, tmpFile);
 		try {
 			CommonTree tree = (CommonTree) parser.file().getTree();
@@ -222,11 +225,10 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 	public PreprocessorTokenSource(File source, PreprocessorParser parser,
 			File[] systemIncludePaths, File[] userIncludePaths,
-			TokenFactory tokenFactory, CommonPreprocessor preprocessor,
+			TokenFactory tokenFactory, PreprocessorWorker worker,
 			boolean tmpFile) throws PreprocessorException {
 		this(source, parser, systemIncludePaths, userIncludePaths,
-				new HashMap<String, Macro>(), tokenFactory, preprocessor,
-				tmpFile);
+				new HashMap<String, Macro>(), tokenFactory, worker, tmpFile);
 	}
 
 	// Helper
@@ -278,7 +280,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 * @return the {@link SourceFile} corresponding to the given file
 	 */
 	private SourceFile getOrMakeSourceFile(File file, boolean tmpFile) {
-		SourceFile result = preprocessor.getOrMakeSourceFile(file, tmpFile);
+		SourceFile result = worker.getOrMakeSourceFile(file, tmpFile);
 
 		sourceFiles.add(result);
 		return result;
@@ -1312,13 +1314,14 @@ public class PreprocessorTokenSource implements CTokenSource {
 
 			file = new File(currentDir, filename);
 			if (!file.isFile())
-				file = findFile(userIncludePaths, filename);
+				file = worker.findFile(userIncludePaths, filename);
 		}
 		if (file == null)
-			file = findFile(systemIncludePaths, filename);
+			file = worker.findFile(systemIncludePaths, filename);
 		if (file == null) {
-			charStream = PreprocessorUtils.newFilteredCharStreamFromResource(
-					filename, "/" + filename);
+			// last but not least: look internally in the class path
+			// directories:
+			charStream = worker.findInternalSystemFile(filename);
 			if (charStream == null)
 				return null;
 			file = new File(filename);
@@ -1338,30 +1341,6 @@ public class PreprocessorTokenSource implements CTokenSource {
 		return new PreprocessorSourceFileInfo(tokenFactory.newInclusion(
 				getOrMakeSourceFile(file, false), filenameToken), parser, tree,
 				tree.getChild(0));
-	}
-
-	/**
-	 * Find the file with the given name by looking through the directories in
-	 * the given list. Go through list from first to last. Returns first
-	 * instance found.
-	 * 
-	 * Note: the filename may itself containing directory structure, e.g.,
-	 * "sys/stdio.h".
-	 * 
-	 * @param paths
-	 *            list of directories to search
-	 * @param filename
-	 *            name of file
-	 * @return file named filename, or null if not found
-	 */
-	private File findFile(File[] paths, String filename) {
-		for (File path : paths) {
-			File result = new File(path, filename);
-
-			if (result.isFile())
-				return result;
-		}
-		return null;
 	}
 
 	/**

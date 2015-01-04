@@ -8,9 +8,11 @@ import java.util.Map;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 
+import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
+import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.Tokens;
 
@@ -25,6 +27,11 @@ import edu.udel.cis.vsl.abc.token.IF.Tokens;
 public class PreprocessorWorker {
 
 	/* ******************* Package-private static fields ******************* */
+
+	/**
+	 * The preprocessor which created this worker.
+	 */
+	private CommonPreprocessor preprocessor;
 
 	/**
 	 * The system include paths to search for included system headers
@@ -79,8 +86,10 @@ public class PreprocessorWorker {
 	 *            the predefined macros, including those specified in command
 	 *            line
 	 */
-	public PreprocessorWorker(File[] systemIncludePaths,
-			File[] userIncludePaths, Map<String, Macro> macros) {
+	public PreprocessorWorker(CommonPreprocessor preprocessor,
+			File[] systemIncludePaths, File[] userIncludePaths,
+			Map<String, Macro> macros) {
+		this.preprocessor = preprocessor;
 		if (systemIncludePaths == null || systemIncludePaths.length == 0)
 			this.systemIncludePaths = defaultSystemIncludes;
 		else
@@ -95,7 +104,93 @@ public class PreprocessorWorker {
 			this.implicitMacros = new HashMap<>(macros);
 	}
 
-	/* *************************** Constructors **************************** */
+	/* ************************ Private methods ************************* */
+
+	/**
+	 * Given a preprocessor source file, this returns a Token Source that emits
+	 * the tokens resulting from preprocessing the file.
+	 * 
+	 * @param file
+	 * @param macroMap
+	 * @param tokenFactory
+	 * @param preprocessor
+	 * @return
+	 * @throws PreprocessorException
+	 */
+	private PreprocessorTokenSource outputTokenSource(File file,
+			Map<String, Macro> macroMap, TokenFactory tokenFactory,
+			boolean tmpFile) throws PreprocessorException {
+		PreprocessorParser parser = preprocessor.parser(file);
+		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
+				parser, systemIncludePaths, userIncludePaths, macroMap,
+				tokenFactory, this, tmpFile);
+
+		return tokenSource;
+	}
+
+	/* ************************ Package methods ************************* */
+
+	/**
+	 * Looks to see if a {@link SourceFile} object has already been created for
+	 * the given {@link File}. If so, returns that one. Else creates a new one,
+	 * assigns it the next index, and stores it.
+	 * 
+	 * @param file
+	 *            a file that is being read to produce this token source
+	 * @return the {@link SourceFile} corresponding to the given file
+	 */
+	SourceFile getOrMakeSourceFile(File file, boolean tmpFile) {
+		return preprocessor.getOrMakeSourceFile(file, tmpFile);
+	}
+
+	/**
+	 * Find the file with the given name by looking through the directories in
+	 * the given list. Go through list from first to last. Returns first
+	 * instance found.
+	 * 
+	 * Note: the filename may itself containing directory structure, e.g.,
+	 * "sys/stdio.h".
+	 * 
+	 * @param paths
+	 *            list of directories to search
+	 * @param filename
+	 *            name of file
+	 * @return file named filename, or null if not found
+	 */
+	File findFile(File[] paths, String filename) {
+		for (File path : paths) {
+			File result = new File(path, filename);
+
+			if (result.isFile())
+				return result;
+		}
+		return null;
+	}
+
+	CharStream findInternalSystemFile(File path, String filename) {
+		File file = new File(path, filename);
+
+		try {
+			CharStream charStream = PreprocessorUtils
+					.newFilteredCharStreamFromResource(filename,
+							file.getAbsolutePath());
+
+			return charStream;
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	CharStream findInternalSystemFile(String filename) {
+		for (File systemPath : systemIncludePaths) {
+			CharStream charStream = findInternalSystemFile(systemPath, filename);
+
+			if (charStream != null)
+				return charStream;
+		}
+		// look in directory "abc" in the class path:
+		return findInternalSystemFile(Preprocessor.ABC_INCLUDE_PATH, filename);
+	}
 
 	/**
 	 * Given a preprocessor source file, this returns a Token Source that emits
@@ -109,15 +204,13 @@ public class PreprocessorWorker {
 	 * @throws PreprocessorException
 	 *             if an I/O error occurs
 	 */
-	PreprocessorTokenSource outputTokenSource(File file,
-			CommonPreprocessor preprocessor, boolean tmpFile)
+	PreprocessorTokenSource outputTokenSource(File file, boolean tmpFile)
 			throws PreprocessorException {
 		Map<String, Macro> macroMap = new HashMap<String, Macro>();
 
 		if (implicitMacros != null)
 			macroMap.putAll(implicitMacros);
-		return outputTokenSource(file, macroMap, tokenFactory, preprocessor,
-				tmpFile);
+		return outputTokenSource(file, macroMap, tokenFactory, tmpFile);
 	}
 
 	/**
@@ -132,9 +225,8 @@ public class PreprocessorWorker {
 	 * @throws PreprocessorException
 	 *             if an I/O error occurs
 	 */
-	CTokenSource outputTokenSource(String filename,
-			CommonPreprocessor preprocessor) throws PreprocessorException,
-			IOException {
+	CTokenSource outputTokenSource(String filename)
+			throws PreprocessorException, IOException {
 		Map<String, Macro> macroMap = new HashMap<String, Macro>();
 
 		if (implicitMacros != null)
@@ -150,8 +242,9 @@ public class PreprocessorWorker {
 		if (file == null)
 			file = findFile(systemIncludePaths, filename);
 		if (file == null) {
-			charStream = PreprocessorUtils.newFilteredCharStreamFromResource(
-					filename, "/" + filename);
+			// charStream = PreprocessorUtils.newFilteredCharStreamFromResource(
+			// filename, "/" + filename);
+			charStream = findInternalSystemFile(filename);
 
 			if (charStream == null)
 				return null;
@@ -169,55 +262,9 @@ public class PreprocessorWorker {
 
 		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
 				parser, systemIncludePaths, userIncludePaths, macroMap,
-				tokenFactory, preprocessor, false);
+				tokenFactory, this, false);
 
 		return tokenSource;
 	}
 
-	/**
-	 * Given a preprocessor source file, this returns a Token Source that emits
-	 * the tokens resulting from preprocessing the file.
-	 * 
-	 * @param file
-	 * @param macroMap
-	 * @param tokenFactory
-	 * @param preprocessor
-	 * @return
-	 * @throws PreprocessorException
-	 */
-	private PreprocessorTokenSource outputTokenSource(File file,
-			Map<String, Macro> macroMap, TokenFactory tokenFactory,
-			CommonPreprocessor preprocessor, boolean tmpFile)
-			throws PreprocessorException {
-		PreprocessorParser parser = preprocessor.parser(file);
-		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
-				parser, systemIncludePaths, userIncludePaths, macroMap,
-				tokenFactory, preprocessor, tmpFile);
-
-		return tokenSource;
-	}
-
-	/**
-	 * Find the file with the given name by looking through the directories in
-	 * the given list. Go through list from first to last. Returns first
-	 * instance found.
-	 * 
-	 * Note: the filename may itself containing directory structure, e.g.,
-	 * "sys/stdio.h".
-	 * 
-	 * @param paths
-	 *            list of directories to search
-	 * @param filename
-	 *            name of file
-	 * @return file named filename, or null if not found
-	 */
-	private File findFile(File[] paths, String filename) {
-		for (File path : paths) {
-			File result = new File(path, filename);
-
-			if (result.isFile())
-				return result;
-		}
-		return null;
-	}
 }

@@ -229,12 +229,12 @@
 		</javac>
 	</target>
 
-	<target name="jar" depends="compile" description="Jar up all class files.">
+	<target name="jar" depends="compile" description="Jar up class files and header files">
 		<jar destfile="${jar-path}">
 			<fileset dir="${bin.dir}" />
 			<zipfileset includes="**/*.class" src="${antlr.runtime.jar}" />
 			<zipfileset includes="**/*.class" src="${sarl.jar}" />
-			<fileset dir="${basedir}/text/include" />
+			<fileset dir="${basedir}" includes="include/**" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Main-Class" value="${main-class}" />

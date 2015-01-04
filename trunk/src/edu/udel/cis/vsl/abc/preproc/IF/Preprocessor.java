@@ -14,23 +14,32 @@ import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 /**
+ * <p>
  * A Preprocessor is used to preprocess source files. A single Preprocessor
  * object can be used to preprocess multiple files.
+ * </p>
+ * 
+ * <p>
+ * A Preprocessor does have some state: it keeps track of all the files it has
+ * preprocessed. This includes files that were preprocessed because they were
+ * (recursively) included by <code>#include</code> directives. It maintains an
+ * ordered list in which each of these files occurs exactly once. This
+ * essentially assigned a unique integer ID (numbered from 0) to all the files
+ * that the preprocessor has encountered.
+ * </p>
  * 
  * @author siegel
  * 
  */
 public interface Preprocessor {
 
-	// /**
-	// * Read these files to get their macros. Store the macros and use them as
-	// * the starting point when parsing any subsequent file.
-	// *
-	// * @param implicitIncludes
-	// * @throws PreprocessorException
-	// */
-	// void setImplicitIncludes(File[] implicitIncludes)
-	// throws PreprocessorException;
+	/**
+	 * The path containing the ABC header files. This is internal to the
+	 * project. The path is interpreted relative to the directories in the class
+	 * path. The directory "/include" is in the class path. Therefore "abc" will
+	 * be found in "/include/abc".
+	 */
+	public final static File ABC_INCLUDE_PATH = new File(File.separator + "abc");
 
 	/**
 	 * Returns a lexer for the given preprocessor source file. The lexer removes
@@ -88,7 +97,8 @@ public interface Preprocessor {
 	 */
 	void parse(PrintStream out, File file) throws PreprocessorException;
 
-	Map<String, Macro> getMacros(Map<String, String> macroDefs) throws PreprocessorException;
+	Map<String, Macro> getMacros(Map<String, String> macroDefs)
+			throws PreprocessorException;
 
 	/**
 	 * Given a preprocessor source file, this returns a Token Source that emits
