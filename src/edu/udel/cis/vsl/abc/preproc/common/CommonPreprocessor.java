@@ -60,11 +60,11 @@ public class CommonPreprocessor implements Preprocessor {
 					tmpOut.write("#define " + macro + " "
 							+ macroDefs.get(macro) + "\r\n");
 				tmpOut.close();
-				worker = new PreprocessorWorker(
+				worker = new PreprocessorWorker(this,
 						PreprocessorWorker.defaultSystemIncludes,
 						PreprocessorWorker.defaultSystemIncludes,
 						new HashMap<String, Macro>());
-				tokenSource = worker.outputTokenSource(temp, this, true);
+				tokenSource = worker.outputTokenSource(temp, true);
 				do {
 					token = tokenSource.nextToken();
 				} while (token.getType() != PreprocessorLexer.EOF);
@@ -205,20 +205,20 @@ public class CommonPreprocessor implements Preprocessor {
 	public PreprocessorTokenSource outputTokenSource(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
 			File file) throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
-				userIncludePaths, implicitMacros);
+		PreprocessorWorker worker = new PreprocessorWorker(this,
+				systemIncludePaths, userIncludePaths, implicitMacros);
 
-		return worker.outputTokenSource(file, this, false);
+		return worker.outputTokenSource(file, false);
 	}
 
 	@Override
 	public CTokenSource outputTokenSource(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
 			String filename) throws PreprocessorException, IOException {
-		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
-				userIncludePaths, implicitMacros);
+		PreprocessorWorker worker = new PreprocessorWorker(this,
+				systemIncludePaths, userIncludePaths, implicitMacros);
 
-		return worker.outputTokenSource(filename, this);
+		return worker.outputTokenSource(filename);
 	}
 
 	/**
@@ -238,10 +238,9 @@ public class CommonPreprocessor implements Preprocessor {
 	public void printOutputTokens(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
 			PrintStream out, File file) throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
-				userIncludePaths, implicitMacros);
-		PreprocessorTokenSource source = worker.outputTokenSource(file, this,
-				false);
+		PreprocessorWorker worker = new PreprocessorWorker(this,
+				systemIncludePaths, userIncludePaths, implicitMacros);
+		PreprocessorTokenSource source = worker.outputTokenSource(file, false);
 
 		out.println("Post-preprocessing token stream for " + file + ":\n");
 		PreprocessorUtils.printTokenSource(out, source);
@@ -252,10 +251,9 @@ public class CommonPreprocessor implements Preprocessor {
 	public void printOutput(File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> implicitMacros, PrintStream out, File file)
 			throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(systemIncludePaths,
-				userIncludePaths, implicitMacros);
-		PreprocessorTokenSource source = worker.outputTokenSource(file, this,
-				false);
+		PreprocessorWorker worker = new PreprocessorWorker(this,
+				systemIncludePaths, userIncludePaths, implicitMacros);
+		PreprocessorTokenSource source = worker.outputTokenSource(file, false);
 
 		PreprocessorUtils.sourceTokenSource(out, source);
 		out.flush();

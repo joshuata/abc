@@ -12,7 +12,7 @@
 //In CIVL implementation, they better be abstract functions.
 #define HUGE_VAL       3.40282347e+38F
 #define INFINITY       (1/0)
-#define NAN            NAN
+#define NAN            sqrt(-1)
 
 typedef enum {
   FP_INFINITE,
