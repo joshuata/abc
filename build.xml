@@ -225,8 +225,11 @@
 
 	<target name="compile" description="Compile all java source files." depends="parsers">
 		<mkdir dir="${bin.dir}" />
-		<javac debug="true" srcdir="${src.dir}" destdir="${bin.dir}" includes="edu/udel/cis/vsl/abc/**" classpathref="src.compile.classpath" encoding="UTF-8" includeantruntime="false">
+		<javac debug="true" srcdir="${src.dir}" destdir="${bin.dir}" classpathref="src.compile.classpath" encoding="UTF-8" includeantruntime="false">
 		</javac>
+		<copy todir="${bin.dir}/include">
+			<fileset dir="${src.dir}/include" />
+		</copy>
 	</target>
 
 	<target name="jar" depends="compile" description="Jar up class files and header files">
@@ -234,7 +237,6 @@
 			<fileset dir="${bin.dir}" />
 			<zipfileset includes="**/*.class" src="${antlr.runtime.jar}" />
 			<zipfileset includes="**/*.class" src="${sarl.jar}" />
-			<fileset dir="${basedir}" includes="include/**" />
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 				<attribute name="Main-Class" value="${main-class}" />
@@ -258,7 +260,7 @@
 		<pathelement location="${bin.dir}" />
 		<pathelement location="${antlr.jar}" />
 		<pathelement location="${junit.jar}" />
-		<pathelement location="${basedir}/text/include" />
+		<pathelement location="${src.dir}" />
 		<pathelement location="${hamcrest.jar}" />
 		<pathelement location="${sarl.jar}" />
 	</path>
