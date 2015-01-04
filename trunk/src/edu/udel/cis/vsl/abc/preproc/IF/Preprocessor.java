@@ -39,7 +39,8 @@ public interface Preprocessor {
 	 * path. The directory "/include" is in the class path. Therefore "abc" will
 	 * be found in "/include/abc".
 	 */
-	public final static File ABC_INCLUDE_PATH = new File(File.separator + "abc");
+	public final static File ABC_INCLUDE_PATH = new File(new File(
+			File.separator + "include"), "abc");
 
 	/**
 	 * Returns a lexer for the given preprocessor source file. The lexer removes
