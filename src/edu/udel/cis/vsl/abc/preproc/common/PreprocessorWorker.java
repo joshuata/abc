@@ -90,11 +90,11 @@ public class PreprocessorWorker {
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macros) {
 		this.preprocessor = preprocessor;
-		if (systemIncludePaths == null || systemIncludePaths.length == 0)
+		if (systemIncludePaths == null)
 			this.systemIncludePaths = defaultSystemIncludes;
 		else
 			this.systemIncludePaths = systemIncludePaths;
-		if (userIncludePaths == null || userIncludePaths.length == 0)
+		if (userIncludePaths == null)
 			this.userIncludePaths = defaultUserIncludes;
 		else
 			this.userIncludePaths = userIncludePaths;
