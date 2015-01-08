@@ -363,7 +363,10 @@ public class ASTPrettyPrinter {
 			result.append("struct ");
 		else
 			result.append("union ");
-		if (strOrUnion.getName() != null)
+		// ABC inserts name to anonymous struct/union in the form of
+		// $anon_struct_<i>/$anon_union_<i>
+		if (strOrUnion.getName() != null
+				&& !strOrUnion.getName().startsWith("$"))
 			result.append(strOrUnion.getName());
 		if (fields != null) {
 			int numFields = fields.numChildren();
@@ -455,6 +458,7 @@ public class ASTPrettyPrinter {
 
 	private static StringBuffer enumType2Pretty(String prefix,
 			EnumerationTypeNode enumeration) {
+
 		StringBuffer result = new StringBuffer();
 		IdentifierNode tag = enumeration.getTag();
 		SequenceNode<EnumeratorDeclarationNode> enumerators = enumeration
@@ -463,7 +467,9 @@ public class ASTPrettyPrinter {
 
 		result.append(prefix);
 		result.append("enum ");
-		if (tag != null)
+		// ABC inserts name to anonymous enum in the format of
+		// $annon_enum_<i>$TU<j>.
+		if (tag != null && !tag.name().startsWith("$"))
 			result.append(tag.name());
 		if (enumerators != null) {
 			int num = enumerators.numChildren();
@@ -609,7 +615,9 @@ public class ASTPrettyPrinter {
 					(TypedefDeclarationNode) block);
 			break;
 		case ENUMERATOR:
-			out.print(prefix + "enum;");
+			// out.print(prefix + "enum;");
+			out.print(enumType2Pretty(prefix, (EnumerationTypeNode) block)
+					+ ";");
 			break;
 		case PRAGMA:
 			pPrintPragma(out, prefix, (PragmaNode) block);
