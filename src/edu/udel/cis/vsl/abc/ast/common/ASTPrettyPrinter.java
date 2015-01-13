@@ -1750,9 +1750,11 @@ public class ASTPrettyPrinter {
 		case PREDECREMENT:
 			result.append("--");
 			result.append(arg0);
+			break;
 		case PREINCREMENT:
 			result.append("++");
 			result.append(arg0);
+			break;
 		case POSTINCREMENT:
 			result.append(arg0);
 			result.append("++");
