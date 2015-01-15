@@ -198,6 +198,7 @@ public class CommonVariableDeclarationNode extends
 		result.setAutoStorage(hasAutoStorage());
 		result.setRegisterStorage(hasRegisterStorage());
 		result.setThreadLocalStorage(hasThreadLocalStorage());
+		result.setSharedStorage(hasSharedStorage());
 		if (specifiers != null)
 			result.setConstantAlignmentSpecifiers(specifiers.copy());
 		if (typeAlignmentSpecifiers != null)
