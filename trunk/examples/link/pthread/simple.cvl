@@ -1,4 +1,4 @@
-#include <simplepthread.h>
+#include "simplepthread.h"
 
 int main(){
   return 0;
