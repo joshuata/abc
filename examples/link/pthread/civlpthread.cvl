@@ -3,7 +3,7 @@
 #define __CIVL_CIVLPTHREAD__
 
 #include <civlc.h>
-#include <civlpthread.cvh>
+#include "civlpthread.cvh"
 #include <concurrency.cvh>
 
 /* __pthread_pool_t struct definition

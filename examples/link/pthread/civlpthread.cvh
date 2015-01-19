@@ -3,7 +3,7 @@
 #define __CIVLPTHREAD__
 
 #include <civlc.cvh>
-#include <pthread.h>
+#include "simplepthread.h"
 
 typedef struct __pthread_pool_t __pthread_pool_t;
 
