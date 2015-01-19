@@ -71,4 +71,11 @@ public class CIVLLinkageTest {
 		assertTrue(compileAndLink(new String[] { "comm/messageUnpack.cvl",
 				"comm/comm.cvl" }, new File[] { new File(root, "comm") }));
 	}
+	
+	@Test
+	public void pthread() throws ParseException, SyntaxException,
+			PreprocessorException {
+		assertTrue(compileAndLink(new String[] { "pthread/simple.cvl",
+				"pthread/simplepthread.cvl" }, new File[] { new File(root, "pthread")}));
+	}
 }
