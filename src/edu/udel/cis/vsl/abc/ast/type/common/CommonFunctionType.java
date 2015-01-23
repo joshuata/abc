@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
@@ -148,15 +149,15 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 	}
 
 	private boolean equiv(ArrayList<ObjectType> types1,
-			ArrayList<ObjectType> types2) {
+			ArrayList<ObjectType> types2, Map<TypeKey, Type> seen) {
 		int length1 = types1.size();
 		int length2 = types2.size();
 
 		if (length1 != length2)
 			return false;
 		for (int i = 0; i < length1; i++) {
-			Type x1 = types1.get(i);
-			Type x2 = types2.get(i);
+			CommonType x1 = (CommonType) types1.get(i);
+			CommonType x2 = (CommonType) types2.get(i);
 
 			if (x1 == null) {
 				if (x2 != null)
@@ -164,27 +165,24 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 			} else {
 				if (x2 == null)
 					return false;
-				if (!x1.equivalentTo(x2))
+				if (!x1.similar(x2, true, seen))
 					return false;
 			}
 		}
 		return true;
 	}
 
-	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
+	private boolean equivalentTo(Type type, Map<TypeKey, Type> seen) {
 		if (type instanceof CommonFunctionType) {
 			CommonFunctionType that = (CommonFunctionType) type;
 
-			if (!returnType.equivalentTo(that.returnType))
+			if (!((CommonType) returnType).similar(that.returnType, true, seen))
 				return false;
 			if (parameterTypes == null) {
 				if (that.parameterTypes != null)
 					return false;
 			} else {
-				if (!equiv(parameterTypes, that.parameterTypes))
+				if (!equiv(parameterTypes, that.parameterTypes, seen))
 					return false;
 			}
 			return hasVariableArgs == that.hasVariableArgs
@@ -206,8 +204,7 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 	 * performed on each argument, and arguments that have type float are
 	 * promoted to double. These are called the default argument promotions."
 	 */
-	@Override
-	public boolean compatibleWith(Type type) {
+	private boolean compatibleWith(Type type, Map<TypeKey, Type> seen) {
 		if (type instanceof CommonFunctionType) {
 			CommonFunctionType that = (CommonFunctionType) type;
 
@@ -225,10 +222,11 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 				if (numParameters != that.getNumParameters())
 					return false;
 				for (int i = 0; i < numParameters; i++) {
-					ObjectType parameterType1 = this.getParameterType(i);
+					CommonObjectType parameterType1 = (CommonObjectType) this
+							.getParameterType(i);
 					ObjectType parameterType2 = that.getParameterType(i);
 
-					if (!parameterType1.compatibleWith(parameterType2))
+					if (!parameterType1.similar(parameterType2, false, seen))
 						return false;
 				}
 				if (this.hasVariableArgs != that.hasVariableArgs)
@@ -249,7 +247,7 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 				return true;
 			} else if (!that.fromIdentifierList && !this.parametersKnown()) {
 				// symmetric situation
-				return that.compatibleWith(this);
+				return that.compatibleWith(this, seen);
 			} else if (!this.fromIdentifierList
 					&& (that.fromIdentifierList && that.parametersKnown())) {
 				// "If one type has a parameter type list and the other type is
@@ -267,12 +265,14 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 				if (numParameters != that.getNumParameters())
 					return false;
 				for (int i = 0; i < numParameters; i++) {
-					ObjectType parameterType1 = this.getParameterType(i);
-					ObjectType parameterType2 = that.getParameterType(i);
+					CommonObjectType parameterType1 = (CommonObjectType) this
+							.getParameterType(i);
+					CommonObjectType parameterType2 = (CommonObjectType) that
+							.getParameterType(i);
 
 					// TODO: perform default argument promotion to
 					// parameterType2
-					if (!parameterType1.compatibleWith(parameterType2))
+					if (!parameterType1.similar(parameterType2, false, seen))
 						return false;
 				}
 				if (this.hasVariableArgs != that.hasVariableArgs)
@@ -281,7 +281,7 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 			} else if (!that.fromIdentifierList
 					&& (this.fromIdentifierList && this.parametersKnown())) {
 				// symmetric situation
-				return that.compatibleWith(this);
+				return that.compatibleWith(this, seen);
 			} else {
 				return true;
 			}
@@ -318,6 +318,13 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 	@Override
 	public boolean isScalar() {
 		return true;
+	}
+
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return equivalent ? equivalentTo(other, seen) : compatibleWith(other,
+				seen);
 	}
 
 }

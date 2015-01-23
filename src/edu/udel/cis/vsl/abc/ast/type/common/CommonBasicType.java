@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -119,11 +120,6 @@ public class CommonBasicType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean compatibleWith(Type type) {
-		return equals(type);
-	}
-
-	@Override
 	public String toString() {
 		switch (basicTypeKind) {
 		case BOOL:
@@ -180,8 +176,9 @@ public class CommonBasicType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		return equals(type);
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return equals(other);
 	}
 
 }

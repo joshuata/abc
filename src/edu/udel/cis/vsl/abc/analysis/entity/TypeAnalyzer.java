@@ -466,10 +466,9 @@ public class TypeAnalyzer {
 		String tag = node.getName(); // could be null
 		SequenceNode<FieldDeclarationNode> fieldDecls = node
 				.getStructDeclList(); // could be null
-		StructureOrUnionType structureOrUnionType;
+		StructureOrUnionType structureOrUnionType = typeFactory
+				.structureOrUnionType(node, node.isStruct(), tag);
 
-		structureOrUnionType = typeFactory.structureOrUnionType(node,
-				node.isStruct(), tag);
 		// in case this was used in previous analysis pass, clear it:
 		structureOrUnionType.clear();
 		scope.add(structureOrUnionType);

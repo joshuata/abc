@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -111,25 +112,23 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 
 	@Override
 	public int hashCode() {
-		int result = classCode + elementType.hashCode();
+		int result = classCode ^ ((CommonType) elementType).hashCode();
 
 		if (constantSize != null)
-			result += constantSize.hashCode();
+			result ^= constantSize.hashCode();
 		else if (variableSize != null)
-			result += variableSize.hashCode();
+			result ^= variableSize.hashCode();
 		if (unspecifiedVariableLength)
-			result += 32;
+			result ^= 172830823; // random int
 		return result;
 	}
 
-	private boolean equiv(Object object, boolean strict) {
-		if (this == object)
-			return true;
-		if (object instanceof CommonArrayType) {
-			CommonArrayType that = (CommonArrayType) object;
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof CommonArrayType) {
+			CommonArrayType that = (CommonArrayType) obj;
 
-			if (!(strict ? elementType.equals(that.elementType) : elementType
-					.equivalentTo(that.elementType)))
+			if (!elementType.equals(that.elementType))
 				return false;
 			if (constantSize != null) {
 				if (that.constantSize == null)
@@ -154,24 +153,42 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 		return false;
 	}
 
-	@Override
-	public boolean equals(Object object) {
-		return equiv(object, true);
+	private boolean equivalentTo(Type other, Map<TypeKey, Type> seen) {
+		if (other instanceof CommonArrayType) {
+			CommonArrayType that = (CommonArrayType) other;
+
+			if (!((CommonType) elementType).similar(that.elementType, true,
+					seen))
+				return false;
+			if (constantSize != null) {
+				if (that.constantSize == null)
+					return false;
+				if (!constantSize.equals(that.constantSize))
+					return false;
+			} else {
+				if (that.constantSize != null)
+					return false;
+				if (variableSize != null) {
+					if (that.variableSize == null)
+						return false;
+					if (!variableSize.equals(that.variableSize))
+						return false;
+				} else {
+					if (that.variableSize != null)
+						return false;
+				}
+			}
+			return unspecifiedVariableLength == that.unspecifiedVariableLength;
+		}
+		return false;
 	}
 
-	@Override
-	public boolean equivalentTo(Type type) {
-		return equiv(type, false);
-	}
-
-	@Override
-	public boolean compatibleWith(Type type) {
-		if (this == type)
-			return true;
+	private boolean compatibleWith(Type type, Map<TypeKey, Type> seen) {
 		if (type instanceof CommonArrayType) {
 			CommonArrayType that = (CommonArrayType) type;
 
-			if (!elementType.compatibleWith(that.elementType))
+			if (!((CommonType) elementType).similar(that.elementType, false,
+					seen))
 				return false;
 			if (constantSize != null && that.constantSize != null
 					&& !constantSize.equals(that.constantSize))
@@ -215,4 +232,10 @@ public class CommonArrayType extends CommonObjectType implements ArrayType {
 		return false;
 	}
 
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return equivalent ? equivalentTo(other, seen) : compatibleWith(other,
+				seen);
+	}
 }

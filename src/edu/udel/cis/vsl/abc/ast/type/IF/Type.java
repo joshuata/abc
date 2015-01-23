@@ -41,8 +41,47 @@ import java.io.PrintStream;
  * </ul>
  * </ul>
  * 
+ * <p>
  * Note: {@link AtomicType} and {@link QualifiedObjectType} constructors take an
  * {@link UnqualifiedObjectType}.
+ * </p>
+ * 
+ * 
+ * <p>
+ * Equivalence relations: there are 3 equivalence relations on the set of types.
+ * From strongest to weakest, they are: equality, equivalence, and
+ * compatibility. If T1 equals (according to the equals method) T2, then T1 is
+ * also equivalent to T2. If T1 is equivalent to T2 then T1 is compatible with
+ * T2.
+ * <p>
+ * 
+ * <p>
+ * The differences mainly involve tagged entities (structs, unions, enums). In
+ * C, it is possible for two structs (for example) to have the same tag, fields,
+ * and field types, but still represent two distinct types. This happens if they
+ * are declared in two different scopes. Hence it is necessary to specify some
+ * other "hidden" component of a struct type to determine when two are equal. We
+ * call this the "key": this is any Object, whose "equals" method is used to
+ * determine when two tagged types are equal. For any key, there can be at most
+ * one struct type using that key. Hence two structs are equal if and only if
+ * their keys are equal. Since there can be only one struct object with that
+ * key, it follows that they are ==. This invariant is enforced by the type
+ * factory.
+ * </p>
+ * 
+ * <p>
+ * Two structs which are not equal may still be "equivalent". This means they
+ * have equal tags (equal as strings), and, they are either both complete or
+ * both incomplete. If they are complete, they must have equivalent fields with
+ * the same names and in the same order.
+ * </p>
+ * 
+ * <p>
+ * Two structs which are not equal may nevertheless be "compatible". An
+ * incomplete struct with tag T is compatible with any struct with tag T. An
+ * incomplete array type is compatible with a complete array type which has a
+ * compatible element type.
+ * </p>
  * 
  * @author siegel
  * 
@@ -124,35 +163,12 @@ public interface Type {
 	 * Is this type "compatible" with the given type? See C11 Sec. 6.2.7 for the
 	 * definition of "compatible".
 	 * 
-	 * Notion extended to deal with CIVL-C scope-restricted pointers. Two
-	 * pointers types: (P1) pointer to T1 in scope S1, and (P2) pointer to T2 in
-	 * scope S2 are compatible iff:
-	 * 
-	 * <ol>
-	 * <li>pointer-to-T1 and pointer-to-T2 are compatible in the C sense, and</li>
-	 * <li>one of the following holds:
-	 * <ol>
-	 * <li>at least one of S1, S2 is null</li>
-	 * <li>S1 and S2 are non null and one of the two scopes is contained in the
-	 * other</li>
-	 * </ol>
-	 * </li>
-	 * </ol>
-	 * 
-	 * Note that the above does not guarantee "assignment compatibility". For an
-	 * assignment "lhs=rhs" where lhs has type P1 and rhs has type P2, we must
-	 * have in addition one of the following: (1) S1 is null; or (2) S1 is
-	 * non-null and is the root scope; or (3) S1 is a non-null, non-root scope
-	 * and S2 is a non-null scope contained in S1. In such cases, there will be
-	 * an automatic conversion. In all other cases, an explicit cast is
-	 * required.
-	 * 
 	 * @param type
 	 *            the type to compare with this one for compatibility
 	 * @return true iff the two types are compatible
 	 */
 	boolean compatibleWith(Type type);
-	
+
 	boolean equivalentTo(Type type);
 
 	/**

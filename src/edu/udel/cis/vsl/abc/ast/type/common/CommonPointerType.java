@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -51,35 +52,6 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof CommonPointerType) {
-			CommonPointerType that = (CommonPointerType) type;
-
-			return referencedType.equivalentTo(that.referencedType);
-		}
-		return false;
-	}
-
-	/**
-	 * "For two pointer types to be compatible, both shall be identically
-	 * qualified and both shall be pointers to compatible types."
-	 * 
-	 */
-	@Override
-	public boolean compatibleWith(Type type) {
-		if (type instanceof PointerType) {
-			CommonPointerType that = (CommonPointerType) type;
-
-			if (!this.referencedType().compatibleWith(that.referencedType()))
-				return false;
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
 		out.print("Pointer");
 		if (referencedType != null) {
@@ -99,5 +71,22 @@ public class CommonPointerType extends CommonObjectType implements PointerType {
 	@Override
 	public boolean isScalar() {
 		return true;
+	}
+
+	/**
+	 * "For two pointer types to be compatible, both shall be identically
+	 * qualified and both shall be pointers to compatible types."
+	 * 
+	 */
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		if (other instanceof CommonPointerType) {
+			CommonPointerType that = (CommonPointerType) other;
+
+			return ((CommonType) referencedType).similar(that.referencedType,
+					equivalent, seen);
+		}
+		return false;
 	}
 }

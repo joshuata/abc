@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
@@ -35,16 +36,6 @@ public class CommonVoidType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		return type instanceof CommonVoidType;
-	}
-
-	@Override
-	public boolean compatibleWith(Type type) {
-		return equals(type);
-	}
-
-	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
 		out.print("void");
 	}
@@ -57,6 +48,12 @@ public class CommonVoidType extends CommonObjectType implements
 	@Override
 	public String toString() {
 		return "void";
+	}
+
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return other instanceof CommonVoidType;
 	}
 
 }

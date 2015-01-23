@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
+import java.util.Map;
+
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
@@ -36,16 +38,6 @@ public abstract class CommonIntegerType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean compatibleWith(Type type) {
-		return equals(type);
-	}
-
-	@Override
-	public boolean equivalentTo(Type type) {
-		return equals(type);
-	}
-
-	@Override
 	public boolean isVariablyModified() {
 		return false;
 	}
@@ -53,6 +45,12 @@ public abstract class CommonIntegerType extends CommonObjectType implements
 	@Override
 	public boolean isScalar() {
 		return true;
+	}
+
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return equals(other);
 	}
 
 }

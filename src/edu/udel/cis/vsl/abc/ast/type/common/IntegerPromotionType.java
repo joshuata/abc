@@ -44,7 +44,7 @@ public class IntegerPromotionType extends CommonIntegerType {
 
 	@Override
 	public int hashCode() {
-		return classCode + baseType.hashCode();
+		return classCode ^ baseType.hashCode();
 	}
 
 }
