@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.CommonEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
@@ -350,6 +351,12 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	@Override
 	public void setIsSystem(boolean value) {
 		entity.setIsSystem(value);
+	}
+
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return equivalent ? equivalentTo(other) : compatibleWith(other);
 	}
 
 }

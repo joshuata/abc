@@ -145,8 +145,7 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	 * declared in the same order. For two structures or unions, corresponding
 	 * bit-fields shall have the same widths."
 	 */
-	@Override
-	public boolean compatibleWith(Type type) {
+	private boolean compatibleWith(Type type, Map<TypeKey, Type> seen) {
 		if (type instanceof CommonStructureOrUnionType) {
 			CommonStructureOrUnionType that = (CommonStructureOrUnionType) type;
 
@@ -163,6 +162,13 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 				if (numFields != that.getNumFields())
 					return false;
+
+				TypeKey newKey = new TypeKey(this);
+				Type oldType = seen.get(newKey);
+
+				if (oldType != null)
+					return type == oldType;
+				seen.put(newKey, type);
 				for (int i = 0; i < numFields; i++) {
 					Field thisField = this.getField(i);
 					Field thatField = that.getField(i);
@@ -181,8 +187,13 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 					if (thisType == null) {
 						if (thatType != null)
 							return false;
-					} else if (!thisType.equals(thatType))
-						return false;
+					} else {
+						if (thatType == null)
+							return false;
+						if (!((CommonType) thisType).similar(thatType, false,
+								seen))
+							return false;
+					}
 					if (thisWidth == null) {
 						if (thatWidth != null)
 							return false;
@@ -195,10 +206,9 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 		return false;
 	}
 
-	@Override
-	public boolean equivalentTo(Type type) {
-		if (type instanceof CommonStructureOrUnionType) {
-			CommonStructureOrUnionType that = (CommonStructureOrUnionType) type;
+	private boolean equivalentTo(Type other, Map<TypeKey, Type> seen) {
+		if (other instanceof CommonStructureOrUnionType) {
+			CommonStructureOrUnionType that = (CommonStructureOrUnionType) other;
 
 			if (this.tag != null) {
 				if (!this.tag.equals(that.tag))
@@ -218,6 +228,15 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 
 					if (numFields != that.getNumFields())
 						return false;
+
+					TypeKey thisKey = new TypeKey(this);
+					Type oldType = seen.get(thisKey);
+
+					if (oldType == null) {
+						seen.put(thisKey, other);
+					} else {
+						return oldType == other;
+					}
 					for (int i = 0; i < numFields; i++) {
 						Field thisField = this.getField(i);
 						Field thatField = that.getField(i);
@@ -236,7 +255,8 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 						if (thisType == null) {
 							if (thatType != null)
 								return false;
-						} else if (!thisType.equivalentTo(thatType))
+						} else if (!((CommonType) thisType).similar(thatType,
+								true, seen))
 							return false;
 						if (thisWidth == null) {
 							if (thatWidth != null)
@@ -284,31 +304,6 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	@Override
 	public boolean isScalar() {
 		return false;
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		if (this == object)
-			return true;
-		if (object instanceof CommonStructureOrUnionType) {
-			CommonStructureOrUnionType that = (CommonStructureOrUnionType) object;
-
-			return key.equals(that.key)
-					&& (tag == null || tag.equals(that.tag))
-					&& isStruct == that.isStruct;
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		int result = classCode ^ key.hashCode();
-
-		if (tag != null)
-			result ^= tag.hashCode();
-		if (isStruct)
-			result ^= 1;
-		return result;
 	}
 
 	@Override
@@ -402,6 +397,36 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 	@Override
 	public void setIsSystem(boolean value) {
 		entity.setIsSystem(value);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof CommonStructureOrUnionType) {
+			CommonStructureOrUnionType that = (CommonStructureOrUnionType) obj;
+
+			return isStruct == that.isStruct
+					&& ((tag == null && that.tag == null) || tag
+							.equals(that.tag)) && key.equals(that.key);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = classCode ^ key.hashCode();
+
+		if (tag != null)
+			result ^= tag.hashCode();
+		if (!isStruct)
+			result ^= 96394720;
+		return result;
+	}
+
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		return equivalent ? equivalentTo(other, seen) : compatibleWith(other,
+				seen);
 	}
 
 }

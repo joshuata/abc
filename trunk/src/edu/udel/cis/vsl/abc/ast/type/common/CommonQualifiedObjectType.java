@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -64,21 +65,6 @@ public class CommonQualifiedObjectType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean compatibleWith(Type type) {
-		if (type instanceof QualifiedObjectType) {
-			QualifiedObjectType that = (QualifiedObjectType) type;
-
-			return constQualified == that.isConstQualified()
-					&& volatileQualified == that.isVolatileQualified()
-					&& restrictQualified == that.isRestrictQualified()
-					&& inputQualified == that.isInputQualified()
-					&& outputQualified == that.isOutputQualified()
-					&& baseType.compatibleWith(that.getBaseType());
-		}
-		return false;
-	}
-
-	@Override
 	public UnqualifiedObjectType getBaseType() {
 		return baseType;
 	}
@@ -128,23 +114,6 @@ public class CommonQualifiedObjectType extends CommonObjectType implements
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof QualifiedObjectType) {
-			QualifiedObjectType that = (QualifiedObjectType) type;
-
-			return constQualified == that.isConstQualified()
-					&& volatileQualified == that.isVolatileQualified()
-					&& restrictQualified == that.isRestrictQualified()
-					&& inputQualified == that.isInputQualified()
-					&& outputQualified == that.isOutputQualified()
-					&& baseType.equivalentTo(that.getBaseType());
-		}
-		return false;
-	}
-
-	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
 		String seperator = "";
 
@@ -177,6 +146,23 @@ public class CommonQualifiedObjectType extends CommonObjectType implements
 	@Override
 	public boolean isScalar() {
 		return baseType.isScalar();
+	}
+
+	@Override
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		if (other instanceof QualifiedObjectType) {
+			QualifiedObjectType that = (QualifiedObjectType) other;
+
+			return constQualified == that.isConstQualified()
+					&& volatileQualified == that.isVolatileQualified()
+					&& restrictQualified == that.isRestrictQualified()
+					&& inputQualified == that.isInputQualified()
+					&& outputQualified == that.isOutputQualified()
+					&& ((CommonType) baseType).similar(that.getBaseType(),
+							equivalent, seen);
+		}
+		return false;
 	}
 
 }

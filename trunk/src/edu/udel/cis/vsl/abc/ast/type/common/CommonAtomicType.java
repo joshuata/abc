@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -34,29 +35,15 @@ public class CommonAtomicType extends CommonObjectType implements AtomicType {
 
 	@Override
 	public int hashCode() {
-		return classCode + baseType.hashCode();
+		return classCode ^ baseType.hashCode();
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		if (this == object)
-			return true;
-		if (object instanceof CommonAtomicType) {
-			CommonAtomicType that = (CommonAtomicType) object;
+	public boolean equals(Object obj) {
+		if (obj instanceof CommonAtomicType) {
+			CommonAtomicType that = (CommonAtomicType) obj;
 
 			return baseType.equals(that.baseType);
-		}
-		return false;
-	}
-
-	@Override
-	public boolean compatibleWith(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof CommonAtomicType) {
-			CommonAtomicType that = (CommonAtomicType) type;
-
-			return baseType.compatibleWith(that.baseType);
 		}
 		return false;
 	}
@@ -78,13 +65,11 @@ public class CommonAtomicType extends CommonObjectType implements AtomicType {
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		if (this == type)
-			return true;
-		if (type instanceof CommonAtomicType) {
-			CommonAtomicType that = (CommonAtomicType) type;
-
-			return baseType.equivalentTo(that.baseType);
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		if (other instanceof AtomicType) {
+			return ((CommonType) baseType).similar(
+					((AtomicType) other).getBaseType(), equivalent, seen);
 		}
 		return false;
 	}

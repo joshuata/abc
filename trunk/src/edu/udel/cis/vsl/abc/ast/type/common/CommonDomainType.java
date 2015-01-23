@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.type.common;
 
 import java.io.PrintStream;
+import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
@@ -95,8 +96,12 @@ public class CommonDomainType extends CommonObjectType implements DomainType {
 	}
 
 	@Override
-	public boolean equivalentTo(Type type) {
-		return equals(type);
+	protected boolean similar(Type other, boolean equivalent,
+			Map<TypeKey, Type> seen) {
+		if (equivalent)
+			return equals(other);
+		else
+			return compatibleWith(other);
 	}
 
 }
