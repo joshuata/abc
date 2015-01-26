@@ -1,0 +1,273 @@
+/* This header file contains useful helper functions for manipulating
+ * the CIVL versions of various Cuda objects.
+ */
+
+#ifdef __CUDA_HELPER__
+#else
+#define __CUDA_HELPER__
+
+#include <concurrency.cvh>
+
+/* used to represent the size of three dimensional grids
+ */
+typedef struct {
+  unsigned int x, y, z;
+} dim3;
+
+/* used to represent a location in a three dimensional grid
+ */
+typedef struct {
+  unsigned int x, y, z;
+} uint3;
+
+/* a flag type used to indicate the type of memory transfer to occur
+ * in a call to cudaMemcpy
+ */
+enum cudaMemcpyKind {
+  cudaMemcpyHostToHost,
+  cudaMemcpyHostToDevice,
+  cudaMemcpyDeviceToHost,
+  cudaMemcpyDeviceToDevice,
+  cudaMemcpyDefault
+};
+
+/* the type returned by all Cuda functions
+ */
+enum cudaError {
+  cudaSuccess,
+  cudaErrorMissingConfiguration,
+  cudaErrorMemoryAllocation,
+  cudaErrorInitializationError,
+  cudaErrorLaunchFailure,
+  cudaErrorPriorLaunchFailure,
+  cudaErrorLaunchTimeout,
+  cudaErrorLaunchOutOfResources,
+  cudaErrorInvalidDeviceFunction,
+  cudaErrorInvalidConfiguration,
+  cudaErrorInvalidDevice,
+  cudaErrorInvalidValue,
+  cudaErrorInvalidPitchValue,
+  cudaErrorInvalidSymbol,
+  cudaErrorMapBufferObjectFailed,
+  cudaErrorUnmapBufferObjectFailed,
+  cudaErrorInvalidHostPointer,
+  cudaErrorInvalidDevicePointer,
+  cudaErrorInvalidTexture,
+  cudaErrorInvalidTextureBinding,
+  cudaErrorInvalidChannelDescriptor,
+  cudaErrorInvalidMemcpyDirection,
+  cudaErrorAddressOfConstant,
+  cudaErrorTextureFetchFailed,
+  cudaErrorTextureNotBound,
+  cudaErrorSynchronizationError,
+  cudaErrorInvalidFilterSetting,
+  cudaErrorInvalidNormSetting,
+  cudaErrorMixedDeviceExecution,
+  cudaErrorCudartUnloading,
+  cudaErrorUnknown,
+  cudaErrorNotYetImplemented,
+  cudaErrorMemoryValueTooLarge,
+  cudaErrorInvalidResourceHandle,
+  cudaErrorNotReady,
+  cudaErrorInsufficientDriver,
+  cudaErrorSetOnActiveProcess,
+  cudaErrorInvalidSurface,
+  cudaErrorNoDevice,
+  cudaErrorECCUncorrectable,
+  cudaErrorSharedObjectSymbolNotFound,
+  cudaErrorSharedObjectInitFailed,
+  cudaErrorUnsupportedLimit,
+  cudaErrorDuplicateVariableName,
+  cudaErrorDuplicateTextureName,
+  cudaErrorDuplicateSurfaceName,
+  cudaErrorDevicesUnavailable,
+  cudaErrorInvalidKernelImage,
+  cudaErrorNoKernelImageForDevice,
+  cudaErrorIncompatibleDriverContext,
+  cudaErrorPeerAccessAlreadyEnabled,
+  cudaErrorPeerAccessNotEnabled,
+  cudaErrorDeviceAlreadyInUse,
+  cudaErrorProfilerDisabled,
+  cudaErrorProfilerNotInitialized,
+  cudaErrorProfilerAlreadyStarted,
+  cudaErrorProfilerAlreadyStopped,
+  cudaErrorAssert,
+  cudaErrorTooManyPeers,
+  cudaErrorHostMemoryAlreadyRegistered,
+  cudaErrorHostMemoryNotRegistered,
+  cudaErrorOperatingSystem,
+  cudaErrorStartupFailure,
+  cudaErrorApiFailureBase
+};
+typedef enum cudaError cudaError_t;
+
+/* flag type used to represent the status of a kernel instance
+ */
+typedef enum {
+    _kernelStatusWaiting,
+    _kernelStatusRunning,
+    _kernelStatusFinished
+} _kernelStatus;
+
+/* type used to represent an instance of a Cuda kernel
+ */
+typedef struct {
+  $proc process;        // the actual process executing this kernel
+  _kernelStatus status; // the kernel status
+} _kernelInstance;
+
+/* a type that wraps a kernel instance for insertion into a list
+ */
+typedef struct _kernelInstanceNode _kernelInstanceNode;
+struct _kernelInstanceNode {
+  _kernelInstance *instance;
+  _kernelInstanceNode  *next;
+};
+
+/* a type used to represent a Cuda stream
+ */
+typedef struct {
+    _kernelInstanceNode *mostRecent;  // the most recently enqueued instance
+    _Bool usable;                     // indicates whether or not this stream
+                                      // has been marked for deletion
+} _CUstream;
+typedef _CUstream* cudaStream_t;
+
+/* a type that wraps a stream for insertion into a list
+ */
+typedef struct _cudaStreamNode _cudaStreamNode;
+struct _cudaStreamNode {
+  cudaStream_t stream;
+  _cudaStreamNode *next;
+};
+
+/* a type used to represent a Cuda event
+ */
+typedef struct {
+    _kernelInstance **instances;
+    int numInstances;
+} _CUevent;
+typedef _CUevent* cudaEvent_t;
+
+/* a type representing the state of a Cuda device
+ */
+typedef struct {
+  _cudaStreamNode *headNode;
+  cudaStream_t nullStream;
+  int numStreams;
+} _cudaContext;
+
+/* Computes the one dimensional index of a grid cell at a given location
+ * in a three dimensional grid of a given size
+ */
+int _index (dim3 size, uint3 location);
+
+/* Lifts a single integer x into a three dimensional vector representing
+ * a one dimensional grid of length x
+ */
+dim3 _toDim3(int x);
+
+/* Given a three dimensional vector representing a grid of size dim,
+ * create and destroy a process, in parallel, for each cell in the grid. 
+ * The location of the cell is passed to the spawning function.
+ */
+void _runProcs(dim3 dim, void spawningFunction(uint3));
+
+// ------------------------------------------------
+
+/* $wait on a given process is it is non-null
+ */
+void _tryWait($proc p);
+
+/* The current state of the GPU
+ */
+_cudaContext _context;
+
+/* malloc and initialize a new _kernelInstance
+ */
+_kernelInstance *_kernelInstanceCreate(void);
+
+/* cleanup and free a given _kernelInstance
+ */
+void _kernelInstanceDestroy(_kernelInstance *i);
+
+/* malloc and initialize a new _kernelInstanceNode
+ */
+_kernelInstanceNode *_kernelInstanceNodeCreate(void);
+
+/* cleanup and free a given _kernelInstanceNode
+ */
+void _kernelInstanceNodeDestroy(_kernelInstanceNode *node);
+
+/* malloc and initialize a new stream
+ */
+cudaStream_t _streamCreate(void);
+
+/* block until the most recently enqueued process on the given stream
+ * has terminated (meaning all kernels in that stream have completed)
+ */
+void _streamWait(cudaStream_t s);
+
+/* block until no more streams have kernels executing
+ */
+void _streamWaitAll(void);
+
+/* cleanup and free a given stream
+ */
+void _streamDestroy(cudaStream_t s);
+
+/* malloc and initialize a new _cudaStreamNode
+ */
+_cudaStreamNode *_streamNodeCreate(void);
+
+/* cleanup and free a given _cudaStreamNode
+ */
+void _streamNodeDestroy(_cudaStreamNode *node);
+
+/* destroy all stream nodes contained in the context
+ */
+void _streamNodeDestroyAll(void);
+
+/* malloc and initialize a new event
+ */
+cudaEvent_t _eventCreate(void);
+
+/* block until all _kernelInstances contained in this event have
+ * completed
+ */
+void _eventWait(cudaEvent_t e);
+
+/* cleanup and free a given event
+ */
+void _eventDestroy(cudaEvent_t e);
+
+/* initialize the cuda context. must be called before any cuda functions.
+ */
+void _cudaInit(void);
+
+/* cleanup the cuda context. must be called after all cuda functions.
+ */
+void _cudaFinalize(void);
+
+/* returns an array of pointers to the most recently enqueued kernel
+ * of each stream.
+ */
+_kernelInstance **_allMostRecentKernels(void);
+
+/* create a kernel instance for the given function k, and enqueue it
+ * onto the given stream.
+ */
+void _enqueueKernel(cudaStream_t stream, void (*k)(_kernelInstance*, cudaEvent_t));
+
+/* called by kernel processes. wait on the given event, then update
+ * the status of the calling kernel to indicate it has finished waiting
+ */
+void _waitInQueue (_kernelInstance *this, cudaEvent_t e);
+
+/* called by kernel processes. update the status of the calling kernel
+ * to indicate that it has completed execution
+ */
+void _kernelFinish(_kernelInstance *k);
+
+#endif
+
