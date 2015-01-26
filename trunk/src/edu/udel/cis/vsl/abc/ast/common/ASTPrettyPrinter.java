@@ -1680,6 +1680,11 @@ public class ASTPrettyPrinter {
 			result.append(" / ");
 			result.append(argWtP1);
 			break;
+		case DIVEQ:
+			result.append(argWtP0);
+			result.append(" /= ");
+			result.append(argWtP1);
+			break;
 		case EQUALS:
 			result.append(argWtP0);
 			result.append(" == ");
