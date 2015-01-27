@@ -303,6 +303,13 @@ public abstract class CommonASTNode implements ASTNode {
 		return oldChild;
 	}
 
+	@Override
+	public void remove() {
+		if (parent != null) {
+			parent.removeChild(childIndex);
+		}
+	}
+
 	/**
 	 * Default implementation, for non-sequence nodes. Must be overridden for
 	 * sequence nodes.
