@@ -1,9 +1,7 @@
 #ifndef __OMP__
 #define __OMP__
 
-typedef struct omp_lock_t {
-  int id;
-} omp_lock_t;
+typedef struct omp_lock_t omp_lock_t;
 
 typedef struct omp_next_lock_t {
   int id;
