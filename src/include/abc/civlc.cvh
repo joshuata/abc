@@ -5,6 +5,10 @@
 #ifdef __CIVLC__
 #else
 #define __CIVLC__
+
+// Ignore GNU C extensions, for now...                                          
+#define __attribute__(X)
+
 #include <op.h>
 /* *********************  Standard Constants and Types ********************* */
 #define $true 1
