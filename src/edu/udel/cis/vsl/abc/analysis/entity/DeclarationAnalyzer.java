@@ -171,6 +171,7 @@ public class DeclarationAnalyzer {
 			CompoundStatementNode body = ((FunctionDefinitionNode) node)
 					.getBody();
 
+			node.setIsDefinition(true);
 			entityAnalyzer.statementAnalyzer.processCompoundStatement(body);
 			processGotos(body);
 		}
@@ -489,8 +490,8 @@ public class DeclarationAnalyzer {
 			if (oldInitializer != null)
 				throw error(
 						"Re-initialization of variable " + variable.getName()
-								+ ". First was at " + oldInitializer.getSource()
-								+ ".", initializer);
+								+ ". First was at "
+								+ oldInitializer.getSource() + ".", initializer);
 			variable.setInitializer(initializer);
 			variable.setDefinition(declaration);
 			declaration.setIsDefinition(true);
