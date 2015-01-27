@@ -247,22 +247,6 @@ public class EntityAnalyzer implements Analyzer {
 		// replacing the pragma node with some other kind of node,
 		// you won't be here. Otherwise, the entity of the pragma
 		// identifier has already been set to the handler.
-
-		// IdentifierNode identifier = node.getPragmaIdentifier();
-		//
-		// if (identifier == null) {
-		// return;
-		// } else {
-		// String name = identifier.name();
-		// PragmaHandler handler = pragmaHandlerMap.get(name);
-		//
-		// if (handler == null) {
-		// handler = pragmaFactory.getHandler(name);
-		//
-		// pragmaHandlerMap.put(name, handler);
-		// }
-		// identifier.setEntity(handler);
-		// }
 	}
 
 	/**
