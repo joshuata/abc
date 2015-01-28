@@ -11,7 +11,14 @@ appropriate definitions are changed to input variables
 #ifdef __PTHREAD__
 #else
 #define __PTHREAD__
+#ifdef NULL
+#else
 #define NULL ((void*)0)
+#endif
+#ifdef __SVCOMP__
+#else
+#include <svcomp.h>
+#endif
 //Mutex types
 enum{
     PTHREAD_MUTEX_NORMAL,
