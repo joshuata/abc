@@ -9,12 +9,20 @@
 #else
 #define __CUDA__
 
-#include <cuda-helper.cvh>
+#include <civl-cuda.cvh>
 
 /* Returns in *count the number of devices with compute capability 
  * greater or equal to 1.0 that are available for execution.
  */
 cudaError_t cudaGetDeviceCount(int *count);
+
+/* Returns in *device the current devie for the calling host thread
+ */
+cudaError_t cudaGetDevice(int * device);
+
+/* Returns in *prop the properties of device dev
+ */
+cudaError_t cudaGetDeviceProperties(struct cudaDeviceProp * prop, int dev);
 
 /* Creates and event object
  */
@@ -85,9 +93,14 @@ cudaError_t cudaDeviceSynchronize( void );
  */
 cudaError_t cudaMemcpy ( void *dst, const void *src, size_t count, enum cudaMemcpyKind kind );
 
-/* Not implemented. Prototype provided for compatibilty purposes
+/* Not implemented. Prototype provided for compiling purposes.
  */
 cudaError_t cudaMalloc( void *ptr, size_t size);
+
+/* Fills the first count bytes of the memory area pointed to by devPtr 
+ * with the constant byte value value
+ */
+cudaError_t cudaMemset(void * devPtr, int value, size_t count);
 
 /* Frees the memory space pointed to by devPtr. Similar semantics to free/$free.
  */
@@ -97,6 +110,15 @@ cudaError_t cudaFree(void *devPtr);
  * only a single device is supported, so this call always succeeds with a noop.
  */
 cudaError_t cudaSetDevice(int device_id);
+
+/* Returns the message string from an error code
+ */
+const char* cudaGetErrorString(cudaError_t error);
+
+/* Returns the last error that has been produces by any of the runtime calls 
+ * in the same host thread and resets it to cudaSuccess
+ */
+cudaError_t cudaGetLastError(void);
 
 /* Not implemented. Prototype provided for compatibilty purposes
  */
