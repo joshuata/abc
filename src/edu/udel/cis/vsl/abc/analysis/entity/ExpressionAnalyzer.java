@@ -587,7 +587,6 @@ public class ExpressionAnalyzer {
 			ExpressionNode argument = node.getContextArgument(i);
 
 			processExpression(argument);
-			argument.prettyPrint(System.out);
 		}
 		for (int i = 0; i < numArgs; i++) {
 			ExpressionNode argument = node.getArgument(i);
