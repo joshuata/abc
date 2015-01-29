@@ -540,6 +540,7 @@ public class ExpressionAnalyzer {
 			throws SyntaxException {
 		ExpressionNode functionNode = node.getFunction();
 		int numArgs = node.getNumberOfArguments();
+		int numContextArgs = node.getNumberOfContextArguments();
 		FunctionType functionType;
 		int expectedNumArgs;
 		boolean hasVariableNumArgs;
@@ -581,6 +582,12 @@ public class ExpressionAnalyzer {
 			if (numArgs != expectedNumArgs)
 				throw error("Expected " + expectedNumArgs
 						+ " arguments but saw " + numArgs, node);
+		}
+		for (int i = 0; i < numContextArgs; i++) {
+			ExpressionNode argument = node.getContextArgument(i);
+
+			processExpression(argument);
+			argument.prettyPrint(System.out);
 		}
 		for (int i = 0; i < numArgs; i++) {
 			ExpressionNode argument = node.getArgument(i);
