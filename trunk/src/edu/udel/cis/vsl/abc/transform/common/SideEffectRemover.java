@@ -48,6 +48,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
+import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -62,9 +63,9 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * A transformer which modifies an AST so that no expressions other than
  * assignments have side effects.
  * 
- * TODO: search for race conditions.   Need a way to represent the set
- * read-set and write-set of a statement or expression.  This is a subset of the
- * variables in scope.
+ * TODO: search for race conditions. Need a way to represent the set read-set
+ * and write-set of a statement or expression. This is a subset of the variables
+ * in scope.
  * 
  * i++: equivalent to i=i+1, this is a read and write of i.
  * 
@@ -74,13 +75,13 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * 
  * If function pointer, get type, go over all functions with that type.
  * 
- * *p : reads p, and also (in absence of pointer analysis) anything visible
- * with same type as *p.
+ * *p : reads p, and also (in absence of pointer analysis) anything visible with
+ * same type as *p.
  * 
  * *p=...; reads p and writes to *p
  * 
- * system functions: in absence of contracts, can read or write anything
- * in scope
+ * system functions: in absence of contracts, can read or write anything in
+ * scope
  * 
  * @author zirkel
  *
@@ -433,7 +434,27 @@ public class SideEffectRemover extends BaseTransformer {
 		}
 		case VOID:
 			return nodeFactory.newVoidTypeNode(source);
-		case ENUMERATION:
+		case ENUMERATION: {
+			// if original type is anonymous enum, need to spell out
+			// the type again.
+			// if original type has tag, and is visible, can leave out
+			// the enumerators
+			EnumerationType enumType = (EnumerationType) type;
+			String tag = enumType.getTag();
+
+			if (tag != null) {
+				IdentifierNode tagNode = nodeFactory.newIdentifierNode(source,
+						tag);
+				TypeNode result = nodeFactory.newEnumerationTypeNode(source,
+						tagNode, null);
+
+				return result;
+			} else {
+				throw new ABCUnsupportedException(
+						"converting anonymous enumeration type  " + type,
+						source.getSummary(false));
+			}
+		}
 		case FUNCTION:
 		case HEAP:
 		case OTHER_INTEGER:
