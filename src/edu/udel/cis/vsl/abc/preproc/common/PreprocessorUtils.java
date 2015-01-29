@@ -17,7 +17,6 @@ import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 public class PreprocessorUtils {
 
 	private static int identifierMinIndex, identifierMaxIndex;
-
 	private static boolean[] identifierPredicate = initIdentifierPredicate();
 
 	private static boolean[] initIdentifierPredicate() {
