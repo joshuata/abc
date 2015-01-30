@@ -52,6 +52,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
@@ -455,12 +456,22 @@ public class SideEffectRemover extends BaseTransformer {
 						source.getSummary(false));
 			}
 		}
+		case STRUCTURE_OR_UNION: {
+			StructureOrUnionType structOrUnionType = (StructureOrUnionType) type;
+
+			return nodeFactory.newStructOrUnionTypeNode(
+					source,
+					structOrUnionType.isStruct(),
+					nodeFactory.newIdentifierNode(source,
+							structOrUnionType.getName()), null);
+		}
+		case SCOPE:
+			return nodeFactory.newScopeTypeNode(source);
 		case FUNCTION:
 		case HEAP:
 		case OTHER_INTEGER:
 		case PROCESS:
 		case QUALIFIED:
-		case STRUCTURE_OR_UNION:
 		default:
 			throw new ABCUnsupportedException("converting type " + type
 					+ " to a type node.", source.getSummary(false));
