@@ -192,7 +192,7 @@ public class StatementAnalyzer {
 
 			expressionAnalyzer.processExpression(caseExpression);
 			if (!caseExpression.isConstantExpression())
-				error("Case expression not constant", caseExpression);
+				throw error("Case expression not constant", caseExpression);
 			constant = nodeFactory.getConstantValue(caseExpression);
 			while (cases.hasNext()) {
 				SwitchLabelNode labelNode = (SwitchLabelNode) cases.next()
