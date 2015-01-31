@@ -1149,7 +1149,7 @@ public class SideEffectRemover extends BaseTransformer {
 					if (!leftTriple.getExpression().isSideEffectFree(true)) {
 						before.add(nodeFactory
 								.newExpressionStatementNode(leftTriple
-										.getExpression()));
+										.getExpression().copy()));
 					}
 					// All side effects from the left operand must be evaluated
 					// before the right operand since there is a sequence point
