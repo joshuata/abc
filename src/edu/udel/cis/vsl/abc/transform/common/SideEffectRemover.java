@@ -847,7 +847,9 @@ public class SideEffectRemover extends BaseTransformer {
 						commaStatements.add(nodeFactory
 								.newExpressionStatementNode(triple
 										.getExpression()));
-					}
+					}else
+						commaStatements.add(nodeFactory
+								.newExpressionStatementNode(expr.copy()));
 					commaStatements.addAll(triple.getAfter());
 					result = nodeFactory.newCompoundStatementNode(
 							expression.getSource(), commaStatements);
@@ -1146,11 +1148,11 @@ public class SideEffectRemover extends BaseTransformer {
 					// In case there is a possible error side effect, add an
 					// expression statement for the LHS. Normally this will
 					// essentially be a noop.
-					if (!leftTriple.getExpression().isSideEffectFree(true)) {
-						before.add(nodeFactory
-								.newExpressionStatementNode(leftTriple
-										.getExpression().copy()));
-					}
+//					if (!leftTriple.getExpression().isSideEffectFree(true)) {
+//						before.add(nodeFactory
+//								.newExpressionStatementNode(leftTriple
+//										.getExpression().copy()));
+//					}
 					// All side effects from the left operand must be evaluated
 					// before the right operand since there is a sequence point
 					// between evaluations of left and right operands (per C11
