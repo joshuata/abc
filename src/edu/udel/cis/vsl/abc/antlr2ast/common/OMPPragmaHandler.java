@@ -242,7 +242,8 @@ public class OMPPragmaHandler implements PragmaHandler {
 				workshareNode.setNowait(true);
 				break;
 			default:
-				throw new ABCRuntimeException("Unreachable");
+				throw new ABCRuntimeException(
+						"OMPPragmaHandler: unsupported token");
 			}
 		}
 		return workshareNode;
