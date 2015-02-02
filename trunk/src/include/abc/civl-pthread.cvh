@@ -2,15 +2,7 @@
 #else
 #define __CIVLPTHREAD__
 
-#include <civlc.cvh>
-
-typedef struct __pthread_pool_t{
-  struct pthread_t** threads;
-  int len;
-}__pthread_pool_t;
-
 // Function Prototypes
-void _free_pool(__pthread_pool_t *);
 void _pthread_exit(void *, _Bool);
 
 #endif

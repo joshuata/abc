@@ -19,6 +19,8 @@ appropriate definitions are changed to input variables
 #else
 #include <svcomp.h>
 #endif
+
+
 //Mutex types
 enum{
     PTHREAD_MUTEX_NORMAL,
