@@ -1,5 +1,4 @@
-/* This header file contains the core definitions of the CIVL-C language,
- * including standard types and function prototypes.
+/* This header file provides types and function prototypes for domains.
  */
 
 #ifdef __DOMAIN__
