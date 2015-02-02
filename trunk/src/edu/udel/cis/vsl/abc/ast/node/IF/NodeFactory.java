@@ -607,7 +607,7 @@ public interface NodeFactory {
 
 	/**
 	 * Constructs a new identifier expression node. This is an expression node
-	 * which just wraps an identifier. Idenfiers can be used as expressions in
+	 * which just wraps an identifier. Identifiers can be used as expressions in
 	 * various ways in C: a variable or the name of a function, for example.
 	 * 
 	 * The source is not necessarily the same as the identifier because you

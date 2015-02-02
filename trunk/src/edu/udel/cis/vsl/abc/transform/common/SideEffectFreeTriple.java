@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -32,6 +33,11 @@ public class SideEffectFreeTriple {
 		this.before = before;
 		this.expression = expression;
 		this.after = after;
+	}
+
+	public SideEffectFreeTriple(ExpressionNode expression) {
+		this(new LinkedList<BlockItemNode>(), expression,
+				new LinkedList<BlockItemNode>());
 	}
 
 	/**
@@ -77,6 +83,10 @@ public class SideEffectFreeTriple {
 	 */
 	public void setExpression(ExpressionNode expression) {
 		this.expression = expression;
+	}
+
+	public boolean isTrivial() {
+		return before.isEmpty() && after.isEmpty();
 	}
 
 }
