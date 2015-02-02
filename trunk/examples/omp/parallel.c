@@ -1,5 +1,5 @@
 #include <omp.h>
-#include <civlc.h>
+//#include <civlc.cvh>
 
 #define THREAD_MAX 4
 

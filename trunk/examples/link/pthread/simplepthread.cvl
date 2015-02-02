@@ -1,7 +1,7 @@
 #ifdef __CIVL_SIMPLEPTHREAD__
 #else
 #define __CIVL_SIMPLEPTHREAD__
-#include <civlc.h>
+#include <civlc.cvh>
 #include <simplepthread.h>
 #include <civlpthread.cvh>
 

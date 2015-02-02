@@ -20,7 +20,7 @@
  * 02110-1301 USA.
  */
 
-#include<civlc.h>
+#include<civlc.cvh>
 #include<stdio.h>
 #include<stdlib.h>
 #include"mpi.h"
