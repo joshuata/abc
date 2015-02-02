@@ -332,12 +332,19 @@ public class SideEffectRemover extends BaseTransformer {
 			}
 		}
 		if (change) {
-			if (numContextArgs == 0)
+			functionNode.remove();
+			for (ExpressionNode arg : arguments)
+				arg.remove();
+
+			if (numContextArgs == 0) {
 				callNode = nodeFactory.newFunctionCallNode(source,
 						functionNode, arguments, null);
-			else
+			} else {
+				for (ExpressionNode contextArg : contextArgs)
+					contextArg.remove();
 				callNode = nodeFactory.newFunctionCallNode(source,
 						functionNode, contextArgs, arguments, null);
+			}
 		}
 		if (storeResult) {
 			// T tmp = f(...);
@@ -345,8 +352,7 @@ public class SideEffectRemover extends BaseTransformer {
 			String tmpId = tempVariablePrefix + tempVariableCounter;
 
 			tempVariableCounter++;
-			if (!change)
-				callNode = callNode.copy();
+			callNode.remove();
 
 			TypeNode returnTypeNode = typeNode(source,
 					((FunctionType) functionNode.getType()).getReturnType());
@@ -1107,39 +1113,25 @@ public class SideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private StatementNode returnStatement(ReturnNode statement)
-			throws SyntaxException {
-		StatementNode result;
+	private StatementNode returnStatement(ReturnNode statement) {
+		ExpressionNode arg = statement.getExpression();
 
-		if (statement.getExpression() == null
-				|| statement.getExpression().isSideEffectFree(false)) {
-			result = statement;
-		} else {
-			List<BlockItemNode> newStatements = new ArrayList<>();
-			SideEffectFreeTriple triple = processExpression(statement
-					.getExpression());
-			TypeNode expressionType = typeNode(statement.getExpression()
-					.getSource(), statement.getExpression().getType());
-			IdentifierNode tempVariableID = nodeFactory.newIdentifierNode(
-					statement.getExpression().getSource(), tempVariablePrefix
-							+ tempVariableCounter++);
-			VariableDeclarationNode tempVariableDeclaration = nodeFactory
-					.newVariableDeclarationNode(statement.getExpression()
-							.getSource(), tempVariableID, expressionType,
-							triple.getExpression());
+		if (arg == null)
+			return statement;
 
-			newStatements.addAll(triple.getBefore());
-			newStatements.add(tempVariableDeclaration);
-			newStatements.addAll(triple.getAfter());
-			newStatements
-					.add(nodeFactory.newReturnNode(statement.getSource(),
-							nodeFactory.newIdentifierExpressionNode(statement
-									.getExpression().getSource(),
-									tempVariableID.copy())));
-			result = nodeFactory.newCompoundStatementNode(
-					statement.getSource(), newStatements);
-		}
-		return result;
+		SideEffectFreeTriple triple = processExpression(arg, true);
+
+		if (triple.isTrivial())
+			return statement;
+
+		List<BlockItemNode> newStatements = new LinkedList<>();
+		Source source = statement.getSource();
+
+		newStatements.addAll(triple.getBefore());
+		newStatements.addAll(triple.getAfter());
+		newStatements.add(nodeFactory.newReturnNode(source,
+				triple.getExpression()));
+		return nodeFactory.newCompoundStatementNode(source, newStatements);
 	}
 
 	private StatementNode labeledStatement(LabeledStatementNode statement)
@@ -1533,24 +1525,6 @@ public class SideEffectRemover extends BaseTransformer {
 				items);
 		return result;
 	}
-
-	// /**
-	// * Is the ABC expression node an expression of the form
-	// * <code>(t)$malloc(...)</code>? I.e., a cast expression for which the
-	// * argument is a malloc call?
-	// *
-	// * @param node
-	// * an expression node
-	// * @return true iff this is a cast of a malloc call
-	// */
-	// private boolean isCompleteMallocExpression(ExpressionNode node) {
-	// if (node instanceof CastNode) {
-	// ExpressionNode argumentNode = ((CastNode) node).getArgument();
-	//
-	// return isMallocCall(argumentNode);
-	// }
-	// return false;
-	// }
 
 	/**
 	 * Remove side effects if the statement contains them. Note that
