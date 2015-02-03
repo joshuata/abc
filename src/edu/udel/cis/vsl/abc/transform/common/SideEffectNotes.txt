@@ -1,0 +1,156 @@
+
+a statement is in normal form if it has one of the forms
+
+e1=e2, for side-effect-free expressions e1 and e2, and e1 a lhs expression 
+
+e1=f(arg0,...), for side-effect-free expressions e1, f, arg0, ....
+  (function call with left-hand-side)
+  
+f(arg0, ...) (function call with no lhs)
+
+ditto last two with $spawn inserted before the call
+
+--
+
+a SEFTriple is an ordered triple [b|e|a] where b and a are some sequences
+of statements in normal form and e is either a side-effect-free expression
+or a function call or spawn f(arg0,...) where f, arg0, ... are side-effect-free.
+There is a sense in which two triples are equivalent.  Basically think
+of starting in some arbitrary state s, then executing the statements in b,
+then evaluating e and shorting the result in V, then, then executing the
+statements in a.  Call the resulting state s'.  Hence the result of executing
+a triple from s in a pair (V,s').  If for any s, the result of executing t
+equals the result of executing t' then t and t' are equivalent.  (Modulo
+the temporary variables which you can ignore after execution completes.)
+
+--
+
+The following operations take an SEFTriple t=[b|e|a] and return an
+equivalent SEFTriple.
+
+shift([b|e|a]) = [b,tmp=e,a|tmp|].
+
+emptyafter(t) = t          if empty(a)
+emptyafter(t) = shift(t)   otherwise
+// shifts the after clauses to the before section, using temp variable
+// to capture value of e at the right point.  Result always has empty
+// after section.
+
+purify(t) = t          if empty(a) and sef(e)
+purify(t) = shift(t)   otherwise
+// same as above but in addition guarantees expression part of result is
+// s.e.f.  Here sef(e) means "e is side-effect-free".
+
+makesef(t) = t           if sef(e)
+makesef(t) = shift(t)    otherwise.
+// makes the expression s.e.f. but does not necessarily get rid of
+// after clauses
+
+
+--
+
+Define translate: Expr -> SEFTriple and lhstranslate: LHSExpr->SEFTriple.
+Expr is all expressions (not just sef).
+LHSExpr is all left-hand-side expressions.
+
+The result of lhstranslate actually always has from [b|e|] where
+e is an LHS expression (and is side-effect-free, e.g., x or a[i][j].v).
+
+
+Definition of lhstranslate by cases:
+
+Variable x:
+lhstranslate(x) = translate(x) = [|x|].
+
+Index expression lhs[expr]:
+Let lhstranslate(lhs) = [b1|e1|].
+Let purify(translate(expr)) = [b2|e2|].
+lhstranslate(lhs[expr]) = [b1,b2|e1[e2]|].
+
+Pointer dereferences *(expr):
+Let purify(translate(expr))=[b|e|].
+translate(*(expr))=[b|*e|].
+
+Field: expr.n:
+Let lhstranslate(expr)=[b|e|].
+translate(expr.n) = [b|e.n|].
+
+--
+
+Definition of translate by cases:
+
+lhs++:
+Let lhstranslate(lhs)=[b|e|].
+translate(lhs++)=[b|e|e=e+1].
+
+++lhs:
+Let lhstranslate(lhs)=[b|e|].
+translate(++lhs)=[b,e=e+1|e|]
+
+lhs=rhs:
+Let lhstranslate(lhs)=[b1|e1|], emptyAfter(translate(rhs))=[b2|e2|].
+translate(lhs=rhs) = [b1,b2,e1=e2|e1|]
+
+*expr:
+Let makesef(translate(expr))=[b|e|a].
+translate(*expr)=[b|*e|a].
+
+expr1+expr2:
+Let makesef(translate(expr1))=[b1|e1|a1],
+makesef(translate(expr2))=[b2|e2|a2].
+translate(expr1+expr2)=[b1,b2|e1+e2|a1,a2].
+Replace + with any side-effect-free binary operator. Subscription too?
+
+-expr:
+Let makesef(translate(expr))=[b1|e1|a1].
+translate(-expr)=[b1|-e1|a1].
+Replace - with any side-effect-free unary operator.
+
+func(arg1, arg2, ...):
+Let purify(func)=[b0|f|].
+Let purify(arg1)=[b1|e1|], ...
+translate(func(arg1, ...)) = [b1,b2,...|f(e1,e2,...)|].
+
+lhs+=rhs:
+Let lhstranslate(lhs)=[b1|e1|].
+Let purify(translate(rhs))=[b2|e2|].
+translate(lhs+=rhs) = [b1,b2,e1=e1+e2|e1|].
+
+expr1,expr2:
+let translate(expr1)   = [b1|e1|a1].
+let translate(expr2)   = [b2|e2|a2].
+translate(expr1,expr2) = [b1,e1^,a1,b2|e2|a2].
+Here e1^ means: omit this if e1 is s.e.f., else make it the exprssion
+statement e1;.
+
+-------------------------
+
+Statements
+
+expr;
+let translate(expr)=[b|e|a].
+trans(expr;) = b; e^; a;
+
+while (expr) stmt
+let purify(expr)
+
+for (e1; e2; e3) stmt
+purify all...convert to while
+
+return expr;
+let emptyafter(translate(expr))=[b|e|].
+tran(return expr;) = b; return e;
+
+switch (expr) {...}
+
+choose {S1; ...}
+
+atomic {S}
+
+when (expr) stmt
+
+if (cond) s1 else s2
+let purify(cond)=[b|e|]
+trans(if (cond) s1 else s2) =
+  b; if (e) trans(s1) else trans(s2)
+  
