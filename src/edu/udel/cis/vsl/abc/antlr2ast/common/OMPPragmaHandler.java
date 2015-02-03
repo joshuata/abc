@@ -280,13 +280,14 @@ public class OMPPragmaHandler implements PragmaHandler {
 
 	private void translateUniqueForClause(CommonTree forClause,
 			OmpForNode forNode) throws SyntaxException {
-		int type = forClause.getType();
+		CommonTree uniqueForClause = (CommonTree) forClause.getChild(0);
+		int type = uniqueForClause.getType();
 
 		switch (type) {
 		case ORDERED:
 			break;
 		case SCHEDULE:
-			int scheduleType = forClause.getChild(0).getType();
+			int scheduleType = uniqueForClause.getChild(0).getType();
 
 			switch (scheduleType) {
 			case STATIC:
@@ -301,8 +302,9 @@ public class OMPPragmaHandler implements PragmaHandler {
 			default: // case RUNTIME:
 				forNode.setSchedule(OmpScheduleKind.RUNTIME);
 			}
-			if (forClause.getChildCount() > 1) {
-				CommonTree chunkSizeTree = (CommonTree) forClause.getChild(1);
+			if (uniqueForClause.getChildCount() > 1) {
+				CommonTree chunkSizeTree = (CommonTree) uniqueForClause
+						.getChild(1);
 
 				// TODO: is null acceptable for a SimpleScope?
 
@@ -314,7 +316,7 @@ public class OMPPragmaHandler implements PragmaHandler {
 
 			break;
 		case COLLAPSE: {
-			CommonTree constant = (CommonTree) forClause.getChild(0);
+			CommonTree constant = (CommonTree) uniqueForClause.getChild(0);
 			IntegerConstantNode constantNode = nodeFactory
 					.newIntegerConstantNode(null, constant.getText());
 
