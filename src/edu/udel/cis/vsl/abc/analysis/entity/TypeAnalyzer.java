@@ -261,13 +261,14 @@ public class TypeAnalyzer {
 		return typeFactory.atomicType((UnqualifiedObjectType) baseType);
 	}
 
-	private Type processTypedefName(TypedefNameNode typeNode)
-			throws SyntaxException {
+	private Type processTypedefName(TypedefNameNode typeNode,
+			boolean isParameter) throws SyntaxException {
 		String name = typeNode.getName().name();
 		Scope scope = typeNode.getScope();
 		OrdinaryEntity entity = scope.getLexicalOrdinaryEntity(name);
 		EntityKind kind = entity.getEntityKind();
 		Typedef typedef;
+		Type result;
 
 		if (kind != EntityKind.TYPEDEF)
 			throw error(
@@ -275,7 +276,12 @@ public class TypeAnalyzer {
 					typeNode);
 		typedef = (Typedef) entity;
 		typeNode.getName().setEntity(typedef);
-		return typedef.getType();
+		result = typedef.getType();
+		if (isParameter && result.kind() == TypeKind.ARRAY) {
+			result = typeFactory.pointerType(((ArrayType) result)
+					.getElementType());
+		}
+		return result;
 	}
 
 	private boolean onlyVoid(SequenceNode<VariableDeclarationNode> parameters) {
@@ -691,7 +697,7 @@ public class TypeAnalyzer {
 			type = processAtomicType((AtomicTypeNode) typeNode);
 			break;
 		case TYPEDEF_NAME:
-			type = processTypedefName((TypedefNameNode) typeNode);
+			type = processTypedefName((TypedefNameNode) typeNode, isParameter);
 			break;
 		case SCOPE:
 			type = typeFactory.scopeType();
