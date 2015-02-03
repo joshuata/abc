@@ -2,9 +2,8 @@
  * the CIVL versions of various Cuda objects.
  */
 
-#ifdef __CUDA_HELPER__
-#else
-#define __CUDA_HELPER__
+#ifndef __CUDA_HELPER
+#define __CUDA_HELPER
 
 #include <concurrency.cvh>
 
