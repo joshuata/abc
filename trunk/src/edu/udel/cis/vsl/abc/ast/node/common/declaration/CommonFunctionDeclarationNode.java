@@ -121,6 +121,7 @@ public class CommonFunctionDeclarationNode extends
 
 		result.setInlineFunctionSpecifier(hasInlineFunctionSpecifier());
 		result.setNoreturnFunctionSpecifier(hasNoreturnFunctionSpecifier());
+		result.setGlobalFunctionSpecifier(hasGlobalFunctionSpecifier());
 		copyStorage(result);
 		return result;
 	}
