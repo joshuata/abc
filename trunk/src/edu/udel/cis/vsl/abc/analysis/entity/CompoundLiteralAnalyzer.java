@@ -245,6 +245,7 @@ public class CompoundLiteralAnalyzer {
 				ExpressionNode expr = (ExpressionNode) initNode;
 
 				entityAnalyzer.expressionAnalyzer.processExpression(expr);
+				entityAnalyzer.expressionAnalyzer.addStandardConversions(expr);
 				position.descendToType((ObjectType) expr.getType(),
 						initNode.getSource());
 				subType = position.getDesignatedType();

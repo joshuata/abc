@@ -1749,8 +1749,7 @@ public class ExpressionAnalyzer {
 	 * @return the post-coversion type of the expression
 	 * @throws SyntaxException
 	 */
-	private Type addStandardConversions(ExpressionNode node)
-			throws SyntaxException {
+	Type addStandardConversions(ExpressionNode node) throws SyntaxException {
 		addArrayConversion(node);
 		addFunctionConversion(node);
 		addLvalueConversion(node);
