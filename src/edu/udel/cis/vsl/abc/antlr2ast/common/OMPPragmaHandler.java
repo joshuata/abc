@@ -261,8 +261,7 @@ public class OMPPragmaHandler implements PragmaHandler {
 
 			switch (type) {
 			case UNIQUE_FOR:
-				translateUniqueForClause((CommonTree) forClause.getChild(0),
-						forNode);
+				translateUniqueForClause((CommonTree) forClause, forNode);
 				break;
 			case DATA_CLAUSE:
 				this.translateDataClause(source, forClause, forNode);
