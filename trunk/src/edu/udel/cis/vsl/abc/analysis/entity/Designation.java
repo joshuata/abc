@@ -117,8 +117,14 @@ public class Designation {
 			if (result instanceof LiteralArrayTypeNode) {
 				result = ((LiteralArrayTypeNode) result).getElementNode();
 			} else if (result instanceof LiteralStructOrUnionTypeNode) {
-				result = ((LiteralStructOrUnionTypeNode) result)
-						.getMemberNode(index);
+				LiteralStructOrUnionTypeNode sunode = (LiteralStructOrUnionTypeNode) result;
+				int length = sunode.length();
+
+				if (index < 0 || index >= length)
+					throw new SyntaxException(
+							"Member index out of range for struct or union",
+							navigator.getSource());
+				result = sunode.getMemberNode(index);
 			} else {
 				throw new SyntaxException(
 						"Navigator in compound literal/initializer is incompatible with type",
