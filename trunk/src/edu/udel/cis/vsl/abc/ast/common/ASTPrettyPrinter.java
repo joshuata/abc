@@ -1263,8 +1263,24 @@ public class ASTPrettyPrinter {
 			result.append("$input ");
 		if (typeNode.isOutputQualified())
 			result.append("$output ");
+		if (typeNode.isAtomicQualified())
+			result.append("_Atomic ");
+		if (typeNode.isConstQualified())
+			result.append("const ");
+		if (typeNode.isRestrictQualified())
+			result.append("restrict ");
+		if (typeNode.isVolatileQualified())
+			result.append("volatile ");
 		if (variable.hasExternStorage())
 			result.append("extern ");
+		if (variable.hasAutoStorage())
+			result.append("auto ");
+		if (variable.hasRegisterStorage())
+			result.append("register ");
+		if (variable.hasStaticStorage())
+			result.append("static ");
+		if (variable.hasThreadLocalStorage())
+			result.append("_Thread_local ");
 		if (variable.hasSharedStorage())
 			result.append("__shared__ ");
 		type = type2Pretty(prefix, typeNode, false).toString();
