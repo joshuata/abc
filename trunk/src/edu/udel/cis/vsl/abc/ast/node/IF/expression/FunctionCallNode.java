@@ -59,6 +59,14 @@ public interface FunctionCallNode extends ExpressionNode {
 	ExpressionNode getContextArgument(int index);
 
 	/**
+	 * Returns the arguments of this function call node, which is a sequence
+	 * node of expressions.
+	 * 
+	 * @return the arguments of this function call node
+	 */
+	SequenceNode<ExpressionNode> getArguments();
+
+	/**
 	 * Returns the index-th argument, indexed from 0.
 	 * 
 	 * @return the index-th actual argument
