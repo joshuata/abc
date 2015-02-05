@@ -149,4 +149,10 @@ public class CommonFunctionCallNode extends CommonExpressionNode implements
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public SequenceNode<ExpressionNode> getArguments() {
+		return (SequenceNode<ExpressionNode>) child(2);
+	}
+
 }

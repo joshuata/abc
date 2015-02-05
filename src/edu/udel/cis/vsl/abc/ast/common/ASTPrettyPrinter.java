@@ -1815,6 +1815,11 @@ public class ASTPrettyPrinter {
 			result.append("+");
 			result.append(argWtP0);
 			break;
+		case MINUSEQ:
+			result.append(argWtP0);
+			result.append(" -= ");
+			result.append(argWtP1);
+			break;
 		default:
 			throw new ABCUnsupportedException(
 					"pretty print of operator node of " + op + " kind");
