@@ -20,6 +20,7 @@ appropriate definitions are changed to input variables
 #include <svcomp.h>
 #endif
 
+#include <civlc.cvh>
 
 //Mutex types
 enum{
@@ -27,6 +28,8 @@ enum{
     PTHREAD_MUTEX_RECURSIVE,
     PTHREAD_MUTEX_ERRORCHECK
 };
+
+#define PTHREAD_MUTEX_INITIALIZER {0,$proc_null,0,0,{0,0,0,PTHREAD_MUTEX_NORMAL,0}}
 
 enum{
     PTHREAD_MUTEX_STALLED,
@@ -68,12 +71,26 @@ enum{
     ERSCH        
 };
 
+typedef struct{
+  int robust;
+  int pshared;
+  int protocol;
+  int type;
+  int prioceiling;
+} pthread_mutexattr_t;
+
+typedef struct{
+  int count;
+  $proc ownerid;
+  int lock;
+  int prioceiling;
+  pthread_mutexattr_t attr;
+} pthread_mutex_t;
+
 typedef struct pthread_barrierattr_t pthread_barrierattr_t;
 typedef struct pthread_barrier_t pthread_barrier_t;
 typedef struct pthread_spinlock_t pthread_spinlock_t;
 typedef struct pthread_attr_t pthread_attr_t;
-typedef struct pthread_mutexattr_t pthread_mutexattr_t;
-typedef struct pthread_mutex_t pthread_mutex_t;
 typedef struct pthread_rwlockattr_t pthread_rwlockattr_t;
 typedef struct pthread_rwlock_t pthread_rwlock_t;
 typedef struct pthread_cond_t pthread_cond_t;
