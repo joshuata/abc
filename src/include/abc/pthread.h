@@ -71,7 +71,7 @@ enum{
     ERSCH        
 };
 
-typedef struct{
+typedef struct pthread_mutexattr_t{
   int robust;
   int pshared;
   int protocol;
@@ -79,7 +79,7 @@ typedef struct{
   int prioceiling;
 } pthread_mutexattr_t;
 
-typedef struct{
+typedef struct pthread_mutex_t{
   int count;
   $proc ownerid;
   int lock;
