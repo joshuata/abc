@@ -140,7 +140,7 @@ public class TagCategoryInfo {
 	}
 
 	// you actually want to complete the incomplete type because
-	// this type is ahred by many other types, so the change
+	// this type is shared by many other types, so the change
 	// will be reflected in all types which use that type
 	private void complete(TaggedEntity incomplete, TaggedEntity complete) {
 		if (incomplete instanceof EnumerationType) {
