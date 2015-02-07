@@ -116,9 +116,9 @@ MPI_Comm CMPI_Comm_create($scope, CMPI_Gcomm , int);
 
 void CMPI_Comm_destroy(MPI_Comm);
 
-int __MPI_Init(void);
+int _MPI_Init(void);
 
-int __MPI_Finalize(void);
+int _MPI_Finalize(void);
 
 int CMPI_Send(const void *, int, MPI_Datatype, int, int, $comm);
 
