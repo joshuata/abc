@@ -30,4 +30,16 @@ void $copy(void *ptr, void *value);
 */
 void $leaf_node_ptrs(void *array, void *obj);
 
+/*
+  returns true if the given pointer is referencing to 
+  an object by identity reference
+*/
+_Bool $is_identity_ref(void *obj);
+
+/*
+  updates the leaf nodes of the given objects to with
+  the given integer value
+*/
+void $set_leaf_nodes(void *obj, int value);
+
 #endif
