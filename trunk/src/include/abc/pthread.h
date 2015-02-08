@@ -20,6 +20,8 @@ appropriate definitions are changed to input variables
 #include <svcomp.h>
 #endif
 
+// don't think this should be here, but this is using CIVL's $proc
+// need to talk about it...
 #include <civlc.cvh>
 
 //Mutex types

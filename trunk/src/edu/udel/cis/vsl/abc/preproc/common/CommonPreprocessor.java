@@ -56,6 +56,9 @@ public class CommonPreprocessor implements Preprocessor {
 				PreprocessorTokenSource tokenSource;
 				Token token;
 
+				// for now, put this here.  Find a better place:
+				tmpOut.write("#define __attribute__(X)\n");
+				
 				for (String macro : macroDefs.keySet())
 					tmpOut.write("#define " + macro + " "
 							+ macroDefs.get(macro) + "\r\n");
