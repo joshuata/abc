@@ -119,6 +119,10 @@ const char* cudaGetErrorString(cudaError_t error);
  */
 cudaError_t cudaGetLastError(void);
 
+/* DEPRECATED. DO NOT USE
+ */
+cudaError_t cudaThreadExit(void);
+
 /* Not implemented. Prototype provided for compatibilty purposes
  */
 void __syncthreads( void );
