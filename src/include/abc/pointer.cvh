@@ -42,4 +42,10 @@ _Bool $is_identity_ref(void *obj);
 */
 void $set_leaf_nodes(void *obj, int value);
 
+/*
+  returns true iff all leaf nodes of the given
+  object equal to the given value
+*/
+_Bool $leaf_nodes_equal_to(void *obj, int value);
+
 #endif
