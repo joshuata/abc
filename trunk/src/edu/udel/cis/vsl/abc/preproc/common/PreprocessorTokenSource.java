@@ -455,7 +455,9 @@ public class PreprocessorTokenSource implements CTokenSource {
 		Macro macro = macroMap.get(name);
 
 		if (macro != null
-				&& (macro instanceof ObjectMacro || peekAheadHasType(PreprocessorLexer.LPAREN))) {
+				&& (macro instanceof ObjectMacro || peekAheadSkipWSHasType(PreprocessorLexer.LPAREN)
+				// peekAheadHasType(PreprocessorLexer.LPAREN)
+				)) {
 			processInvocation(macro, identifierNode);
 		} else {
 			shiftToOutput(identifierNode);
@@ -930,10 +932,15 @@ public class PreprocessorTokenSource implements CTokenSource {
 		int argCount = 0, type, parenDepth;
 		CToken token, previousToken;
 
-		if (!argumentIterator.hasNext())
-			throw new PreprocessorException("Macro invocation " + macro
-					+ " does not contain any arguments");
-		token = argumentIterator.next();
+		// first, skip through all the white space to get to the '(':
+		while (true) {
+			if (!argumentIterator.hasNext())
+				throw new PreprocessorException("Macro invocation " + macro
+						+ " does not contain any arguments");
+			token = argumentIterator.next();
+			if (!PreprocessorUtils.isWhiteSpace(token))
+				break;
+		}
 		if (token.getType() != PreprocessorLexer.LPAREN)
 			throw new PreprocessorException(
 					"Invocation of function macro does not begin with '(': "
@@ -1514,33 +1521,47 @@ public class PreprocessorTokenSource implements CTokenSource {
 		}
 	}
 
-	/**
-	 * Returns the token for node that follows the next node in DFS order, or
-	 * null if there is no such node.
-	 * 
-	 * @return the token of the node that follows the next node
-	 */
-	private Token peek() {
+//	/**
+//	 * Returns the token for node that follows the next node in DFS order, or
+//	 * null if there is no such node.
+//	 * 
+//	 * @return the token of the node that follows the next node
+//	 */
+//	private Token peek() {
+//		CommonTree node = (CommonTree) getSuccessorNode(getNextInputNode());
+//
+//		if (node == null)
+//			return null;
+//		return node.getToken();
+//	}
+
+//	/**
+//	 * Determines whether the token that follows the next node in DFS order has
+//	 * the given type. If the token is null, returns false.
+//	 * 
+//	 * @param tokenType
+//	 *            a token type
+//	 * @return true iff the token of the node that follows the next node has
+//	 *         type tokenType
+//	 */
+//	private boolean peekAheadHasType(int tokenType) {
+//		Token token = peek();
+//
+//		return token != null && token.getType() == tokenType;
+//	}
+
+	private boolean peekAheadSkipWSHasType(int tokenType) {
 		CommonTree node = (CommonTree) getSuccessorNode(getNextInputNode());
 
-		if (node == null)
-			return null;
-		return node.getToken();
-	}
+		while (node != null) {
+			Token token = node.getToken();
 
-	/**
-	 * Determines whether the token that follows the next node in DFS order has
-	 * the given type. If the token is null, returns false.
-	 * 
-	 * @param tokenType
-	 *            a token type
-	 * @return true iff the token of the node that follows the next node has
-	 *         type tokenType
-	 */
-	private boolean peekAheadHasType(int tokenType) {
-		Token token = peek();
-
-		return token != null && token.getType() == tokenType;
+			if (!PreprocessorUtils.isWhiteSpace(token)) {
+				return token != null && token.getType() == tokenType;
+			}
+			node = (CommonTree) getSuccessorNode(node);
+		}
+		return false;
 	}
 
 	/**
