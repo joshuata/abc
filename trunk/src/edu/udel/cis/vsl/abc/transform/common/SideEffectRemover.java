@@ -52,6 +52,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
+import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
@@ -215,7 +216,16 @@ public class SideEffectRemover extends BaseTransformer {
 		}
 		case FUNCTION:
 		case HEAP:
-		case QUALIFIED:
+		case QUALIFIED: {
+			QualifiedObjectType qType = (QualifiedObjectType) type;
+			Type innerType = qType.getBaseType();
+			TypeNode innerTypeNode = typeNode(source, innerType);
+
+			innerTypeNode.setConstQualified(qType.isConstQualified());
+			innerTypeNode.setRestrictQualified(qType.isRestrictQualified());
+			// more?
+			return innerTypeNode;
+		}
 		default:
 			throw new ABCUnsupportedException("converting type " + type
 					+ " to a type node.", source.getSummary(false));
