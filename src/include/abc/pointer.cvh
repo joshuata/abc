@@ -48,4 +48,10 @@ void $set_leaf_nodes(void *obj, int value);
 */
 _Bool $leaf_nodes_equal_to(void *obj, int value);
 
+/*
+  returns true iff at least one leaf nodes of the given
+  object equal to the given value
+ */
+_Bool $has_leaf_node_equal_to(void *obj, int value);
+
 #endif
