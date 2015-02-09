@@ -54,4 +54,10 @@ _Bool $leaf_nodes_equal_to(void *obj, int value);
  */
 _Bool $has_leaf_node_equal_to(void *obj, int value);
 
+/*
+  is the given pointer a valid one, i.e, it is not NULL
+  and is referring to some valid dyscope.
+*/
+_Bool $is_valid_pointer(void *ptr);
+
 #endif
