@@ -132,19 +132,22 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 				// for example. But overflow could also be a problem.
 				return false;
 			}
-			// possible pointer or numeric arithmetic error:
+			break;
+		// possible pointer or numeric arithmetic error:
 		case MINUS:
 		case PLUS:
 			if (errorsAreSideEffects) {
 				return false;
 			}
-			// always a problem:
+			break;
+		// always a problem:
 		case DEREFERENCE:
 		case SUBSCRIPT:
 			if (errorsAreSideEffects) {
 				return false;
 			}
-			// innocuous unless operands have side effects...
+			break;
+		// innocuous unless operands have side effects...
 		case ADDRESSOF:
 		case BIG_O:
 		case BITAND:
@@ -166,8 +169,9 @@ public class CommonOperatorNode extends CommonExpressionNode implements
 		case SHIFTLEFT:
 		case SHIFTRIGHT:
 		case UNARYPLUS:
+			break;
 		} // end of switch
-			// now check operands...
+			// default case: check operands...
 		for (int i = 0; i < getNumberOfArguments(); i++) {
 			if (!getArgument(i).isSideEffectFree(errorsAreSideEffects))
 				return false;
