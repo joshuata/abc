@@ -1,20 +1,33 @@
+An expression is side-effect-free if it does not contain a function
+call or any subexpression which can modify the state (such as an
+assignment).  
 
-a statement is in normal form if it has one of the forms
+A expression e is in normal form if it has one of the following
+forms:
 
-e1=e2, for side-effect-free expressions e1 and e2, and e1 a lhs expression 
+1. e is an assignment expression e1=e2, for side-effect-free
+expressions e1 and e2, and e1 is a lhs expression
 
-e1=f(arg0,...), for side-effect-free expressions e1, f, arg0, ....
-  (function call with left-hand-side)
-  
-f(arg0, ...) (function call with no lhs)
+2. e is of the form e1=f(arg0,...), for side-effect-free
+expressions e1, f, arg0, .... (function call with left-hand-side)
 
-ditto last two with $spawn inserted before the call
+3. e is of the form f(arg0,...), for side-effect-free
+expressions f, arg0, ... (function call with no left-hand-side)
+
+4. ditto last two with $spawn inserted before the call
+
+A statement is in normal form if:
+ - if it is an expression statement wrapping e, then
+   e is in normal form
+ - for other kinds of statements: all its
+   member expressions are side-effect-free and all its
+   member statements are in normal form.
 
 --
 
-a SEFTriple is an ordered triple [b|e|a] where b and a are some sequences
-of statements in normal form and e is either a side-effect-free expression
-or a function call or spawn f(arg0,...) where f, arg0, ... are side-effect-free.
+A SEFTriple is an ordered triple [b|e|a] where b and a are some sequences
+of statements in normal form and e is an expression in normal form.
+
 There is a sense in which two triples are equivalent.  Basically think
 of starting in some arbitrary state s, then executing the statements in b,
 then evaluating e and shorting the result in V, then, then executing the
@@ -29,33 +42,41 @@ The following operations take an SEFTriple t=[b|e|a] and return an
 equivalent SEFTriple.
 
 shift([b|e|a]) = [b,tmp=e,a|tmp|].
-
-emptyafter(t) = t          if empty(a)
-emptyafter(t) = shift(t)   otherwise
-// shifts the after clauses to the before section, using temp variable
-// to capture value of e at the right point.  Result always has empty
-// after section.
-
-purify(t) = t          if empty(a) and sef(e)
-purify(t) = shift(t)   otherwise
-// same as above but in addition guarantees expression part of result is
-// s.e.f.  Here sef(e) means "e is side-effect-free".
+// introduces new temporary variable tmp to hold result
+// of evaluating e.  Note that in the resulting triple,
+// the expression is sef (since it is just a variable),
+// and the after clause is empty.
 
 makesef(t) = t           if sef(e)
 makesef(t) = shift(t)    otherwise.
-// makes the expression s.e.f. but does not necessarily get rid of
-// after clauses
+// does the shift if e is not sef.
+// guarantees that in the result, expression will be sef.
 
+emptyafter(t) = t          if empty(a)
+emptyafter(t) = shift(t)   otherwise
+// does shift if a is not empty.  Always guarantees that
+// the resulting after clause will be empty
+
+purify(t) = t          if empty(a) and sef(e)
+purify(t) = shift(t)   otherwise
+// does the shift if a is not empty or e is not sef.
+// guarantees expression part of result is s.e.f. and a is empty.
 
 --
 
-Define translate: Expr -> SEFTriple and lhstranslate: LHSExpr->SEFTriple.
+Define 
+
+  translate:      Expr -> SEFTriple 
+  lhstranslate: LHSExpr-> SEFTriple
+  
 Expr is all expressions (not just sef).
 LHSExpr is all left-hand-side expressions.
 
 The result of lhstranslate actually always has from [b|e|] where
-e is an LHS expression (and is side-effect-free, e.g., x or a[i][j].v).
+e is an LHS expression and is side-effect-free, e.g.,
+x or a[i][j].v.
 
+--
 
 Definition of lhstranslate by cases:
 
@@ -112,16 +133,38 @@ Let purify(arg1)=[b1|e1|], ...
 translate(func(arg1, ...)) = [b1,b2,...|f(e1,e2,...)|].
 
 lhs+=rhs:
+evaluations are unsequences but the assignment happens after
+they complete.
 Let lhstranslate(lhs)=[b1|e1|].
 Let purify(translate(rhs))=[b2|e2|].
 translate(lhs+=rhs) = [b1,b2,e1=e1+e2|e1|].
 
 expr1,expr2:
+sequence point at ,
 let translate(expr1)   = [b1|e1|a1].
 let translate(expr2)   = [b2|e2|a2].
 translate(expr1,expr2) = [b1,e1^,a1,b2|e2|a2].
-Here e1^ means: omit this if e1 is s.e.f., else make it the exprssion
+Here e1^ means: omit this if e1 is s.e.f., else make it the expression
 statement e1;.
+
+c ? expr1 : expr2:
+sequence point at ?
+purify(translate(c))   = [b0|e0|]
+sef(translate(expr1))  = [b1|e1|a1]
+sef(translate(expr2))  = [b2|e2|a2]
+
+translate(c?expr1:expr2) :
+
+if b1, a1, b2, a2 are all empty:
+   [b0 | e0?e1:e2 | ]
+otherwise:
+   [ b0, decl tmp,
+     if (e0) { b1; tmp=e1; a1 } else { b2; tmp=e2; a2 }
+   | tmp
+   |
+   ]
+
+
 
 -------------------------
 
