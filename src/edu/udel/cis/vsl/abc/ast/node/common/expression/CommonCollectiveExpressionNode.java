@@ -59,4 +59,19 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 				&& getProcessPointerExpression().isSideEffectFree(
 						errorsAreSideEffects);
 	}
+
+	@Override
+	public void setProcessPointerExpression(ExpressionNode arg) {
+		setChild(0, arg);
+	}
+
+	@Override
+	public void setLengthExpression(ExpressionNode arg) {
+		setChild(1, arg);
+	}
+
+	@Override
+	public void setBody(ExpressionNode arg) {
+		setChild(2, arg);
+	}
 }

@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.common;
 
+import java.util.Arrays;
 import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -957,5 +958,25 @@ public class CommonNodeFactory implements NodeFactory {
 	public RegularRangeNode newRegularRangeNode(Source source,
 			ExpressionNode low, ExpressionNode high, ExpressionNode step) {
 		return new CommonRegularRangeNode(source, low, high, step);
+	}
+
+	@Override
+	public OperatorNode newOperatorNode(Source source, Operator operator,
+			ExpressionNode argument) {
+		return new CommonOperatorNode(source, operator, Arrays.asList(argument));
+	}
+
+	@Override
+	public OperatorNode newOperatorNode(Source source, Operator operator,
+			ExpressionNode arg0, ExpressionNode arg1) {
+		return new CommonOperatorNode(source, operator, Arrays.asList(arg0,
+				arg1));
+	}
+
+	@Override
+	public OperatorNode newOperatorNode(Source source, Operator operator,
+			ExpressionNode arg0, ExpressionNode arg1, ExpressionNode arg2) {
+		return new CommonOperatorNode(source, operator, Arrays.asList(arg0,
+				arg1, arg2));
 	}
 }

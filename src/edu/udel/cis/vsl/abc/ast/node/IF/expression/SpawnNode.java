@@ -19,6 +19,14 @@ public interface SpawnNode extends ExpressionNode {
 	 */
 	FunctionCallNode getCall();
 
+	/**
+	 * Sets the function call node child to the given node.
+	 * 
+	 * @param call
+	 *            the function call node
+	 */
+	void setCall(FunctionCallNode call);
+
 	@Override
 	SpawnNode copy();
 

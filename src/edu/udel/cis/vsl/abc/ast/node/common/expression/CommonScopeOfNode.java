@@ -47,4 +47,9 @@ public class CommonScopeOfNode extends CommonExpressionNode implements
 		}
 		return true;
 	}
+
+	@Override
+	public void setExpression(ExpressionNode expr) {
+		setChild(0, expr);
+	}
 }

@@ -71,4 +71,19 @@ public class CommonRegularRangeNode extends CommonExpressionNode implements
 		out.print("RegularRange");
 	}
 
+	@Override
+	public void setLow(ExpressionNode arg) {
+		setChild(0, arg);
+	}
+
+	@Override
+	public void setHigh(ExpressionNode arg) {
+		setChild(1, arg);
+	}
+
+	@Override
+	public void setStep(ExpressionNode arg) {
+		setChild(2, arg);
+	}
+
 }

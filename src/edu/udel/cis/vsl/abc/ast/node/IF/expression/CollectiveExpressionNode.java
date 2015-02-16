@@ -38,6 +38,14 @@ public interface CollectiveExpressionNode extends ExpressionNode {
 	ExpressionNode getProcessPointerExpression();
 
 	/**
+	 * Sets the process pointer expression argument.
+	 * 
+	 * @param arg
+	 *            the new value for the process pointer expression argument
+	 */
+	void setProcessPointerExpression(ExpressionNode arg);
+
+	/**
 	 * Gets the expression of integer type which evaluates to the number of
 	 * processes involved in the collective operation (<code>nprocs</code>).
 	 * 
@@ -47,11 +55,27 @@ public interface CollectiveExpressionNode extends ExpressionNode {
 	ExpressionNode getLengthExpression();
 
 	/**
+	 * Sets the length expression argument.
+	 * 
+	 * @param arg
+	 *            the new value for the length expression argument
+	 */
+	void setLengthExpression(ExpressionNode arg);
+
+	/**
 	 * Returns the "body" of the collective expression (<code>expr</code>).
 	 * 
 	 * @return the body of the collective expression
 	 */
 	ExpressionNode getBody();
+
+	/**
+	 * Sets the body argument.
+	 * 
+	 * @param arg
+	 *            the new value for the body argument
+	 */
+	void setBody(ExpressionNode arg);
 
 	@Override
 	CollectiveExpressionNode copy();

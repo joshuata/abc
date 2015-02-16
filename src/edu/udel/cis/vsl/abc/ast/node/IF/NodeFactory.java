@@ -749,7 +749,7 @@ public interface NodeFactory {
 	 * </p>
 	 * 
 	 * <p>
-	 * Some operators are not included in the enuemrated type, and instead have
+	 * Some operators are not included in the enumerated type, and instead have
 	 * their own special class, because they either need to implement an
 	 * interface that not all operator expressions should implement (e.g.,
 	 * because they are left-hand-side expressions) or because they need to
@@ -771,6 +771,64 @@ public interface NodeFactory {
 	 */
 	OperatorNode newOperatorNode(Source source, Operator operator,
 			List<ExpressionNode> arguments);
+
+	/**
+	 * Convenience method for constructing new unary operator node; equivalent
+	 * to invoking {@link #newOperatorNode(Source, Operator, ExpressionNode)} on
+	 * the singleton list containing <code>argument</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire operator
+	 *            expression, including the operator itself and its arguments
+	 * @param operator
+	 *            the unary operator
+	 * @param argument
+	 *            the sole argument to the operator
+	 * @return the new operator expression node
+	 */
+	OperatorNode newOperatorNode(Source source, Operator operator,
+			ExpressionNode argument);
+
+	/**
+	 * Convenience method for constructing new binary operator node; equivalent
+	 * to invoking {@link #newOperatorNode(Source, Operator, ExpressionNode)} on
+	 * the list consisting of <code>arg0</code> and <code>arg1</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire operator
+	 *            expression, including the operator itself and its arguments
+	 * @param operator
+	 *            the binary operator
+	 * @param arg0
+	 *            the first argument to the binary operator
+	 * @param arg1
+	 *            the second argument to the binary operator
+	 * @return the new operator expression node
+	 */
+	OperatorNode newOperatorNode(Source source, Operator operator,
+			ExpressionNode arg0, ExpressionNode arg1);
+
+	/**
+	 * Convenience method for constructing new ternary operator node; equivalent
+	 * to invoking {@link #newOperatorNode(Source, Operator, ExpressionNode)} on
+	 * the list consisting of <code>arg0</code>, <code>arg1</code>, and
+	 * <code>arg2</code>.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire operator
+	 *            expression, including the operator itself and its arguments
+	 * @param operator
+	 *            the ternary operator
+	 * @param arg0
+	 *            the first argument to the ternary operator
+	 * @param arg1
+	 *            the second argument to the ternary operator
+	 * @param arg2
+	 *            the third argument to the ternary operator
+	 * @return the new operator expression node
+	 */
+	OperatorNode newOperatorNode(Source source, Operator operator,
+			ExpressionNode arg0, ExpressionNode arg1, ExpressionNode arg2);
 
 	/**
 	 * Constrcts a new <code>sizeof</code> expression. This takes one argument,
