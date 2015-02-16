@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +18,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
@@ -44,7 +42,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
@@ -343,87 +340,67 @@ public class NewSideEffectRemover extends BaseTransformer {
 
 	private ExprTriple lhsTranslate(ExpressionNode lhs) {
 		ExpressionKind kind = lhs.expressionKind();
-		Source source = lhs.getSource();
-		ExprTriple result;
 
 		switch (kind) {
 		case ARROW: {
 			// p->f = (*p).f
 			ArrowNode arrow = (ArrowNode) lhs;
-			ExpressionNode arg = arrow.getStructurePointer();
+			ExprTriple result = translate(arrow.getStructurePointer());
 
-			result = translate(arg);
-			if (purify(result)) { // it changed
-				result.setNode(nodeFactory.newArrowNode(source,
-						result.getNode(), arrow.getFieldName()));
-			} else {
-				result = new ExprTriple(lhs);
-			}
-			break;
+			purify(result);
+			arrow.setStructurePointer(result.getNode());
+			result.setNode(arrow);
+			return result;
 		}
 		case DOT: {
 			// e.f
 			DotNode dotNode = (DotNode) lhs;
-			ExpressionNode arg = dotNode.getStructure();
+			ExprTriple result = translate(dotNode.getStructure());
 
-			result = translate(arg);
-			if (purify(result)) { // it changed
-				result.setNode(nodeFactory.newDotNode(source, result.getNode(),
-						dotNode.getFieldName()));
-			} else {
-				result = new ExprTriple(lhs);
-			}
-			break;
+			purify(result);
+			dotNode.setStructure(result.getNode());
+			result.setNode(dotNode);
+			return result;
 		}
 		case IDENTIFIER_EXPRESSION:
-			result = new ExprTriple(lhs);
-			break;
+			return new ExprTriple(lhs);
 		case OPERATOR: {
 			OperatorNode opNode = (OperatorNode) lhs;
 			Operator op = opNode.getOperator();
-			switch (op) {
-			case DEREFERENCE: {
-				// *p
-				ExpressionNode arg = opNode.getArgument(0);
 
-				result = translate(arg);
-				if (purify(result)) { // it changed
-					result.setNode(nodeFactory.newOperatorNode(source, op,
-							Arrays.asList(result.getNode())));
-				} else {
-					result = new ExprTriple(lhs);
-				}
-				break;
+			switch (op) {
+			case DEREFERENCE: { // *p
+				ExprTriple result = translate(opNode.getArgument(0));
+
+				purify(result);
+				opNode.setArgument(0, result.getNode());
+				result.setNode(opNode);
+				return result;
 			}
 			case SUBSCRIPT: {
 				// expr[i].
 				// expr can be a LHSExpression of array type (like a[j][k])
 				// expr can be an expression of pointer type
-				ExpressionNode left = opNode.getArgument(0);
-				ExpressionNode right = opNode.getArgument(1);
-				ExprTriple t1 = translate(left), t2 = translate(right);
+				ExprTriple t1 = translate(opNode.getArgument(0)), t2 = translate(opNode
+						.getArgument(1));
 
-				if (purify(t1) || purify(t2)) {
-					t1.getBefore().addAll(t2.getBefore());
-					t1.setNode(nodeFactory.newOperatorNode(source, op,
-							Arrays.asList(t1.getNode(), t2.getNode())));
-					result = t1;
-				} else {
-					result = new ExprTriple(lhs);
-				}
-				break;
+				purify(t1);
+				purify(t2);
+				opNode.setArgument(0, t1.getNode());
+				opNode.setArgument(1, t2.getNode());
+				t1.addAllBefore(t2.getBefore());
+				t1.setNode(opNode);
+				return t1;
 			}
 			default:
 				throw new ABCRuntimeException(
 						"Unreachable: unknown LHS operator: " + op);
 			}
-			break;
 		}
 		default:
 			throw new ABCRuntimeException(
 					"Unreachable: unknown LHS expression kind: " + kind);
 		}
-		return result;
 	}
 
 	private IntegerConstantNode newOneNode(Source source) {
@@ -480,11 +457,12 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExprTriple result = lhsTranslate(arg);
 		ExpressionNode newArg = result.getNode();
 		StatementNode assignment = nodeFactory
-				.newExpressionStatementNode(nodeFactory.newOperatorNode(source,
-						Operator.ASSIGN, Arrays.asList(newArg.copy(),
-								nodeFactory.newOperatorNode(source, unaryOp,
-										Arrays.asList(newArg.copy(),
-												newOneNode(source))))));
+				.newExpressionStatementNode(nodeFactory.newOperatorNode(
+						source,
+						Operator.ASSIGN,
+						newArg.copy(),
+						nodeFactory.newOperatorNode(source, unaryOp,
+								newArg.copy(), newOneNode(source))));
 
 		if (pre)
 			result.addBefore(assignment);
@@ -516,20 +494,22 @@ public class NewSideEffectRemover extends BaseTransformer {
 
 		ExpressionNode lhs = assign.getArgument(0);
 		ExpressionNode rhs = assign.getArgument(1);
-		ExprTriple result = lhsTranslate(lhs);
+		ExprTriple leftTriple = lhsTranslate(lhs);
 		ExprTriple rightTriple = translate(rhs);
 
 		emptyAfter(rightTriple);
 
-		ExpressionNode newLhs = result.getNode();
+		ExpressionNode newLhs = leftTriple.getNode();
 		ExpressionNode newRhs = rightTriple.getNode();
-		Source source = assign.getSource();
-		StatementNode assignment = nodeFactory
-				.newExpressionStatementNode(nodeFactory.newOperatorNode(source,
-						Operator.ASSIGN, Arrays.asList(newLhs.copy(), newRhs)));
 
+		assign.setArgument(0, newLhs);
+		assign.setArgument(1, newRhs);
+
+		ExprTriple result = new ExprTriple(newLhs.copy());
+
+		result.addAllBefore(leftTriple.getBefore());
 		result.addAllBefore(rightTriple.getBefore());
-		result.addBefore(assignment);
+		result.addBefore(nodeFactory.newExpressionStatementNode(assign));
 		return result;
 	}
 
@@ -545,16 +525,12 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	private ExprTriple translateDereference(OperatorNode dereference) {
 		Operator operator = dereference.getOperator();
+		ExprTriple result = translate(dereference.getArgument(0));
 
 		assert operator == Operator.DEREFERENCE;
-
-		Source source = dereference.getSource();
-		ExpressionNode expr = dereference.getArgument(0);
-		ExprTriple result = translate(expr);
-
 		makesef(result);
-		result.setNode(nodeFactory.newOperatorNode(source, operator,
-				Arrays.asList(result.getNode())));
+		dereference.setArgument(0, result.getNode());
+		result.setNode(dereference);
 		return result;
 	}
 
@@ -571,20 +547,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * @return
 	 */
 	private ExprTriple translateGenericBinaryOperator(OperatorNode opNode) {
-		Operator operator = opNode.getOperator();
-		ExpressionNode left = opNode.getArgument(0);
-		ExpressionNode right = opNode.getArgument(1);
-		ExprTriple leftTriple = translate(left);
-		ExprTriple rightTriple = translate(right);
-		Source source = opNode.getSource();
+		ExprTriple leftTriple = translate(opNode.getArgument(0));
+		ExprTriple rightTriple = translate(opNode.getArgument(1));
 
 		makesef(leftTriple);
 		makesef(rightTriple);
+		opNode.setArgument(0, leftTriple.getNode());
+		opNode.setArgument(1, rightTriple.getNode());
 		leftTriple.addAllBefore(rightTriple.getBefore());
 		leftTriple.addAllAfter(rightTriple.getAfter());
-		leftTriple.setNode(nodeFactory.newOperatorNode(source, operator,
-				Arrays.asList(leftTriple.getNode(), rightTriple.getNode())));
-
+		leftTriple.setNode(opNode);
 		return leftTriple;
 	}
 
@@ -600,14 +572,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * @return
 	 */
 	private ExprTriple translateGenericUnaryOperator(OperatorNode opNode) {
-		Operator operator = opNode.getOperator();
-		ExpressionNode arg = opNode.getArgument(0);
-		Source source = opNode.getSource();
-		ExprTriple result = translate(arg);
+		ExprTriple result = translate(opNode.getArgument(0));
 
 		makesef(result);
-		result.setNode(nodeFactory.newOperatorNode(source, operator,
-				Arrays.asList(result.getNode())));
+		opNode.setArgument(0, result.getNode());
+		result.setNode(opNode);
 		return result;
 	}
 
@@ -647,45 +616,36 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * </pre>
 	 */
 	private ExprTriple translateFunctionCall(FunctionCallNode callNode) {
-		Source source = callNode.getSource();
 		ExprTriple functionTriple = translate(callNode.getFunction());
-		int numArgs = callNode.getNumberOfArguments();
-		List<ExpressionNode> arguments = new LinkedList<>();
 		int numContextArgs = callNode.getNumberOfContextArguments();
-		List<ExpressionNode> contextArgs = new LinkedList<>();
-		List<BlockItemNode> before = new LinkedList<>();
+		int numArgs = callNode.getNumberOfArguments();
+		ExprTriple result = new ExprTriple(callNode);
 
 		purify(functionTriple);
-		before.addAll(functionTriple.getBefore());
+		callNode.setFunction(functionTriple.getNode());
+		result.addAllBefore(functionTriple.getBefore());
 		for (int i = 0; i < numContextArgs; i++) {
 			ExprTriple triple = translate(callNode.getContextArgument(i));
 
 			purify(triple);
-			before.addAll(triple.getBefore());
-			contextArgs.add(triple.getNode());
+			result.addAllBefore(triple.getBefore());
+			callNode.setContextArgument(i, triple.getNode());
 		}
 		for (int i = 0; i < numArgs; i++) {
 			ExprTriple triple = translate(callNode.getArgument(i));
 
 			purify(triple);
-			before.addAll(triple.getBefore());
-			arguments.add(triple.getNode());
+			result.addAllBefore(triple.getBefore());
+			callNode.setArgument(i, triple.getNode());
 		}
-
-		ExprTriple result = new ExprTriple(
-				before,
-				nodeFactory.newFunctionCallNode(source,
-						functionTriple.getNode(), contextArgs, arguments, null),
-				new LinkedList<BlockItemNode>());
-
 		return result;
 	}
 
 	private ExprTriple translateSpawn(SpawnNode spawn) {
 		ExprTriple result = translate(spawn.getCall());
 
-		result.setNode(nodeFactory.newSpawnNode(spawn.getSource(),
-				(FunctionCallNode) result.getNode()));
+		spawn.setCall((FunctionCallNode) result.getNode());
+		result.setNode(spawn);
 		return result;
 	}
 
@@ -740,10 +700,12 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExpressionNode newRhs = rightTriple.getNode();
 		Source source = opNode.getSource();
 		StatementNode assignment = nodeFactory
-				.newExpressionStatementNode(nodeFactory.newOperatorNode(source,
-						Operator.ASSIGN, Arrays.asList(newLhs.copy(),
-								nodeFactory.newOperatorNode(source, binaryOp,
-										Arrays.asList(newLhs.copy(), newRhs)))));
+				.newExpressionStatementNode(nodeFactory.newOperatorNode(
+						source,
+						Operator.ASSIGN,
+						newLhs.copy(),
+						nodeFactory.newOperatorNode(source, binaryOp,
+								newLhs.copy(), newRhs)));
 
 		result.addAllBefore(rightTriple.getBefore());
 		result.addBefore(assignment);
@@ -787,6 +749,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
+	/**
+	 * Translates a conditional expression <code>x?y:z</code> to a triple. There
+	 * is a sequence point at the <code>?</code>.
+	 * 
+	 * @param conditional
+	 *            the conditional expression
+	 * @return result of translation
+	 */
 	private ExprTriple translateConditional(OperatorNode conditional) {
 		Source source = conditional.getSource();
 		Operator operator = conditional.getOperator();
@@ -807,8 +777,10 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExpressionNode e1 = triple1.getNode(), e2 = triple2.getNode();
 
 		if (b1.isEmpty() && b2.isEmpty() && a1.isEmpty() && a2.isEmpty()) {
-			result = new ExprTriple(nodeFactory.newOperatorNode(source,
-					operator, Arrays.asList(e0, e1, e2)));
+			conditional.setChild(0, e0);
+			conditional.setChild(1, e1);
+			conditional.setChild(2, e2);
+			result = new ExprTriple(conditional);
 			result.addAllBefore(b0);
 		} else {
 			String tmpId = tempVariablePrefix + (tempVariableCounter++);
@@ -829,7 +801,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 					stmtlist.add(nodeFactory
 							.newExpressionStatementNode(nodeFactory
 									.newOperatorNode(source, Operator.ASSIGN,
-											Arrays.asList(tmpNode.copy(), e1))));
+											tmpNode.copy(), e1)));
 					stmtlist.addAll(a1);
 					stmt1 = nodeFactory.newCompoundStatementNode(source,
 							stmtlist);
@@ -840,7 +812,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 					stmtlist.add(nodeFactory
 							.newExpressionStatementNode(nodeFactory
 									.newOperatorNode(source, Operator.ASSIGN,
-											Arrays.asList(tmpNode.copy(), e2))));
+											tmpNode.copy(), e2)));
 					stmtlist.addAll(a2);
 					stmt2 = nodeFactory.newCompoundStatementNode(source,
 							stmtlist);
@@ -927,54 +899,6 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	// need type node triple?
-	private TypeNode translateTypeNode(TypeNode typeNode) {
-		TypeNodeKind kind = typeNode.kind();
-
-		// need to define isSideEffectFree(boolean) on type nodes
-		// just look for presence of expression
-		// need ExprTriple and TypeTriple
-
-		switch (kind) {
-		case ARRAY:
-			break;
-		case ATOMIC:
-			break;
-		case BASIC:
-			break;
-		case DOMAIN:
-			break;
-		case ENUMERATION:
-			break;
-		case FUNCTION:
-			break;
-		case POINTER:
-			break;
-		case RANGE:
-			break;
-		case SCOPE:
-			break;
-		case STRUCTURE_OR_UNION:
-			break;
-		case TYPEDEF_NAME:
-			break;
-		case VOID:
-			break;
-		default:
-			break;
-
-		}
-		// TODO: finish this
-		return typeNode;
-	}
-
-	private ExprTriple translateAlignOf(AlignOfNode align) {
-		TypeNode typeNode = align.getArgument();
-
-		// TODO: need to get the side effects from the type node
-		return new ExprTriple(align);
-	}
-
 	private ExprTriple translateSizeof(SizeofNode expression) {
 		SizeableNode arg = expression.getArgument();
 		ExprTriple triple;
@@ -982,10 +906,10 @@ public class NewSideEffectRemover extends BaseTransformer {
 		if (arg instanceof ExpressionNode) {
 			triple = translate((ExpressionNode) arg);
 			makesef(triple);
-			triple.setNode(nodeFactory.newSizeofNode(expression.getSource(),
-					triple.getNode()));
+			expression.setArgument(triple.getNode());
+			triple.setNode(expression);
 		} else if (arg instanceof TypeNode) {
-			// TODO: need to process type nodes
+			// types can't have side-effects
 			triple = new ExprTriple(expression);
 		} else
 			throw new ABCRuntimeException("Unexpected kind of SizeableNode: "
@@ -994,22 +918,20 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	private ExprTriple translateScopeOf(ScopeOfNode expression) {
-		ExpressionNode arg = expression.expression();
-		ExprTriple result = translate(arg);
+		ExprTriple result = translate(expression.expression());
 
 		makesef(result);
-		result.setNode(nodeFactory.newScopeOfNode(expression.getSource(),
-				result.getNode()));
+		expression.setExpression(result.getNode());
+		result.setNode(expression);
 		return result;
 	}
 
 	private ExprTriple translateRemoteReference(RemoteExpressionNode expression) {
-		IdentifierExpressionNode id = expression.getIdentifierNode();
 		ExprTriple result = translate(expression.getProcessExpression());
 
 		makesef(result);
-		result.setNode(nodeFactory.newRemoteExpressionNode(
-				expression.getSource(), result.getNode(), id));
+		expression.setProcessExpression(result.getNode());
+		result.setNode(expression);
 		return result;
 	}
 
@@ -1021,9 +943,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 		makesef(hi);
 		makesef(step);
 
-		ExprTriple result = new ExprTriple(nodeFactory.newRegularRangeNode(
-				expression.getSource(), low.getNode(), hi.getNode(),
-				step.getNode()));
+		expression.setLow(low.getNode());
+		expression.setHigh(hi.getNode());
+		expression.setStep(step.getNode());
+
+		ExprTriple result = new ExprTriple(expression);
 
 		result.addAllBefore(low.getBefore());
 		result.addAllBefore(hi.getBefore());
@@ -1049,8 +973,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExprTriple result = translate(expression.getStructure());
 
 		makesef(result);
-		result.setNode(nodeFactory.newDotNode(expression.getSource(),
-				result.getNode(), expression.getFieldName()));
+		expression.setStructure(result.getNode());
+		result.setNode(expression);
 		return result;
 	}
 
@@ -1060,46 +984,125 @@ public class NewSideEffectRemover extends BaseTransformer {
 	// would like a triple with TypeNode in the middle
 	// would like many different kinds of triples with different nodes in middle
 
-	private ExprTriple translateCompoundLiteral(CompoundLiteralNode expression) {
-		CompoundInitializerNode ciNode = expression.getInitializerList();
+	// need to purify all and put them before the compound
+	// no sequence points
 
-		for (PairNode<DesignationNode, InitializerNode> pair : ciNode) {
+	private SETriple translateInitializer(InitializerNode node) {
+		if (node instanceof ExpressionNode)
+			return translate((ExpressionNode) node);
+		else if (node instanceof CompoundInitializerNode)
+			return translateCompoundInitializer((CompoundInitializerNode) node);
+		else
+			throw new ABCRuntimeException(
+					"Unexpected kind of initializer node: " + node);
+	}
+
+	/**
+	 * Translates a compound initializer. There are no sequence points.
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private SETriple translateCompoundInitializer(CompoundInitializerNode node) {
+		SETriple result = new SETriple(node);
+
+		for (PairNode<DesignationNode, InitializerNode> pair : node) {
 			DesignationNode designationNode = pair.getLeft();
-			InitializerNode initNode = pair.getRight();
 
 			for (DesignatorNode designator : designationNode) {
-
 				if (designator instanceof FieldDesignatorNode) {
 					// no side effects possible
-
 				} else if (designator instanceof ArrayDesignatorNode) {
 					ExpressionNode indexNode = ((ArrayDesignatorNode) designator)
 							.getIndex();
+					ExprTriple triple = translate(indexNode);
 
+					makesef(triple);
+					result.addAllBefore(triple.getBefore());
+					result.addAllAfter(triple.getAfter());
+					((ArrayDesignatorNode) designator).setIndex(triple
+							.getNode());
 				} else {
 					throw new ABCRuntimeException(
 							"Unexpected kind of designator node: " + designator);
 				}
 			}
-		}
 
-		// TODO Auto-generated method stub
-		return null;
+			SETriple initTriple = translateInitializer(pair.getRight());
+
+			result.addAllBefore(initTriple.getBefore());
+			result.addAllAfter(initTriple.getAfter());
+			pair.setRight((InitializerNode) initTriple.getNode());
+		}
+		return result;
+	}
+
+	/**
+	 * Translates a compound literal. There are no sequence points.
+	 * 
+	 * @param expression
+	 *            a compound literal expression
+	 * @return result of translation
+	 */
+	private ExprTriple translateCompoundLiteral(CompoundLiteralNode expression) {
+		CompoundInitializerNode ciNode = expression.getInitializerList();
+		SETriple triple = translateCompoundInitializer(ciNode);
+		ExprTriple result = new ExprTriple(expression);
+
+		expression.setInitializerList((CompoundInitializerNode) triple
+				.getNode());
+		result.setBefore(triple.getBefore());
+		result.setAfter(triple.getAfter());
+		return result;
 	}
 
 	private ExprTriple translateCollective(CollectiveExpressionNode expression) {
-		// TODO Auto-generated method stub
-		return null;
+		ExprTriple result = new ExprTriple(expression);
+		ExprTriple e0 = translate(expression.getProcessPointerExpression());
+		ExprTriple e1 = translate(expression.getLengthExpression());
+		ExprTriple e2 = translate(expression.getBody());
+
+		makesef(e0);
+		makesef(e1);
+		makesef(e2);
+		expression.setProcessPointerExpression(e0.getNode());
+		expression.setLengthExpression(e1.getNode());
+		expression.setBody(e2.getNode());
+		result.addAllBefore(e0.getBefore());
+		result.addAllBefore(e1.getBefore());
+		result.addAllBefore(e2.getBefore());
+		result.addAllAfter(e0.getAfter());
+		result.addAllAfter(e1.getAfter());
+		result.addAllAfter(e2.getAfter());
+		return result;
 	}
 
 	private ExprTriple translateCast(CastNode expression) {
-		// TODO Auto-generated method stub
-		return null;
+		// mallocs need to keep their casts, i.e., no
+		// tmp=malloc | (int*)tmp | ...
+		ExpressionNode arg = expression.getArgument();
+		ExprTriple triple = translate(arg);
+		ExpressionNode newArg = triple.getNode();
+
+		// if arg started off as a function call, will newArg
+		// still be a function call? Yes! See translateFunctionCall.
+		if (isMallocCall(newArg)) {
+			expression.setArgument(newArg);
+		} else {
+			makesef(triple);
+			expression.setArgument(newArg);
+		}
+		triple.setNode(expression);
+		return triple;
 	}
 
 	private ExprTriple translateArrow(ArrowNode expression) {
-		// TODO Auto-generated method stub
-		return null;
+		ExprTriple result = translate(expression.getStructurePointer());
+
+		makesef(result);
+		expression.setStructurePointer(result.getNode());
+		result.setNode(expression);
+		return result;
 	}
 
 	/**
@@ -1114,11 +1117,10 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	private ExprTriple translate(ExpressionNode expression) {
 		ExpressionKind kind = expression.expressionKind();
-		Source source = expression.getSource();
 
 		switch (kind) {
 		case ALIGNOF:
-			return translateAlignOf((AlignOfNode) expression);
+			return new ExprTriple(expression);
 		case ARROW:
 			return translateArrow((ArrowNode) expression);
 		case CAST:

@@ -19,4 +19,12 @@ public interface ScopeOfNode extends ExpressionNode {
 	 */
 	ExpressionNode expression();
 
+	/**
+	 * Sets the argument of this scope-of expression
+	 * 
+	 * @param expr
+	 *            the argument
+	 */
+	void setExpression(ExpressionNode expr);
+
 }

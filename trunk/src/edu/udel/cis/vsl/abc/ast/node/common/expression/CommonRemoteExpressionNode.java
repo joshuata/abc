@@ -53,4 +53,14 @@ public class CommonRemoteExpressionNode extends CommonExpressionNode implements
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
 		return getProcessExpression().isSideEffectFree(errorsAreSideEffects);
 	}
+
+	@Override
+	public void setProcessExpression(ExpressionNode arg) {
+		setChild(0, arg);
+	}
+
+	@Override
+	public void setIdentifierNode(IdentifierExpressionNode arg) {
+		setChild(1, arg);
+	}
 }

@@ -39,6 +39,14 @@ public interface CompoundLiteralNode extends ExpressionNode {
 	 */
 	CompoundInitializerNode getInitializerList();
 
+	/**
+	 * Sets the initializer list.
+	 * 
+	 * @param arg
+	 *            the compound initializer node to become the child of this node
+	 */
+	void setInitializerList(CompoundInitializerNode arg);
+
 	@Override
 	CompoundLiteralNode copy();
 

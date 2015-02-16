@@ -42,4 +42,9 @@ public class CommonSpawnNode extends CommonExpressionNode implements SpawnNode {
 		return false;
 	}
 
+	@Override
+	public void setCall(FunctionCallNode call) {
+		this.setChild(0, call);
+	}
+
 }

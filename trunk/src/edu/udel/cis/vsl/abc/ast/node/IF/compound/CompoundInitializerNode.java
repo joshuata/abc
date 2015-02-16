@@ -33,10 +33,10 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
  * tuples of integers. All tuples in a domain have the same arity, say n, called
  * the dimension of the domain. For a Cartesian domain, n is the number of
  * ranges used to form the domain. The order on the domain is the dictionary
- * order. In a Caretesian domain literal, all the designation nodes are null,
- * and each initializer node is an expression of range type. Moreover, the
- * method {@link #getLiteralObject()} will return <code>null</code>, as there is
- * not object associated to a Caretesian domain literal, only a type. The method
+ * order. In a Cartesian domain literal, all the designation nodes are null, and
+ * each initializer node is an expression of range type. Moreover, the method
+ * {@link #getLiteralObject()} will return <code>null</code>, as there is not
+ * object associated to a Caretesian domain literal, only a type. The method
  * {@link #getType()} returns (after analysis) all the information you need
  * about the domain.
  * </p>

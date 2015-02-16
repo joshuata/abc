@@ -35,11 +35,27 @@ public interface RegularRangeNode extends ExpressionNode {
 	ExpressionNode getLow();
 
 	/**
+	 * Sets the lower bound argument <code>lo</code>
+	 * 
+	 * @param arg
+	 *            the new lower bound argument
+	 */
+	void setLow(ExpressionNode arg);
+
+	/**
 	 * Returns the upper bound argument <code>hi</code>.
 	 * 
 	 * @return the lower bound
 	 */
 	ExpressionNode getHigh();
+
+	/**
+	 * Sets the upper bound argument <code>hi</code>
+	 * 
+	 * @param arg
+	 *            the new upper bound argument
+	 */
+	void setHigh(ExpressionNode arg);
 
 	/**
 	 * Returns the step argument <code>step</code> if it is present, else
@@ -48,5 +64,13 @@ public interface RegularRangeNode extends ExpressionNode {
 	 * @return the step argument or <code>null</code>
 	 */
 	ExpressionNode getStep();
+
+	/**
+	 * Sets the step argument <code>step</code>
+	 * 
+	 * @param arg
+	 *            the new step argument
+	 */
+	void setStep(ExpressionNode arg);
 
 }
