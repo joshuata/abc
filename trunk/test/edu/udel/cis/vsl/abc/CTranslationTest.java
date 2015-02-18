@@ -144,4 +144,9 @@ public class CTranslationTest {
 	public void funcPointer() throws ABCException, IOException {
 		check("funcPointer");
 	}
+
+	@Test
+	public void comma() throws ABCException, IOException {
+		check("comma");
+	}
 }

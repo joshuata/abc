@@ -36,6 +36,11 @@ public class CIVLTranslationTest {
 	}
 
 	@Test
+	public void assertForall() throws ABCException, IOException {
+		check("forall");
+	}
+
+	@Test
 	public void spawn() throws ABCException, IOException {
 		check("spawn");
 	}
