@@ -920,7 +920,7 @@ assignmentExpression_opt
 
 /* 6.7.6 
  * Root: POINTER
- * chilren: STAR
+ * children: STAR
  */
 pointer
     : pointer_part+ -> ^(POINTER pointer_part+)
