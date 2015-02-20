@@ -160,8 +160,16 @@ public interface Type {
 	};
 
 	/**
+	 * <p>
 	 * Is this type "compatible" with the given type? See C11 Sec. 6.2.7 for the
 	 * definition of "compatible".
+	 * </p>
+	 * 
+	 * <p>
+	 * Special handling for tags that begin with "$anon"--all of these are
+	 * treated as identical. These are the names given to anonymous entities by
+	 * ABC for convenience.
+	 * </p>
 	 * 
 	 * @param type
 	 *            the type to compare with this one for compatibility
@@ -169,6 +177,24 @@ public interface Type {
 	 */
 	boolean compatibleWith(Type type);
 
+	/**
+	 * <p>
+	 * Is this type "equivalent to" the given type. Two equivalent types should
+	 * be interchangeable in any situation. Note that an incomplete struct type
+	 * (for example) will never be equivalent to a complete struct type, though
+	 * they may be compatible.
+	 * </p>
+	 * 
+	 * <p>
+	 * Special handling for tags that begin with "$anon"--all of these are
+	 * treated as identical. These are the names given to anonymous entities by
+	 * ABC for convenience.
+	 * </p>
+	 * 
+	 * @param type
+	 *            any type
+	 * @return true iff the two types are equivalent.
+	 */
 	boolean equivalentTo(Type type);
 
 	/**

@@ -219,7 +219,8 @@ public class CommonStructureOrUnionType extends CommonObjectType implements
 			CommonStructureOrUnionType that = (CommonStructureOrUnionType) other;
 
 			if (this.tag != null) {
-				if (!this.tag.equals(that.tag))
+				if (!this.getCompatibilityString().equals(
+						that.getCompatibilityString()))
 					return false;
 			} else {
 				if (that.tag != null)
