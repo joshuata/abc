@@ -111,6 +111,12 @@ public class LinkTest {
 	}
 
 	@Test
+	public void extern() throws ABCException {
+		check(new String[] { "extern/var_0.c", "extern/var_1.c",
+				"extern/var_2.c" }, "extern/var.c");
+	}
+
+	@Test
 	public void struct_compat() throws ABCException {
 		check(new String[] { "struct_compat_0.c", "struct_compat_1.c" },
 				"struct_compat.c");
