@@ -178,7 +178,8 @@ public class CommonEnumerationType extends CommonIntegerType implements
 			if (tag == null) {
 				if (that.tag != null)
 					return false;
-			} else if (!this.tag.equals(that.tag))
+			} else if (!getCompatibilityString().equals(
+					that.getCompatibilityString()))
 				return false;
 			if (enumerators == null) {
 				if (that.enumerators != null)
