@@ -100,12 +100,20 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	 * tagged entities in different translation units so they can be merged into
 	 * a single AST, but such entities should still be considered compatible.
 	 * 
+	 * NOTE: also removing $anon.
+	 * 
 	 * @return the tag with any suffix beginning with '$' removed
 	 */
 	private String getCompatibilityString() {
 		if (tag == null)
-			return null;
-		else {
+			return "";
+		if (tag.startsWith("$anon")) {
+			// "$anon" prefixes are inserted by ABC to give names
+			// to anonymous structures. Since the original tag
+			// was null, that is what should be used for checking
+			// compatibility...
+			return "";
+		} else {
 			int dollarIndex = tag.indexOf("$TU");
 
 			return dollarIndex < 0 ? tag : tag.substring(0, dollarIndex);
