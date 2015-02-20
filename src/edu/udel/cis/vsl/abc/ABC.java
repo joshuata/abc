@@ -37,7 +37,7 @@ import edu.udel.cis.vsl.abc.transform.IF.Transform;
  * in a plain text human-readable form. Various options can control how much
  * information is printed, and can also cause various transformations to be
  * applied to the AST. Executing with no command line arguments will print a
- * help message desciribing the options.
+ * help message describing the options.
  * </p>
  * 
  * <p>
