@@ -363,10 +363,7 @@ public class ASTPrettyPrinter {
 			result.append("struct ");
 		else
 			result.append("union ");
-		// ABC inserts name to anonymous struct/union in the form of
-		// $anon_struct_<i>/$anon_union_<i>
-		if (strOrUnion.getName() != null
-				&& !strOrUnion.getName().startsWith("$"))
+		if (strOrUnion.getName() != null)
 			result.append(strOrUnion.getName());
 		if (fields != null) {
 			int numFields = fields.numChildren();
@@ -467,9 +464,7 @@ public class ASTPrettyPrinter {
 
 		result.append(prefix);
 		result.append("enum ");
-		// ABC inserts name to anonymous enum in the format of
-		// $annon_enum_<i>$TU<j>.
-		if (tag != null && !tag.name().startsWith("$"))
+		if (tag != null)
 			result.append(tag.name());
 		if (enumerators != null) {
 			int num = enumerators.numChildren();
