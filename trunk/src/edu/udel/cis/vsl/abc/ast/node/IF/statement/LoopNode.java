@@ -25,13 +25,42 @@ public interface LoopNode extends StatementNode {
 	ExpressionNode getCondition();
 
 	/**
+	 * Sets the loop condition for this loop node.
+	 * 
+	 * @param condition
+	 *            the loop condition
+	 */
+	void setCondition(ExpressionNode condition);
+
+	/**
 	 * The loop body.
 	 * 
 	 * @return the loop body
 	 */
 	StatementNode getBody();
 
+	/**
+	 * Sets the loop body.
+	 * 
+	 * @param body
+	 *            the body
+	 */
+	void setBody(StatementNode body);
+
+	/**
+	 * Gets the invariant expression associated to this loop node.
+	 * 
+	 * @return the invariant
+	 */
 	ExpressionNode getInvariant();
+
+	/**
+	 * Sets the loop invariant associated to this loop node.
+	 * 
+	 * @param invariant
+	 *            the loop invariant expression
+	 */
+	void setInvariant(ExpressionNode invariant);
 
 	/**
 	 * What kind of loop is this?

@@ -1,5 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.node.IF;
 
+import java.util.List;
+
 /**
  * A node in which all children have type <code>T</code>.
  */
@@ -53,4 +55,16 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode, Iterable<T> {
 
 	@Override
 	T removeChild(int index);
+
+	/**
+	 * Inserts a sequence of nodes into the child sequence of this node. Any
+	 * children after the given index will be shifted up in index.
+	 * 
+	 * @param index
+	 *            an integer in [0,numChildren]
+	 * @param list
+	 *            a non-null list of free nodes of type T, any of which may be
+	 *            null
+	 */
+	void insertChildren(int index, List<T> list);
 }

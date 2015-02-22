@@ -75,4 +75,19 @@ public class CommonLoopNode extends CommonStatementNode implements LoopNode {
 				return null;
 		return new DifferenceObject(this, that);
 	}
+
+	@Override
+	public void setCondition(ExpressionNode condition) {
+		setChild(0, condition);
+	}
+
+	@Override
+	public void setBody(StatementNode body) {
+		setChild(1, body);
+	}
+
+	@Override
+	public void setInvariant(ExpressionNode invariant) {
+		setChild(2, invariant);
+	}
 }

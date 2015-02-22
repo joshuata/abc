@@ -15,10 +15,34 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
  */
 public interface ForLoopNode extends LoopNode {
 
-	/** Either: expression or list of declaration. */
+	/**
+	 * Gets the initializer part of this for loop node. Note that this is an
+	 * instance of either {@link ExpressionNode} or {@link DeclarationListNode}.
+	 */
 	ForLoopInitializerNode getInitializer();
 
+	/**
+	 * Sets the initializer part of this for loop node.
+	 * 
+	 * @param initNode
+	 *            the initializer
+	 */
+	void setInitializer(ForLoopInitializerNode initNode);
+
+	/**
+	 * Gets the incrementer part of this for loop node.
+	 * 
+	 * @return incrementer
+	 */
 	ExpressionNode getIncrementer();
+
+	/**
+	 * Sets the incrementer part of this for loop node.
+	 * 
+	 * @param node
+	 *            the incrementer
+	 */
+	void setIncrementer(ExpressionNode node);
 
 	@Override
 	ForLoopNode copy();
