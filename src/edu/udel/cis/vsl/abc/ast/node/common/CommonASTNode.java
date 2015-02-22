@@ -261,9 +261,6 @@ public abstract class CommonASTNode implements ASTNode {
 		if (index < 0)
 			throw new ASTException("Negative index " + index
 					+ " used in setChild on " + this);
-		// if (child == null)
-		// throw new ASTException("Cannot set child to null (index=" + index
-		// + "): " + this);
 		if (child != null && child.parent() != null)
 			throw new ASTException("Cannot make\n" + child
 					+ "\na child of node\n" + this
@@ -283,6 +280,49 @@ public abstract class CommonASTNode implements ASTNode {
 			((CommonASTNode) child).childIndex = index;
 		}
 		return oldChild;
+	}
+
+	/**
+	 * Insert a sequence of nodes into the child list of this node.
+	 * 
+	 * @param index
+	 *            an integer in [0,numChildren]
+	 * @param list
+	 *            a non-null list of free nodes, any of which may be null
+	 */
+	protected void insertChildrenAt(int index, List<? extends ASTNode> list) {
+		int oldSize = children.size();
+		int listSize = list.size();
+		int newSize = oldSize + listSize;
+
+		checkModifiable();
+		if (index < 0)
+			throw new ASTException("Negative index " + index
+					+ " used in insertChildren on " + this);
+		if (index > oldSize)
+			throw new ASTException("Index " + index + " exceeds size "
+					+ oldSize + " in insertChildren on " + this);
+		children.addAll(index, list);
+		for (int i = index; i < index + listSize; i++) {
+			ASTNode child = children.get(i);
+
+			if (child != null) {
+				if (child.parent() != null)
+					throw new ASTException("Cannot make\n" + child
+							+ "\na child of node\n" + this
+							+ "\nbecause it is already a child of\n"
+							+ child.parent());
+				((CommonASTNode) child).parent = this;
+				((CommonASTNode) child).childIndex = i;
+			}
+		}
+		for (int i = index + listSize; i < newSize; i++) {
+			ASTNode child = children.get(i);
+
+			if (child != null) {
+				((CommonASTNode) child).childIndex = i;
+			}
+		}
 	}
 
 	@Override
@@ -454,6 +494,8 @@ public abstract class CommonASTNode implements ASTNode {
 
 	@Override
 	public StringBuffer prettyRepresentation() {
+		// TODO there has to be a better way to do this that does
+		// not involve File I/O
 		StringBuffer result = new StringBuffer();
 
 		try {

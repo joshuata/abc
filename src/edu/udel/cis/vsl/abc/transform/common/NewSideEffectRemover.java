@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
@@ -40,6 +42,11 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
@@ -909,8 +916,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 			expression.setArgument(triple.getNode());
 			triple.setNode(expression);
 		} else if (arg instanceof TypeNode) {
-			// types can't have side-effects
-			triple = new ExprTriple(expression);
+			SETriple typeTriple = translateGenericNode(arg);
+
+			expression.setArgument((TypeNode) typeTriple.getNode());
+			triple = new ExprTriple(typeTriple.getBefore(), expression,
+					new LinkedList<BlockItemNode>());
 		} else
 			throw new ABCRuntimeException("Unexpected kind of SizeableNode: "
 					+ arg);
@@ -978,21 +988,26 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	// ExpressionNode in middle
-	// would like a triple with an InitializerNode in middle
-	// would like a triple with CompoundInitializerNode in middle
-	// would like a triple with TypeNode in the middle
-	// would like many different kinds of triples with different nodes in middle
+	/**
+	 * Translates an initializer node.
+	 * 
+	 * @param node
+	 *            an initializer node
+	 * @param emptyAfter
+	 *            must the resulting triple have an empty after clause?
+	 * @return result of translation
+	 */
+	private SETriple translateInitializer(InitializerNode node,
+			boolean emptyAfter) {
+		if (node instanceof ExpressionNode) {
+			ExprTriple triple = translate((ExpressionNode) node);
 
-	// need to purify all and put them before the compound
-	// no sequence points
-
-	private SETriple translateInitializer(InitializerNode node) {
-		if (node instanceof ExpressionNode)
-			return translate((ExpressionNode) node);
-		else if (node instanceof CompoundInitializerNode)
-			return translateCompoundInitializer((CompoundInitializerNode) node);
-		else
+			emptyAfter(triple);
+			return triple;
+		} else if (node instanceof CompoundInitializerNode) {
+			return translateCompoundInitializer((CompoundInitializerNode) node,
+					emptyAfter);
+		} else
 			throw new ABCRuntimeException(
 					"Unexpected kind of initializer node: " + node);
 	}
@@ -1001,9 +1016,13 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * Translates a compound initializer. There are no sequence points.
 	 * 
 	 * @param node
-	 * @return
+	 *            a compound initializer node, possibly containing side-effects
+	 * @param emptyAfter
+	 *            should the triple returned have an empty after clause?
+	 * @return triple corresponding to given node
 	 */
-	private SETriple translateCompoundInitializer(CompoundInitializerNode node) {
+	private SETriple translateCompoundInitializer(CompoundInitializerNode node,
+			boolean emptyAfter) {
 		SETriple result = new SETriple(node);
 
 		for (PairNode<DesignationNode, InitializerNode> pair : node) {
@@ -1017,9 +1036,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 							.getIndex();
 					ExprTriple triple = translate(indexNode);
 
-					makesef(triple);
-					result.addAllBefore(triple.getBefore());
-					result.addAllAfter(triple.getAfter());
+					if (emptyAfter) {
+						purify(triple);
+						result.addAllBefore(triple.getBefore());
+					} else {
+						makesef(triple);
+						result.addAllBefore(triple.getBefore());
+						result.addAllAfter(triple.getAfter());
+					}
 					((ArrayDesignatorNode) designator).setIndex(triple
 							.getNode());
 				} else {
@@ -1028,7 +1052,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 				}
 			}
 
-			SETriple initTriple = translateInitializer(pair.getRight());
+			SETriple initTriple = translateInitializer(pair.getRight(),
+					emptyAfter);
 
 			result.addAllBefore(initTriple.getBefore());
 			result.addAllAfter(initTriple.getAfter());
@@ -1046,7 +1071,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	private ExprTriple translateCompoundLiteral(CompoundLiteralNode expression) {
 		CompoundInitializerNode ciNode = expression.getInitializerList();
-		SETriple triple = translateCompoundInitializer(ciNode);
+		SETriple triple = translateCompoundInitializer(ciNode, false);
 		ExprTriple result = new ExprTriple(expression);
 
 		expression.setInitializerList((CompoundInitializerNode) triple
@@ -1162,8 +1187,314 @@ public class NewSideEffectRemover extends BaseTransformer {
 				+ ") in " + expression);
 	}
 
-	// TODO: make these methods return a list of statements.
-	// no need to keep creating new scopes.
+	// Declarations...
+
+	/**
+	 * <p>
+	 * Translates any AST node into a pure side-effect-free triple. Pure means
+	 * the after clause will be empty and all expressions occurring within the
+	 * resulting node will be side-effect-free. The kind of node returned in the
+	 * triple will be the same kind given: e.g., if node is an instance of
+	 * {@link DeclarationNode}, then the node component of the triple returned
+	 * will also be an instance of {@link DeclarationNode}.
+	 * </p>
+	 * 
+	 * <p>
+	 * Specifically, what this method does: it explores the tree rooted at the
+	 * given node in DFS order. Whenever it encounters an expression (so an
+	 * expression that is not a sub-expression of another expression) it
+	 * translates and purifies that expression. The before side-effects from the
+	 * expression are appended to the before clause for the final result. The
+	 * (sef) node component of the result replaces the original expression.
+	 * </p>
+	 * 
+	 * @param node
+	 *            any ASTNode
+	 * @return a pure side-effect-free triple resulting from the translation of
+	 *         the node
+	 */
+	private SETriple translateGenericNode(ASTNode node) {
+		if (node instanceof ExpressionNode) {
+			ExprTriple result = translate((ExpressionNode) node);
+
+			purify(result);
+			return result;
+		} else {
+			int numChildren = node.numChildren();
+			SETriple result = new SETriple(node);
+
+			for (int i = 0; i < numChildren; i++) {
+				SETriple childTriple = translateGenericNode(node.child(i));
+
+				result.addAllBefore(childTriple.getBefore());
+				node.setChild(i, childTriple.getNode());
+			}
+			return result;
+		}
+	}
+
+	/**
+	 * Returns a triple in which the after clause is empty and the node is the
+	 * variable declaration node, because we want the side-effects to complete
+	 * before the initialization takes place.
+	 * 
+	 * @param decl
+	 *            a variable declaration
+	 * @return equivalent triple with empty after
+	 */
+	private List<BlockItemNode> normalizeVariableDeclaration(
+			VariableDeclarationNode decl) {
+		TypeNode typeNode = decl.getTypeNode();
+		InitializerNode initNode = decl.getInitializer();
+		SETriple typeTriple = translateGenericNode(typeNode);
+		List<BlockItemNode> result = new LinkedList<>();
+
+		result.addAll(typeTriple.getBefore());
+		decl.setTypeNode((TypeNode) typeTriple.getNode());
+		if (initNode != null) {
+			SETriple initTriple;
+
+			if (initNode instanceof ExpressionNode) {
+				initTriple = translate((ExpressionNode) initNode);
+				emptyAfter((ExprTriple) initTriple);
+			} else {
+				initTriple = translateCompoundInitializer(
+						(CompoundInitializerNode) initNode, true);
+				// true, since need side-effects to complete before
+				// initialization happens
+			}
+			result.addAll(initTriple.getBefore());
+			decl.setInitializer((InitializerNode) initTriple.getNode());
+		}
+		return result;
+	}
+
+	// statements
+
+	private List<BlockItemNode> normalizeExpressionAsStatement(
+			ExpressionNode expr) {
+		ExprTriple triple = translate(expr);
+		List<BlockItemNode> result;
+
+		// expr part of triple may contain function call/spawn
+		makesef(triple);
+		result = triple.getBefore();
+		result.addAll(triple.getAfter());
+		return result;
+	}
+
+	private List<BlockItemNode> normalizeExpressionStatement(
+			ExpressionStatementNode exprStmt) {
+		return normalizeExpressionAsStatement(exprStmt.getExpression());
+	}
+
+	private CompoundStatementNode makeCompound(StatementNode stmt) {
+		if (stmt instanceof CompoundStatementNode)
+			return (CompoundStatementNode) stmt;
+		else
+			return nodeFactory.newCompoundStatementNode(stmt.getSource(),
+					Arrays.asList((BlockItemNode) stmt));
+	}
+
+	private void normalizeLoopBody(LoopNode loop) {
+		StatementNode body = loop.getBody();
+		List<BlockItemNode> bodyList = normalizeStatement(body);
+
+		if (bodyList.size() == 1)
+			loop.setBody((StatementNode) bodyList.get(0));
+		else
+			loop.setBody(nodeFactory.newCompoundStatementNode(body.getSource(),
+					bodyList));
+	}
+
+	/**
+	 * Normalizes the initializer node of for loop by placing it in normal form
+	 * and moving before the for loop if necessary. This may modify the for
+	 * loop.
+	 * 
+	 * @param forLoop
+	 *            a for loop node
+	 * @return the sequence of statements to insert before the for loop
+	 *         (possibly empty)
+	 */
+	private List<BlockItemNode> normalizeForLoopInitializer(ForLoopNode forLoop) {
+		ForLoopInitializerNode init = forLoop.getInitializer();
+
+		if (init instanceof ExpressionNode) {
+			List<BlockItemNode> initItems = normalizeExpressionAsStatement((ExpressionNode) init);
+
+			// if initItems consists of one expression statement, keep it in for
+			if (initItems.size() == 1) {
+				BlockItemNode item = initItems.get(0);
+
+				if (item instanceof ExpressionStatementNode) {
+					ExpressionNode expr = ((ExpressionStatementNode) item)
+							.getExpression();
+
+					forLoop.setInitializer(expr);
+					return new LinkedList<BlockItemNode>();
+				}
+			}
+			forLoop.setInitializer(null);
+			return initItems;
+		} else if (init instanceof DeclarationListNode) {
+			// make all declarations normal. if there are any side
+			// effects, move them to an outer scope?
+			DeclarationListNode declList = (DeclarationListNode) init;
+			int numDecls = declList.numChildren();
+			List<BlockItemNode> result = new LinkedList<>();
+
+			for (int i = 0; i < numDecls; i++) {
+				VariableDeclarationNode decl = declList.getSequenceChild(i);
+
+				result.addAll(normalizeVariableDeclaration(decl));
+			}
+			return result;
+		} else
+			throw new ABCRuntimeException(
+					"Unexpected kind of for loop initializer: " + init);
+	}
+
+	private void normalizeForLoopIncrementer(ForLoopNode forLoop) {
+		// incrementer: if normal statement, leave alone, otherwise:
+		// for (...; ...; ;) { ... incrementer }
+		ExpressionNode incrementer = forLoop.getIncrementer();
+		List<BlockItemNode> incItems = normalizeExpressionAsStatement(incrementer);
+
+		if (incItems.size() == 1
+				& incItems.get(0) instanceof ExpressionStatementNode) {
+			// nothing to do
+		} else {
+			CompoundStatementNode body = makeCompound(forLoop.getBody());
+
+			forLoop.setBody(body);
+			body.insertChildren(body.numChildren(), incItems);
+			forLoop.setIncrementer(null);
+		}
+	}
+
+	private void normalizeLoopCondition(LoopNode loop) {
+		// cond: purify. if before is non-trivial then transform to
+		// while (1) { befores; if (!expr) break; body}
+		ExpressionNode cond = loop.getCondition();
+		ExprTriple condTriple = translate(cond);
+
+		purify(condTriple);
+
+		List<BlockItemNode> condItems = condTriple.getBefore();
+
+		if (!condItems.isEmpty()) {
+			Source condSource = cond.getSource();
+			CompoundStatementNode body = makeCompound(loop.getBody());
+
+			loop.setBody(body);
+			condItems.add(nodeFactory.newIfNode(condSource, nodeFactory
+					.newOperatorNode(condSource, Operator.NOT,
+							condTriple.getNode()), nodeFactory
+					.newBreakNode(condSource)));
+			body.insertChildren(0, condItems);
+			loop.setCondition(newOneNode(condSource));
+		}
+	}
+
+	private List<BlockItemNode> normalizeForLoop(ForLoopNode forLoop) {
+		normalizeLoopBody(forLoop);
+
+		List<BlockItemNode> result = normalizeForLoopInitializer(forLoop);
+
+		result.add(forLoop);
+		normalizeLoopCondition(forLoop);
+		normalizeForLoopIncrementer(forLoop);
+		return result;
+	}
+
+	private List<BlockItemNode> normalizeWhileLoop(LoopNode whileLoop) {
+		normalizeLoopBody(whileLoop);
+		normalizeLoopCondition(whileLoop);
+
+		List<BlockItemNode> result = new LinkedList<>();
+
+		result.add(whileLoop);
+		return result;
+	}
+
+	private List<BlockItemNode> normalizeDoLoop(LoopNode doLoop) {
+		normalizeLoopBody(doLoop);
+
+		// do {... befores} while (e);
+		ExprTriple condTriple = translate(doLoop.getCondition());
+
+		purify(condTriple);
+
+		List<BlockItemNode> condItems = condTriple.getBefore();
+
+		if (condItems.isEmpty()) {
+			// nothing to do
+		} else {
+			CompoundStatementNode body = makeCompound(doLoop.getBody());
+
+			body.insertChildren(body.numChildren(), condItems);
+			doLoop.setCondition(condTriple.getNode());
+		}
+		return Arrays.asList((BlockItemNode) doLoop);
+	}
+
+	private List<BlockItemNode> normalizeLoop(LoopNode loop) {
+		switch (loop.getKind()) {
+		case DO_WHILE:
+			return normalizeDoLoop(loop);
+		case FOR:
+			return normalizeForLoop((ForLoopNode) loop);
+		case WHILE:
+			return normalizeWhileLoop(loop);
+		default:
+			throw new ABCRuntimeException("Unknown kind of loop: "
+					+ loop.getKind());
+		}
+	}
+
+	List<BlockItemNode> normalizeStatement(StatementNode statement) {
+		switch (statement.statementKind()) {
+		case ASSERT:
+			break;
+		case ASSUME:
+			break;
+		case ATOMIC:
+			break;
+		case CHOOSE:
+			break;
+		case CIVL_FOR:
+			break;
+		case COMPOUND:
+			break;
+		case EXPRESSION:
+			return normalizeExpressionStatement((ExpressionStatementNode) statement);
+		case IF:
+			break;
+		case JUMP:
+			break;
+		case LABELED:
+			break;
+		case LOOP:
+			return normalizeLoop((LoopNode) statement);
+		case NULL:
+			break;
+		case OMP_STATEMENT:
+			break;
+		case PRAGMA:
+			break;
+		case SWITCH:
+			break;
+		case WHEN:
+			break;
+		default:
+			break;
+
+		}
+		return null;
+	}
+
+	// function definitions...
 
 	private void removeSideEffects(FunctionDefinitionNode function)
 			throws SyntaxException {

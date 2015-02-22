@@ -8,37 +8,22 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonForLoopNode extends CommonLoopNode implements ForLoopNode {
 
-	private ForLoopInitializerNode initializer;
-	private ExpressionNode condition;
-	private ExpressionNode incrementer;
-
 	public CommonForLoopNode(Source source, ExpressionNode condition,
 			StatementNode statement, ForLoopInitializerNode initializer,
 			ExpressionNode incrementer, ExpressionNode invariant) {
 		super(source, LoopKind.FOR, condition, statement, invariant);
-		addChild(initializer);
-		addChild(incrementer);
-		this.initializer = initializer;
-		this.condition = condition;
-		this.incrementer = incrementer;
-
+		addChild(initializer); // child 3
+		addChild(incrementer); // child 4
 	}
 
-	// TODO: currently just assuming for loop initializer has only 2 forms: i =
-	// 0 or int i = 0.
 	@Override
 	public ForLoopInitializerNode getInitializer() {
-		return this.initializer;
+		return (ForLoopInitializerNode) child(3);
 	}
 
 	@Override
 	public ExpressionNode getIncrementer() {
-		return (ExpressionNode) this.incrementer;
-	}
-
-	@Override
-	public ExpressionNode getCondition() {
-		return (ExpressionNode) this.condition;
+		return (ExpressionNode) child(4);
 	}
 
 	@Override
@@ -51,5 +36,15 @@ public class CommonForLoopNode extends CommonLoopNode implements ForLoopNode {
 	@Override
 	public StatementKind statementKind() {
 		return StatementKind.LOOP;
+	}
+
+	@Override
+	public void setInitializer(ForLoopInitializerNode initNode) {
+		setChild(3, initNode);
+	}
+
+	@Override
+	public void setIncrementer(ExpressionNode node) {
+		setChild(4, node);
 	}
 }

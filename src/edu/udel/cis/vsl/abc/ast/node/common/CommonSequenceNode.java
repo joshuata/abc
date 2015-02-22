@@ -118,4 +118,9 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 		return (T) super.removeChild(index);
 	}
 
+	@Override
+	public void insertChildren(int index, List<T> list) {
+		insertChildrenAt(index, list);
+	}
+
 }
