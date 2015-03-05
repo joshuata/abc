@@ -31,4 +31,9 @@ public class CommonAssumeNode extends CommonStatementNode implements AssumeNode 
 	public StatementKind statementKind() {
 		return StatementKind.ASSUME;
 	}
+
+	@Override
+	public void setExpression(ExpressionNode expr) {
+		setChild(0, expr);
+	}
 }

@@ -22,6 +22,14 @@ public interface AtomicNode extends StatementNode {
 	StatementNode getBody();
 
 	/**
+	 * Sets the body of this atomic statement.
+	 * 
+	 * @param body
+	 *            a statement to become the body
+	 */
+	void setBody(StatementNode body);
+
+	/**
 	 * Is this an <code>$atom</code> statement?
 	 * 
 	 * @return <code>true</code> if this is an <code>$atom</code> statement;

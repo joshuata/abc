@@ -74,4 +74,9 @@ public class CommonAtomicNode extends CommonStatementNode implements AtomicNode 
 						"different atom/atomic specifier");
 		return new DifferenceObject(this, that);
 	}
+
+	@Override
+	public void setBody(StatementNode body) {
+		setChild(0, body);
+	}
 }
