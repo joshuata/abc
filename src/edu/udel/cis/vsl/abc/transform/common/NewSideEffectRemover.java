@@ -40,7 +40,11 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
@@ -1453,14 +1457,106 @@ public class NewSideEffectRemover extends BaseTransformer {
 		}
 	}
 
+	private List<BlockItemNode> normalizeAssert(AssertNode statement) {
+		ExprTriple triple = translate(statement.getCondition());
+
+		purify(triple);
+
+		List<BlockItemNode> result = triple.getBefore();
+
+		statement.setCondition(triple.getNode());
+		result.add(statement);
+		return result;
+	}
+
+	private List<BlockItemNode> normalizeAssume(AssumeNode statement) {
+		ExprTriple triple = translate(statement.getExpression());
+
+		purify(triple);
+
+		List<BlockItemNode> result = triple.getBefore();
+
+		statement.setExpression(triple.getNode());
+		result.add(statement);
+		return result;
+	}
+
+	private List<BlockItemNode> normalizeAtomic(AtomicNode statement) {
+		StatementNode body = statement.getBody();
+		List<BlockItemNode> bodyItems = normalizeStatement(body);
+		List<BlockItemNode> result = new LinkedList<>();
+
+		result.add(statement);
+		if (bodyItems.size() == 1) {
+			BlockItemNode item = bodyItems.get(0);
+
+			if (item instanceof StatementNode) {
+				statement.setBody((StatementNode) item);
+				return result;
+			}
+		}
+		statement.setBody(nodeFactory.newCompoundStatementNode(
+				body.getSource(), bodyItems));
+		return result;
+	}
+
+	private List<BlockItemNode> normalizeBlockItem(BlockItemNode item) {
+		BlockItemKind kind = item.blockItemKind();
+
+		// TODO
+		switch (kind) {
+		case ENUMERATOR:
+			break;
+		case ORDINARY_DECLARATION:
+			break;
+		case PRAGMA:
+			break;
+		case SCOPED_DECLARATION:
+			break;
+		case STATEMENT:
+			break;
+		case STATIC_ASSERTION:
+			break;
+		case STRUCT_OR_UNION:
+			break;
+		case TYPEDEF:
+			break;
+		default:
+			break;
+
+		}
+
+		return null;
+	}
+
+	private List<BlockItemNode> normalizeCompound(CompoundStatementNode compound) {
+		List<BlockItemNode> result = new LinkedList<>();
+
+		for (BlockItemNode item : compound) {
+			result.addAll(normalizeBlockItem(item));
+		}
+		return result;
+	}
+
+	private CompoundStatementNode removeSideEffectsCompound(
+			CompoundStatementNode compound) {
+		List<BlockItemNode> items = normalizeCompound(compound);
+
+		// TODO
+		return null;
+
+	}
+
+	// TODO: continue here for all statement
+
 	List<BlockItemNode> normalizeStatement(StatementNode statement) {
 		switch (statement.statementKind()) {
 		case ASSERT:
-			break;
+			return normalizeAssert((AssertNode) statement);
 		case ASSUME:
-			break;
+			return normalizeAssume((AssumeNode) statement);
 		case ATOMIC:
-			break;
+			return normalizeAtomic((AtomicNode) statement);
 		case CHOOSE:
 			break;
 		case CIVL_FOR:
@@ -1498,7 +1594,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 
 	private void removeSideEffects(FunctionDefinitionNode function)
 			throws SyntaxException {
-		// function.setBody(processCompoundStatement(function.getBody()));
+		function.setBody(removeSideEffectsCompound(function.getBody()));
 	}
 
 	/* Public Methods */

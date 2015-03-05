@@ -29,6 +29,14 @@ public interface AssumeNode extends StatementNode, ExternalDefinitionNode {
 	 */
 	ExpressionNode getExpression();
 
+	/**
+	 * Sets the argument to the assume statement.
+	 * 
+	 * @param expr
+	 *            the argument, a boolean-valued expression
+	 */
+	void setExpression(ExpressionNode expr);
+
 	@Override
 	AssumeNode copy();
 }

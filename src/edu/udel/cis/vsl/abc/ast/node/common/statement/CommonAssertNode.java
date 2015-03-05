@@ -40,4 +40,9 @@ public class CommonAssertNode extends CommonStatementNode implements AssertNode 
 	public SequenceNode<ExpressionNode> getExplanation() {
 		return (SequenceNode<ExpressionNode>) child(1);
 	}
+
+	@Override
+	public void setCondition(ExpressionNode expr) {
+		setChild(0, expr);
+	}
 }

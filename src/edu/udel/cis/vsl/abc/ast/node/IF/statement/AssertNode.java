@@ -33,6 +33,14 @@ public interface AssertNode extends StatementNode, ExternalDefinitionNode {
 	ExpressionNode getCondition();
 
 	/**
+	 * Sets the condition to the assert statement.
+	 * 
+	 * @param expr
+	 *            a Boolean-valued expression
+	 */
+	void setCondition(ExpressionNode expr);
+
+	/**
 	 * Gets the explanation of the assert statement. Could be null if absent.
 	 * 
 	 * @return the explanation of the assert statement, or null if absent.
