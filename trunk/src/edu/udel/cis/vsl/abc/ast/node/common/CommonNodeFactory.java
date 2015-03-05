@@ -19,7 +19,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
@@ -27,7 +26,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -112,7 +110,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFieldDeclarationNo
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonRequiresNode;
-import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonTypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonVariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonAlignOfNode;
@@ -323,14 +320,6 @@ public class CommonNodeFactory implements NodeFactory {
 	public DomainTypeNode newDomainTypeNode(Source source,
 			ExpressionNode dimension) {
 		return new CommonDomainTypeNode(source, dimension);
-	}
-
-	@Override
-	public ScopeParameterizedDeclarationNode newScopeParameterizedDeclarationNode(
-			Source source, SequenceNode<VariableDeclarationNode> scopeList,
-			DeclarationNode baseDeclaration) {
-		return new CommonScopeParameterizedDeclarationNode(source, scopeList,
-				baseDeclaration);
 	}
 
 	@Override

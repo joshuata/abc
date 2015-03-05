@@ -52,6 +52,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
@@ -67,8 +68,6 @@ import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
-
-//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 
 /**
  * <p>
@@ -228,8 +227,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 					nodeFactory.newIdentifierNode(source, "$proc"), null);
 		}
 		case FUNCTION:
+			// TODO
 		case HEAP:
+			// TODO
 		case QUALIFIED:
+			// TODO
 		default:
 			throw new ABCUnsupportedException("converting type " + type
 					+ " to a type node.", source.getSummary(false));
@@ -240,8 +242,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * Modifies the triple by introducing a new temporary variable t whose type
 	 * is same as the type of the expression, appending a declaration for t to
 	 * the before clause, moving all the after clauses to the end of the before
-	 * clause, and replacing the expression with t. The result is a triple with
-	 * a side-effect-free expression and an empty after clause.
+	 * clause, and replacing the expression with t. The result is a triple
+	 * equivalent to original but with a side-effect-free expression and an
+	 * empty after clause.
 	 * 
 	 * @param triple
 	 *            any triple
@@ -349,6 +352,17 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return false;
 	}
 
+	/**
+	 * Translates a left-hand-side expression into a triple. The result returned
+	 * will always have empty after clause. The expression component of the
+	 * triple returned will be left-hand-side expression that will refer to the
+	 * same memory unit as the original.
+	 * 
+	 * Example: a[i++] -> [int tmp = i; i=i+1 | a[tmp] | ].
+	 * 
+	 * @param lhs
+	 * @return
+	 */
 	private ExprTriple lhsTranslate(ExpressionNode lhs) {
 		ExpressionKind kind = lhs.expressionKind();
 
@@ -392,6 +406,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 				// expr[i].
 				// expr can be a LHSExpression of array type (like a[j][k])
 				// expr can be an expression of pointer type
+
 				ExprTriple t1 = translate(opNode.getArgument(0)), t2 = translate(opNode
 						.getArgument(1));
 
@@ -414,6 +429,13 @@ public class NewSideEffectRemover extends BaseTransformer {
 		}
 	}
 
+	/**
+	 * Creates a new integer constant node "1" with given source.
+	 * 
+	 * @param source
+	 *            a source object
+	 * @return a new integer constant node with value 1 and that source
+	 */
 	private IntegerConstantNode newOneNode(Source source) {
 		try {
 			return nodeFactory.newIntegerConstantNode(source, "1");
@@ -423,6 +445,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * Translates an expression of one of the following forms to a triple: e++,
+	 * e--, ++e, --e. Strategy:
+	 * 
 	 * <pre>
 	 * lhs++:
 	 * Let lhstranslate(lhs)=[b|e|].
@@ -434,7 +459,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * </pre>
 	 * 
 	 * @param opNode
-	 * @return
+	 *            an operator node in which the operator is one of the four
+	 *            operators {@link Operator#PREINCREMENT},
+	 *            {@link Operator#POSTINCREMENT}, {@link Operator#PREDECREMENT},
+	 *            {@link Operator#POSTDECREMENT}.
+	 * @return an equivalent triple
 	 */
 	private ExprTriple translateIncrementOrDecrement(OperatorNode opNode) {
 		Source source = opNode.getSource();
@@ -483,12 +512,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * Translates an assignment expression to an equivalent triple.
+	 * 
 	 * <p>
-	 * C11 6.15.16: "The side effect of updating the stored value of the left
-	 * operand is sequenced after the value computations of the left and right
-	 * operands. The evaluations of the operands are unsequenced."
+	 * Note from C11 6.15.16: "The side effect of updating the stored value of
+	 * the left operand is sequenced after the value computations of the left
+	 * and right operands. The evaluations of the operands are unsequenced."
 	 * </p>
 	 *
+	 * Strategy:
+	 * 
 	 * <pre>
 	 * lhs=rhs:
 	 * Let lhstranslate(lhs)=[b1|e1|], emptyAfter(translate(rhs))=[b2|e2|].
@@ -498,7 +531,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * @param assign
 	 *            an assignment node (operator node for which the operator is
 	 *            {@link Operator.ASSIGN}
-	 * @return SEFTriple equivalent to the given expression
+	 * @return a triple equivalent to the given expression
 	 */
 	private ExprTriple translateAssign(OperatorNode assign) {
 		assert assign.getOperator() == Operator.ASSIGN;
@@ -525,6 +558,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * Translates a pointer dereference expression <code>*e</code> to an
+	 * equivalent triple. Strategy:
+	 * 
 	 * <pre>
 	 * Pointer dereference *(expr):
 	 * Let purify(translate(expr))=[b|e|].
@@ -532,7 +568,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * </pre>
 	 * 
 	 * @param dereference
-	 * @return
+	 *            a pointer dereference expression
+	 * @return an equvialent triple
 	 */
 	private ExprTriple translateDereference(OperatorNode dereference) {
 		Operator operator = dereference.getOperator();
@@ -546,6 +583,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * Translates most binary operator expressions to an equivalent triple. This
+	 * is the default behavior used for a binary operator. Strategy:
+	 * 
 	 * <pre>
 	 * expr1+expr2:
 	 * Let makesef(translate(expr1))=[b1|e1|a1],
@@ -555,7 +595,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * </pre>
 	 * 
 	 * @param opNode
-	 * @return
+	 *            a binary operator expression
+	 * @return an equivalent triple
 	 */
 	private ExprTriple translateGenericBinaryOperator(OperatorNode opNode) {
 		ExprTriple leftTriple = translate(opNode.getArgument(0));
@@ -572,6 +613,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * Translates most unary expressions to equivalent triple. Strategy:
+	 * 
 	 * <pre>
 	 * -expr:
 	 * Let makesef(translate(expr))=[b1|e1|a1].
@@ -580,7 +623,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * </pre>
 	 * 
 	 * @param opNode
-	 * @return
+	 *            a unary operator node
+	 * @return equivalent triple
 	 */
 	private ExprTriple translateGenericUnaryOperator(OperatorNode opNode) {
 		ExprTriple result = translate(opNode.getArgument(0));
@@ -592,11 +636,13 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * Translates a function call node to an equivalent triple.
+	 * 
 	 * <p>
-	 * C11 6.5.2.2: "There is a sequence point after the evaluations of the
-	 * function designator and the actual arguments but before the actual call.
-	 * Every evaluation in the calling function (including other function calls)
-	 * that is not otherwise specifically sequenced before or after the
+	 * Note from C11 6.5.2.2: "There is a sequence point after the evaluations
+	 * of the function designator and the actual arguments but before the actual
+	 * call. Every evaluation in the calling function (including other function
+	 * calls) that is not otherwise specifically sequenced before or after the
 	 * execution of the body of the called function is indeterminately sequenced
 	 * with respect to the execution of the called function."
 	 * </p>
@@ -607,17 +653,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * of the returned triple, and the "after" component will be empty.
 	 * </p>
 	 * 
-	 * <p>
-	 * In the end, the only places where a function call node may occur are (1)
-	 * as an expression statement, i.e., the function call is the complete
-	 * statement, or (2) as the expression which is the complete right-hand side
-	 * of an assignment. Furthermore, in the end, the only place an assignment
-	 * can occur is as an expression statement. Therefore, when this method is
-	 * invoked from an expression statement or when processing the right-hand
-	 * side of an assignment expression, it should be invoked with
-	 * <code>storeResult</code> <code>false</code>. In all other cases it should
-	 * be called with <code>storeResult</code> <code>true</code>.
-	 * </p>
+	 * Strategy:
 	 * 
 	 * <pre>
 	 * func(arg1, arg2, ...):
@@ -625,6 +661,10 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 * Let purify(arg1)=[b1|e1|], ...
 	 * translate(func(arg1, ...)) = [b1,b2,...|f(e1,e2,...)|].
 	 * </pre>
+	 * 
+	 * @param callNode
+	 *            a function call node
+	 * @return an equivalent triple with empty after
 	 */
 	private ExprTriple translateFunctionCall(FunctionCallNode callNode) {
 		ExprTriple functionTriple = translate(callNode.getFunction());
@@ -652,6 +692,15 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
+	/**
+	 * Translates a spawn expression. A spawn expression simply wraps a function
+	 * call expression, so the specification is exactly the same as that of
+	 * {@link #translateFunctionCall(FunctionCallNode)}.
+	 * 
+	 * @param spawn
+	 *            a spawn node
+	 * @return an equivalent triple
+	 */
 	private ExprTriple translateSpawn(SpawnNode spawn) {
 		ExprTriple result = translate(spawn.getCall());
 
@@ -660,6 +709,19 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
+	/**
+	 * Translates an expression using one of the following operators:
+	 * {@link Operator#PLUSEQ}, {@link Operator#MINUSEQ},
+	 * {@link Operator#BITANDEQ}, {@link Operator#BITOREQ},
+	 * {@link Operator#BITXOREQ}, {@link Operator#DIVEQ}, {@link Operator#MODEQ}
+	 * , {@link Operator#SHIFTLEFTEQ}, {@link Operator#SHIFTRIGHTEQ},
+	 * {@link Operator#TIMESEQ}.
+	 * 
+	 * @param opNode
+	 *            an operator node using one of the generalized assignment
+	 *            operators (but not the standard assignment operator)
+	 * @return an equivalent triple
+	 */
 	private ExprTriple translateGeneralAssignment(OperatorNode opNode) {
 		Operator assignmentOp = opNode.getOperator();
 		Operator binaryOp;
@@ -726,7 +788,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 	/**
 	 * Translates a comma expression into side-effect-free triple form. There is
 	 * a sequence point at the comma. So all side effects from the first
-	 * argument must complete before the second argument is evaluated.
+	 * argument must complete before the second argument is evaluated. Strategy:
 	 * 
 	 * <pre>
 	 * expr1,expr2:
@@ -838,6 +900,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
+	/**
+	 * Translates any operator expression to an equivalent triple. Delegates to
+	 * helper methods as needed.
+	 * 
+	 * @param expression
+	 *            any operator expression
+	 * @return an equivalent triple
+	 */
 	private ExprTriple translateOperatorExpression(OperatorNode expression) {
 		ExprTriple result;
 
@@ -910,6 +980,13 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
+	/**
+	 * Translates a <code>sizeof</code> expression to an equivalent triple.
+	 * 
+	 * @param expression
+	 *            any {@link SizeofNode}
+	 * @return equivalent triple
+	 */
 	private ExprTriple translateSizeof(SizeofNode expression) {
 		SizeableNode arg = expression.getArgument();
 		ExprTriple triple;
@@ -931,6 +1008,13 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return triple;
 	}
 
+	/**
+	 * Translates a <code>$scopeof</code> expression into an equivalent triple.
+	 * 
+	 * @param expression
+	 *            an instance of {@link ScopeOfNode}
+	 * @return equivalent triple
+	 */
 	private ExprTriple translateScopeOf(ScopeOfNode expression) {
 		ExprTriple result = translate(expression.expression());
 
@@ -1246,7 +1330,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 *            a variable declaration
 	 * @return equivalent triple with empty after
 	 */
-	private List<BlockItemNode> normalizeVariableDeclaration(
+	private List<BlockItemNode> translateVariableDeclaration(
 			VariableDeclarationNode decl) {
 		TypeNode typeNode = decl.getTypeNode();
 		InitializerNode initNode = decl.getInitializer();
@@ -1275,7 +1359,18 @@ public class NewSideEffectRemover extends BaseTransformer {
 
 	// statements
 
-	private List<BlockItemNode> normalizeExpressionAsStatement(
+	/**
+	 * Given an expression which is going to be used essentially as a statement,
+	 * i.e., only for its side-effects (for example, in an expression statement,
+	 * or a for loop initializer or incrementer), returns an equivalent list of
+	 * block items in normal form.
+	 * 
+	 * @param expr
+	 *            a non-<code>null</code> expression
+	 * @return list of block items in normal form the execution of which is
+	 *         equivalent to the evaluation of the expression
+	 */
+	private List<BlockItemNode> translateExpressionAsStatement(
 			ExpressionNode expr) {
 		ExprTriple triple = translate(expr);
 		List<BlockItemNode> result;
@@ -1287,11 +1382,29 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private List<BlockItemNode> normalizeExpressionStatement(
+	/**
+	 * Transforms an expression statement into a sequence of block items
+	 * equivalent to the original expression but in normal form.
+	 * 
+	 * @param exprStmt
+	 *            a non-<code>null</code> expression statement node
+	 * @return list of block items in normal form equivalent to original
+	 */
+	private List<BlockItemNode> translateExpressionStatement(
 			ExpressionStatementNode exprStmt) {
-		return normalizeExpressionAsStatement(exprStmt.getExpression());
+		return translateExpressionAsStatement(exprStmt.getExpression());
 	}
 
+	/**
+	 * If the given statement is already a compound statement (instance of
+	 * {@link CompoundStatementNode}), the given statement is returned
+	 * unmodified; otherwise, a new {@link CompoundStatementNode} is created
+	 * with a single child which is the given statement.
+	 * 
+	 * @param stmt
+	 *            any non-null statement
+	 * @return a compound statement equivalent to the given one
+	 */
 	private CompoundStatementNode makeCompound(StatementNode stmt) {
 		if (stmt instanceof CompoundStatementNode)
 			return (CompoundStatementNode) stmt;
@@ -1300,9 +1413,15 @@ public class NewSideEffectRemover extends BaseTransformer {
 					Arrays.asList((BlockItemNode) stmt));
 	}
 
+	/**
+	 * Places a loop statement body into normal form.
+	 * 
+	 * @param loop
+	 *            a non-<code>null</code> loop node
+	 */
 	private void normalizeLoopBody(LoopNode loop) {
 		StatementNode body = loop.getBody();
-		List<BlockItemNode> bodyList = normalizeStatement(body);
+		List<BlockItemNode> bodyList = translateStatement(body);
 
 		if (bodyList.size() == 1)
 			loop.setBody((StatementNode) bodyList.get(0));
@@ -1325,7 +1444,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ForLoopInitializerNode init = forLoop.getInitializer();
 
 		if (init instanceof ExpressionNode) {
-			List<BlockItemNode> initItems = normalizeExpressionAsStatement((ExpressionNode) init);
+			List<BlockItemNode> initItems = translateExpressionAsStatement((ExpressionNode) init);
 
 			// if initItems consists of one expression statement, keep it in for
 			if (initItems.size() == 1) {
@@ -1351,7 +1470,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 			for (int i = 0; i < numDecls; i++) {
 				VariableDeclarationNode decl = declList.getSequenceChild(i);
 
-				result.addAll(normalizeVariableDeclaration(decl));
+				result.addAll(translateVariableDeclaration(decl));
 			}
 			return result;
 		} else
@@ -1359,11 +1478,19 @@ public class NewSideEffectRemover extends BaseTransformer {
 					"Unexpected kind of for loop initializer: " + init);
 	}
 
+	/**
+	 * Transforms a for-loop to an equivalent form in which the incrementer
+	 * expression has been normalized. May involve modifications to the loop
+	 * body as well as to the incrementer.
+	 * 
+	 * @param forLoop
+	 *            a non-<code>null</code> for-loop node
+	 */
 	private void normalizeForLoopIncrementer(ForLoopNode forLoop) {
 		// incrementer: if normal statement, leave alone, otherwise:
 		// for (...; ...; ;) { ... incrementer }
 		ExpressionNode incrementer = forLoop.getIncrementer();
-		List<BlockItemNode> incItems = normalizeExpressionAsStatement(incrementer);
+		List<BlockItemNode> incItems = translateExpressionAsStatement(incrementer);
 
 		if (incItems.size() == 1
 				& incItems.get(0) instanceof ExpressionStatementNode) {
@@ -1377,6 +1504,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 		}
 	}
 
+	/**
+	 * Transforms a loop node to an equivalent form in which the loop condition
+	 * expression has been placed in normal form. This may involve modifications
+	 * to the loop body.
+	 * 
+	 * @param loop
+	 *            a non-<code>null</code> loop node
+	 */
 	private void normalizeLoopCondition(LoopNode loop) {
 		// cond: purify. if before is non-trivial then transform to
 		// while (1) { befores; if (!expr) break; body}
@@ -1401,7 +1536,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 		}
 	}
 
-	private List<BlockItemNode> normalizeForLoop(ForLoopNode forLoop) {
+	/**
+	 * Produces a list of block items in normal form that is equivalent to the
+	 * given for-loop node. The loop node may be modified.
+	 * 
+	 * @param loop
+	 *            a non-<code>null</code> for loop node
+	 * @return list of block items in normal form equivalent to original loop
+	 *         node
+	 */
+	private List<BlockItemNode> translateForLoop(ForLoopNode forLoop) {
 		normalizeLoopBody(forLoop);
 
 		List<BlockItemNode> result = normalizeForLoopInitializer(forLoop);
@@ -1412,7 +1556,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private List<BlockItemNode> normalizeWhileLoop(LoopNode whileLoop) {
+	/**
+	 * Produces a list of block items in normal form that is equivalent to the
+	 * given while-loop node. The loop node may be modified.
+	 * 
+	 * @param loop
+	 *            a non-<code>null</code> while loop node
+	 * @return list of block items in normal form equivalent to original loop
+	 *         node
+	 */
+	private List<BlockItemNode> translateWhileLoop(LoopNode whileLoop) {
 		normalizeLoopBody(whileLoop);
 		normalizeLoopCondition(whileLoop);
 
@@ -1422,7 +1575,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private List<BlockItemNode> normalizeDoLoop(LoopNode doLoop) {
+	/**
+	 * Produces a list of block items in normal form that is equivalent to the
+	 * given do-while-loop node. The loop node may be modified.
+	 * 
+	 * @param loop
+	 *            a non-<code>null</code> do loop node
+	 * @return list of block items in normal form equivalent to original loop
+	 *         node
+	 */
+	private List<BlockItemNode> translateDoLoop(LoopNode doLoop) {
 		normalizeLoopBody(doLoop);
 
 		// do {... befores} while (e);
@@ -1443,21 +1605,30 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return Arrays.asList((BlockItemNode) doLoop);
 	}
 
-	private List<BlockItemNode> normalizeLoop(LoopNode loop) {
+	/**
+	 * Produces a list of block items in normal form that is equivalent to the
+	 * given loop node. The loop node may be modified.
+	 * 
+	 * @param loop
+	 *            a non-<code>null</code> loop node
+	 * @return list of block items in normal form equivalent to original loop
+	 *         node
+	 */
+	private List<BlockItemNode> translateLoop(LoopNode loop) {
 		switch (loop.getKind()) {
 		case DO_WHILE:
-			return normalizeDoLoop(loop);
+			return translateDoLoop(loop);
 		case FOR:
-			return normalizeForLoop((ForLoopNode) loop);
+			return translateForLoop((ForLoopNode) loop);
 		case WHILE:
-			return normalizeWhileLoop(loop);
+			return translateWhileLoop(loop);
 		default:
 			throw new ABCRuntimeException("Unknown kind of loop: "
 					+ loop.getKind());
 		}
 	}
 
-	private List<BlockItemNode> normalizeAssert(AssertNode statement) {
+	private List<BlockItemNode> translateAssert(AssertNode statement) {
 		ExprTriple triple = translate(statement.getCondition());
 
 		purify(triple);
@@ -1469,7 +1640,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private List<BlockItemNode> normalizeAssume(AssumeNode statement) {
+	private List<BlockItemNode> translateAssume(AssumeNode statement) {
 		ExprTriple triple = translate(statement.getExpression());
 
 		purify(triple);
@@ -1481,9 +1652,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private List<BlockItemNode> normalizeAtomic(AtomicNode statement) {
+	/**
+	 * 
+	 * @param statement
+	 * @return
+	 */
+	private List<BlockItemNode> translateAtomic(AtomicNode statement) {
 		StatementNode body = statement.getBody();
-		List<BlockItemNode> bodyItems = normalizeStatement(body);
+		List<BlockItemNode> bodyItems = translateStatement(body);
 		List<BlockItemNode> result = new LinkedList<>();
 
 		result.add(statement);
@@ -1500,63 +1676,57 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private List<BlockItemNode> normalizeBlockItem(BlockItemNode item) {
-		BlockItemKind kind = item.blockItemKind();
-
-		// TODO
-		switch (kind) {
-		case ENUMERATOR:
-			break;
-		case ORDINARY_DECLARATION:
-			break;
-		case PRAGMA:
-			break;
-		case SCOPED_DECLARATION:
-			break;
-		case STATEMENT:
-			break;
-		case STATIC_ASSERTION:
-			break;
-		case STRUCT_OR_UNION:
-			break;
-		case TYPEDEF:
-			break;
-		default:
-			break;
-
-		}
-
-		return null;
-	}
-
-	private List<BlockItemNode> normalizeCompound(CompoundStatementNode compound) {
+	/**
+	 * Returns a list of block items equivalent to the list of block items in a
+	 * given compound statement, but all in normal form. May modify any node in
+	 * the compound statement.
+	 * 
+	 * @param compound
+	 *            a non-<code>null</code> compound statement node
+	 * @return list of block items equivalent to the sequence of items in the
+	 *         original compound statement
+	 */
+	private List<BlockItemNode> translateCompound(CompoundStatementNode compound) {
 		List<BlockItemNode> result = new LinkedList<>();
 
 		for (BlockItemNode item : compound) {
-			result.addAll(normalizeBlockItem(item));
+			result.addAll(translateBlockItem(item));
 		}
 		return result;
 	}
 
-	private CompoundStatementNode removeSideEffectsCompound(
+	/**
+	 * Transforms a compound statement into an equivalent compound statement in
+	 * which all the items are in normal form.
+	 * 
+	 * @param compound
+	 *            a non-<code>null</code> compound statement node
+	 * @return a compound statement node equivalent to original but in which all
+	 *         items are in normal form
+	 */
+	private CompoundStatementNode transformCompound(
 			CompoundStatementNode compound) {
-		List<BlockItemNode> items = normalizeCompound(compound);
-
-		// TODO
-		return null;
-
+		return nodeFactory.newCompoundStatementNode(compound.getSource(),
+				translateCompound(compound));
 	}
 
-	// TODO: continue here for all statement
-
-	List<BlockItemNode> normalizeStatement(StatementNode statement) {
+	/**
+	 * Given a statement, computes a list of block items whose execution is
+	 * equivalent to the execution of the statement, but which are all in normal
+	 * form. May result in the modification of the statement.
+	 * 
+	 * @param statement
+	 *            a non-<code>null</code> statement node
+	 * @return list of block items in normal form equivalent to given statement
+	 */
+	List<BlockItemNode> translateStatement(StatementNode statement) {
 		switch (statement.statementKind()) {
 		case ASSERT:
-			return normalizeAssert((AssertNode) statement);
+			return translateAssert((AssertNode) statement);
 		case ASSUME:
-			return normalizeAssume((AssumeNode) statement);
+			return translateAssume((AssumeNode) statement);
 		case ATOMIC:
-			return normalizeAtomic((AtomicNode) statement);
+			return translateAtomic((AtomicNode) statement);
 		case CHOOSE:
 			break;
 		case CIVL_FOR:
@@ -1564,15 +1734,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 		case COMPOUND:
 			break;
 		case EXPRESSION:
-			return normalizeExpressionStatement((ExpressionStatementNode) statement);
+			return translateExpressionStatement((ExpressionStatementNode) statement);
 		case IF:
 			break;
 		case JUMP:
+
 			break;
 		case LABELED:
 			break;
 		case LOOP:
-			return normalizeLoop((LoopNode) statement);
+			return translateLoop((LoopNode) statement);
 		case NULL:
 			break;
 		case OMP_STATEMENT:
@@ -1590,15 +1761,67 @@ public class NewSideEffectRemover extends BaseTransformer {
 		return null;
 	}
 
-	// function definitions...
+	private List<BlockItemNode> translateEnumeration(
+			EnumerationTypeNode enumeration) {
+		// TODO
+		return null;
+	}
 
-	private void removeSideEffects(FunctionDefinitionNode function)
-			throws SyntaxException {
-		function.setBody(removeSideEffectsCompound(function.getBody()));
+	/**
+	 * Returns a list of block items in normal form that is equivalent to the
+	 * given block item. May modify the given block item.
+	 * 
+	 * @param item
+	 *            a non-<code>null</code> block item
+	 * @return list of block items all in normal form and equivalent to original
+	 *         item
+	 */
+	private List<BlockItemNode> translateBlockItem(BlockItemNode item) {
+		BlockItemKind kind = item.blockItemKind();
+
+		// TODO
+		switch (kind) {
+		case ENUMERATION:
+			return translateEnumeration((EnumerationTypeNode) item);
+		case ORDINARY_DECLARATION:
+			break;
+		case PRAGMA:
+			break;
+		case STATEMENT:
+			return translateStatement((StatementNode) item);
+		case STATIC_ASSERTION:
+			break;
+		case STRUCT_OR_UNION:
+			break;
+		case TYPEDEF:
+			break;
+		default:
+			break;
+
+		}
+
+		return null;
+	}
+
+	/**
+	 * Places a function definition into normal form.
+	 * 
+	 * @param function
+	 *            a function definition node
+	 */
+	private void normalizeFunctionDefinition(FunctionDefinitionNode function) {
+		function.setBody(transformCompound(function.getBody()));
 	}
 
 	/* Public Methods */
 
+	/**
+	 * {@inheritDoc}
+	 * 
+	 * Transforms this AST by removing all side effects so the entire AST is in
+	 * normal form. The result is an equivalent AST. This method is destructive:
+	 * it may modify the given AST.
+	 */
 	@Override
 	public AST transform(AST ast) throws SyntaxException {
 		SequenceNode<ExternalDefinitionNode> rootNode = ast.getRootNode();
@@ -1610,11 +1833,12 @@ public class NewSideEffectRemover extends BaseTransformer {
 			ASTNode node = rootNode.child(i);
 
 			// For now, assume initializers for global variables are side effect
-			// free (SEF).
+			// free (SEF). TODO: don't assume this! But then we need
+			// external definition equal to block item.
 			if (node instanceof VariableDeclarationNode) {
 
 			} else if (node instanceof FunctionDefinitionNode) {
-				removeSideEffects((FunctionDefinitionNode) node);
+				normalizeFunctionDefinition((FunctionDefinitionNode) node);
 			}
 		}
 		return astFactory.newAST(rootNode, ast.getSourceFiles());

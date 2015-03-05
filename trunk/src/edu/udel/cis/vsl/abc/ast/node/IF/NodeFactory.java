@@ -12,7 +12,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
@@ -20,7 +19,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -1320,18 +1318,6 @@ public interface NodeFactory {
 	 */
 	ArrayDesignatorNode newArrayDesignatorNode(Source source,
 			ExpressionNode index);
-
-	/**
-	 * Deprecated soon, since we are removing scope parameters.
-	 * 
-	 * @param source
-	 * @param scopeList
-	 * @param baseDeclaration
-	 * @return
-	 */
-	ScopeParameterizedDeclarationNode newScopeParameterizedDeclarationNode(
-			Source source, SequenceNode<VariableDeclarationNode> scopeList,
-			DeclarationNode baseDeclaration);
 
 	// Statements...
 
