@@ -100,7 +100,7 @@ public class CommonEnumerationTypeNode extends CommonTypeNode implements
 
 	@Override
 	public BlockItemKind blockItemKind() {
-		return BlockItemKind.ENUMERATOR;
+		return BlockItemKind.ENUMERATION;
 	}
 
 	@Override

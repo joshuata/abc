@@ -609,7 +609,7 @@ public class ASTPrettyPrinter {
 			pPrintTypedefDeclaration(out, prefix,
 					(TypedefDeclarationNode) block);
 			break;
-		case ENUMERATOR:
+		case ENUMERATION:
 			// out.print(prefix + "enum;");
 			out.print(enumType2Pretty(prefix, (EnumerationTypeNode) block)
 					+ ";");
