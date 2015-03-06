@@ -18,10 +18,10 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.TaggedEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
@@ -114,7 +114,7 @@ public class CommonProgramFactory implements ProgramFactory {
 	 * @param plan
 	 *            a plan specifying actions that must be performed on this AST.
 	 */
-	private void transform(SequenceNode<ExternalDefinitionNode> root, Plan plan) {
+	private void transform(SequenceNode<BlockItemNode> root, Plan plan) {
 		Renamer renamer = new Renamer(plan.getRenameMap());
 
 		for (TaggedEntity entity : plan.getMakeIncompleteActions()) {
@@ -266,7 +266,7 @@ public class CommonProgramFactory implements ProgramFactory {
 			info.computeRenamings(plans, enumMergeMap);
 		for (int i = 0; i < n; i++) {
 			AST ast = translationUnits[i];
-			SequenceNode<ExternalDefinitionNode> root = ast.getRootNode();
+			SequenceNode<BlockItemNode> root = ast.getRootNode();
 
 			ast.release();
 			transform(root, plans[i]);
@@ -295,16 +295,15 @@ public class CommonProgramFactory implements ProgramFactory {
 	 */
 	private AST link(AST[] translationUnits) throws SyntaxException {
 		int n = translationUnits.length;
-		ArrayList<SequenceNode<ExternalDefinitionNode>> roots = new ArrayList<>(
-				n);
+		ArrayList<SequenceNode<BlockItemNode>> roots = new ArrayList<>(n);
 		NodeFactory nodeFactory = astFactory.getNodeFactory();
 		TokenFactory tokenFactory = astFactory.getTokenFactory();
 		Formation formation = tokenFactory.newSystemFormation("Program");
 		CToken fakeToken = tokenFactory.newCToken(CivlCParser.PROGRAM,
 				"Program", formation);
 		Source fakeSource = tokenFactory.newSource(fakeToken);
-		List<ExternalDefinitionNode> definitions = new LinkedList<>();
-		SequenceNode<ExternalDefinitionNode> newRoot;
+		List<BlockItemNode> definitions = new LinkedList<>();
+		SequenceNode<BlockItemNode> newRoot;
 		Collection<SourceFile> allSourceFiles = new LinkedHashSet<>();
 		AST result;
 
@@ -317,8 +316,8 @@ public class CommonProgramFactory implements ProgramFactory {
 			out.println("Transformed translation units: ");
 			out.println();
 			for (int i = 0; i < n; i++) {
-				SequenceNode<ExternalDefinitionNode> root = roots.get(i);
-				SequenceNode<ExternalDefinitionNode> rootClone = root.copy();
+				SequenceNode<BlockItemNode> root = roots.get(i);
+				SequenceNode<BlockItemNode> rootClone = root.copy();
 				Collection<SourceFile> sourceFiles = translationUnits[i]
 						.getSourceFiles();
 				AST ast = astFactory.newAST(rootClone, sourceFiles);
@@ -329,11 +328,11 @@ public class CommonProgramFactory implements ProgramFactory {
 				out.flush();
 			}
 		}
-		for (SequenceNode<ExternalDefinitionNode> root : roots) {
+		for (SequenceNode<BlockItemNode> root : roots) {
 			int numChildren = root.numChildren();
 
 			for (int i = 0; i < numChildren; i++) {
-				ExternalDefinitionNode def = root.removeChild(i);
+				BlockItemNode def = root.removeChild(i);
 
 				if (def != null) {
 					definitions.add(def);

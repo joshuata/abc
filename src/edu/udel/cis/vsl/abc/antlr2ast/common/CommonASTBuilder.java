@@ -5,8 +5,8 @@ import edu.udel.cis.vsl.abc.antlr2ast.IF.ASTBuilderWorker;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.PragmaFactory;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -25,7 +25,7 @@ public class CommonASTBuilder implements ASTBuilder {
 	@Override
 	public AST getTranslationUnit(ParseTree tree) throws SyntaxException {
 		ASTBuilderWorker worker = getWorker(tree);
-		SequenceNode<ExternalDefinitionNode> rootNode = worker.translateRoot();
+		SequenceNode<BlockItemNode> rootNode = worker.translateRoot();
 		AST ast = astFactory.newAST(rootNode, tree.getSourceFiles());
 
 		return ast;

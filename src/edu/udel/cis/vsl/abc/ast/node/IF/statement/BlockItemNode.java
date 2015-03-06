@@ -5,6 +5,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 
@@ -33,6 +34,11 @@ public interface BlockItemNode extends ASTNode {
 		 * {@link EnumerationTypeNode}.
 		 */
 		ENUMERATION,
+		/**
+		 * Indicates that the block item is an instance of
+		 * {@link OmpDeclarativeNode}.
+		 */
+		OMP_DECLARATIVE,
 		/**
 		 * Indicates that the block item is an instance of
 		 * {@link OrdinaryDeclarationNode}.

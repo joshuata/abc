@@ -11,7 +11,6 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Variable;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
@@ -31,6 +30,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
@@ -135,7 +135,7 @@ public class EntityAnalyzer implements Analyzer {
 			throw error(e, root);
 		}
 		for (ASTNode child : children) {
-			processExternalDefinitions((ExternalDefinitionNode) child);
+			processExternalDefinitions((BlockItemNode) child);
 		}
 		findTentativeDefinitions(rootScope);
 	}
@@ -189,10 +189,11 @@ public class EntityAnalyzer implements Analyzer {
 	// Private methods...
 
 	/**
-	 * Process an ExternalDefinitionNode.
+	 * Process an ExternalDefinitionNode. TODO fix me, complete all cases for
+	 * block item nodes.
 	 * 
 	 */
-	private void processExternalDefinitions(ExternalDefinitionNode node)
+	private void processExternalDefinitions(BlockItemNode node)
 			throws SyntaxException {
 		if (node == null)
 			return;

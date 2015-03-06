@@ -7,8 +7,8 @@ import java.util.Iterator;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 
 /**
@@ -59,7 +59,7 @@ public interface AST {
 	 * 
 	 * @return the root node
 	 */
-	SequenceNode<ExternalDefinitionNode> getRootNode();
+	SequenceNode<BlockItemNode> getRootNode();
 
 	/**
 	 * Returns the number of nodes in the tree.

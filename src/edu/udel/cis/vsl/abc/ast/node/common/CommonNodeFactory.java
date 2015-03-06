@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
@@ -667,14 +666,14 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public SequenceNode<ExternalDefinitionNode> newTranslationUnitNode(
-			Source source, List<ExternalDefinitionNode> definitions) {
+	public SequenceNode<BlockItemNode> newTranslationUnitNode(Source source,
+			List<BlockItemNode> definitions) {
 		return newSequenceNode(source, "TranslationUnit", definitions);
 	}
 
 	@Override
-	public SequenceNode<ExternalDefinitionNode> newProgramNode(Source source,
-			List<ExternalDefinitionNode> definitions) {
+	public SequenceNode<BlockItemNode> newProgramNode(Source source,
+			List<BlockItemNode> definitions) {
 		return newSequenceNode(source, "Program", definitions);
 	}
 

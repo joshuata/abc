@@ -16,7 +16,7 @@ import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
  * @author siegel
  * 
  */
-public interface PragmaNode extends ExternalDefinitionNode, StatementNode {
+public interface PragmaNode extends StatementNode {
 
 	/**
 	 * Returns the pragma identifier, i.e., the identifier immediately following

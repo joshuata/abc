@@ -12,7 +12,7 @@ public class CommonExpressionStatementNode extends CommonStatementNode
 	public CommonExpressionStatementNode(Source source,
 			ExpressionNode expression) {
 		super(source, expression);
-		assert expression != null;
+//		assert expression != null;
 	}
 
 	@Override

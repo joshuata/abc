@@ -1823,8 +1823,8 @@ public interface NodeFactory {
 	 *            the translation unit
 	 * @return the new translation unit node
 	 */
-	SequenceNode<ExternalDefinitionNode> newTranslationUnitNode(Source source,
-			List<ExternalDefinitionNode> definitions);
+	SequenceNode<BlockItemNode> newTranslationUnitNode(Source source,
+			List<BlockItemNode> definitions);
 
 	/**
 	 * Creates a new node representing an entire program. The children of this
@@ -1839,8 +1839,8 @@ public interface NodeFactory {
 	 *            the translation units, perhaps after some modifications
 	 * @return the new program node
 	 */
-	SequenceNode<ExternalDefinitionNode> newProgramNode(Source source,
-			List<ExternalDefinitionNode> definitions);
+	SequenceNode<BlockItemNode> newProgramNode(Source source,
+			List<BlockItemNode> definitions);
 
 	/**
 	 * Returns the value factory associated to this node factory. The value

@@ -6,7 +6,6 @@ import java.util.Arrays;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.ASTs;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
@@ -251,8 +250,9 @@ public class SimpleCudaAST {
 				source, newId("main"), mainType, null, mainBody);
 
 		// build the AST
-		AST ast = astF.newAST(nodeF.newSequenceNode(source, "definitions",
-				Arrays.<ExternalDefinitionNode> asList(kernelDef, mainDef)),
+		AST ast = astF.newAST(
+				nodeF.newSequenceNode(source, "definitions",
+						Arrays.<BlockItemNode> asList(kernelDef, mainDef)),
 				Arrays.asList(sysForm.getLastFile()));
 
 		ast.print(System.out);

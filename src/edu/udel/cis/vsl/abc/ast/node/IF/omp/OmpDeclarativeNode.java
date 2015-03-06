@@ -1,8 +1,8 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 
 /**
  * This represents an OpenMP declarative directive, which can only be placed in
@@ -12,7 +12,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
  * @author Manchun Zheng
  * 
  */
-public interface OmpDeclarativeNode extends OmpNode, ExternalDefinitionNode {
+public interface OmpDeclarativeNode extends OmpNode, BlockItemNode {
 
 	/**
 	 * The kind of an OpenMP declarative pragma.

@@ -4,9 +4,9 @@ import java.util.Collection;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -45,7 +45,7 @@ public class CommonASTFactory implements ASTFactory {
 	}
 
 	@Override
-	public AST newAST(SequenceNode<ExternalDefinitionNode> root,
+	public AST newAST(SequenceNode<BlockItemNode> root,
 			Collection<SourceFile> sourceFiles) throws SyntaxException {
 		AST unit = new CommonAST(this, root, false, sourceFiles);
 

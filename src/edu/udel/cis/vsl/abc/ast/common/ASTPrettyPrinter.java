@@ -6,7 +6,6 @@ import java.util.Stack;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
@@ -23,8 +22,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode.OrdinaryDeclarationKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -224,12 +221,12 @@ public class ASTPrettyPrinter {
 	}
 
 	static void prettyPrint(AST ast, PrintStream out, boolean ignoreStdLibs) {
-		SequenceNode<ExternalDefinitionNode> root = ast.getRootNode();
+		SequenceNode<BlockItemNode> root = ast.getRootNode();
 		int numChildren = root.numChildren();
 		String currentFile = null;
 
 		for (int i = 0; i < numChildren; i++) {
-			ExternalDefinitionNode child = root.getSequenceChild(i);
+			BlockItemNode child = root.getSequenceChild(i);
 
 			if (child != null) {
 				String sourceFile = child.getSource().getFirstToken()
@@ -298,7 +295,8 @@ public class ASTPrettyPrinter {
 					out.print("\n");
 					currentFile = sourceFile;
 				}
-				pPrintExternalDef(out, child);
+				// pPrintExternalDef(out, child);
+				pPrintBlockItem(out, "", child);
 			}
 		}
 	}
@@ -310,34 +308,34 @@ public class ASTPrettyPrinter {
 
 	/* *************************** Private Methods ************************* */
 
-	private static void pPrintExternalDef(PrintStream out,
-			ExternalDefinitionNode extern) {
-		if (extern instanceof AssumeNode) {
-			pPrintAssume(out, "", (AssumeNode) extern);
-		} else if (extern instanceof AssertNode) {
-			pPrintAssert(out, "", (AssertNode) extern);
-		} else if (extern instanceof EnumerationTypeNode) {
-			out.print(enumType2Pretty("", (EnumerationTypeNode) extern));
-			out.print(";");
-		} else if (extern instanceof OrdinaryDeclarationNode) {
-			pPrintOrdinaryDeclaration(out, "", (OrdinaryDeclarationNode) extern);
-		} else if (extern instanceof PragmaNode) {
-			pPrintPragma(out, "", (PragmaNode) extern);
-		} else if (extern instanceof StaticAssertionNode) {
-			pPrintStaticAssertion(out, "", (StaticAssertionNode) extern);
-			out.print(";");
-		} else if (extern instanceof StructureOrUnionTypeNode) {
-			out.print(structOrUnion2Pretty("",
-					(StructureOrUnionTypeNode) extern));
-			out.print(";");
-		} else if (extern instanceof TypedefDeclarationNode) {
-			pPrintTypedefDeclaration(out, "", (TypedefDeclarationNode) extern);
-			out.print(";");
-		} else if (extern instanceof OmpDeclarativeNode) {
-			pPrintOmpDeclarative(out, "", (OmpDeclarativeNode) extern);
-		}
-		out.print("\n");
-	}
+	// private static void pPrintExternalDef(PrintStream out,
+	// ExternalDefinitionNode extern) {
+	// if (extern instanceof AssumeNode) {
+	// pPrintAssume(out, "", (AssumeNode) extern);
+	// } else if (extern instanceof AssertNode) {
+	// pPrintAssert(out, "", (AssertNode) extern);
+	// } else if (extern instanceof EnumerationTypeNode) {
+	// out.print(enumType2Pretty("", (EnumerationTypeNode) extern));
+	// out.print(";");
+	// } else if (extern instanceof OrdinaryDeclarationNode) {
+	// pPrintOrdinaryDeclaration(out, "", (OrdinaryDeclarationNode) extern);
+	// } else if (extern instanceof PragmaNode) {
+	// pPrintPragma(out, "", (PragmaNode) extern);
+	// } else if (extern instanceof StaticAssertionNode) {
+	// pPrintStaticAssertion(out, "", (StaticAssertionNode) extern);
+	// out.print(";");
+	// } else if (extern instanceof StructureOrUnionTypeNode) {
+	// out.print(structOrUnion2Pretty("",
+	// (StructureOrUnionTypeNode) extern));
+	// out.print(";");
+	// } else if (extern instanceof TypedefDeclarationNode) {
+	// pPrintTypedefDeclaration(out, "", (TypedefDeclarationNode) extern);
+	// out.print(";");
+	// } else if (extern instanceof OmpDeclarativeNode) {
+	// pPrintOmpDeclarative(out, "", (OmpDeclarativeNode) extern);
+	// }
+	// out.print("\n");
+	// }
 
 	private static void pPrintOmpNode(PrintStream out, String prefix,
 			OmpNode ompNode) {
@@ -436,26 +434,8 @@ public class ASTPrettyPrinter {
 		}
 	}
 
-	private static void pPrintOrdinaryDeclaration(PrintStream out,
-			String prefix, OrdinaryDeclarationNode declaration) {
-		OrdinaryDeclarationKind kind = declaration.ordinaryDeclarationKind();
-
-		switch (kind) {
-		case VARIABLE_DECLARATION:
-			out.print(variableDeclaration2Pretty(prefix,
-					(VariableDeclarationNode) declaration));
-			out.print(";");
-			break;
-		default: // cases FUNCTION_DECLARATION, FUNCTION_DEFINITION,
-					// ABSTRACT_FUNCTION_DEFINITION:
-			pPrintFunctionDeclaration(out, prefix,
-					(FunctionDeclarationNode) declaration);
-		}
-	}
-
 	private static StringBuffer enumType2Pretty(String prefix,
 			EnumerationTypeNode enumeration) {
-
 		StringBuffer result = new StringBuffer();
 		IdentifierNode tag = enumeration.getTag();
 		SequenceNode<EnumeratorDeclarationNode> enumerators = enumeration
@@ -610,7 +590,6 @@ public class ASTPrettyPrinter {
 					(TypedefDeclarationNode) block);
 			break;
 		case ENUMERATION:
-			// out.print(prefix + "enum;");
 			out.print(enumType2Pretty(prefix, (EnumerationTypeNode) block)
 					+ ";");
 			break;
@@ -1391,6 +1370,10 @@ public class ASTPrettyPrinter {
 
 	private static StringBuffer expression2Pretty(ExpressionNode expression) {
 		StringBuffer result = new StringBuffer();
+
+		if (expression == null)
+			return result;
+
 		ExpressionKind kind = expression.expressionKind();
 
 		switch (kind) {

@@ -3,9 +3,9 @@ package edu.udel.cis.vsl.abc.ast.IF;
 import java.util.Collection;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.token.IF.Inclusion;
@@ -65,7 +65,7 @@ public interface ASTFactory {
 	 *             if something violating the syntax rules is found while
 	 *             traversing this AST
 	 */
-	AST newAST(SequenceNode<ExternalDefinitionNode> root,
+	AST newAST(SequenceNode<BlockItemNode> root,
 			Collection<SourceFile> sourceFiles) throws SyntaxException;
 
 	/**

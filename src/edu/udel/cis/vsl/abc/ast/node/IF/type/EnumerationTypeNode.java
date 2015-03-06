@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.type;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
@@ -14,7 +13,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
  * @author siegel
  */
 public interface EnumerationTypeNode extends DeclarationNode, TypeNode,
-		ExternalDefinitionNode, BlockItemNode {
+		BlockItemNode {
 	/**
 	 * Returns the "tag", which is the name of this enumerated type. For
 	 * example, in "enum color {...}", "color" is the tag.

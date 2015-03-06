@@ -1479,8 +1479,8 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
     $Symbols::isFunctionDefinition = false;
     $DeclarationScope::isTypedef = false;
 }
-	:	externalDeclaration* EOF
-		-> ^(TRANSLATION_UNIT externalDeclaration*)
+	:	blockItem* EOF
+		-> ^(TRANSLATION_UNIT blockItem*)
 	;
 
 /* 6.9
@@ -1488,7 +1488,7 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
  * a declaration.  As soon as you see the "{", you know you 
  * are in a function definition.
  */
-externalDeclaration
+/*externalDeclaration
 scope DeclarationScope;
 @init {
   $DeclarationScope::isTypedef = false;
@@ -1501,7 +1501,7 @@ scope DeclarationScope;
 	| pragma
 	| assumeStatement
 	| assertStatement
-	;
+	;*/
 
 
 /* 6.9.1

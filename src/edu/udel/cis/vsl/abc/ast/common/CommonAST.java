@@ -14,8 +14,8 @@ import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
@@ -29,7 +29,7 @@ public class CommonAST implements AST {
 
 	private ASTFactory astFactory;
 
-	private SequenceNode<ExternalDefinitionNode> root;
+	private SequenceNode<BlockItemNode> root;
 
 	private int nodeCount;
 
@@ -44,7 +44,7 @@ public class CommonAST implements AST {
 	private Collection<SourceFile> sourceFiles;
 
 	public CommonAST(ASTFactory astFactory,
-			SequenceNode<ExternalDefinitionNode> root, boolean hasOmpPragma,
+			SequenceNode<BlockItemNode> root, boolean hasOmpPragma,
 			Collection<SourceFile> sourceFiles) throws SyntaxException {
 		this.root = root;
 		this.astFactory = astFactory;
@@ -66,7 +66,7 @@ public class CommonAST implements AST {
 	}
 
 	@Override
-	public SequenceNode<ExternalDefinitionNode> getRootNode() {
+	public SequenceNode<BlockItemNode> getRootNode() {
 		return root;
 	}
 
