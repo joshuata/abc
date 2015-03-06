@@ -8,9 +8,9 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
@@ -39,7 +39,7 @@ public class NameTransformer extends BaseTransformer {
 
 	@Override
 	public AST transform(AST unit) throws SyntaxException {
-		SequenceNode<ExternalDefinitionNode> rootNode = unit.getRootNode();
+		SequenceNode<BlockItemNode> rootNode = unit.getRootNode();
 		AST result;
 
 		identifierNameMap = new LinkedHashMap<IdentifierNode, String>();

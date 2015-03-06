@@ -1,7 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Typedef;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 
@@ -13,8 +12,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
  * @author siegel
  * 
  */
-public interface TypedefDeclarationNode extends DeclarationNode,
-		ExternalDefinitionNode, BlockItemNode {
+public interface TypedefDeclarationNode extends DeclarationNode, BlockItemNode {
 
 	/**
 	 * Returns the typedef entity itself associated to this declaration.

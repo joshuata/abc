@@ -46,33 +46,14 @@ public class CommonOmpDeclarativeNode extends CommonOmpNode implements
 		out.print("OmpThreadprivate");
 	}
 
-	// @SuppressWarnings("unchecked")
-	// @Override
-	// protected void printExtras(String prefix, PrintStream out) {
-	// int count;
-	// SequenceNode<IdentifierExpressionNode> variables =
-	// (SequenceNode<IdentifierExpressionNode>) this
-	// .child(1);
-	//
-	// if (variables != null) {
-	// count = variables.numChildren();
-	// if (count > 0) {
-	// out.println();
-	// out.print(prefix + "threadprivate(");
-	// for (int i = 0; i < count; i++) {
-	// out.print(variables.getSequenceChild(i).getIdentifier()
-	// .name());
-	// if (i < count - 1)
-	// out.print(",");
-	// }
-	// out.print(")");
-	// }
-	// }
-	// }
-
 	@Override
 	public OmpDeclarativeNode copy() {
 		return new CommonOmpDeclarativeNode(getSource(), this.variables()
 				.copy());
+	}
+
+	@Override
+	public BlockItemKind blockItemKind() {
+		return BlockItemKind.OMP_DECLARATIVE;
 	}
 }

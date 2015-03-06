@@ -14,7 +14,7 @@ import edu.udel.cis.vsl.abc.token.IF.CToken;
 public class Parse {
 
 	public static enum RuleKind {
-		TRANSLATION_UNIT, EXTERNAL_DEFINITION, BLOCK_ITEM
+		TRANSLATION_UNIT, BLOCK_ITEM
 	}
 
 	/**

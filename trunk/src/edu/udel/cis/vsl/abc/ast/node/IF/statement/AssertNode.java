@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
@@ -23,7 +22,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
  * @author Manchun Zheng (zmanchun)
  * 
  */
-public interface AssertNode extends StatementNode, ExternalDefinitionNode {
+public interface AssertNode extends StatementNode {
 
 	/**
 	 * Gets the condition to the assert statement.

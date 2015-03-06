@@ -19,7 +19,6 @@ import edu.udel.cis.vsl.abc.antlr2ast.IF.PragmaHandler;
 import edu.udel.cis.vsl.abc.antlr2ast.IF.SimpleScope;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.PairNode;
@@ -954,7 +953,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 * @throws SyntaxException
 	 *             if the declaration does not conform to the C11 Standard
 	 */
-	private List<ExternalDefinitionNode> translateDeclaration(
+	private List<BlockItemNode> translateDeclaration(
 			CommonTree declarationTree, SimpleScope scope)
 			throws SyntaxException {
 		CommonTree declarationSpecifiers = (CommonTree) declarationTree
@@ -965,12 +964,12 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		SequenceNode<ContractNode> contract = getContract(contractTree, scope);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(declarationSpecifiers);
 		int numDeclarators = initDeclaratorList.getChildCount();
-		ArrayList<ExternalDefinitionNode> definitionList = new ArrayList<ExternalDefinitionNode>();
+		ArrayList<BlockItemNode> definitionList = new ArrayList<BlockItemNode>();
 		Source source = newSource(declarationTree);
 
 		if (numDeclarators == 0) {
 			TypeNode baseType;
-			ExternalDefinitionNode definition;
+			BlockItemNode definition;
 
 			// C11 Sec. 6.7 Constraint 2:
 			// "A declaration other than a static_assert declaration shall
@@ -1013,7 +1012,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					: makeIncomplete(newSpecifierType(analysis, scope));
 			DeclaratorData data = processDeclarator(declaratorTree, baseType,
 					scope);
-			ExternalDefinitionNode definition;
+			BlockItemNode definition;
 
 			// special handling of $input and $output qualifiers required
 			// these must not go in base type but must be pulled all the
@@ -2009,11 +2008,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		ForLoopInitializerNode initializerNode;
 
 		if (initializerTree.getType() == DECLARATION) {
-			List<ExternalDefinitionNode> definitions = translateDeclaration(
+			List<BlockItemNode> definitions = translateDeclaration(
 					initializerTree, loopScope);
 			List<VariableDeclarationNode> declarations = new LinkedList<VariableDeclarationNode>();
 
-			for (ExternalDefinitionNode definition : definitions) {
+			for (BlockItemNode definition : definitions) {
 				if (!(definition instanceof VariableDeclarationNode))
 					throw error(
 							"For-loop initializer declaration "
@@ -2191,7 +2190,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			int kind = childTree.getType();
 
 			if (kind == DECLARATION) {
-				for (ExternalDefinitionNode declaration : translateDeclaration(
+				for (BlockItemNode declaration : translateDeclaration(
 						childTree, newScope))
 					items.add((BlockItemNode) declaration);
 				// } else if (kind == SCOPE) {
@@ -2412,7 +2411,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 * @return
 	 * @throws SyntaxException
 	 */
-	private ExternalDefinitionNode translateFunctionDefinition(
+	private BlockItemNode translateFunctionDefinition(
 			CommonTree functionDefinitionTree, SimpleScope scope)
 			throws SyntaxException {
 		// two different ways of declaring parameters:
@@ -2436,7 +2435,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		DeclaratorData data = processDeclarator(declarator, baseType, newScope);
 		FunctionTypeNode functionType = (FunctionTypeNode) data.type;
 		CompoundStatementNode body;
-		ExternalDefinitionNode result;
+		BlockItemNode result;
 
 		if (functionType.hasIdentifierList()) {
 			SequenceNode<VariableDeclarationNode> formalSequenceNode = functionType
@@ -2457,10 +2456,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				for (int i = 0; i < numDeclarations; i++) {
 					CommonTree declarationTree = (CommonTree) declarationList
 							.getChild(i);
-					List<ExternalDefinitionNode> declNodes = translateDeclaration(
+					List<BlockItemNode> declNodes = translateDeclaration(
 							declarationTree, newScope);
 
-					for (ExternalDefinitionNode definition : declNodes) {
+					for (BlockItemNode definition : declNodes) {
 						String parameterName;
 						VariableDeclarationNode oldDeclaration;
 
@@ -2574,10 +2573,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 * @return
 	 * @throws SyntaxException
 	 */
-	private SequenceNode<ExternalDefinitionNode> translateTranslationUnit(
+	private SequenceNode<BlockItemNode> translateTranslationUnit(
 			CommonTree translationUnit) throws SyntaxException {
 		int numChildren = translationUnit.getChildCount();
-		ArrayList<ExternalDefinitionNode> definitions = new ArrayList<ExternalDefinitionNode>();
+		ArrayList<BlockItemNode> definitions = new ArrayList<BlockItemNode>();
 		SimpleScope scope = new SimpleScope(null);
 
 		if (numChildren == 0) {
@@ -2604,8 +2603,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				ASTNode newNode = translatePragma(newSource(definitionTree),
 						definitionTree, scope);
 
-				if (newNode instanceof ExternalDefinitionNode)
-					definitions.add((ExternalDefinitionNode) newNode);
+				if (newNode instanceof BlockItemNode)
+					definitions.add((BlockItemNode) newNode);
 				else
 					throw error(
 							"This pragma cannot be used as an external definition",
@@ -2621,7 +2620,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		// TODO: maybe find a better way to handle this (e.g. only when Cuda
 		// flag specified so we don't have to rely on automatically detecting
 		// Cuda programs
-		for (ExternalDefinitionNode defNode : definitions) {
+		for (BlockItemNode defNode : definitions) {
 			if (defNode instanceof FunctionDeclarationNode) {
 				if (((FunctionDeclarationNode) defNode)
 						.hasGlobalFunctionSpecifier()) {
@@ -2641,15 +2640,23 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				definitions);
 	}
 
+	/**
+	 * TODO Complete block item kinds
+	 * 
+	 * @param blockItemTree
+	 * @param scope
+	 * @return
+	 * @throws SyntaxException
+	 */
 	private List<BlockItemNode> translateBlockItemNode(
 			CommonTree blockItemTree, SimpleScope scope) throws SyntaxException {
 		int kind = blockItemTree.getType();
 		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
 
 		if (kind == DECLARATION) {
-			for (ExternalDefinitionNode declaration : translateDeclaration(
+			for (BlockItemNode declaration : translateDeclaration(
 					blockItemTree, scope))
-				items.add((BlockItemNode) declaration);
+				items.add(declaration);
 			// } else if (kind == SCOPE) {
 			// items.add(translateScopeDeclaration(blockItemTree, scope));
 		} else if (kind == STATICASSERT) {
@@ -2679,8 +2686,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 *             the C11 standard
 	 */
 	@Override
-	public SequenceNode<ExternalDefinitionNode> translateRoot()
-			throws SyntaxException {
+	public SequenceNode<BlockItemNode> translateRoot() throws SyntaxException {
 		return translateTranslationUnit(rootTree);
 	}
 

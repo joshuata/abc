@@ -8,9 +8,9 @@ import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.AttributeKey;
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodePredicate;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
 
@@ -112,7 +112,7 @@ public class Pruner extends BaseTransformer {
 
 	@Override
 	public AST transform(AST ast) throws SyntaxException {
-		SequenceNode<ExternalDefinitionNode> root = ast.getRootNode();
+		SequenceNode<BlockItemNode> root = ast.getRootNode();
 		Function main = (Function) root.getScope().getOrdinaryEntity("main");
 
 		assert this.astFactory == ast.getASTFactory();

@@ -144,9 +144,9 @@ public class CommonCParser implements CParser {
 			case TRANSLATION_UNIT:
 				root = (CommonTree) parser.translationUnit().getTree();
 				break;
-			case EXTERNAL_DEFINITION:
-				root = (CommonTree) parser.externalDeclaration().getTree();
-				break;
+			// case EXTERNAL_DEFINITION:
+			// root = (CommonTree) parser.externalDeclaration().getTree();
+			// break;
 			case BLOCK_ITEM:
 				root = (CommonTree) parser.blockItemWithScope().getTree();
 				break;

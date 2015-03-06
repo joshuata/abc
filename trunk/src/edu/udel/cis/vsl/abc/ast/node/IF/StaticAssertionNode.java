@@ -15,7 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
  * @author siegel
  * 
  */
-public interface StaticAssertionNode extends ExternalDefinitionNode,
+public interface StaticAssertionNode extends
 		BlockItemNode {
 
 	/**

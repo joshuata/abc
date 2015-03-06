@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.statement;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
 /**
@@ -20,7 +19,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
  * @author siegel
  * 
  */
-public interface AssumeNode extends StatementNode, ExternalDefinitionNode {
+public interface AssumeNode extends StatementNode {
 
 	/**
 	 * Gets the argument to the assume statement.

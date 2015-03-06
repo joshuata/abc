@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 
@@ -20,7 +19,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
  * 
  */
 public interface OrdinaryDeclarationNode extends BlockItemNode,
-		DeclarationNode, ExternalDefinitionNode {
+		DeclarationNode {
 
 	/**
 	 * The different kinds of ordinary declarations.

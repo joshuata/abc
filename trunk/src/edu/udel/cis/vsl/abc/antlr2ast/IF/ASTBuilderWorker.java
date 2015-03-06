@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.antlr.runtime.tree.CommonTree;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ExternalDefinitionNode;
+import antlr.ParseTree;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -31,7 +31,7 @@ public interface ASTBuilderWorker {
 	 *             if any syntax error is encountered in the process of
 	 *             translation
 	 */
-	SequenceNode<ExternalDefinitionNode> translateRoot() throws SyntaxException;
+	SequenceNode<BlockItemNode> translateRoot() throws SyntaxException;
 
 	/**
 	 * Translates a single expression in the parse tree. The method takes a
