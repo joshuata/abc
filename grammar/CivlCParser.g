@@ -1,8 +1,7 @@
 /* Grammar for programming CIVL-C.
  * Based on C11 grammar.
  *
- * Author: Stephen F. Siegel
- * Last modified:
+ * Author: Stephen F. Siegel, University of Delaware
  *
  * This grammar assumes the input token stream is the result of
  * translation phase 7, as specified in the C11 Standard.
@@ -192,6 +191,28 @@ genericSelection
 	  -> ^(GENERIC assignmentExpression genericAssocList)
 	;
 
+/* A CIVL-C derivative expression.  Some sequence
+ * of partial-differentiation operators applied to a function.
+ */
+derivativeExpression
+	: DERIV LSQUARE IDENTIFIER COMMA partialList RSQUARE 
+	  LPAREN argumentExpressionList RPAREN
+	  -> ^(DERIVATIVE_EXPRESSION IDENTIFIER partialList
+	       argumentExpressionList RPAREN)
+	;
+
+/* A list of partial derivative operators.
+ */
+partialList
+	: partial (COMMA partial)* -> ^(PARTIAL_LIST partial+)
+	;
+
+/* A partial-derivative operator */
+partial
+	: LCURLY IDENTIFIER COMMA INTEGER_CONSTANT RCURLY 
+	  -> ^(PARTIAL IDENTIFIER INTEGER_CONSTANT)
+	;
+
 /* 6.5.1.1 */
 genericAssocList
 	: genericAssociation (COMMA genericAssociation)*
@@ -219,7 +240,7 @@ postfixExpression
 	    LPAREN argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression ABSENT argumentExpressionList
 	    	 RPAREN ABSENT)
-	  |	// kernel function call:
+	  |	// CUDA kernel function call:
 	    LEXCON args1=argumentExpressionList REXCON 
 	    LPAREN args2=argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression $args1 $args2 RPAREN ABSENT)
@@ -292,6 +313,7 @@ unaryExpression
 	;
 
 
+/* CIVL $spawn expression */
 spawnExpression
 	: SPAWN postfixExpressionRoot LPAREN 
 	  argumentExpressionList RPAREN 
@@ -326,8 +348,6 @@ multiplicativeExpression
     )*
 	;
 
-
-
 /* 6.5.6 */
 additiveExpression
 	: (multiplicativeExpression -> multiplicativeExpression)
@@ -349,7 +369,6 @@ rangeExpression
         )
       )?
     ;
-
 
 /* 6.5.7 */
 shiftExpression
@@ -446,6 +465,30 @@ conditionalExpression
     	)
 	;
 
+/* A CIVL-C quantified expression using $exists or $forall.
+ */
+quantifierExpression
+	: quantifier LCURLY type=typeName id=IDENTIFIER
+	  BITOR restrict=conditionalExpression RCURLY 
+	  cond=assignmentExpression
+	  -> ^(quantifier $type $id $restrict $cond)
+	| quantifier LCURLY id=IDENTIFIER ASSIGN
+	  lower=additiveExpression DOTDOT upper=additiveExpression
+	  RCURLY cond=assignmentExpression
+	  -> ^(quantifier $id $lower $upper $cond)
+// eventually change to the following:
+//	| quantifier LCURLY id=IDENTIFIER ASSIGN rangeExpression
+//	  RCURLY cond=assignmentExpression
+//	  -> ^(quantifier $id rangeExpression $cond)
+	;
+
+/* One of the CIVL-C first-order quantifiers.
+ * UNIFORM represents uniform continuity.  
+ */	
+quantifier
+	: FORALL | EXISTS | UNIFORM
+	;
+
 /* 6.5.16
  * conditionalExpression or
  * Root: OPERATOR
@@ -484,6 +527,10 @@ commaExpression
 	  )*
 	;
 
+/* The most general class of expressions.
+ * Includes a CIVL-C "collective" expression,
+ * and all expressions defined previously.
+ */
 expression
 	: COLLECTIVE LPAREN proc=conditionalExpression
 	  COMMA intExpr=conditionalExpression RPAREN
@@ -492,44 +539,12 @@ expression
 	| commaExpression
 	;
 			
-derivativeExpression
-	: DERIV LSQUARE IDENTIFIER COMMA partialList RSQUARE 
-	  LPAREN argumentExpressionList RPAREN
-	  -> ^(DERIVATIVE_EXPRESSION IDENTIFIER partialList argumentExpressionList RPAREN)
-	;
-
-partialList
-	: partial (COMMA partial)* -> ^(PARTIAL_LIST partial+)
-	;
-
-partial
-	: LCURLY IDENTIFIER COMMA INTEGER_CONSTANT RCURLY 
-	  -> ^(PARTIAL IDENTIFIER INTEGER_CONSTANT)
-    ;
 
 /* 6.6 */
 constantExpression
 	: conditionalExpression
 	;
 	
-quantifierExpression
-	: quantifier LCURLY type=typeName id=IDENTIFIER
-	  BITOR restrict=conditionalExpression RCURLY 
-	  cond=assignmentExpression
-	  -> ^(quantifier $type $id $restrict $cond)
-	| quantifier LCURLY id=IDENTIFIER ASSIGN
-      lower=additiveExpression DOTDOT upper=additiveExpression
-      RCURLY cond=assignmentExpression
-	  -> ^(quantifier $id $lower $upper $cond)
-// eventually change to the following:
-//	| quantifier LCURLY id=IDENTIFIER ASSIGN rangeExpression
-//	  RCURLY cond=assignmentExpression
-//	  -> ^(quantifier $id rangeExpression $cond)
-	;
-	
-quantifier
-	: FORALL | EXISTS | UNIFORM
-	;
 
 /* ***** A.2.2: Declarations ***** */
 
@@ -553,7 +568,6 @@ quantifier
  * where eventually an IDENTIFIER should be reached.  At that point,
  * if the bit is true, the IDENTIFIER is added to the set of typedef
  * names.
- *
  */
 declaration
 scope DeclarationScope;
@@ -1006,7 +1020,6 @@ scope DeclarationScope;
 
 // this has non-LL* decision due to recursive rule invocations
 // reachable from alts 1,2...  E.g., both can start with pointer.
-
 declaratorOrAbstractDeclarator
 	:	(declarator)=> declarator
 	|	abstractDeclarator
@@ -1090,7 +1103,7 @@ directAbstractDeclarator
  * by requiring that if you are "in" a typedef, a typedef name
  * cannot be immediately followed by a semicolon.  This is sound
  * because the C11 Standard requires at least one declarator
- * to be present in a typedef.
+ * to be present in a typedef.  See declarationSpecifierList.
  */
 typedefName
     : {isTypeName(input.LT(1).getText())}?
@@ -1553,7 +1566,6 @@ blockItem
 	| statement
 	;
 
-
 /* 6.9
  * Root: TRANSLATION_UNIT
  * Children: blockItem
@@ -1578,5 +1590,3 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
 	:	blockItem* EOF
 		-> ^(TRANSLATION_UNIT blockItem*)
 	;
-
-
