@@ -5,7 +5,7 @@
  * Last modified:
  *
  * This grammar assumes the input token stream is the result of
- * translation phase 7, as specified in the Standard.
+ * translation phase 7, as specified in the C11 Standard.
  * In particular, all the preprocessing has already been
  * done.  
  *
@@ -24,69 +24,69 @@ options
 
 tokens
 {
-	ABSENT;               // represents missing syntactic element
-	GENERIC_ASSOC_LIST;   // generic association list
-	GENERIC_ASSOCIATION;  // a generic association
-	ENUMERATION_CONSTANT; // use of enumeration constant
-	COMPOUND_LITERAL;     // literal for structs, etc.
-	CONTRACT;             // procedure contracts
-	CALL;                 // function call
-	INDEX;                // array subscript operator
-	ARGUMENT_LIST;        // list of arguments to an operator
-	POST_INCREMENT;
-	POST_DECREMENT;
-	PRE_INCREMENT;
-	PRE_DECREMENT;
-	OPERATOR;             // symbol indicating an operator
-	TYPE;                 // symbol indicating "type"
-	EXPR;                 // symbol indicating "expression"
-	PARENTHESIZED_EXPRESSION;
-	CAST;                 // type cast operator
-	DECLARATION;          // a declaration
+	ABSENT;                   // represents missing syntactic element
+	ABSTRACT_DECLARATOR;      // declarator without identifier
+	ARGUMENT_LIST;            // list of arguments to an operator
+	ARRAY_ELEMENT_DESIGNATOR; // [idx]=expr
+	ARRAY_SUFFIX;             // [..] used in declarator
+	BLOCK_ITEM_LIST;          // list of block items
+	CALL;                     // function call
+	CASE_LABELED_STATEMENT;   // case CONST: stmt
+	CAST;                     // type cast operator
+	COMPOUND_LITERAL;         // literal for structs, etc.
+	COMPOUND_STATEMENT;       // { ... }
+	CONTRACT;                 // procedure contracts
+	DECLARATION;              // a declaration
+	DECLARATION_LIST;         // list of declarations
 	DECLARATION_SPECIFIERS;   // list of declaration specifiers
-	INIT_DECLARATOR_LIST;     // list of initializer-declarator pairs
+	DECLARATOR;               // a declarator
+	DEFAULT_LABELED_STATEMENT;// default: stmt
+	DERIVATIVE_EXPRESSION;    // complete derivative expression
+	DESIGNATED_INITIALIZER;   // used in compound initializer
+	DESIGNATION;              // designation, used in compound initializer
+	DIRECT_ABSTRACT_DECLARATOR;   // direct declarator sans identifier
+	DIRECT_DECLARATOR;        // declarator after removing leading *s
+	ENUMERATION_CONSTANT;     // use of enumeration constant
+	ENUMERATOR;               // identifier and optional int constant
+	ENUMERATOR_LIST;          // list of enumerators in enum type definition
+	EXPR;                     // symbol indicating "expression"
+	EXPRESSION_STATEMENT;     // expr; (expression used as stmt)
+	FIELD_DESIGNATOR;         // .id=expr
+	FUNCTION_DEFINITION;      // function definition (contains body)
+	FUNCTION_SUFFIX;          // (..) used in declarator
+	GENERIC_ASSOCIATION;      // a generic association
+	GENERIC_ASSOC_LIST;       // generic association list
+	IDENTIFIER_LABELED_STATEMENT; // label: stmt
+	IDENTIFIER_LIST;          // list of parameter names only in function decl
+	INDEX;                    // array subscript operator
+	INITIALIZER_LIST;         // initializer list in compound initializer
 	INIT_DECLARATOR;          // initializer-declaration pair
- 	STRUCT_DECLARATION_LIST;  // list of field declarations
-	STRUCT_DECLARATION;       // a field declaration
+	INIT_DECLARATOR_LIST;     // list of initializer-declarator pairs
+	OPERATOR;                 // symbol indicating an operator
+	PARAMETER_DECLARATION;    // parameter declaration in function decl
+	PARAMETER_LIST;           // list of parameter decls in function decl
+	PARAMETER_TYPE_LIST;      // parameter list and optional "..."
+	PARENTHESIZED_EXPRESSION; // ( expr )
+	PARTIAL;                  // CIVL-C partial derivative operator
+	PARTIAL_LIST;             // list of partial operators
+	POINTER;                  // * used in declarator
+	POST_DECREMENT;           // expr--
+	POST_INCREMENT;           // expr++
+	PRE_DECREMENT;            // --expr
+	PRE_INCREMENT;            // ++expr
+	PROGRAM;                  // whole program (linking translation units)
+	SCALAR_INITIALIZER;       // initializer for scalar variable
 	SPECIFIER_QUALIFIER_LIST; // list of type specifiers and qualifiers
-	STRUCT_DECLARATOR_LIST;   // list of struct/union declarators
+	STRUCT_DECLARATION;       // a field declaration
+	STRUCT_DECLARATION_LIST;  // list of field declarations
 	STRUCT_DECLARATOR;        // a struct/union declarator
-	ENUMERATOR_LIST;      // list of enumerators in enum type definition
-	ENUMERATOR;           // identifier and optional int constant
-	DECLARATOR;           // a declarator
-	DIRECT_DECLARATOR;    // declarator after removing leading *s
-	TYPE_QUALIFIER_LIST;  // list of type qualifiers
-	ARRAY_SUFFIX;         // [..] used in declarator
-	FUNCTION_SUFFIX;      // (..) used in declarator
-	POINTER;              // * used in declarator
-	PARAMETER_TYPE_LIST;  // parameter list and optional "..."
-	PARAMETER_LIST;       // list of parameter decls in function decl
-	PARAMETER_DECLARATION;// parameter declaration in function decl
-	IDENTIFIER_LIST;      // list of parameter names only in function decl
-	TYPE_NAME;            // type specification without identifier
-	ABSTRACT_DECLARATOR;  // declarator without identifier
-	DIRECT_ABSTRACT_DECLARATOR; // direct declarator sans identifier
-	SCALAR_INITIALIZER;   // 
-	INITIALIZER_LIST;
-	DESIGNATED_INITIALIZER;
-	DESIGNATION;
-	ARRAY_ELEMENT_DESIGNATOR;
-	FIELD_DESIGNATOR;
-	IDENTIFIER_LABELED_STATEMENT;
-	CASE_LABELED_STATEMENT;
-	DEFAULT_LABELED_STATEMENT;
-	COMPOUND_STATEMENT;
-	BLOCK_ITEM_LIST;
-	EXPRESSION_STATEMENT;
-	TRANSLATION_UNIT;
-	DECLARATION_LIST;
-	FUNCTION_DEFINITION;
-	TYPEDEF_NAME;
-	TOKEN_LIST;
-	PARTIAL;
-	PARTIAL_LIST;
-	DERIVATIVE_EXPRESSION;
-	PROGRAM;        // represents whole program (linking translation units)
+	STRUCT_DECLARATOR_LIST;   // list of struct/union declarators
+	TOKEN_LIST;               // list of tokens, e.g., in pragma
+	TRANSLATION_UNIT;         // final result of translation
+	TYPE;                     // symbol indicating "type"
+	TYPEDEF_NAME;             // use of typedef name
+	TYPE_NAME;                // type specification without identifier
+	TYPE_QUALIFIER_LIST;      // list of type qualifiers
 }
 
 scope Symbols {
@@ -109,17 +109,17 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 }
 
 @members {
-    public void setSymbols_stack(Stack<ScopeSymbols> symbols){
-        this.Symbols_stack = new Stack();
-        while(!symbols.isEmpty()){
-            ScopeSymbols current = symbols.pop();
-            Symbols_scope mySymbols = new Symbols_scope();
+	public void setSymbols_stack(Stack<ScopeSymbols> symbols){
+		this.Symbols_stack = new Stack();
+		while(!symbols.isEmpty()){
+			ScopeSymbols current = symbols.pop();
+			Symbols_scope mySymbols = new Symbols_scope();
 
-            mySymbols.types = current.types;
-            mySymbols.enumerationConstants = current.enumerationConstants;
-            Symbols_stack.add(mySymbols);
-        }
-    }
+			mySymbols.types = current.types;
+			mySymbols.enumerationConstants = current.enumerationConstants;
+			Symbols_stack.add(mySymbols);
+		}
+	}
 
 	@Override
 	public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
@@ -186,7 +186,6 @@ primaryExpression
 	;
 
 /* 6.5.1.1 */
-
 genericSelection
 	: GENERIC LPAREN assignmentExpression COMMA genericAssocList
 	  RPAREN
@@ -563,8 +562,8 @@ scope DeclarationScope;
 }
 	: d=declarationSpecifiers
 	  ( 
-	    i=initDeclaratorList contract_opt SEMI
-	    -> ^(DECLARATION $d $i contract_opt)
+	    i=initDeclaratorList contract SEMI
+	    -> ^(DECLARATION $d $i contract)
 	  | SEMI
 	    -> ^(DECLARATION $d ABSENT ABSENT)
 	  )
@@ -1268,30 +1267,6 @@ blockItemList
     : blockItem+ -> ^(BLOCK_ITEM_LIST blockItem+)
     ;
 
-/* 6.8.2 */
-
-
-/* A block item which can be called from the external world.
- * This requires a scope.
- */
-blockItemWithScope
-scope DeclarationScope;
-@init {
-  $DeclarationScope::isTypedef = false;
-}
-	: blockItem;
-
-/* A block item: declaration list, function definition,
- * or statement.
- */
-blockItem
-	: 	( (declarationSpecifiers declarator contract_opt
-	   	    declarationList_opt LCURLY)=>
-		  functionDefinition
-		| declaration
-		) 
-	| statement
-	;
 
 
 /* 6.8.3
@@ -1421,6 +1396,10 @@ jumpStatement
     ;
 
 /*
+ * A pragma, which is represented as an identifier
+ * (the first token following # pragma), followed
+ * by a sequence of tokens.
+ *
  * Root: PRAGMA
  * child 0: IDENTIFIER (first token following # pragma)
  * child 1: TOKEN_LIST (chilren are list of tokens following identifier)
@@ -1430,45 +1409,162 @@ pragma	:	PRAGMA IDENTIFIER pragmaBody NEWLINE
 		-> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST pragmaBody) NEWLINE)
 	;
 
+/* A pragma body, which is any sequence of tokens not 
+ * containing NEWLINE, used in pragma rule.
+ */
 pragmaBody
 	:	(~ NEWLINE)*
 	;
 
+/* CIVL-C assume statement. TODO: make function.
+ */
 assumeStatement
 	:	ASSUME expression SEMI -> ^(ASSUME expression)
 	;
 	
+/* CIVL-C assert statement. TODO: make function
+ */
 assertStatement
 	:	ASSERT conditionalExpression (COLON conditionalExpression (COMMA conditionalExpression)*)? SEMI -> ^(ASSERT conditionalExpression conditionalExpression*)
 	;
 
+/* CIVL-C $when statement.  This is a guarded command.
+ * Syntax: $when (expr) stmt, where expr is a boolean
+ * expression (guard).
+ *
+ * Root: WHEN
+ * Child 0: expression
+ * Child 1: statement
+ */
 whenStatement
 	:	WHEN LPAREN expression RPAREN statement
 		-> ^(WHEN expression statement)
 	;
 
+/* CIVL-C $choose statement.  This is a non-deterministic
+ * selection statement.  Syntax: $choose { stmt stmt ... }.
+ *
+ * Root: CHOOSE
+ * Children: 1 or more statement
+ */
 chooseStatement
 	:	CHOOSE LCURLY statement+ RCURLY 
 		-> ^(CHOOSE statement+)
 	;
 
-// general atomic block $atomic{...}
+/* CIVL-C $atomic statement.  Syntax:
+ * $atomic stmt.
+ *
+ * Root: CIVLATOMIC
+ * Child 0: statement
+ */
 atomicStatement
 	:	CIVLATOMIC s=statementWithScope
 		-> ^(CIVLATOMIC $s)
 	;
 
-// deterministic atomic block $atom{...}
+/* CIVL-C $atom statement.  Syntax:
+ * $atom stmt.
+ *
+ * Root: CIVLATOM
+ * Child 0: statement
+ */
 datomicStatement
 	:	CIVLATOM s=statementWithScope
 		-> ^(CIVLATOM $s)
 	;
 
-/* ***** A.2.4: External Definitions ***** */
+/* 6.9.1
+ *
+ * Root: FUNCTION_DEFINITION
+ * Child 0: declarationSpecifiers
+ * Child 1: declarator
+ * Child 2: declarationList or ABSENT (formal parameters)
+ * Child 3: compound statement (body)
+ * Child 4: contract
+ */
+functionDefinition
+scope Symbols; // "function scope"
+@init {
+    $Symbols::types = new HashSet<String>();
+    $Symbols::enumerationConstants = new HashSet<String>();
+    $Symbols::isFunctionDefinition = true;
+}
+	: declarationSpecifiers
+	  declarator
+	  contract
+	  declarationList_opt
+	  compoundStatement
+	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
+	       declarationList_opt compoundStatement contract
+	      )
+	;
+
+
+/* 6.9.1
+ * Root: DECLARATION_LIST
+ * Children: declaration (any number)
+ */
+declarationList_opt
+	: declaration* -> ^(DECLARATION_LIST declaration*)
+	;
+
+/* An item in a CIVL-C contract.
+ * 
+ * Root: REQUIRES or ENSURES
+ * Child: expression
+ */
+contractItem
+	: REQUIRES expression SEMI -> ^(REQUIRES expression)
+	| ENSURES expression SEMI -> ^(ENSURES expression)
+	;
+
+/* A CIVL-C contract: sequence of 0 or more
+ * contract items.
+ *
+ * Root: CONTRACT
+ * Children: 0 or more contractItem
+ */
+contract
+	: contractItem* -> ^(CONTRACT contractItem*)
+	;
+
+
+/* A block item which can be called from the external world.
+ * This requires a scope.
+ */
+blockItemWithScope
+scope DeclarationScope;
+@init {
+  $DeclarationScope::isTypedef = false;
+}
+	: blockItem;
+
+/* A block item: a declaration, function definition,
+ * or statement.  Note that in C, a function definition
+ * is not a block item, but in CIVL-C it is.
+ */
+blockItem
+	: 	( (declarationSpecifiers declarator contract
+	   	    declarationList_opt LCURLY)=>
+		  functionDefinition
+		| declaration
+		) 
+	| statement
+	;
+
 
 /* 6.9
  * Root: TRANSLATION_UNIT
- * Children: externalDeclaration
+ * Children: blockItem
+ *
+ * Note that this accepts more than what C allows.
+ * C only allows "external declarations".  This rule
+ * allows any block item, and block items include
+ * function definitions as well as statements,
+ * declarations, etc.  These are permissible in the
+ * CIVL-C language.  To enforce C's stricter restrictions,
+ * do some checks on the tree after parsing completes.
  */
 translationUnit
 scope Symbols; // the global scope
@@ -1483,68 +1579,4 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
 		-> ^(TRANSLATION_UNIT blockItem*)
 	;
 
-/* 6.9
- * Need to look ahead to distinguish function definition from
- * a declaration.  As soon as you see the "{", you know you 
- * are in a function definition.
- */
-/*externalDeclaration
-scope DeclarationScope;
-@init {
-  $DeclarationScope::isTypedef = false;
-}
-	: ( (declarationSpecifiers declarator contract_opt
-	       declarationList_opt LCURLY)=>
-	     functionDefinition
-	  | declaration
-	  ) 
-	| pragma
-	| assumeStatement
-	| assertStatement
-	;*/
 
-
-/* 6.9.1
- *
- *
- * Root: FUNCTION_DEFINITION
- * Child 0: declarationSpecifiers
- * Child 1: declarator
- * Child 2: declarationList or ABSENT (formal parameters)
- * Child 3: compound statement (body)
- * Child 4: contract or ABSENT (code contract)
- */
-functionDefinition
-scope Symbols; // "function scope"
-@init {
-    $Symbols::types = new HashSet<String>();
-    $Symbols::enumerationConstants = new HashSet<String>();
-    $Symbols::isFunctionDefinition = true;
-}
-	: declarationSpecifiers
-	  declarator
-	  contract_opt
-	  declarationList_opt
-	  compoundStatement
-	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
-	       declarationList_opt compoundStatement contract_opt
-	      )
-	;
-
-
-/* 6.9.1
- * Root: DECLARATION_LIST
- * Children: declaration (any number)
- */
-declarationList_opt
-	: declaration* -> ^(DECLARATION_LIST declaration*)
-	;
-
-contractItem
-	: REQUIRES expression SEMI -> ^(REQUIRES expression)
-	| ENSURES expression SEMI -> ^(ENSURES expression)
-	;
-
-contract_opt
-	: contractItem* -> ^(CONTRACT contractItem*)
-	;
