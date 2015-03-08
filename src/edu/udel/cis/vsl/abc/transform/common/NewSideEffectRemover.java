@@ -1745,7 +1745,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 			return translateLoop((LoopNode) statement);
 		case NULL:
 			break;
-		case OMP_STATEMENT:
+		case OMP:
 			break;
 		case PRAGMA:
 			break;
@@ -1800,6 +1800,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 		}
 
 		return null;
+	}
+
+	@SuppressWarnings("unused")
+	private void normalizeVariableDeclaration(VariableDeclarationNode variable) {
+		TypeNode type = variable.getTypeNode();
+		InitializerNode initializer = variable.getInitializer();
+		SETriple initTriple = this.translateInitializer(initializer, true);
+
 	}
 
 	/**

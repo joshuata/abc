@@ -15,6 +15,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
  * 
  * <ul>
  * <li>{@link EnumerationTypeNode}</li>
+ * <li>{@link OmpDeclarativeNode}</li>
  * <li>{@link OrdinaryDeclarationNode}</li>
  * <li>{@link PragmaNode}</li>
  * <li>{@link StatementNode}</li>

@@ -27,7 +27,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
  * In the constructor, these children are all set to null.
  * 
  */
-public interface OmpStatementNode extends OmpNode, StatementNode {
+public interface OmpExecutableNode extends OmpNode {
 
 	/**
 	 * The kind of this OpenMP statement:
@@ -42,7 +42,7 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * @author Manchun Zheng
 	 * 
 	 */
-	public enum OmpStatementNodeKind {
+	public enum OmpExecutableKind {
 		PARALLEL, SYNCHRONIZATION, WORKSHARING
 	}
 
@@ -59,7 +59,7 @@ public interface OmpStatementNode extends OmpNode, StatementNode {
 	 * 
 	 * @return the OpenMP statement kind of this node.
 	 */
-	OmpStatementNodeKind ompStatementNodeKind();
+	OmpExecutableKind ompStatementNodeKind();
 
 	/**
 	 * Returns true iff nowait is applied.

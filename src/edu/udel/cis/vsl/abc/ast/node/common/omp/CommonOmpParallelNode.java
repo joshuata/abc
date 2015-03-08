@@ -9,7 +9,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -31,7 +31,7 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 	 */
 	public CommonOmpParallelNode(Source source, StatementNode statement) {
 		super(source, statement);
-		this.ompStatementKind = OmpStatementNodeKind.PARALLEL;
+		this.ompStatementKind = OmpExecutableKind.PARALLEL;
 		this.addChild(null);// child 8
 		this.addChild(null);// child 9
 	}
@@ -41,7 +41,7 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 			ExpressionNode ifClause, StatementNode statementNode,
 			boolean isDefaultShared) {
 		super(source, statementNode);
-		this.ompStatementKind = OmpStatementNodeKind.PARALLEL;
+		this.ompStatementKind = OmpExecutableKind.PARALLEL;
 		this.setNumThreads(numThreads);
 		this.setIfClause(ifClause);
 		this.isDefaultShared = isDefaultShared;
@@ -52,7 +52,7 @@ public class CommonOmpParallelNode extends CommonOmpStatementNode implements
 		StatementNode statementNode = (StatementNode) this.child(7);
 
 		if (statementNode != null) {
-			((OmpStatementNode) statementNode).setStatementNode(statement);
+			((OmpExecutableNode) statementNode).setStatementNode(statement);
 		} else {
 			super.setStatementNode(statement);
 		}

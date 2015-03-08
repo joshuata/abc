@@ -24,7 +24,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
  * @author Manchun Zheng
  * 
  */
-public interface OmpParallelNode extends OmpStatementNode {
+public interface OmpParallelNode extends OmpExecutableNode {
 	/**
 	 * Returns the expression node of <code>num_threads()</code>. NULL if
 	 * num_threads() is absent.

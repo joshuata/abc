@@ -18,7 +18,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode.OrdinaryDeclarationKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
@@ -28,10 +29,10 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
@@ -42,6 +43,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
+import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -135,7 +137,7 @@ public class EntityAnalyzer implements Analyzer {
 			throw error(e, root);
 		}
 		for (ASTNode child : children) {
-			processExternalDefinitions((BlockItemNode) child);
+			processBlockItemNode((BlockItemNode) child);
 		}
 		findTentativeDefinitions(rootScope);
 	}
@@ -189,45 +191,70 @@ public class EntityAnalyzer implements Analyzer {
 	// Private methods...
 
 	/**
-	 * Process an ExternalDefinitionNode. TODO fix me, complete all cases for
-	 * block item nodes.
+	 * Process a block item node.
 	 * 
 	 */
-	private void processExternalDefinitions(BlockItemNode node)
+	private void processBlockItemNode(BlockItemNode node)
 			throws SyntaxException {
 		if (node == null)
 			return;
-		if (node instanceof VariableDeclarationNode) {
-			declarationAnalyzer
-					.processVariableDeclaration((VariableDeclarationNode) node);
-		} else if (node instanceof FunctionDeclarationNode) {
-			declarationAnalyzer
-					.processFunctionDeclaration((FunctionDeclarationNode) node);
-		} else if (node instanceof TypedefDeclarationNode) {
-			declarationAnalyzer
-					.processTypedefDeclaration((TypedefDeclarationNode) node);
-		} else if (node instanceof PragmaNode) {
-			processPragma((PragmaNode) node);
-		} else if (node instanceof OmpDeclarativeNode) {
+
+		BlockItemKind kind = node.blockItemKind();
+
+		switch (kind) {
+		case ENUMERATION:
+			((EnumerationTypeNode) node).setType(typeAnalyzer
+					.processEnumerationType((EnumerationTypeNode) node));
+			break;
+		case OMP_DECLARATIVE:
 			processOmpDeclarativeNode((OmpDeclarativeNode) node);
-		} else if (node instanceof StaticAssertionNode) {
+			break;
+		case ORDINARY_DECLARATION:
+			processOrdinaryDeclaration((OrdinaryDeclarationNode) node);
+			break;
+		case PRAGMA:
+			processPragma((PragmaNode) node);
+			break;
+		case STATEMENT:
+			statementAnalyzer.processStatement((StatementNode) node);
+			break;
+		case STATIC_ASSERTION:
 			processStaticAssertion((StaticAssertionNode) node);
-		} else if (node instanceof StructureOrUnionTypeNode) {
+			break;
+		case STRUCT_OR_UNION:
 			((StructureOrUnionTypeNode) node)
 					.setType(typeAnalyzer
 							.processStructureOrUnionType((StructureOrUnionTypeNode) node));
-		} else if (node instanceof EnumerationTypeNode) {
-			((EnumerationTypeNode) node).setType(typeAnalyzer
-					.processEnumerationType((EnumerationTypeNode) node));
-		} else if (node instanceof AssumeNode) {
-			statementAnalyzer.processStatement((AssumeNode) node);
-		} else if (node instanceof AssertNode) {
-			statementAnalyzer.processStatement((AssertNode) node);
-		} else if (node instanceof ScopeParameterizedDeclarationNode) {
+			break;
+		case TYPEDEF:
 			declarationAnalyzer
-					.processScopeParameterizedDeclaration((ScopeParameterizedDeclarationNode) node);
-		} else {
-			throw new RuntimeException("Unreachable");
+					.processTypedefDeclaration((TypedefDeclarationNode) node);
+			break;
+		default:
+			throw new ABCUnsupportedException(
+					"Entity analysis for block item node of " + kind + " kind");
+		}
+	}
+
+	private void processOrdinaryDeclaration(OrdinaryDeclarationNode node)
+			throws SyntaxException {
+		OrdinaryDeclarationKind kind = node.ordinaryDeclarationKind();
+
+		switch (kind) {
+		case VARIABLE_DECLARATION:
+			declarationAnalyzer
+					.processVariableDeclaration((VariableDeclarationNode) node);
+			break;
+		case FUNCTION_DECLARATION:
+		case FUNCTION_DEFINITION:
+		case ABSTRACT_FUNCTION_DEFINITION:
+			declarationAnalyzer
+					.processFunctionDeclaration((FunctionDeclarationNode) node);
+			break;
+		default:
+			throw new ABCUnsupportedException(
+					"Entity analysis for ordinary declaration of " + kind
+							+ " kind");
 		}
 	}
 

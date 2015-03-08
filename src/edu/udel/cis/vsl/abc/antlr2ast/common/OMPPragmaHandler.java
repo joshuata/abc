@@ -70,7 +70,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode.OmpScheduleKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
@@ -457,7 +457,7 @@ public class OMPPragmaHandler implements PragmaHandler {
 	}
 
 	private void translateDataClause(Source source, CommonTree dataClause,
-			OmpStatementNode ompStatementNode) {
+			OmpExecutableNode ompStatementNode) {
 		int numChildren = dataClause.getChildCount();
 		CommonTree dataClauseEle;
 		int type;

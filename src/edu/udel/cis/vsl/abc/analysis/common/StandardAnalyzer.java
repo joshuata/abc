@@ -32,6 +32,7 @@ public class StandardAnalyzer implements Analyzer {
 	@Override
 	public void analyze(AST unit) throws SyntaxException {
 		scopeAnalyzer.analyze(unit);
+		unit.prettyPrint(System.out, false);
 		entityAnalyzer.analyze(unit);
 	}
 

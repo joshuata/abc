@@ -76,6 +76,7 @@ tokens
 	PROGRAM;                  // whole program (linking translation units)
 	SCALAR_INITIALIZER;       // initializer for scalar variable
 	SPECIFIER_QUALIFIER_LIST; // list of type specifiers and qualifiers
+    STATEMENT;                // a statement
 	STRUCT_DECLARATION;       // a field declaration
 	STRUCT_DECLARATION_LIST;  // list of field declarations
 	STRUCT_DECLARATOR;        // a struct/union declarator
@@ -1204,19 +1205,19 @@ domainSpecifier
 
 /* 6.8 */
 statement
-    : labeledStatement
-    | compoundStatement
-    | expressionStatement
-    | selectionStatement
-    | iterationStatement
-    | jumpStatement
-    | pragma
-    | assumeStatement
-    | assertStatement
-    | whenStatement
-    | chooseStatement
-    | atomicStatement
-    | datomicStatement
+    : labeledStatement -> ^(STATEMENT labeledStatement)
+    | compoundStatement -> ^(STATEMENT compoundStatement)
+    | expressionStatement -> ^(STATEMENT expressionStatement)
+    | selectionStatement -> ^(STATEMENT selectionStatement)
+    | iterationStatement -> ^(STATEMENT iterationStatement)
+    | jumpStatement -> ^(STATEMENT jumpStatement)
+//    | pragma -> ^(STATEMENT pragma)
+    | assumeStatement -> ^(STATEMENT assumeStatement)
+    | assertStatement -> ^(STATEMENT assertStatement)
+    | whenStatement -> ^(STATEMENT whenStatement)
+    | chooseStatement -> ^(STATEMENT chooseStatement)
+    | atomicStatement -> ^(STATEMENT atomicStatement)
+    | datomicStatement -> ^(STATEMENT datomicStatement)
     ;
 
 statementWithScope
@@ -1563,7 +1564,8 @@ blockItem
 		  functionDefinition
 		| declaration
 		) 
-	| statement
+	| pragma
+    | statement
 	;
 
 /* 6.9

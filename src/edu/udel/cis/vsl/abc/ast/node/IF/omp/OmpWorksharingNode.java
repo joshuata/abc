@@ -6,7 +6,7 @@ package edu.udel.cis.vsl.abc.ast.node.IF.omp;
  * 
  * @author Manchun Zheng
  */
-public interface OmpWorksharingNode extends OmpStatementNode {
+public interface OmpWorksharingNode extends OmpExecutableNode {
 
 	/**
 	 * The kind of this OmpWorksharingNode:

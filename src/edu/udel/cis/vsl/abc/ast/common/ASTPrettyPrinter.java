@@ -49,6 +49,8 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpDeclarativeNode.OmpDeclarativeNodeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode.OmpExecutableKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode.OmpScheduleKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
@@ -56,8 +58,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode.OmpNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode.OmpStatementNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
@@ -345,7 +345,7 @@ public class ASTPrettyPrinter {
 		case DECLARATIVE:
 			pPrintOmpDeclarative(out, prefix, (OmpDeclarativeNode) ompNode);
 		default:// EXECUTABLE
-			pPrintOmpStatement(out, prefix, (OmpStatementNode) ompNode);
+			pPrintOmpStatement(out, prefix, (OmpExecutableNode) ompNode);
 		}
 	}
 
@@ -593,6 +593,9 @@ public class ASTPrettyPrinter {
 			out.print(enumType2Pretty(prefix, (EnumerationTypeNode) block)
 					+ ";");
 			break;
+		case OMP_DECLARATIVE:
+			pPrintOmpDeclarative(out, prefix, (OmpDeclarativeNode) block);
+			break;
 		case PRAGMA:
 			pPrintPragma(out, prefix, (PragmaNode) block);
 			break;
@@ -660,8 +663,8 @@ public class ASTPrettyPrinter {
 			out.print(prefix);
 			out.print(";");
 			break;
-		case OMP_STATEMENT:
-			pPrintOmpStatement(out, prefix, (OmpStatementNode) statement);
+		case OMP:
+			pPrintOmpStatement(out, prefix, (OmpExecutableNode) statement);
 			break;
 		case SWITCH:
 			pPrintSwitch(out, prefix, (SwitchNode) statement);
@@ -714,8 +717,8 @@ public class ASTPrettyPrinter {
 	}
 
 	private static void pPrintOmpStatement(PrintStream out, String prefix,
-			OmpStatementNode ompStmt) {
-		OmpStatementNodeKind kind = ompStmt.ompStatementNodeKind();
+			OmpExecutableNode ompStmt) {
+		OmpExecutableKind kind = ompStmt.ompStatementNodeKind();
 		SequenceNode<IdentifierExpressionNode> privateList = ompStmt
 				.privateList(), firstPrivateList = ompStmt.firstprivateList(), sharedList = ompStmt
 				.sharedList(), copyinList = ompStmt.copyinList(), copyPrivateList = ompStmt

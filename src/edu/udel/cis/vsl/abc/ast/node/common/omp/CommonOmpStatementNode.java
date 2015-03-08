@@ -3,19 +3,19 @@ package edu.udel.cis.vsl.abc.ast.node.common.omp;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 @SuppressWarnings("unchecked")
 public abstract class CommonOmpStatementNode extends CommonOmpNode implements
-		OmpStatementNode {
+		OmpExecutableNode {
 
 	/**
 	 * The kind of this OpenMP Statement Node. It can be one of the following:
 	 * PARALLEL, SYNCHRONIZATION, WORKSHARE.
 	 */
-	protected OmpStatementNodeKind ompStatementKind;
+	protected OmpExecutableKind ompStatementKind;
 
 	/**
 	 * True iff <code>nowait</code> clause is present.
@@ -69,8 +69,8 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 		StatementNode statementNode = (StatementNode) this.child(7);
 
 		if (statementNode != null) {
-			if (statementNode instanceof OmpStatementNode)
-				return ((OmpStatementNode) statementNode).isComplete();
+			if (statementNode instanceof OmpExecutableNode)
+				return ((OmpExecutableNode) statementNode).isComplete();
 			return true;
 		} else
 			return false;
@@ -93,11 +93,11 @@ public abstract class CommonOmpStatementNode extends CommonOmpNode implements
 
 	@Override
 	public StatementKind statementKind() {
-		return StatementKind.OMP_STATEMENT;
+		return StatementKind.OMP;
 	}
 
 	@Override
-	public OmpStatementNodeKind ompStatementNodeKind() {
+	public OmpExecutableKind ompStatementNodeKind() {
 		return this.ompStatementKind;
 	}
 
