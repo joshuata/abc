@@ -297,6 +297,7 @@ public class ASTPrettyPrinter {
 				}
 				// pPrintExternalDef(out, child);
 				pPrintBlockItem(out, "", child);
+				out.println();
 			}
 		}
 	}
@@ -588,6 +589,7 @@ public class ASTPrettyPrinter {
 		case TYPEDEF:
 			pPrintTypedefDeclaration(out, prefix,
 					(TypedefDeclarationNode) block);
+			out.print(";");
 			break;
 		case ENUMERATION:
 			out.print(enumType2Pretty(prefix, (EnumerationTypeNode) block)
