@@ -36,7 +36,7 @@ public class CommonOmpSyncNode extends CommonOmpStatementNode implements
 			StatementNode statement) {
 		super(source, statement);
 		this.ompSyncNodeKind = kind;
-		this.ompStatementKind = OmpStatementNodeKind.SYNCHRONIZATION;
+		this.ompStatementKind = OmpExecutableKind.SYNCHRONIZATION;
 		this.addChild(null);// child 8
 		this.addChild(null);// child 9
 	}

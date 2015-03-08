@@ -24,9 +24,4 @@ public class SyntaxException extends ABCException {
 		return source;
 	}
 
-	@Override
-	public String getMessage() {
-		return super.getMessage() + " at " + source.getSummary(false) + ".";
-	}
-
 }

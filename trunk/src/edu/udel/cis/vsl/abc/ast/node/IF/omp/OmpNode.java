@@ -1,6 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.omp;
 
-import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 
 /**
  * A node representing any kind of an OpenMP pragma. There are two
@@ -14,7 +14,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
  * @author Manchun Zheng
  * 
  */
-public interface OmpNode extends ASTNode {
+public interface OmpNode extends StatementNode {
 	/**
 	 * The kind of this OpenMP pragma.
 	 * 

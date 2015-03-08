@@ -123,4 +123,9 @@ public class CIVLTranslationTest {
 	public void cond() throws ABCException, IOException {
 		check("cond");
 	}
+	
+	@Test
+	public void externalDefs() throws ABCException, IOException {
+		check("externaldefs");
+	}
 }

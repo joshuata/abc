@@ -52,11 +52,12 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
@@ -75,6 +76,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
@@ -2150,8 +2152,9 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		return result;
 	}
 
-	private ASTNode translatePragma(Source source, CommonTree pragmaTree,
-			SimpleScope scope) throws SyntaxException {
+	private ASTNode translatePragma(CommonTree pragmaTree, SimpleScope scope)
+			throws SyntaxException {
+		Source source = newSource(pragmaTree);
 		CommonTree identifierTree = (CommonTree) pragmaTree.getChild(0);
 		IdentifierNode identifier = translateIdentifier(identifierTree);
 		String code = identifier.name();
@@ -2183,39 +2186,31 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		CommonTree blockItems = (CommonTree) compoundStatementTree.getChild(1);
 		int numChildren = blockItems.getChildCount();
 		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
-		OmpStatementNode ompStatementNode = null;
+		OmpExecutableNode ompStatementNode = null;
 
 		for (int i = 0; i < numChildren; i++) {
 			CommonTree childTree = (CommonTree) blockItems.getChild(i);
-			int kind = childTree.getType();
+			List<BlockItemNode> newBlockItems = this.translateBlockItemNode(
+					childTree, newScope, false);
 
-			if (kind == DECLARATION) {
-				for (BlockItemNode declaration : translateDeclaration(
-						childTree, newScope))
-					items.add((BlockItemNode) declaration);
-				// } else if (kind == SCOPE) {
-				// items.add(translateScopeDeclaration(childTree, newScope));
-			} else if (kind == STATICASSERT) {
-				items.add(translateStaticAssertion(childTree, newScope));
-			} else if (kind == FUNCTION_DEFINITION) {
-				items.add((BlockItemNode) translateFunctionDefinition(
-						childTree, newScope));
-			} else {
-				StatementNode statementNode = translateStatement(childTree,
-						newScope);
+			if (newBlockItems.size() == 1
+					&& newBlockItems.get(0).blockItemKind() == BlockItemKind.STATEMENT) {
+				StatementNode statementNode = (StatementNode) newBlockItems
+						.get(0);
 
 				if (ompStatementNode != null) {
 					ompStatementNode.setStatementNode(statementNode);
 					ompStatementNode = null;
 				} else {
 					items.add(statementNode);
-					if (statementNode.statementKind() == StatementKind.OMP_STATEMENT) {
-						ompStatementNode = (OmpStatementNode) statementNode;
+					if (statementNode.statementKind() == StatementKind.OMP) {
+						ompStatementNode = (OmpExecutableNode) statementNode;
 						if (ompStatementNode.isComplete())
 							ompStatementNode = null;
 					}
 				}
-			}
+			} else
+				items.addAll(newBlockItems);
 		}
 
 		int numItems = items.size();
@@ -2224,8 +2219,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		for (int i = 0; i < numItems; i++) {
 			ASTNode child = items.get(i);
 
-			if (child != null && child instanceof OmpStatementNode) {
-				OmpStatementNode ompStmt = (OmpStatementNode) child;
+			if (child != null && child instanceof OmpExecutableNode) {
+				OmpExecutableNode ompStmt = (OmpExecutableNode) child;
 
 				if (!ompStmt.isComplete()) {
 					changed = true;
@@ -2304,12 +2299,16 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 * @return
 	 * @throws SyntaxException
 	 */
-	private StatementNode translateStatement(CommonTree statementTree,
-			SimpleScope scope) throws SyntaxException {
-		int kind = statementTree.getType();
+	private StatementNode translateStatement(CommonTree tree, SimpleScope scope)
+			throws SyntaxException {
+		int kind = tree.getType();
 
 		if (kind == ABSENT)
 			return null;
+
+		CommonTree statementTree = (CommonTree) tree.getChild(0);
+
+		kind = statementTree.getType();
 		switch (kind) {
 		case ASSUME:
 			return translateAssume(newSource(statementTree), statementTree,
@@ -2353,8 +2352,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		case IF:
 			return translateIf(statementTree, scope);
 		case PRAGMA: {
-			ASTNode newNode = translatePragma(newSource(statementTree),
-					statementTree, scope);
+			ASTNode newNode = translatePragma(statementTree, scope);
 
 			if (newNode instanceof StatementNode)
 				return (StatementNode) newNode;
@@ -2379,7 +2377,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		case WHILE:
 			return translateWhile(statementTree, scope);
 		default:
-			throw error("Unknown statement type", statementTree);
+			throw error("Unknown statement type " + kind, statementTree);
 		}
 	}
 
@@ -2568,7 +2566,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	// Translation of Translation Unit...
 
 	/**
-	 * 
 	 * @param translationUnit
 	 * @return
 	 * @throws SyntaxException
@@ -2584,37 +2581,11 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					translationUnit);
 		}
 		for (int i = 0; i < numChildren; i++) {
-			CommonTree definitionTree = (CommonTree) translationUnit
-					.getChild(i);
-			int definitionType = definitionTree.getType();
-
-			if (definitionType == DECLARATION)
-				definitions.addAll(translateDeclaration(definitionTree, scope));
-			// else if (definitionType == SCOPE)
-			// definitions
-			// .add(translateScopeDeclaration(definitionTree, scope));
-			else if (definitionType == FUNCTION_DEFINITION)
-				definitions.add(translateFunctionDefinition(definitionTree,
-						scope));
-			else if (definitionType == STATICASSERT)
-				definitions
-						.add(translateStaticAssertion(definitionTree, scope));
-			else if (definitionType == PRAGMA) {
-				ASTNode newNode = translatePragma(newSource(definitionTree),
-						definitionTree, scope);
-
-				if (newNode instanceof BlockItemNode)
-					definitions.add((BlockItemNode) newNode);
-				else
-					throw error(
-							"This pragma cannot be used as an external definition",
-							newNode);
-			} else if (definitionType == ASSUME)
-				definitions.add(translateAssume(newSource(definitionTree),
-						definitionTree, scope));
-			else
-				throw error("Unknown type of external definition",
-						definitionTree);
+			// TODO need to know what's the language and decide whether the
+			// external definition node type needs to be checked, because C
+			// doesn't allow statement in the filescope
+			definitions.addAll(this.translateBlockItemNode(
+					(CommonTree) translationUnit.getChild(i), scope, false));
 		}
 
 		// TODO: maybe find a better way to handle this (e.g. only when Cuda
@@ -2641,7 +2612,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	}
 
 	/**
-	 * TODO Complete block item kinds
+	 * Translates a block item node.
 	 * 
 	 * @param blockItemTree
 	 * @param scope
@@ -2649,26 +2620,38 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 * @throws SyntaxException
 	 */
 	private List<BlockItemNode> translateBlockItemNode(
-			CommonTree blockItemTree, SimpleScope scope) throws SyntaxException {
+			CommonTree blockItemTree, SimpleScope scope,
+			boolean checkCExternalDefs) throws SyntaxException {
 		int kind = blockItemTree.getType();
 		List<BlockItemNode> items = new LinkedList<BlockItemNode>();
 
-		if (kind == DECLARATION) {
+		switch (kind) {
+		case DECLARATION:
 			for (BlockItemNode declaration : translateDeclaration(
 					blockItemTree, scope))
 				items.add(declaration);
-			// } else if (kind == SCOPE) {
-			// items.add(translateScopeDeclaration(blockItemTree, scope));
-		} else if (kind == STATICASSERT) {
-			items.add(translateStaticAssertion(blockItemTree, scope));
-		} else if (kind == FUNCTION_DEFINITION) {
+			break;
+		case FUNCTION_DEFINITION:
 			items.add((BlockItemNode) translateFunctionDefinition(
 					blockItemTree, scope));
-		} else {
-			StatementNode statementNode = translateStatement(blockItemTree,
-					scope);
-
-			items.add(statementNode);
+			break;
+		case PRAGMA:
+			items.add((BlockItemNode) this
+					.translatePragma(blockItemTree, scope));
+			break;
+		case STATEMENT:
+			if (checkCExternalDefs) {
+				throw new SyntaxException("statement is not allowed in ", null);
+			}
+			items.add((BlockItemNode) this.translateStatement(blockItemTree,
+					scope));
+			break;
+		case STATICASSERT:
+			items.add(translateStaticAssertion(blockItemTree, scope));
+			break;
+		default:
+			throw new ABCUnsupportedException("translating block item node of "
+					+ kind + " kind");
 		}
 		return items;
 	}
@@ -2704,7 +2687,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	@Override
 	public List<BlockItemNode> translateBlockItem(CommonTree blockItemTree,
 			SimpleScope scope) throws SyntaxException {
-		return translateBlockItemNode(blockItemTree, scope);
+		return translateBlockItemNode(blockItemTree, scope, false);
 	}
 }
 

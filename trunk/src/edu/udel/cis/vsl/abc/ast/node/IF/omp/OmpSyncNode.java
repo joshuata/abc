@@ -18,7 +18,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
  * @author Manchun Zheng
  * 
  */
-public interface OmpSyncNode extends OmpStatementNode {
+public interface OmpSyncNode extends OmpExecutableNode {
 	/**
 	 * The kind of this OmpSyncNode:
 	 * 

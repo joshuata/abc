@@ -18,13 +18,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode.OmpExecutableKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpFunctionReductionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode.OmpNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode.OmpReductionNodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpStatementNode.OmpStatementNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 //import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
@@ -358,8 +360,8 @@ public class StatementAnalyzer {
 		case PRAGMA:
 			entityAnalyzer.processPragma((PragmaNode) statement);
 			break;
-		case OMP_STATEMENT:
-			processOmpStatement((OmpStatementNode) statement);
+		case OMP:
+			processOmpNode((OmpNode) statement);
 			break;
 		case NULL:
 			break;
@@ -458,10 +460,23 @@ public class StatementAnalyzer {
 		// throw error("Unknown kind of statement", statement);
 	}
 
+	private void processOmpNode(OmpNode ompNode) throws SyntaxException {
+		OmpNodeKind ompKind = ompNode.ompNodeKind();
+
+		switch (ompKind) {
+		case EXECUTABLE:
+			processOmpExecutableNode((OmpExecutableNode) ompNode);
+			break;
+		case DECLARATIVE:
+		default:
+
+		}
+	}
+
 	@SuppressWarnings("unchecked")
-	private void processOmpStatement(OmpStatementNode statement)
+	private void processOmpExecutableNode(OmpExecutableNode statement)
 			throws SyntaxException {
-		OmpStatementNodeKind kind = statement.ompStatementNodeKind();
+		OmpExecutableKind kind = statement.ompStatementNodeKind();
 		SequenceNode<OmpReductionNode> reductionList = (SequenceNode<OmpReductionNode>) statement
 				.reductionList();
 
