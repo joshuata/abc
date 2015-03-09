@@ -9,7 +9,6 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode.NodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
@@ -101,10 +100,9 @@ public class CommonProgram implements Program {
 	}
 
 	private boolean hasOmpPragmaInASTNode(ASTNode node) {
-		if (node.nodeKind() == NodeKind.PRAGMA) {
-			PragmaNode pragmaNode = (PragmaNode) node;
-
-			if (pragmaNode.getPragmaIdentifier().name().equals("omp"))
+		if (node.nodeKind() == NodeKind.OMP_NODE) {
+//			PragmaNode pragmaNode = (PragmaNode) node;
+//			if (pragmaNode.getPragmaIdentifier().name().equals("omp"))
 				return true;
 		} else {
 			for (ASTNode child : node.children()) {
