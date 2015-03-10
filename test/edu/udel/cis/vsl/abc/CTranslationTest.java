@@ -149,4 +149,9 @@ public class CTranslationTest {
 	public void comma() throws ABCException, IOException {
 		check("comma");
 	}
+	
+	@Test
+	public void intChar() throws ABCException, IOException {
+		check("c/intChar");
+	}
 }
