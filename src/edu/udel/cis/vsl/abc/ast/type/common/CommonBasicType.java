@@ -62,7 +62,8 @@ public class CommonBasicType extends CommonObjectType implements
 
 	@Override
 	public boolean isInteger() {
-		return isSigned() || isUnsigned();
+		return isSigned() || isUnsigned()
+				|| basicTypeKind == BasicTypeKind.CHAR;
 	}
 
 	@Override
