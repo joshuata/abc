@@ -5,6 +5,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.ATOMIC;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.BARRIER;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.BITOR;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.BITXOR;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.CAPTURE;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.COLLAPSE;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.COPYIN;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.COPYPRIVATE;
@@ -29,11 +30,13 @@ import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PARALLEL_FOR;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PARALLEL_SECTIONS;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PLUS;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.PRIVATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.READ;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.REDUCTION;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.RUNTIME;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SCHEDULE;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SECTION;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SECTIONS;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SEQ_CST;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SHARED;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SINGLE;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.STAR;
@@ -42,6 +45,8 @@ import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.SUB;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.THD_PRIVATE;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UNIQUE_FOR;
 import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UNIQUE_PARALLEL;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.UPDATE;
+import static edu.udel.cis.vsl.abc.parse.IF.OmpCParser.WRITE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,12 +70,12 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode.OmpScheduleKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
@@ -126,8 +131,14 @@ public class OMPPragmaHandler implements PragmaHandler {
 
 			if (type == IDENTIFIER) {
 				switch (token.getText()) {
+				case "atomic":
+					token.setType(ATOMIC);
+					break;
 				case "barrier":
 					token.setType(BARRIER);
+					break;
+				case "capture":
+					token.setType(CAPTURE);
 					break;
 				case "collapse":
 					token.setType(COLLAPSE);
@@ -180,6 +191,9 @@ public class OMPPragmaHandler implements PragmaHandler {
 				case "private":
 					token.setType(PRIVATE);
 					break;
+				case "read":
+					token.setType(READ);
+					break;
 				case "reduction":
 					token.setType(REDUCTION);
 					break;
@@ -195,6 +209,9 @@ public class OMPPragmaHandler implements PragmaHandler {
 				case "section":
 					token.setType(SECTION);
 					break;
+				case "seq_cst":
+					token.setType(SEQ_CST);
+					break;
 				case "shared":
 					token.setType(SHARED);
 					break;
@@ -206,6 +223,12 @@ public class OMPPragmaHandler implements PragmaHandler {
 					break;
 				case "threadprivate":
 					token.setType(THD_PRIVATE);
+					break;
+				case "update":
+					token.setType(UPDATE);
+					break;
+				case "write":
+					token.setType(WRITE);
 					break;
 				default:
 				}

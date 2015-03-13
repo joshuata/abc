@@ -8,10 +8,11 @@ import edu.udel.cis.vsl.abc.parse.common.OmpParser;
 
 public class OmpCParser {
 	public static final int AMPERSAND = OmpParser.AMPERSAND;
-	public static final int ATOMIC = OmpParser.OMP_ATOMIC;
+	public static final int ATOMIC = OmpParser.OMPATOMIC;
 	public static final int BARRIER = OmpParser.BARRIER;
 	public static final int BITOR = OmpParser.BITOR;
 	public static final int BITXOR = OmpParser.BITXOR;
+	public static final int CAPTURE = OmpParser.CAPTURE;
 	public static final int COLLAPSE = OmpParser.COLLAPSE;
 	public static final int COPYIN = OmpParser.COPYIN;
 	public static final int COPYPRIVATE = OmpParser.COPYPRIVATE;
@@ -36,11 +37,13 @@ public class OmpCParser {
 	public static final int PARALLEL_SECTIONS = OmpParser.PARALLEL_SECTIONS;
 	public static final int PLUS = OmpParser.PLUS;
 	public static final int PRIVATE = OmpParser.PRIVATE;
+	public static final int READ = OmpParser.READ;
 	public static final int REDUCTION = OmpParser.REDUCTION;
 	public static final int RUNTIME = OmpParser.RUNTIME;
 	public static final int SCHEDULE = OmpParser.SCHEDULE;
 	public static final int SECTION = OmpParser.SECTION;
 	public static final int SECTIONS = OmpParser.SECTIONS;
+	public static final int SEQ_CST = OmpParser.SEQ_CST;
 	public static final int SHARED = OmpParser.SHARED;
 	public static final int SINGLE = OmpParser.SINGLE;
 	public static final int STAR = OmpParser.STAR;
@@ -49,6 +52,8 @@ public class OmpCParser {
 	public static final int THD_PRIVATE = OmpParser.THD_PRIVATE;
 	public static final int UNIQUE_FOR = OmpParser.UNIQUE_FOR;
 	public static final int UNIQUE_PARALLEL = OmpParser.UNIQUE_PARALLEL;
+	public static final int UPDATE = OmpParser.UPDATE;
+	public static final int WRITE = OmpParser.WRITE;
 
 	public static CommonTree parse(TokenStream tokens)
 			throws RecognitionException {

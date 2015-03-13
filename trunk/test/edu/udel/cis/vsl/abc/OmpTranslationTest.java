@@ -168,4 +168,9 @@ public class OmpTranslationTest {
 	public void vecAdd_fix() throws ABCException, IOException {
 		check("vecAdd_fix");
 	}
+	
+	@Test
+	public void test() throws ABCException, IOException {
+		check("test");
+	}
 }
