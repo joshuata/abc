@@ -8,7 +8,7 @@ import edu.udel.cis.vsl.abc.parse.common.OmpParser;
 
 public class OmpCParser {
 	public static final int AMPERSAND = OmpParser.AMPERSAND;
-	public static final int ATOMIC = OmpParser.ATOMIC;
+	public static final int ATOMIC = OmpParser.OMP_ATOMIC;
 	public static final int BARRIER = OmpParser.BARRIER;
 	public static final int BITOR = OmpParser.BITOR;
 	public static final int BITXOR = OmpParser.BITXOR;
