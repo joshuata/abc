@@ -160,7 +160,6 @@
 	<target name="OmpLexerDependencies" depends="CivlCParser">
 		<uptodate property="unchangedOmpLexerGrammar" srcfile="${grammar.dir}/OmpLexer.g" targetfile="${grammar.dir}/OmpLexer.tokens" />
 		<uptodate property="CivlCParserTokensBeforeOmpLexer" srcfile="${grammar.dir}/CivlCParser.tokens" targetfile="${grammar.dir}/OmpLexer.tokens" />
-		<!--<uptodate property="PreprocessorLexerBeforeOmpLexer" srcfile="${real.src.dir}/preproc/common/PreprocessorLexer.java" targetfile="${grammar.dir}/OmpLexer.tokens" />-->
 		<condition property="OmpLexerUpToDate">
 			<and>
 				<isset property="unchangedOmpLexerGrammar" />
@@ -177,7 +176,6 @@
 			<arg value="OmpLexer.g" />
 		</java>
 		<delete file="${grammar.dir}/OmpLexer.java" />
-		<!--<delete file="${grammar.dir}/OmpLexer_PreprocessorLexer.java" />-->
 	</target>
 
 	<!--
