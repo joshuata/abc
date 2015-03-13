@@ -23,6 +23,7 @@ MASTER		:	'master'		NotLineStart;
 NONE		:	'none'			NotLineStart;
 NOWAIT		:	'nowait'		NotLineStart;
 NUM_THREADS	:	'num_threads'	NotLineStart;
+OMP_ATOMIC  :   'atomic'        NotLineStart;
 ORDERED		:	'ordered'		NotLineStart;
 PARALLEL	:	'parallel'		NotLineStart;
 PRIVATE		:	'private'		NotLineStart;
