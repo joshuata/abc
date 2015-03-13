@@ -133,7 +133,7 @@ barrier_directive
   ;
 
 atomic_directive
-  : ATOMIC -> ^(ATOMIC)
+  : OMP_ATOMIC -> ^(OMP_ATOMIC)
   ;
 
 flush_directive
