@@ -56,10 +56,10 @@ openmp_construct
   | single_directive
   | master_directive
   | critical_directive
-  | atomic_directive
   | ordered_directive
   | section_directive
-  | barrier_directive 
+  | ompatomic_directive
+  | barrier_directive
   | flush_directive
   | threadprivate_directive
   ;
@@ -131,10 +131,19 @@ single_clause
 barrier_directive
   : BARRIER -> ^(BARRIER)
   ;
-
-atomic_directive
-  : OMP_ATOMIC -> ^(OMP_ATOMIC)
+  
+ompatomic_directive
+  : OMPATOMIC c0=atomic_clasue? c1=seq_cst_clause? 
+    -> ^(OMPATOMIC $c0? $c1?)
   ;
+  
+atomic_clasue
+	: READ | WRITE | UPDATE | CAPTURE	
+	;
+	
+seq_cst_clause
+	: SEQ_CST	
+	;
 
 flush_directive
   : FLUSH  f=flush_vars?
