@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
  * <li>critical</li>
  * <li>barrier</li>
  * <li>flush</li>
+ * <li>atomic</li>
  * </ol>
  * 
  * Currently, taskwait and atomic constructs are not supported.
@@ -34,7 +35,7 @@ public interface OmpSyncNode extends OmpExecutableNode {
 	 * 
 	 */
 	public enum OmpSyncNodeKind {
-		MASTER, CRITICAL, BARRIER, FLUSH, ORDERED
+		MASTER, CRITICAL, BARRIER, FLUSH, ORDERED, OMPATOMIC
 	}
 
 	/**

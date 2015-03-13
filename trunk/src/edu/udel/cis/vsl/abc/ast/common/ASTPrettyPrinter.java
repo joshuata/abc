@@ -869,6 +869,9 @@ public class ASTPrettyPrinter {
 				out.print(")");
 			}
 			break;
+		case OMPATOMIC:
+			out.print("atomic ");
+			break;
 		default:// ORDERED
 			out.print("ordered ");
 		}

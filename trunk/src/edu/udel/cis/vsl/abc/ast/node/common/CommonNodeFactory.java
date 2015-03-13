@@ -859,6 +859,11 @@ public class CommonNodeFactory implements NodeFactory {
 	public OmpSyncNode newOmpMasterNode(Source source, StatementNode statement) {
 		return new CommonOmpSyncNode(source, OmpSyncNodeKind.MASTER, statement);
 	}
+	
+	@Override
+	public OmpSyncNode newOmpAtomicNode(Source source, StatementNode statement) {
+		return new CommonOmpSyncNode(source, OmpSyncNodeKind.OMPATOMIC, statement);
+	}
 
 	@Override
 	public OmpSyncNode newOmpBarrierNode(Source source) {

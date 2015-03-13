@@ -696,7 +696,7 @@ public class OMPPragmaHandler implements PragmaHandler {
 						translateIdentifierList(source, "threadprivateList",
 								(CommonTree) rootTree.getChild(0)));
 			case ATOMIC:
-				throw new ABCUnsupportedException("atomic construct of OpenMP");
+				return nodeFactory.newOmpAtomicNode(source, null);
 			default:
 				throw new ABCRuntimeException("Unreachable");
 			}

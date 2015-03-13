@@ -1940,6 +1940,22 @@ public interface NodeFactory {
 	 * @return The new OpenMP master node created.
 	 */
 	OmpSyncNode newOmpMasterNode(Source source, StatementNode statement);
+	
+	/**
+	 * Creates a new OpenMP atomic node, representing
+	 * <code>#pragma omp atomic...</code>. An atomic node has exactly one child
+	 * node, i.e., the statement node corresponding to the block affected by the
+	 * atomic construct. The syntax of the atomic construct is:<br>
+	 * <code>#pragma omp atomic new-line <br>
+	 * structured-block</code>
+	 * 
+	 * @param source
+	 *            The source code element of the new node.
+	 * @param statement
+	 *            The statement node of the master construct.
+	 * @return The new OpenMP atomic node created.
+	 */
+	OmpSyncNode newOmpAtomicNode(Source source, StatementNode statement);
 
 	/**
 	 * Creates a new OpenMP critical node, representing
