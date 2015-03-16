@@ -35,6 +35,7 @@ public class SETriple {
 			List<BlockItemNode> after) {
 		this.before = before;
 		this.node = node;
+		this.node.remove();
 		this.after = after;
 	}
 

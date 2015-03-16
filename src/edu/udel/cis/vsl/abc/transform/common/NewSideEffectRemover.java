@@ -1,6 +1,8 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,8 +18,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode.OrdinaryDeclarationKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
@@ -39,25 +46,34 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.JumpNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.LabeledStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ReturnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.WhenNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.EnumerationTypeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
+import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
@@ -229,8 +245,22 @@ public class NewSideEffectRemover extends BaseTransformer {
 			// TODO
 		case HEAP:
 			// TODO
-		case QUALIFIED:
-			// TODO
+		case QUALIFIED: {
+			QualifiedObjectType qualifiedType = (QualifiedObjectType) type;
+			TypeNode baseTypeNode = this.typeNode(source,
+					qualifiedType.getBaseType());
+
+			baseTypeNode.setConstQualified(qualifiedType.isConstQualified());
+			// baseTypeNode.setAtomicQualified(qualifiedType.is); TODO how to
+			// get _Atomic qualified feature?
+			baseTypeNode.setInputQualified(qualifiedType.isInputQualified());
+			baseTypeNode.setOutputQualified(qualifiedType.isOutputQualified());
+			baseTypeNode.setRestrictQualified(qualifiedType
+					.isRestrictQualified());
+			baseTypeNode.setVolatileQualified(qualifiedType
+					.isVolatileQualified());
+			return baseTypeNode;
+		}
 		default:
 			throw new ABCUnsupportedException("converting type " + type
 					+ " to a type node.", source.getSummary(false));
@@ -298,9 +328,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 	private boolean purify(ExprTriple triple) {
 		if (triple.getAfter().isEmpty()
 				&& triple.getNode().isSideEffectFree(false)) {
+			assert triple.getNode().parent() == null;
 			return false;
 		} else {
 			shift(triple);
+			assert triple.getNode().parent() == null;
 			return true;
 		}
 	}
@@ -547,6 +579,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 
 		assign.setArgument(0, newLhs);
 		assign.setArgument(1, newRhs);
+		assign.remove();
 
 		ExprTriple result = new ExprTriple(newLhs.copy());
 
@@ -809,7 +842,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExpressionNode e1 = leftTriple.getNode();
 
 		result.addAllBefore(leftTriple.getBefore());
-		if (e1.isSideEffectFree(true)) {
+		if (!e1.isSideEffectFree(true)) {
 			// Note that we consider errors as side effects for a comma
 			// operation left hand side, because if there are no possible
 			// side effects we'll just remove the left hand argument.
@@ -1033,25 +1066,29 @@ public class NewSideEffectRemover extends BaseTransformer {
 	}
 
 	private ExprTriple translateRegularRange(RegularRangeNode expression) {
-		ExprTriple low = translate(expression.getLow()), hi = translate(expression
-				.getHigh()), step = translate(expression.getStep());
+		ExpressionNode step = expression.getStep();
+		ExprTriple lowTriple = translate(expression.getLow()), hiTriple = translate(expression
+				.getHigh());
 
-		makesef(low);
-		makesef(hi);
-		makesef(step);
-
-		expression.setLow(low.getNode());
-		expression.setHigh(hi.getNode());
-		expression.setStep(step.getNode());
+		makesef(lowTriple);
+		makesef(hiTriple);
+		expression.setLow(lowTriple.getNode());
+		expression.setHigh(hiTriple.getNode());
 
 		ExprTriple result = new ExprTriple(expression);
 
-		result.addAllBefore(low.getBefore());
-		result.addAllBefore(hi.getBefore());
-		result.addAllBefore(step.getBefore());
-		result.addAllAfter(low.getAfter());
-		result.addAllAfter(hi.getAfter());
-		result.addAllAfter(step.getAfter());
+		result.addAllBefore(lowTriple.getBefore());
+		result.addAllBefore(hiTriple.getBefore());
+		result.addAllAfter(lowTriple.getAfter());
+		result.addAllAfter(hiTriple.getAfter());
+		if (step != null) {
+			ExprTriple stepTriple = translate(expression.getStep());
+
+			makesef(stepTriple);
+			expression.setStep(stepTriple.getNode());
+			result.addAllBefore(stepTriple.getBefore());
+			result.addAllAfter(stepTriple.getAfter());
+		}
 		return result;
 	}
 
@@ -1063,7 +1100,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 
 	private ExprTriple translateGenericSelection(GenericSelectionNode expression) {
 		throw new ABCUnsupportedException(
-				"generic selections not yet implemented: " + expression);
+				"generic selections not yet implemented: " + expression
+						+ " in side-effect remover");
 	}
 
 	private ExprTriple translateDot(DotNode expression) {
@@ -1115,29 +1153,31 @@ public class NewSideEffectRemover extends BaseTransformer {
 		for (PairNode<DesignationNode, InitializerNode> pair : node) {
 			DesignationNode designationNode = pair.getLeft();
 
-			for (DesignatorNode designator : designationNode) {
-				if (designator instanceof FieldDesignatorNode) {
-					// no side effects possible
-				} else if (designator instanceof ArrayDesignatorNode) {
-					ExpressionNode indexNode = ((ArrayDesignatorNode) designator)
-							.getIndex();
-					ExprTriple triple = translate(indexNode);
+			if (designationNode != null)
+				for (DesignatorNode designator : designationNode) {
+					if (designator instanceof FieldDesignatorNode) {
+						// no side effects possible
+					} else if (designator instanceof ArrayDesignatorNode) {
+						ExpressionNode indexNode = ((ArrayDesignatorNode) designator)
+								.getIndex();
+						ExprTriple triple = translate(indexNode);
 
-					if (emptyAfter) {
-						purify(triple);
-						result.addAllBefore(triple.getBefore());
+						if (emptyAfter) {
+							purify(triple);
+							result.addAllBefore(triple.getBefore());
+						} else {
+							makesef(triple);
+							result.addAllBefore(triple.getBefore());
+							result.addAllAfter(triple.getAfter());
+						}
+						((ArrayDesignatorNode) designator).setIndex(triple
+								.getNode());
 					} else {
-						makesef(triple);
-						result.addAllBefore(triple.getBefore());
-						result.addAllAfter(triple.getAfter());
+						throw new ABCRuntimeException(
+								"Unexpected kind of designator node: "
+										+ designator);
 					}
-					((ArrayDesignatorNode) designator).setIndex(triple
-							.getNode());
-				} else {
-					throw new ABCRuntimeException(
-							"Unexpected kind of designator node: " + designator);
 				}
-			}
 
 			SETriple initTriple = translateInitializer(pair.getRight(),
 					emptyAfter);
@@ -1202,7 +1242,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 			expression.setArgument(newArg);
 		} else {
 			makesef(triple);
-			expression.setArgument(newArg);
+			expression.setArgument(triple.getNode());
 		}
 		triple.setNode(expression);
 		return triple;
@@ -1311,9 +1351,15 @@ public class NewSideEffectRemover extends BaseTransformer {
 			SETriple result = new SETriple(node);
 
 			for (int i = 0; i < numChildren; i++) {
-				SETriple childTriple = translateGenericNode(node.child(i));
+				ASTNode child = node.child(i);
+
+				if (child == null)
+					continue;
+
+				SETriple childTriple = translateGenericNode(child);
 
 				result.addAllBefore(childTriple.getBefore());
+				childTriple.getNode().remove();
 				node.setChild(i, childTriple.getNode());
 			}
 			return result;
@@ -1353,6 +1399,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 			result.addAll(initTriple.getBefore());
 			decl.setInitializer((InitializerNode) initTriple.getNode());
 		}
+		result.add(decl);
 		return result;
 	}
 
@@ -1375,8 +1422,14 @@ public class NewSideEffectRemover extends BaseTransformer {
 		List<BlockItemNode> result;
 
 		// expr part of triple may contain function call/spawn
-		makesef(triple);
+		// makesef(triple);
 		result = triple.getBefore();
+
+		ExpressionNode newExpr = triple.getNode();
+
+		if ((triple.getBefore().size() < 1 && triple.getAfter().size() < 1)
+				|| !newExpr.isSideEffectFree(false))
+			result.add(nodeFactory.newExpressionStatementNode(newExpr));
 		result.addAll(triple.getAfter());
 		return result;
 	}
@@ -1407,9 +1460,11 @@ public class NewSideEffectRemover extends BaseTransformer {
 	private CompoundStatementNode makeCompound(StatementNode stmt) {
 		if (stmt instanceof CompoundStatementNode)
 			return (CompoundStatementNode) stmt;
-		else
+		else {
+			stmt.remove();
 			return nodeFactory.newCompoundStatementNode(stmt.getSource(),
 					Arrays.asList((BlockItemNode) stmt));
+		}
 	}
 
 	/**
@@ -1422,6 +1477,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		StatementNode body = loop.getBody();
 		List<BlockItemNode> bodyList = translateStatement(body);
 
+		removeNodes(bodyList);
 		if (bodyList.size() == 1)
 			loop.setBody((StatementNode) bodyList.get(0));
 		else
@@ -1442,6 +1498,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 	private List<BlockItemNode> normalizeForLoopInitializer(ForLoopNode forLoop) {
 		ForLoopInitializerNode init = forLoop.getInitializer();
 
+		if (init == null)
+			return new LinkedList<BlockItemNode>();
 		if (init instanceof ExpressionNode) {
 			List<BlockItemNode> initItems = translateExpressionAsStatement((ExpressionNode) init);
 
@@ -1453,6 +1511,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 					ExpressionNode expr = ((ExpressionStatementNode) item)
 							.getExpression();
 
+					expr.remove();
 					forLoop.setInitializer(expr);
 					return new LinkedList<BlockItemNode>();
 				}
@@ -1494,9 +1553,15 @@ public class NewSideEffectRemover extends BaseTransformer {
 		if (incItems.size() == 1
 				& incItems.get(0) instanceof ExpressionStatementNode) {
 			// nothing to do
+			ExpressionNode newIncrementer = ((ExpressionStatementNode) incItems
+					.get(0)).getExpression();
+
+			newIncrementer.remove();
+			forLoop.setIncrementer(newIncrementer);
 		} else {
 			CompoundStatementNode body = makeCompound(forLoop.getBody());
 
+			body.remove();
 			forLoop.setBody(body);
 			body.insertChildren(body.numChildren(), incItems);
 			forLoop.setIncrementer(null);
@@ -1525,6 +1590,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 			Source condSource = cond.getSource();
 			CompoundStatementNode body = makeCompound(loop.getBody());
 
+			body.remove();
 			loop.setBody(body);
 			condItems.add(nodeFactory.newIfNode(condSource, nodeFactory
 					.newOperatorNode(condSource, Operator.NOT,
@@ -1532,7 +1598,8 @@ public class NewSideEffectRemover extends BaseTransformer {
 					.newBreakNode(condSource)));
 			body.insertChildren(0, condItems);
 			loop.setCondition(newOneNode(condSource));
-		}
+		} else
+			loop.setCondition(condTriple.getNode());
 	}
 
 	/**
@@ -1547,11 +1614,17 @@ public class NewSideEffectRemover extends BaseTransformer {
 	private List<BlockItemNode> translateForLoop(ForLoopNode forLoop) {
 		normalizeLoopBody(forLoop);
 
-		List<BlockItemNode> result = normalizeForLoopInitializer(forLoop);
+		List<BlockItemNode> newItems = normalizeForLoopInitializer(forLoop);
+		List<BlockItemNode> result = new LinkedList<>();
 
-		result.add(forLoop);
+		newItems.add(forLoop);
 		normalizeLoopCondition(forLoop);
 		normalizeForLoopIncrementer(forLoop);
+		if (newItems.size() > 1) {
+			removeNodes(newItems);
+			result.add(makeBlockItem(forLoop.getSource(), newItems));
+		} else
+			result = newItems;
 		return result;
 	}
 
@@ -1590,6 +1663,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExprTriple condTriple = translate(doLoop.getCondition());
 
 		purify(condTriple);
+		doLoop.setCondition(condTriple.getNode());
 
 		List<BlockItemNode> condItems = condTriple.getBefore();
 
@@ -1627,29 +1701,29 @@ public class NewSideEffectRemover extends BaseTransformer {
 		}
 	}
 
-	private List<BlockItemNode> translateAssert(AssertNode statement) {
-		ExprTriple triple = translate(statement.getCondition());
+	// private List<BlockItemNode> translateAssert(AssertNode statement) {
+	// ExprTriple triple = translate(statement.getCondition());
+	//
+	// purify(triple);
+	//
+	// List<BlockItemNode> result = triple.getBefore();
+	//
+	// statement.setCondition(triple.getNode());
+	// result.add(statement);
+	// return result;
+	// }
 
-		purify(triple);
-
-		List<BlockItemNode> result = triple.getBefore();
-
-		statement.setCondition(triple.getNode());
-		result.add(statement);
-		return result;
-	}
-
-	private List<BlockItemNode> translateAssume(AssumeNode statement) {
-		ExprTriple triple = translate(statement.getExpression());
-
-		purify(triple);
-
-		List<BlockItemNode> result = triple.getBefore();
-
-		statement.setExpression(triple.getNode());
-		result.add(statement);
-		return result;
-	}
+	// private List<BlockItemNode> translateAssume(AssumeNode statement) {
+	// ExprTriple triple = translate(statement.getExpression());
+	//
+	// purify(triple);
+	//
+	// List<BlockItemNode> result = triple.getBefore();
+	//
+	// statement.setExpression(triple.getNode());
+	// result.add(statement);
+	// return result;
+	// }
 
 	/**
 	 * 
@@ -1662,6 +1736,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		List<BlockItemNode> result = new LinkedList<>();
 
 		result.add(statement);
+		removeNodes(bodyItems);
 		if (bodyItems.size() == 1) {
 			BlockItemNode item = bodyItems.get(0);
 
@@ -1686,11 +1761,16 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 *         original compound statement
 	 */
 	private List<BlockItemNode> translateCompound(CompoundStatementNode compound) {
+		List<BlockItemNode> blockItems = new LinkedList<>();
 		List<BlockItemNode> result = new LinkedList<>();
 
 		for (BlockItemNode item : compound) {
-			result.addAll(translateBlockItem(item));
+			List<BlockItemNode> tmp = translateBlockItem(item);
+
+			blockItems.addAll(tmp);
 		}
+		removeNodes(blockItems);
+		result.add(makeBlockItem(compound.getSource(), blockItems));
 		return result;
 	}
 
@@ -1705,12 +1785,21 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	private CompoundStatementNode transformCompound(
 			CompoundStatementNode compound) {
+		List<BlockItemNode> blockItems = translateCompound(compound);
+
+		removeNodes(blockItems);
+		if (blockItems.size() == 1) {
+			BlockItemNode item = blockItems.get(0);
+
+			if (item instanceof CompoundStatementNode)
+				return (CompoundStatementNode) item;
+		}
 		return nodeFactory.newCompoundStatementNode(compound.getSource(),
-				translateCompound(compound));
+				blockItems);
 	}
 
 	/**
-	 * Given a statement, computes a list of block items whose execution is
+	 * TODO Given a statement, computes a list of block items whose execution is
 	 * equivalent to the execution of the statement, but which are all in normal
 	 * form. May result in the modification of the statement.
 	 * 
@@ -1720,50 +1809,299 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	List<BlockItemNode> translateStatement(StatementNode statement) {
 		switch (statement.statementKind()) {
-		case ASSERT:
-			return translateAssert((AssertNode) statement);
-		case ASSUME:
-			return translateAssume((AssumeNode) statement);
+		// case ASSERT:
+		// return translateAssert((AssertNode) statement);
+		// case ASSUME:
+		// return translateAssume((AssumeNode) statement);
 		case ATOMIC:
 			return translateAtomic((AtomicNode) statement);
 		case CHOOSE:
-			break;
+			return translateChoose((ChooseStatementNode) statement);
 		case CIVL_FOR:
-			break;
+			return translateCivlFor((CivlForNode) statement);
 		case COMPOUND:
-			break;
+			return translateCompound((CompoundStatementNode) statement);
 		case EXPRESSION:
 			return translateExpressionStatement((ExpressionStatementNode) statement);
 		case IF:
-			break;
+			return translateIf((IfNode) statement);
 		case JUMP:
-
-			break;
+			return translateJump((JumpNode) statement);
 		case LABELED:
-			break;
+			return translateLabeledStatement((LabeledStatementNode) statement);
 		case LOOP:
 			return translateLoop((LoopNode) statement);
 		case NULL:
-			break;
+			return Arrays.asList((BlockItemNode) statement);
 		case OMP:
-			break;
+			return translateOmpExecutable((OmpExecutableNode) statement);
 		case PRAGMA:
-			break;
+			throw new ABCUnsupportedException(
+					"removing side-effects for pragmas");
 		case SWITCH:
-			break;
+			return translateSwitch((SwitchNode) statement);
 		case WHEN:
-			break;
+			return translateWhen((WhenNode) statement);
 		default:
-			break;
+			throw new ABCUnsupportedException("removing side-effects for "
+					+ statement.statementKind() + " statement");
 
 		}
-		return null;
 	}
 
+	private List<BlockItemNode> translateJump(JumpNode jump) {
+		List<BlockItemNode> result = new LinkedList<>();
+
+		if (jump instanceof ReturnNode) {
+			ReturnNode returnNode = (ReturnNode) jump;
+			ExpressionNode expression = returnNode.getExpression();
+
+			if (expression != null) {
+				int exprIndex = expression.childIndex();
+				ExprTriple exprTriple = translate(expression);
+
+				purify(exprTriple);
+				result.addAll(exprTriple.getBefore());
+				returnNode.setChild(exprIndex, exprTriple.getNode());
+				result.add(returnNode);
+				return result;
+			}
+		}
+		result.add(jump);
+		return result;
+	}
+
+	private List<BlockItemNode> translateWhen(WhenNode when) {
+		StatementNode body = when.getBody();
+		List<BlockItemNode> bodyItems = this.translateStatement(body);
+		List<BlockItemNode> result = new LinkedList<>();
+		int bodyIndex = body.childIndex();
+
+		this.removeNodes(bodyItems);
+		when.setChild(bodyIndex,
+				this.makeBlockItem(body.getSource(), bodyItems));
+		result.add(when);
+		return result;
+	}
+
+	private List<BlockItemNode> translateSwitch(SwitchNode switchNode) {
+		List<BlockItemNode> result = new LinkedList<>();
+		ExpressionNode condition = switchNode.getCondition();
+		int condIndex = condition.childIndex();
+		ExprTriple condTriple = this.translate(condition);
+		StatementNode body = switchNode.getBody();
+		int bodyIndex = body.childIndex();
+		List<BlockItemNode> bodyItems = this.translateStatement(body);
+
+		purify(condTriple);
+		result.addAll(condTriple.getBefore());
+		switchNode.setChild(condIndex, condTriple.getNode());
+		removeNodes(bodyItems);
+		switchNode.setChild(bodyIndex,
+				this.makeBlockItem(body.getSource(), bodyItems));
+		result.add(switchNode);
+		return result;
+	}
+
+	private List<BlockItemNode> translateOmpExecutable(OmpExecutableNode ompExec) {
+		StatementNode body = ompExec.statementNode();
+		List<BlockItemNode> result = new LinkedList<>();
+		if (body != null) {
+			int bodyIndex = body.childIndex();
+			List<BlockItemNode> bodyItems = translateStatement(body);
+
+			removeNodes(bodyItems);
+			ompExec.setChild(bodyIndex,
+					makeBlockItem(body.getSource(), bodyItems));
+		}
+		result.add(ompExec);
+		return result;
+	}
+
+	private List<BlockItemNode> translateLabeledStatement(
+			LabeledStatementNode labeled) {
+		StatementNode body = labeled.getStatement();
+		int bodyIndex = body.childIndex();
+		List<BlockItemNode> bodyNormals = translateStatement(body);
+		List<BlockItemNode> result = new LinkedList<>();
+
+		removeNodes(bodyNormals);
+		labeled.setChild(bodyIndex,
+				makeBlockItem(body.getSource(), bodyNormals));
+		result.add(labeled);
+		return result;
+	}
+
+	private List<BlockItemNode> translateIf(IfNode ifNode) {
+		ExpressionNode condition = ifNode.getCondition();
+		StatementNode trueBranch = ifNode.getTrueBranch();
+		StatementNode falseBranch = ifNode.getFalseBranch();
+		int condIndex = condition.childIndex(), trueIndex = trueBranch
+				.childIndex();
+		ExprTriple condTriple = translate(condition);
+		List<BlockItemNode> trueNormalItems = translateStatement(trueBranch);
+		List<BlockItemNode> result = new LinkedList<>();
+
+		purify(condTriple);
+		result.addAll(condTriple.getBefore());
+		ifNode.setChild(condIndex, condTriple.getNode());
+		removeNodes(trueNormalItems);
+		ifNode.setChild(trueIndex,
+				makeBlockItem(trueBranch.getSource(), trueNormalItems));
+		if (falseBranch != null) {
+			int falseIndex = falseBranch.childIndex();
+			List<BlockItemNode> falseNormalItems = translateStatement(falseBranch);
+
+			removeNodes(falseNormalItems);
+			ifNode.setChild(falseIndex,
+					makeBlockItem(falseBranch.getSource(), falseNormalItems));
+		}
+		result.add(ifNode);
+		return result;
+	}
+
+	private BlockItemNode makeBlockItem(Source source, List<BlockItemNode> nodes) {
+		if (nodes.size() == 1)
+			return nodes.get(0);
+		else
+			return nodeFactory.newCompoundStatementNode(source, nodes);
+	}
+
+	private List<BlockItemNode> translateCivlFor(CivlForNode civlFor) {
+		List<BlockItemNode> result = new LinkedList<>();
+		ExpressionNode domain = civlFor.getDomain();
+		ExpressionNode invariant = civlFor.getInvariant();
+		StatementNode body = civlFor.getBody();
+		int domIndex = domain.childIndex(), bodyIndex = body.childIndex();
+		ExprTriple domTriple = translate(domain);
+		List<BlockItemNode> normalBodyItems = translateStatement(body);
+
+		purify(domTriple);
+		result.addAll(domTriple.getBefore());
+		civlFor.setChild(domIndex, domTriple.getNode());
+		if (invariant != null) {
+			int invIndex = invariant.childIndex();
+			ExprTriple invTriple = translate(invariant);
+
+			purify(invTriple);
+			result.addAll(invTriple.getBefore());
+			civlFor.setChild(invIndex, invTriple.getNode());
+		}
+		removeNodes(normalBodyItems);
+		if (normalBodyItems.size() == 1)
+			civlFor.setChild(bodyIndex, normalBodyItems.get(0));
+		else
+			civlFor.setChild(bodyIndex, nodeFactory.newCompoundStatementNode(
+					body.getSource(), normalBodyItems));
+		result.add(civlFor);
+		return result;
+	}
+
+	private void removeNodes(Collection<? extends ASTNode> nodes) {
+		for (ASTNode node : nodes)
+			node.remove();
+	}
+
+	/**
+	 * TODO
+	 * 
+	 * @param choose
+	 * @return
+	 */
+	private List<BlockItemNode> translateChoose(ChooseStatementNode choose) {
+		int numChildren = choose.numChildren();
+		List<BlockItemNode> result = new LinkedList<>();
+
+		result.add(choose);
+		for (int i = 0; i < numChildren; i++) {
+			StatementNode child = choose.getSequenceChild(i);
+			List<BlockItemNode> normalItems = translateStatement(child);
+
+			for (BlockItemNode normalItem : normalItems)
+				normalItem.remove();
+			if (normalItems.size() == 1)
+				choose.setChild(i, normalItems.get(0));
+			else
+				choose.setChild(i, nodeFactory.newCompoundStatementNode(
+						child.getSource(), normalItems));
+		}
+		return result;
+	}
+
+	/**
+	 * TODO simplify me using translateGeneric? Returns a list of block items in
+	 * normal form that is equivalent to the given enumeration type declaration.
+	 * 
+	 * @param enumeration
+	 * @return
+	 */
 	private List<BlockItemNode> translateEnumeration(
 			EnumerationTypeNode enumeration) {
-		// TODO
-		return null;
+		SequenceNode<EnumeratorDeclarationNode> enumerators = enumeration
+				.enumerators();
+		int numEnumerators = enumerators.numChildren();
+		List<BlockItemNode> result = new ArrayList<>();
+
+		for (int i = 0; i < numEnumerators; i++) {
+			EnumeratorDeclarationNode enumerator = enumerators
+					.getSequenceChild(i);
+			ExpressionNode value = enumerator.getValue();
+
+			if (value != null) {
+				ExprTriple expr = this.translate(value);
+
+				result.addAll(expr.getBefore());
+				enumerator.setValue(expr.getNode());
+			}
+		}
+		result.add(enumeration);
+		return result;
+	}
+
+	/**
+	 * TODO simplify me using translateGeneric? Returns a list of block items in
+	 * normal form that is equivalent to the given struct or union type
+	 * declaration.
+	 * 
+	 * @param structOrUnion
+	 * @return
+	 */
+	private List<BlockItemNode> translateStructOrUnion(
+			StructureOrUnionTypeNode structOrUnion) {
+		SequenceNode<FieldDeclarationNode> fieldDecls = structOrUnion
+				.getStructDeclList();
+		List<BlockItemNode> result = new LinkedList<>();
+
+		if (fieldDecls != null) {
+			int numFields = fieldDecls.numChildren();
+
+			for (int i = 0; i < numFields; i++) {
+				FieldDeclarationNode fieldDecl = fieldDecls.getSequenceChild(i);
+				SETriple seTriple = this.translateGenericNode(fieldDecl);
+
+				result.addAll(seTriple.getBefore());
+				seTriple.getNode().remove();
+				fieldDecls.setChild(i, seTriple.getNode());
+			}
+		}
+		result.add(structOrUnion);
+		return result;
+	}
+
+	/**
+	 * Returns a list of block items in normal form that is equivalent to the
+	 * given typedef declaration.
+	 * 
+	 * @param structOrUnion
+	 * @return
+	 */
+	private List<BlockItemNode> translateTypedef(TypedefDeclarationNode typedef) {
+		SETriple seTriple = this.translateGenericNode(typedef);
+		List<BlockItemNode> result = new ArrayList<>();
+
+		result.addAll(seTriple.getBefore());
+		result.add((BlockItemNode) seTriple.getNode());
+		return result;
 	}
 
 	/**
@@ -1778,36 +2116,46 @@ public class NewSideEffectRemover extends BaseTransformer {
 	private List<BlockItemNode> translateBlockItem(BlockItemNode item) {
 		BlockItemKind kind = item.blockItemKind();
 
-		// TODO
 		switch (kind) {
 		case ENUMERATION:
 			return translateEnumeration((EnumerationTypeNode) item);
 		case ORDINARY_DECLARATION:
-			break;
+			return translateOrdinaryDeclaration((OrdinaryDeclarationNode) item);
 		case PRAGMA:
-			break;
+			return Arrays.asList((BlockItemNode) item);
 		case STATEMENT:
 			return translateStatement((StatementNode) item);
 		case STATIC_ASSERTION:
-			break;
+			throw new ABCUnsupportedException(
+					"normalization of static assertions in side-effect remover");
 		case STRUCT_OR_UNION:
-			break;
+			return translateStructOrUnion((StructureOrUnionTypeNode) item);
 		case TYPEDEF:
-			break;
+			return translateTypedef((TypedefDeclarationNode) item);
 		default:
-			break;
-
+			throw new ABCUnsupportedException("normalization of block item of "
+					+ kind + " kind in side-effect remover");
 		}
-
-		return null;
 	}
 
-	@SuppressWarnings("unused")
-	private void normalizeVariableDeclaration(VariableDeclarationNode variable) {
-		TypeNode type = variable.getTypeNode();
-		InitializerNode initializer = variable.getInitializer();
-		SETriple initTriple = this.translateInitializer(initializer, true);
+	private List<BlockItemNode> translateOrdinaryDeclaration(
+			OrdinaryDeclarationNode ordinaryDecl) {
+		OrdinaryDeclarationKind kind = ordinaryDecl.ordinaryDeclarationKind();
 
+		switch (kind) {
+		case VARIABLE_DECLARATION:
+			return this
+					.translateVariableDeclaration((VariableDeclarationNode) ordinaryDecl);
+		case FUNCTION_DEFINITION:
+			this.normalizeFunctionDefinition((FunctionDefinitionNode) ordinaryDecl);
+		case FUNCTION_DECLARATION:
+		case ABSTRACT_FUNCTION_DEFINITION:
+			return Arrays.asList((BlockItemNode) ordinaryDecl);
+		default:
+			throw new ABCUnsupportedException(
+					"normalization of ordinary declaration of " + kind
+							+ " kind in side-effect remover");
+		}
 	}
 
 	/**
@@ -1836,19 +2184,39 @@ public class NewSideEffectRemover extends BaseTransformer {
 		assert this.astFactory == ast.getASTFactory();
 		assert this.nodeFactory == astFactory.getNodeFactory();
 		ast.release();
+
+		List<BlockItemNode> newBlockItems = new ArrayList<>();
+
 		for (int i = 0; i < rootNode.numChildren(); i++) {
-			ASTNode node = rootNode.child(i);
+			BlockItemNode node = rootNode.getSequenceChild(i);
+			List<BlockItemNode> normalNodes = this.translateBlockItem(node);
 
-			// For now, assume initializers for global variables are side effect
-			// free (SEF). TODO: don't assume this! But then we need
-			// external definition equal to block item.
-			if (node instanceof VariableDeclarationNode) {
-
-			} else if (node instanceof FunctionDefinitionNode) {
-				normalizeFunctionDefinition((FunctionDefinitionNode) node);
-			}
+			removeNodes(normalNodes);
+			newBlockItems.addAll(normalNodes);
+			// if (node instanceof VariableDeclarationNode) {
+			// List<BlockItemNode> sefNodes = this
+			// .translateVariableDeclaration((VariableDeclarationNode) node);
+			//
+			// node.remove();
+			// if (sefNodes.size() == 1)
+			// rootNode.setChild(i, sefNodes.get(0));
+			// else
+			// rootNode.setChild(
+			// i,
+			// nodeFactory.newCompoundStatementNode(
+			// node.getSource(), sefNodes));
+			// } else if (node instanceof FunctionDefinitionNode) {
+			// normalizeFunctionDefinition((FunctionDefinitionNode) node);
+			// }
 		}
-		return astFactory.newAST(rootNode, ast.getSourceFiles());
+		rootNode = nodeFactory.newTranslationUnitNode(rootNode.getSource(),
+				newBlockItems);
+
+		AST newAST = astFactory.newAST(rootNode, ast.getSourceFiles());
+
+		// newAST.prettyPrint(System.out, false);
+
+		return newAST;
 	}
 
 }

@@ -58,9 +58,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
@@ -99,6 +96,8 @@ import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 
 /**
  * <p>
@@ -1606,7 +1605,7 @@ public interface NodeFactory {
 	 *            current context
 	 * @return the new <code>$assume</code> statement node
 	 */
-	AssumeNode newAssumeNode(Source source, ExpressionNode expression);
+	// AssumeNode newAssumeNode(Source source, ExpressionNode expression);
 
 	/**
 	 * Creates a new node representing a CIVL-C <code>$assert</code> statement.
@@ -1622,8 +1621,8 @@ public interface NodeFactory {
 	 *            violated.
 	 * @return the new <code>$assert</code> statement node
 	 */
-	AssertNode newAssertNode(Source source, ExpressionNode expression,
-			SequenceNode<ExpressionNode> explanation);
+	// AssertNode newAssertNode(Source source, ExpressionNode expression,
+	// SequenceNode<ExpressionNode> explanation);
 
 	/**
 	 * Creates a new node representing a CIVL-C <code>$when</code> node, used to

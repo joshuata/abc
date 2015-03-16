@@ -47,6 +47,7 @@ public class ExprTriple extends SETriple {
 	@Override
 	public void setNode(ASTNode expression) {
 		assert expression instanceof ExpressionNode;
+		expression.remove();
 		this.node = expression;
 	}
 

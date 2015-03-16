@@ -1,3 +1,6 @@
+#ifdef _CIVL
+#include <civlc.cvh>
+#endif
 /* FEVS: A Functional Equivalence Verification Suite for High-Performance
  * Scientific Computing
  *
@@ -171,7 +174,9 @@ void update() {
  * step */
 int main(int argc, char *argv[]) {
   int iter;
-#pragma CIVL $assume (argc == 2);
+#ifdef _CIVL
+  $assume((argc == 2));
+#endif
   assert(argc==2);
   init(argv[1]);
   write_plain(0);

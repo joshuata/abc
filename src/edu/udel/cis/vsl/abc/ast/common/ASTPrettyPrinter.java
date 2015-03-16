@@ -63,8 +63,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
@@ -515,7 +513,7 @@ public class ASTPrettyPrinter {
 		if (function.hasGlobalFunctionSpecifier())
 			out.print("__global__ ");
 		out.print(prefix);
-		out.print(type2Pretty(prefix, returnType, false));
+		out.print(type2Pretty("", returnType, false));
 		out.print(" ");
 		out.print(function.getName());
 		out.print("(");
@@ -616,7 +614,7 @@ public class ASTPrettyPrinter {
 
 		out.print(prefix);
 		out.print("typedef ");
-		out.print(type2Pretty(prefix, typedef.getTypeNode(), true));
+		out.print(type2Pretty("", typedef.getTypeNode(), true));
 		out.print(" ");
 		out.print(typedef.getName());
 	}
@@ -626,12 +624,12 @@ public class ASTPrettyPrinter {
 		StatementKind kind = statement.statementKind();
 
 		switch (kind) {
-		case ASSUME:
-			pPrintAssume(out, prefix, (AssumeNode) statement);
-			break;
-		case ASSERT:
-			pPrintAssert(out, prefix, (AssertNode) statement);
-			break;
+		// case ASSUME:
+		// pPrintAssume(out, prefix, (AssumeNode) statement);
+		// break;
+		// case ASSERT:
+		// pPrintAssert(out, prefix, (AssertNode) statement);
+		// break;
 		case ATOMIC:
 			pPrintAtomic(out, prefix, (AtomicNode) statement);
 			break;
@@ -698,25 +696,25 @@ public class ASTPrettyPrinter {
 		out.print("}");
 	}
 
-	private static void pPrintAssert(PrintStream out, String prefix,
-			AssertNode assertNode) {
-		SequenceNode<ExpressionNode> explanation = assertNode.getExplanation();
-
-		out.print(prefix);
-		out.print("$assert ");
-		out.print(expression2Pretty(assertNode.getCondition()));
-		if (explanation != null) {
-			int numArgs = explanation.numChildren();
-
-			out.print(" : ");
-			for (int i = 0; i < numArgs; i++) {
-				if (i != 0)
-					out.print(", ");
-				out.print(expression2Pretty(explanation.getSequenceChild(i)));
-			}
-		}
-		out.print(";");
-	}
+	// private static void pPrintAssert(PrintStream out, String prefix,
+	// AssertNode assertNode) {
+	// SequenceNode<ExpressionNode> explanation = assertNode.getExplanation();
+	//
+	// out.print(prefix);
+	// out.print("$assert ");
+	// out.print(expression2Pretty(assertNode.getCondition()));
+	// if (explanation != null) {
+	// int numArgs = explanation.numChildren();
+	//
+	// out.print(" : ");
+	// for (int i = 0; i < numArgs; i++) {
+	// if (i != 0)
+	// out.print(", ");
+	// out.print(expression2Pretty(explanation.getSequenceChild(i)));
+	// }
+	// }
+	// out.print(";");
+	// }
 
 	private static void pPrintOmpStatement(PrintStream out, String prefix,
 			OmpExecutableNode ompStmt) {
@@ -1208,6 +1206,8 @@ public class ASTPrettyPrinter {
 		for (int i = 0; i < num; i++) {
 			VariableDeclarationNode var = list.getSequenceChild(i);
 
+			if (var == null)
+				continue;
 			if (i != 0)
 				result.append(", ");
 			result.append(variableDeclaration2Pretty("", var));
@@ -1265,7 +1265,7 @@ public class ASTPrettyPrinter {
 			result.append("_Thread_local ");
 		if (variable.hasSharedStorage())
 			result.append("__shared__ ");
-		type = type2Pretty(prefix, typeNode, false).toString();
+		type = type2Pretty("", typeNode, false).toString();
 		if (type.endsWith("]")) {
 			Pair<String, String> typeResult = processArrayType(type);
 
@@ -1368,13 +1368,13 @@ public class ASTPrettyPrinter {
 		return result;
 	}
 
-	private static void pPrintAssume(PrintStream out, String prefix,
-			AssumeNode assume) {
-		out.print(prefix);
-		out.print("$assume ");
-		out.print(expression2Pretty(assume.getExpression()));
-		out.print(";");
-	}
+	// private static void pPrintAssume(PrintStream out, String prefix,
+	// AssumeNode assume) {
+	// out.print(prefix);
+	// out.print("$assume ");
+	// out.print(expression2Pretty(assume.getExpression()));
+	// out.print(";");
+	// }
 
 	private static StringBuffer expression2Pretty(ExpressionNode expression) {
 		StringBuffer result = new StringBuffer();
@@ -1818,13 +1818,14 @@ public class ASTPrettyPrinter {
 		StringBuffer result = new StringBuffer();
 		TypeNodeKind kind = type.kind();
 
+		result.append(prefix);
 		switch (kind) {
 		case ARRAY: {
 			ArrayTypeNode arrayType = (ArrayTypeNode) type;
 			ExpressionNode extent = arrayType.getExtent();
 
 			// result.append("(");
-			result.append(type2Pretty(prefix, arrayType.getElementType(),
+			result.append(type2Pretty("", arrayType.getElementType(),
 					isTypeDeclaration));
 			// result.append(")");
 			result.append("[");
@@ -1849,34 +1850,37 @@ public class ASTPrettyPrinter {
 			result.append("void");
 			break;
 		case BASIC:
-			return basicType2Pretty((BasicTypeNode) type);
+			result.append(basicType2Pretty((BasicTypeNode) type));
+			break;
 		case ENUMERATION:
 			EnumerationTypeNode enumType = (EnumerationTypeNode) type;
 
-			if (isTypeDeclaration)
-				result.append(enumType2Pretty(prefix, enumType));
-			else {
-				result.append("enum");
-				if (enumType.getIdentifier() != null)
-					result.append(" " + enumType.getIdentifier().name());
-			}
-			break;
+			return enumType2Pretty(prefix, enumType);
+			// if (isTypeDeclaration)
+			// result.append(enumType2Pretty(prefix, enumType));
+			// else {
+			// result.append("enum");
+			// if (enumType.getIdentifier() != null)
+			// result.append(" " + enumType.getIdentifier().name());
+			// }
+			// break;
 		case STRUCTURE_OR_UNION: {
 			StructureOrUnionTypeNode strOrUnion = (StructureOrUnionTypeNode) type;
 
-			if (isTypeDeclaration)
-				result.append(structOrUnion2Pretty(prefix, strOrUnion));
-			else {
-				if (strOrUnion.isStruct())
-					result.append("struct ");
-				else
-					result.append("union ");
-				result.append(strOrUnion.getName());
-			}
-			break;
+			return structOrUnion2Pretty(prefix, strOrUnion);
+			// if (isTypeDeclaration)
+			// result.append(structOrUnion2Pretty(prefix, strOrUnion));
+			// else {
+			// if (strOrUnion.isStruct())
+			// result.append("struct ");
+			// else
+			// result.append("union ");
+			// result.append(strOrUnion.getName());
+			// }
+			// break;
 		}
 		case POINTER:
-			result.append(type2Pretty(prefix,
+			result.append(type2Pretty("",
 					((PointerTypeNode) type).referencedType(),
 					isTypeDeclaration));
 			result.append("*");

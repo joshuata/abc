@@ -59,6 +59,10 @@ _Bool $proc_defined($proc p);
 the scope s is still valid) */
 _Bool $scope_defined($scope s);
 
+void $assert(_Bool expr, ...);
+
+void $assume(_Bool expr);
+
 /* **************************** Memory Functions *************************** */
 
 /* The CIVL-C malloc function, which takes a reference to a scope */

@@ -25,8 +25,8 @@ public abstract class CommonOmpNode extends CommonASTNode implements OmpNode {
 		return new DifferenceObject(this, that);
 	}
 
-	@Override
-	public StatementKind statementKind() {
-		return StatementKind.OMP;
-	}
+	// @Override
+	// public StatementKind statementKind() {
+	// return StatementKind.OMP;
+	// }
 }

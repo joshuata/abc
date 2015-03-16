@@ -6,7 +6,7 @@
   // automatically
   #include <civlc.cvh>
   $input int N;
-  $assume 0 < N && N < 10;
+  $assume(0 < N && N < 10);
 #else
   // if not runned by CIVL, 
   // then make N a macro.  
@@ -23,7 +23,7 @@ int main(){
     sum += input[i];
 #ifdef _CIVL
   // assertion only added for CIVL
-  $assert sum == N*(N-1)/2;
+  $assert(sum == N*(N-1)/2);
 #endif
   printf("N = %d, sum = %d\n", N, sum);
   fflush(stdout);

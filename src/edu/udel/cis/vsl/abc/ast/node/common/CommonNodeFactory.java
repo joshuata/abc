@@ -65,9 +65,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpSyncNode.OmpSyncNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode.OmpWorksharingNodeKind;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
@@ -145,8 +142,6 @@ import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSymbolReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpSyncNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpWorkshareNode;
-import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssertNode;
-import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonAtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.common.statement.CommonCivlForNode;
@@ -192,6 +187,7 @@ import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 
 public class CommonNodeFactory implements NodeFactory {
 
@@ -717,16 +713,17 @@ public class CommonNodeFactory implements NodeFactory {
 		return new CommonScopeOfNode(source, variableExpression);
 	}
 
-	@Override
-	public AssumeNode newAssumeNode(Source source, ExpressionNode expression) {
-		return new CommonAssumeNode(source, expression);
-	}
-
-	@Override
-	public AssertNode newAssertNode(Source source, ExpressionNode expression,
-			SequenceNode<ExpressionNode> explanation) {
-		return new CommonAssertNode(source, expression, explanation);
-	}
+	// @Override
+	// public AssumeNode newAssumeNode(Source source, ExpressionNode expression)
+	// {
+	// return new CommonAssumeNode(source, expression);
+	// }
+	//
+	// @Override
+	// public AssertNode newAssertNode(Source source, ExpressionNode expression,
+	// SequenceNode<ExpressionNode> explanation) {
+	// return new CommonAssertNode(source, expression, explanation);
+	// }
 
 	@Override
 	public WhenNode newWhenNode(Source source, ExpressionNode guard,

@@ -28,9 +28,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpParallelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpReductionNode.OmpReductionNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpWorksharingNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
@@ -59,6 +56,8 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
+
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 
 public class StatementAnalyzer {
 
@@ -270,9 +269,12 @@ public class StatementAnalyzer {
 			} else if (initializer instanceof DeclarationListNode) {
 				DeclarationListNode declarationList = (DeclarationListNode) initializer;
 
-				for (VariableDeclarationNode child : declarationList)
+				for (VariableDeclarationNode child : declarationList) {
+					if (child == null)
+						continue;
 					entityAnalyzer.declarationAnalyzer
 							.processVariableDeclaration(child);
+				}
 			} else
 				throw error("Unknown kind of initializer clause in for loop",
 						initializer);
@@ -365,24 +367,24 @@ public class StatementAnalyzer {
 			break;
 		case NULL:
 			break;
-		case ASSUME:
-			processExpression(((AssumeNode) statement).getExpression());
-			break;
-		case ASSERT: {
-			AssertNode assertNode = (AssertNode) statement;
-			SequenceNode<ExpressionNode> explanation = assertNode
-					.getExplanation();
-
-			processExpression(assertNode.getCondition());
-			if (explanation != null) {
-				int numArgs = explanation.numChildren();
-
-				for (int i = 0; i < numArgs; i++) {
-					processExpression(explanation.getSequenceChild(i));
-				}
-			}
-			break;
-		}
+		// case ASSUME:
+		// processExpression(((AssumeNode) statement).getExpression());
+		// break;
+		// case ASSERT: {
+		// AssertNode assertNode = (AssertNode) statement;
+		// SequenceNode<ExpressionNode> explanation = assertNode
+		// .getExplanation();
+		//
+		// processExpression(assertNode.getCondition());
+		// if (explanation != null) {
+		// int numArgs = explanation.numChildren();
+		//
+		// for (int i = 0; i < numArgs; i++) {
+		// processExpression(explanation.getSequenceChild(i));
+		// }
+		// }
+		// break;
+		// }
 		case WHEN: {
 			ExpressionNode guard = ((WhenNode) statement).getGuard();
 			Type guardType;

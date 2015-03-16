@@ -2,7 +2,7 @@
 
 #include<civlc.cvh>
 //$input int L;
-//$assume 0<L && L<=3;
+//$assume(0<L && L<=3);
 int L =3;
 int foo(int a[L]){
   return L;

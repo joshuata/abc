@@ -1,3 +1,6 @@
+#ifdef _CIVL
+#include <civlc.cvh>
+#endif
 /* FEVS: A Functional Equivalence Verification Suite for High-Performance
  * Scientific Computing
  *
@@ -53,9 +56,11 @@ int main(int argc, char *argv[]) {
   N = atoi(argv[1]);
   L = atoi(argv[2]);
   M = atoi(argv[3]);
-#pragma CIVL $assume N && N <=2;
-#pragma CIVL $assume M && M <=2;
-#pragma CIVL $assume L && L <=2;
+#ifdef _CIVL
+  $assume(N && N <=2);
+  $assume(M && M <=2);
+  $assume(L && L <=2);
+#endif
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &nprocs);

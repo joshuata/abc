@@ -25,9 +25,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
@@ -61,6 +58,7 @@ import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
+//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 
 /**
  * A transformer which modifies an AST so that no expressions other than
@@ -1020,52 +1018,52 @@ public class SideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private StatementNode assertStatement(AssertNode statement)
-			throws SyntaxException {
-		StatementNode result;
-		ExpressionNode condition = statement.getCondition();
-		SequenceNode<ExpressionNode> explanation = statement.getExplanation();
-		boolean sideEffectFree = condition.isSideEffectFree(false);
-
-		if (explanation != null)
-			for (int i = 0; i < explanation.numChildren(); i++) {
-				sideEffectFree = sideEffectFree
-						&& explanation.getSequenceChild(i).isSideEffectFree(
-								false);
-			}
-		if (sideEffectFree) {
-			result = statement;
-		} else {
-			List<BlockItemNode> newStatements = new ArrayList<BlockItemNode>();
-			SideEffectFreeTriple triple;
-			List<BlockItemNode> before = new ArrayList<>(), after = new ArrayList<>();
-			ExpressionNode newCondition;
-			List<ExpressionNode> newExplanationArgs = new ArrayList<>();
-			SequenceNode<ExpressionNode> newExplanation;
-
-			triple = processExpression(condition);
-			newCondition = triple.getExpression();
-			before.addAll(triple.getBefore());
-			after.addAll(triple.getAfter());
-			if (explanation != null)
-				for (int i = 0; i < explanation.numChildren(); i++) {
-					triple = processExpression(explanation.getSequenceChild(i));
-					newExplanationArgs.add(triple.getExpression());
-					before.addAll(triple.getBefore());
-					after.addAll(triple.getAfter());
-				}
-			newExplanation = explanation != null ? nodeFactory.newSequenceNode(
-					explanation.getSource(), "Explanation", newExplanationArgs)
-					: null;
-			newStatements.addAll(before);
-			newStatements.add(nodeFactory.newAssertNode(statement.getSource(),
-					newCondition, newExplanation));
-			newStatements.addAll(after);
-			result = nodeFactory.newCompoundStatementNode(
-					statement.getSource(), newStatements);
-		}
-		return result;
-	}
+//	private StatementNode assertStatement(AssertNode statement)
+//			throws SyntaxException {
+//		StatementNode result;
+//		ExpressionNode condition = statement.getCondition();
+//		SequenceNode<ExpressionNode> explanation = statement.getExplanation();
+//		boolean sideEffectFree = condition.isSideEffectFree(false);
+//
+//		if (explanation != null)
+//			for (int i = 0; i < explanation.numChildren(); i++) {
+//				sideEffectFree = sideEffectFree
+//						&& explanation.getSequenceChild(i).isSideEffectFree(
+//								false);
+//			}
+//		if (sideEffectFree) {
+//			result = statement;
+//		} else {
+//			List<BlockItemNode> newStatements = new ArrayList<BlockItemNode>();
+//			SideEffectFreeTriple triple;
+//			List<BlockItemNode> before = new ArrayList<>(), after = new ArrayList<>();
+//			ExpressionNode newCondition;
+//			List<ExpressionNode> newExplanationArgs = new ArrayList<>();
+//			SequenceNode<ExpressionNode> newExplanation;
+//
+//			triple = processExpression(condition);
+//			newCondition = triple.getExpression();
+//			before.addAll(triple.getBefore());
+//			after.addAll(triple.getAfter());
+//			if (explanation != null)
+//				for (int i = 0; i < explanation.numChildren(); i++) {
+//					triple = processExpression(explanation.getSequenceChild(i));
+//					newExplanationArgs.add(triple.getExpression());
+//					before.addAll(triple.getBefore());
+//					after.addAll(triple.getAfter());
+//				}
+//			newExplanation = explanation != null ? nodeFactory.newSequenceNode(
+//					explanation.getSource(), "Explanation", newExplanationArgs)
+//					: null;
+//			newStatements.addAll(before);
+//			newStatements.add(nodeFactory.newAssertNode(statement.getSource(),
+//					newCondition, newExplanation));
+//			newStatements.addAll(after);
+//			result = nodeFactory.newCompoundStatementNode(
+//					statement.getSource(), newStatements);
+//		}
+//		return result;
+//	}
 
 	private StatementNode civlForStatement(CivlForNode statement)
 			throws SyntaxException {
@@ -1202,26 +1200,26 @@ public class SideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private StatementNode assumeStatement(AssumeNode statement)
-			throws SyntaxException {
-		StatementNode result;
-
-		if (statement.getExpression().isSideEffectFree(false)) {
-			result = statement;
-		} else {
-			List<BlockItemNode> newStatements = new ArrayList<BlockItemNode>();
-			SideEffectFreeTriple triple = processExpression(statement
-					.getExpression());
-
-			newStatements.addAll(triple.getBefore());
-			newStatements.add(nodeFactory.newAssumeNode(statement.getSource(),
-					triple.getExpression()));
-			newStatements.addAll(triple.getAfter());
-			result = nodeFactory.newCompoundStatementNode(
-					statement.getSource(), newStatements);
-		}
-		return result;
-	}
+//	private StatementNode assumeStatement(AssumeNode statement)
+//			throws SyntaxException {
+//		StatementNode result;
+//
+//		if (statement.getExpression().isSideEffectFree(false)) {
+//			result = statement;
+//		} else {
+//			List<BlockItemNode> newStatements = new ArrayList<BlockItemNode>();
+//			SideEffectFreeTriple triple = processExpression(statement
+//					.getExpression());
+//
+//			newStatements.addAll(triple.getBefore());
+//			newStatements.add(nodeFactory.newAssumeNode(statement.getSource(),
+//					triple.getExpression()));
+//			newStatements.addAll(triple.getAfter());
+//			result = nodeFactory.newCompoundStatementNode(
+//					statement.getSource(), newStatements);
+//		}
+//		return result;
+//	}
 
 	private StatementNode loopStatement(LoopNode statement)
 			throws SyntaxException {
@@ -1553,11 +1551,12 @@ public class SideEffectRemover extends BaseTransformer {
 		if (statement != null && statement.parent() != null) {
 			statement.parent().removeChild(statement.childIndex());
 		}
-		if (statement instanceof AssertNode) {
-			result = assertStatement((AssertNode) statement);
-		} else if (statement instanceof AssumeNode) {
-			result = assumeStatement((AssumeNode) statement);
-		} else if (statement instanceof ChooseStatementNode) {
+		// if (statement instanceof AssertNode) {
+		// result = assertStatement((AssertNode) statement);
+		// } else if (statement instanceof AssumeNode) {
+		// result = assumeStatement((AssumeNode) statement);
+		// } else
+			if (statement instanceof ChooseStatementNode) {
 			result = chooseStatement((ChooseStatementNode) statement);
 		} else if (statement instanceof CompoundStatementNode) {
 			result = processCompoundStatement((CompoundStatementNode) statement);
