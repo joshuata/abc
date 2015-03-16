@@ -7,6 +7,7 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.transform.common.CompareCombiner;
+import edu.udel.cis.vsl.abc.transform.common.NewSideEffectRemover;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
@@ -47,7 +48,7 @@ public class Transform {
 					SideEffectRemover.SHORT_DESCRIPTION) {
 				@Override
 				public Transformer create(ASTFactory astFactory) {
-					return new SideEffectRemover(astFactory);
+					return new NewSideEffectRemover(astFactory);
 				}
 			},
 

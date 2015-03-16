@@ -130,8 +130,8 @@ THREADLOCAL	:	'_Thread_local';
 // Be sure to add these to PreprocessorParser.g too, under c_keyword.
 
 ABSTRACT	:	'$abstract';
-ASSUME		:	'$assume';
-ASSERT		:	'$assert';
+//ASSUME		:	'$assume';
+//ASSERT		:	'$assert';
 AT			:	'@';
 BIG_O		:	'$O';
 CHOOSE		:	'$choose';

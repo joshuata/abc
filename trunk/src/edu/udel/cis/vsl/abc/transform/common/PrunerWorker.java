@@ -21,10 +21,13 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
@@ -191,11 +194,36 @@ public class PrunerWorker {
 
 			if (externalDef instanceof PragmaNode
 					|| externalDef instanceof StaticAssertionNode
-					|| externalDef instanceof AssumeNode
-					|| externalDef instanceof AssertNode)
+					|| isAssumeOrAssert(externalDef))
 				markReachable(externalDef);
 		}
 		explore(main);
+	}
+
+	private boolean isAssumeOrAssert(BlockItemNode item) {
+		if(item == null)
+			return false;
+		if (item.blockItemKind() == BlockItemKind.STATEMENT) {
+			if (item instanceof ExpressionStatementNode) {
+				ExpressionStatementNode exprStmt = (ExpressionStatementNode) item;
+				ExpressionNode expr = exprStmt.getExpression();
+
+				if (expr instanceof FunctionCallNode) {
+					FunctionCallNode funcCall = (FunctionCallNode) expr;
+					ExpressionNode function = funcCall.getFunction();
+
+					if (function instanceof IdentifierExpressionNode) {
+						IdentifierExpressionNode funcID = (IdentifierExpressionNode) function;
+						String funcName=funcID.getIdentifier().name();
+
+						if (funcName.equals("$assert")
+								|| funcName.equals("$assume"))
+							return true;
+					}
+				}
+			}
+		}
+		return false;
 	}
 
 	public List<ASTNode> getReachableNodes() {

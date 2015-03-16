@@ -27,7 +27,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
  * In the constructor, these children are all set to null.
  * 
  */
-public interface OmpExecutableNode extends OmpNode {
+public interface OmpExecutableNode extends OmpNode, StatementNode {
 
 	/**
 	 * The kind of this OpenMP statement:

@@ -96,7 +96,7 @@ public class CompareCombiner implements Combiner {
 		spec.release();
 		impl.release();
 		specFileTypeDef = this.getAndRemoveFileTypeNode(specRoot);
-		implFileTypeDef = this.getAndRemoveFileTypeNode(specRoot);
+		implFileTypeDef = this.getAndRemoveFileTypeNode(implRoot);
 		if (specFileTypeDef != null)
 			nodes.add(specFileTypeDef);
 		else if (implFileTypeDef != null)
@@ -109,6 +109,7 @@ public class CompareCombiner implements Combiner {
 		implSource = this.getMainSource(implRoot);
 		factory = astFactory.getNodeFactory();
 		inputVariables = combineInputs(specRoot, implRoot);
+		nodes.add(this.assertFunctionNode(specSource));
 		nodes.add(definedFunctionNode(specSource));
 		nodes.add(equalsFunctionNode(specSource));
 		nodes.addAll(inputVariables.values());
@@ -170,7 +171,28 @@ public class CompareCombiner implements Combiner {
 		newRoot = factory.newSequenceNode(
 				astFactory.getTokenFactory().join(specSource, implSource),
 				"Composite System", nodes);
-		return astFactory.newAST(newRoot, allSourceFiles);
+
+		AST result = astFactory.newAST(newRoot, allSourceFiles);
+
+//		result.prettyPrint(System.out, false);
+		return result;
+	}
+
+	private FunctionDeclarationNode assertFunctionNode(Source specSource) {
+		IdentifierNode name = factory.newIdentifierNode(specSource, "$assert");
+		FunctionTypeNode funcType = factory.newFunctionTypeNode(specSource,
+				factory.newVoidTypeNode(specSource), factory.newSequenceNode(
+						specSource, "Formals", Arrays.asList(factory
+								.newVariableDeclarationNode(specSource, factory
+										.newIdentifierNode(specSource,
+												"expression"), factory
+										.newBasicTypeNode(specSource,
+												BasicTypeKind.BOOL))))
+
+				, false);
+
+		return factory.newFunctionDeclarationNode(specSource, name, funcType,
+				null);
 	}
 
 	/**
@@ -580,11 +602,11 @@ public class CompareCombiner implements Combiner {
 								source,
 								factory.newIdentifierNode(source, "_isEqual")),
 								equalCall));
-				assertion = factory.newAssertNode(
-						source,
-						factory.newIdentifierExpressionNode(source,
-								factory.newIdentifierNode(source, "_isEqual")),
-						null);
+				assertion = factory
+						.newExpressionStatementNode(this.assertCall(source,
+								factory.newIdentifierExpressionNode(source,
+										factory.newIdentifierNode(source,
+												"_isEqual"))));
 				body = factory
 						.newCompoundStatementNode(source, Arrays.asList(
 								(BlockItemNode) factory
@@ -623,15 +645,23 @@ public class CompareCombiner implements Combiner {
 								factory.newIdentifierNode(source, "_isEqual")),
 								equalCall));
 				result.add(factory.newExpressionStatementNode(assign));
-				assertion = factory.newAssertNode(
-						source,
-						factory.newIdentifierExpressionNode(source,
-								factory.newIdentifierNode(source, "_isEqual")),
-						null);
+				assertion = factory
+						.newExpressionStatementNode(this.assertCall(source,
+								factory.newIdentifierExpressionNode(source,
+										factory.newIdentifierNode(source,
+												"_isEqual"))));
 				result.add(assertion);
 			}
 		}
 		return result;
+	}
+
+	private ExpressionNode assertCall(Source source, ExpressionNode expression) {
+		return factory.newFunctionCallNode(
+				source,
+				factory.newIdentifierExpressionNode(source,
+						factory.newIdentifierNode(source, "$assert")),
+				Arrays.asList(expression), null);
 	}
 
 	/**

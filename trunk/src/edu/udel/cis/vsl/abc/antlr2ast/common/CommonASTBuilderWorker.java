@@ -54,8 +54,6 @@ import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpForNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssumeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
@@ -1854,36 +1852,36 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 
 	// Translation of Statements...
 
-	private AssumeNode translateAssume(Source source, CommonTree assumeTree,
-			SimpleScope scope) throws SyntaxException {
-		return nodeFactory
-				.newAssumeNode(
-						source,
-						translateExpression(
-								(CommonTree) assumeTree.getChild(0), scope));
-	}
-
-	private AssertNode translateAssert(Source source, CommonTree assertTree,
-			SimpleScope scope) throws SyntaxException {
-		SequenceNode<ExpressionNode> explanation = null;
-		int numExplanationArgs = assertTree.getChildCount() - 1;
-
-		if (numExplanationArgs > 0) {
-			List<ExpressionNode> args = new ArrayList<>(numExplanationArgs);
-
-			for (int i = 0; i < numExplanationArgs; i++)
-				args.add(translateExpression(
-						(CommonTree) assertTree.getChild(i + 1), scope));
-			explanation = nodeFactory.newSequenceNode(source,
-					"AssertExplanation", args);
-		}
-		return nodeFactory
-				.newAssertNode(
-						source,
-						translateExpression(
-								(CommonTree) assertTree.getChild(0), scope),
-						explanation);
-	}
+//	private AssumeNode translateAssume(Source source, CommonTree assumeTree,
+//			SimpleScope scope) throws SyntaxException {
+//		return nodeFactory
+//				.newAssumeNode(
+//						source,
+//						translateExpression(
+//								(CommonTree) assumeTree.getChild(0), scope));
+//	}
+//
+//	private AssertNode translateAssert(Source source, CommonTree assertTree,
+//			SimpleScope scope) throws SyntaxException {
+//		SequenceNode<ExpressionNode> explanation = null;
+//		int numExplanationArgs = assertTree.getChildCount() - 1;
+//
+//		if (numExplanationArgs > 0) {
+//			List<ExpressionNode> args = new ArrayList<>(numExplanationArgs);
+//
+//			for (int i = 0; i < numExplanationArgs; i++)
+//				args.add(translateExpression(
+//						(CommonTree) assertTree.getChild(i + 1), scope));
+//			explanation = nodeFactory.newSequenceNode(source,
+//					"AssertExplanation", args);
+//		}
+//		return nodeFactory
+//				.newAssertNode(
+//						source,
+//						translateExpression(
+//								(CommonTree) assertTree.getChild(0), scope),
+//						explanation);
+//	}
 
 	private LabeledStatementNode translateIdentifierLabeledStatement(
 			CommonTree statementTree, SimpleScope scope) throws SyntaxException {
@@ -2310,12 +2308,12 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 
 		kind = statementTree.getType();
 		switch (kind) {
-		case ASSUME:
-			return translateAssume(newSource(statementTree), statementTree,
-					scope);
-		case ASSERT:
-			return translateAssert(newSource(statementTree), statementTree,
-					scope);
+//		case ASSUME:
+//			return translateAssume(newSource(statementTree), statementTree,
+//					scope);
+//		case ASSERT:
+//			return translateAssert(newSource(statementTree), statementTree,
+//					scope);
 		case BREAK:
 			return nodeFactory.newBreakNode(newSource(statementTree));
 		case CASE_LABELED_STATEMENT:
