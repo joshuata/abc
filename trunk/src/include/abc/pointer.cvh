@@ -11,6 +11,9 @@
 /* are the object pointed to equal? */
 _Bool $equals(void *x, void *y);
 
+/* Assert that the two objects pointed are equal */
+void $assert_equals(void *x, void *y, ...);
+
 /* Semantics: Does the object pointed to by obj1 contain that
 pointed to by obj1? */
 _Bool $contains(void *obj1, void *obj2);
