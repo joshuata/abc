@@ -59,6 +59,11 @@ _Bool $proc_defined($proc p);
 the scope s is still valid) */
 _Bool $scope_defined($scope s);
 
+/*
+ * Returns $true iff the given object has a defined value.
+*/
+_Bool $defined(void* obj);
+
 void $assert(_Bool expr, ...);
 
 void $assume(_Bool expr);
