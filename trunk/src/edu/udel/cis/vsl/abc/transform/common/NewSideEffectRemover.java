@@ -1525,6 +1525,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 			int numDecls = declList.numChildren();
 			List<BlockItemNode> result = new LinkedList<>();
 
+			declList.remove();
 			for (int i = 0; i < numDecls; i++) {
 				VariableDeclarationNode decl = declList.getSequenceChild(i);
 
