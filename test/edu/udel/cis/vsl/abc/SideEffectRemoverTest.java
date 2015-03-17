@@ -38,6 +38,21 @@ public class SideEffectRemoverTest {
 	}
 
 	@Test
+	public void assign1() throws ABCException, IOException {
+		check("assign1.c");
+	}
+
+	@Test
+	public void assign2() throws ABCException, IOException {
+		check("assign2.c");
+	}
+
+	@Test
+	public void assign3() throws ABCException, IOException {
+		check("assign3.c");
+	}
+
+	@Test
 	public void comma() throws ABCException, IOException {
 		check("comma.c");
 	}
