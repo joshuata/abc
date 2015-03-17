@@ -29,12 +29,17 @@ public class SideEffectRemoverTest {
 				.compileAndLink(new File[] { file }, Language.CIVL_C);
 
 		program.applyTransformers(codes);
-		program.prettyPrint(System.out);
+		// program.prettyPrint(System.out);
 
 		Program outputProgram = f.compileAndLink(new File[] { outputFile },
 				Language.CIVL_C);
 
 		assertTrue(program.getAST().equiv(outputProgram.getAST()));
+	}
+
+	@Test
+	public void comma() throws ABCException, IOException {
+		check("comma.c");
 	}
 
 	@Test
