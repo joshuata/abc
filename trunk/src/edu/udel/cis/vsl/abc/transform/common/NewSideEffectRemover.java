@@ -842,7 +842,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 		ExpressionNode e1 = leftTriple.getNode();
 
 		result.addAllBefore(leftTriple.getBefore());
-		if (!e1.isSideEffectFree(true)) {
+		if (!e1.isSideEffectFree(true)
+				&& !containsEquiv(leftTriple.getBefore(), e1)
+				&& !containsEquiv(leftTriple.getAfter(), e1)) {
 			// Note that we consider errors as side effects for a comma
 			// operation left hand side, because if there are no possible
 			// side effects we'll just remove the left hand argument.
@@ -1426,12 +1428,38 @@ public class NewSideEffectRemover extends BaseTransformer {
 		result = triple.getBefore();
 
 		ExpressionNode newExpr = triple.getNode();
+		// ExpressionKind kind = newExpr.expressionKind();
 
-		if ((triple.getBefore().size() < 1 && triple.getAfter().size() < 1)
-				|| !newExpr.isSideEffectFree(false))
+		// if(kind!=ExpressionKind.IDENTIFIER_EXPRESSION &&
+		// kind!=ExpressionKind.CONSTANT)
+		if (!newExpr.isSideEffectFree(true)
+				&& !containsEquiv(triple.getBefore(), newExpr)
+				&& !containsEquiv(triple.getAfter(), newExpr))
 			result.add(nodeFactory.newExpressionStatementNode(newExpr));
 		result.addAll(triple.getAfter());
 		return result;
+	}
+
+	private boolean containsEquiv(List<? extends ASTNode> nodes, ASTNode child) {
+		for (ASTNode node : nodes) {
+			if (containsEquiv(node, child))
+				return true;
+		}
+		return false;
+	}
+
+	private boolean containsEquiv(ASTNode node, ASTNode child) {
+		if (child == null)
+			return false;
+		for (ASTNode subNode : node.children()) {
+			if (subNode == null)
+				continue;
+			if (subNode.equiv(child))
+				return true;
+			if (containsEquiv(subNode, child))
+				return true;
+		}
+		return false;
 	}
 
 	/**
