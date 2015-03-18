@@ -135,8 +135,7 @@ int CMPI_Reduce(const void*, void*, int,
 		MPI_Comm);
 
 int CMPI_Gather(const void*, int, MPI_Datatype, 
-	       void*, int, MPI_Datatype, 
-	       int, int, MPI_Comm);
+	       void*, int, MPI_Datatype, int, int, MPI_Comm);
 
 #endif
 
