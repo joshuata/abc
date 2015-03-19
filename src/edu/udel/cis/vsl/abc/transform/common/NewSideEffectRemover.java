@@ -1420,6 +1420,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	private List<BlockItemNode> translateExpressionAsStatement(
 			ExpressionNode expr) {
+		if(expr == null)
+			return new LinkedList<BlockItemNode>();
+			
 		ExprTriple triple = translate(expr);
 		List<BlockItemNode> result;
 
