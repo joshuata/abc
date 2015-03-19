@@ -130,30 +130,31 @@ int CMPI_Send(const void *, int, MPI_Datatype, int, int, $comm);
 
 int CMPI_Recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *);
 
-int CMPI_Collective_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *);
+int CMPI_Collective_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *, 
+			 char *);
 
-int CMPI_Bcast(void *, int, MPI_Datatype, int, int, MPI_Comm);
+int CMPI_Bcast(void *, int, MPI_Datatype, int, int, MPI_Comm, char *);
 
 int CMPI_Reduce(const void*, void*, int,
 		MPI_Datatype, MPI_Op, int, int,
-		MPI_Comm);
+		MPI_Comm, char *);
 
 int CMPI_Gather(const void*, int, MPI_Datatype, 
-	       void*, int, MPI_Datatype, int, int, MPI_Comm);
+	       void*, int, MPI_Datatype, int, int, MPI_Comm, char *);
 
 int CMPI_Gatherv(const void*, int, MPI_Datatype,
 		void*, const int[], const int[],
 		 MPI_Datatype, int, int, 
-		 MPI_Comm);
+		 MPI_Comm, char *);
 
 int CMPI_Scatter(const void*, int, MPI_Datatype, 
 		 void*, int, MPI_Datatype, int,
-		 int, MPI_Comm);
+		 int, MPI_Comm, char *);
 
 int CMPI_Scatterv(const void*, const int[], const
 		 int[], MPI_Datatype, void* ,
 		 int, MPI_Datatype, int, int,
-		 MPI_Comm);
+		  MPI_Comm, char *);
 #endif
 
 
