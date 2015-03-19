@@ -155,6 +155,8 @@ int CMPI_Scatterv(const void*, const int[], const
 		 int[], MPI_Datatype, void* ,
 		 int, MPI_Datatype, int, int,
 		  MPI_Comm, char *);
+
+void* CMPI_PointerAdd(void*, int, MPI_Datatype);
 #endif
 
 
