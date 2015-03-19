@@ -5,14 +5,18 @@
 #include <civlc.cvh>
 #include <comm.cvh>
 
-#define BCAST_TAG      9999
-#define REDUCE_TAG     9998
-#define ALLREDUCE_TAG  9997
-#define GATHER_TAG     9996
-#define SCATTER_TAG    9995
-#define GATHERV_TAG    9994
-#define SCATTERV_TAG   9993
-#define ALLGATHER_TAG  9992
+#define BCAST_TAG        9999
+#define REDUCE_TAG       9998
+#define ALLREDUCE_TAG    9997
+#define GATHER_TAG       9996
+#define SCATTER_TAG      9995
+#define GATHERV_TAG      9994
+#define SCATTERV_TAG     9993
+#define ALLGATHER_TAG    9992
+#define RED_SCATTER_TAG  9991
+#define ALLTOALL_TAG     9990
+#define ALLTOALLV_TAG    9989
+#define ALLTOALLW_TAG    9988
 
 /* Definition of CIVL-MPI */
 typedef enum __MPI_Sys_status__{
@@ -137,6 +141,19 @@ int CMPI_Reduce(const void*, void*, int,
 int CMPI_Gather(const void*, int, MPI_Datatype, 
 	       void*, int, MPI_Datatype, int, int, MPI_Comm);
 
+int CMPI_Gatherv(const void*, int, MPI_Datatype,
+		void*, const int[], const int[],
+		 MPI_Datatype, int, int, 
+		 MPI_Comm);
+
+int CMPI_Scatter(const void*, int, MPI_Datatype, 
+		 void*, int, MPI_Datatype, int,
+		 int, MPI_Comm);
+
+int CMPI_Scatterv(const void*, const int[], const
+		 int[], MPI_Datatype, void* ,
+		 int, MPI_Datatype, int, int,
+		 MPI_Comm);
 #endif
 
 
