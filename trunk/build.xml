@@ -164,7 +164,7 @@
 			<and>
 				<isset property="unchangedOmpLexerGrammar" />
 				<isset property="CivlCParserTokensBeforeOmpLexer" />
-				<isset property="PreprocessorLexerBeforeOmpLexer" />
+				<!--<isset property="PreprocessorLexerBeforeOmpLexer" />-->
 			</and>
 		</condition>
 	</target>
