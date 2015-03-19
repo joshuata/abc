@@ -63,4 +63,10 @@ _Bool $has_leaf_node_equal_to(void *obj, int value);
 */
 _Bool $is_valid_pointer(void *ptr);
 
+/* 
+   Gives a pointer addition operation. Note that the input pointer will always be
+   casted to the form of a pointer to a primitive data type.
+ */
+void * $pointer_add(const void *ptr, int offset, int type_size);
+
 #endif
