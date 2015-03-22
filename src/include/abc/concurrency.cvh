@@ -48,4 +48,31 @@ void $barrier_destroy($barrier barrier);
 /* Calls the barrier associated with this local barrier object.*/
 void $barrier_call($barrier barrier);
 
+/********* Functions For Collective Arrive Checking Record *********/
+/* Collective checker record entry */
+typedef struct __collect_record__  $collect_record;
+
+/* Global collective operation checker */
+typedef struct __gcollect_checker__ * $gcollect_checker;
+
+/* Local handle of the collective operation checker */
+typedef struct __collect_checker__ * $collect_checker;
+
+/* Creates and initializes the global collective operation checker */
+$gcollect_checker $gcollect_checker_create($scope scope);
+
+/* Destroy a global collective operation checker */
+void $gcollect_checker_destroy($gcollect_checker checker);
+
+/* Creates and initializes the local collective operation checker */
+$collect_checker $collect_checker_create($scope scope, 
+				       $gcollect_checker gchecker);
+
+/* Destroy a local collective operation checker */
+void $collect_checker_destroy($collect_checker checker);
+
+/* Do a check for a collecive operation of one process */
+void $collect_check($collect_checker checker, int place, int nprocs,
+		    int routine_tag, int root, int numTypes, void * datatypes);
+
 #endif
