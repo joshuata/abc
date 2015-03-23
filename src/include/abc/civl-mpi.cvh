@@ -17,6 +17,7 @@
 #define ALLTOALL_TAG     9990
 #define ALLTOALLV_TAG    9989
 #define ALLTOALLW_TAG    9988
+#define BARRIER_TAG      9987
 
 /* Definition of CIVL-MPI */
 typedef enum __MPI_Sys_status__{
