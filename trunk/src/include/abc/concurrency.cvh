@@ -73,6 +73,6 @@ void $collect_checker_destroy($collect_checker checker);
 
 /* Do a check for a collecive operation of one process */
 void $collect_check($collect_checker checker, int place, int nprocs,
-		    int routine_tag, int root, int numTypes, void * datatypes);
+		    int routine_tag, int root, int op, int numTypes, void * datatypes);
 
 #endif
