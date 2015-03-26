@@ -59,7 +59,7 @@ public interface OmpExecutableNode extends OmpNode, StatementNode {
 	 * 
 	 * @return the OpenMP statement kind of this node.
 	 */
-	OmpExecutableKind ompStatementNodeKind();
+	OmpExecutableKind ompExecutableKind();
 
 	/**
 	 * Returns true iff nowait is applied.
