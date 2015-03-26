@@ -718,7 +718,7 @@ public class ASTPrettyPrinter {
 
 	private static void pPrintOmpStatement(PrintStream out, String prefix,
 			OmpExecutableNode ompStmt) {
-		OmpExecutableKind kind = ompStmt.ompStatementNodeKind();
+		OmpExecutableKind kind = ompStmt.ompExecutableKind();
 		SequenceNode<IdentifierExpressionNode> privateList = ompStmt
 				.privateList(), firstPrivateList = ompStmt.firstprivateList(), sharedList = ompStmt
 				.sharedList(), copyinList = ompStmt.copyinList(), copyPrivateList = ompStmt

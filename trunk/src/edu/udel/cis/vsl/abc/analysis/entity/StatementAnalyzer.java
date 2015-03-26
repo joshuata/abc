@@ -478,7 +478,7 @@ public class StatementAnalyzer {
 	@SuppressWarnings("unchecked")
 	private void processOmpExecutableNode(OmpExecutableNode statement)
 			throws SyntaxException {
-		OmpExecutableKind kind = statement.ompStatementNodeKind();
+		OmpExecutableKind kind = statement.ompExecutableKind();
 		SequenceNode<OmpReductionNode> reductionList = (SequenceNode<OmpReductionNode>) statement
 				.reductionList();
 
