@@ -88,7 +88,7 @@ public class CommonTransformFormation implements TransformFormation {
 		if (preToken != null)
 			result += " after " + preToken;
 		if (postToken != null)
-			result += "before " + postToken;
+			result += " before " + postToken;
 		return result;
 	}
 
