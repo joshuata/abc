@@ -1419,15 +1419,18 @@ jumpStatement
  * child 1: TOKEN_LIST (chilren are list of tokens following identifier)
  * child 2: NEWLINE (character which ends the pragma)
  */
-pragma	:	PRAGMA IDENTIFIER pragmaBody NEWLINE
-		-> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST pragmaBody) NEWLINE)
+pragma
+    : PRAGMA IDENTIFIER NEWLINE
+        -> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST) NEWLINE)
+    | PRAGMA IDENTIFIER pragmaBody NEWLINE
+        -> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST pragmaBody) NEWLINE)
 	;
 
 /* A pragma body, which is any sequence of tokens not 
  * containing NEWLINE, used in pragma rule.
  */
 pragmaBody
-	:	(~ NEWLINE)*
+	:	(~ NEWLINE)+
 	;
 
 /* CIVL-C assume statement. TODO: make function.
