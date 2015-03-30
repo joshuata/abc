@@ -25,16 +25,16 @@ typedef enum Operation $operation;
 
 /* **************************  Basic CIVL-C Types ************************** */ 
 /* The CIVL-C process reference type */ 
-typedef struct __proc__ $proc;
+typedef struct $proc $proc;
 
 /* The CIVL-C scope type, used to represent a scope */
-typedef struct __scope__ $scope;
+typedef struct $scope $scope;
 
 /* The CIVL-C dynamic type, used to represent a symbolic type */
-typedef struct __dynamic__ $dynamic;
+typedef struct $dynamic $dynamic;
 
 /* The integer iterator */
-typedef struct __int_iter__ * $int_iter;
+typedef struct $int_iter * $int_iter;
 
 /* **************************** Misc. Functions **************************** */
 

@@ -26,7 +26,7 @@
  * the AST.  For the complete version, see the CIVL
  * project.
  */
-typedef struct __message__ {
+typedef struct $message {
   int source;
   int dest;
   int tag;
@@ -37,19 +37,19 @@ typedef struct __message__ {
 /* A datatype representing a queue of messages.  All message
  * data is encapsulated inside this value; no external allocation
  * is used. */ 
-typedef struct __queue__ $queue;
+typedef struct $queue $queue;
  
 /* A global communicator datatype which must be operated by local communicators.
  * This communicator type has the same meaning as the communicator type in MPI
  * standards*/
-typedef struct __gcomm__ * $gcomm;
+typedef struct $gcomm * $gcomm;
 
 /* A datatype representing a local communicator which is used for 
  * operating global communicators. The local communicator type has 
  * a handle of a global communicator. This type represents for 
  * a set of processes which have ranks in common.
  */
-typedef struct __comm__ * $comm;
+typedef struct $comm * $comm;
 
 /* ************************* Functions of Message ************************** */
 
