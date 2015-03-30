@@ -193,4 +193,8 @@ errno_t wcstombs_s(size_t * restrict retval,
           char * restrict dst, rsize_t dstmax,
           const wchar_t * restrict src, rsize_t len);  
           
+#ifdef _LINUX
+int rand_r(unsigned int *seedp);
+#endif
+          
 #endif
