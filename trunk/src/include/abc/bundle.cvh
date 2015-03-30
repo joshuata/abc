@@ -12,7 +12,7 @@
 
 /* A system type for bundling any slice of memory into
  * a single value. */
-typedef struct __bundle__ $bundle;
+typedef struct $bundle $bundle;
 
 /* *********************** Functions *********************** */
 

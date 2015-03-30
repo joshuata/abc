@@ -14,13 +14,13 @@
 /* A data type representing a global barrier which must be operated by local
  * barriers. 
  */
-typedef struct __gbarrier__ * $gbarrier;
+typedef struct $gbarrier * $gbarrier;
  
 /* A data type representing a global barrier which used for 
  * operating global barriers. The local barrier type has 
  * a handle of a global barrier.
  */
-typedef struct __barrier__ * $barrier;
+typedef struct $barrier * $barrier;
 
 /* ******************************* Functions ******************************* */
 
@@ -50,13 +50,13 @@ void $barrier_call($barrier barrier);
 
 /********* Functions For Collective Arrive Checking Record *********/
 /* Collective checker record entry */
-typedef struct __collect_record__  $collect_record;
+typedef struct $collect_record  $collect_record;
 
 /* Global collective operation checker */
-typedef struct __gcollect_checker__ * $gcollect_checker;
+typedef struct $gcollect_checker * $gcollect_checker;
 
 /* Local handle of the collective operation checker */
-typedef struct __collect_checker__ * $collect_checker;
+typedef struct $collect_checker * $collect_checker;
 
 /* Creates and initializes the global collective operation checker */
 $gcollect_checker $gcollect_checker_create($scope scope);
