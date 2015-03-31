@@ -159,7 +159,7 @@
 
 	<target name="OmpLexerDependencies" depends="CivlCParser">
 		<uptodate property="unchangedOmpLexerGrammar" srcfile="${grammar.dir}/OmpLexer.g" targetfile="${grammar.dir}/OmpLexer.tokens" />
-		<uptodate property="CivlCParserTokensBeforeOmpLexer" srcfile="${grammar.dir}/CivlCParser.tokens" targetfile="${grammar.dir}/OmpLexer.tokens" />
+		<uptodate property="CivlCParserTokensBeforeOmpLexer" srcfile="${grammar.dir}/CivlCParser.g" targetfile="${grammar.dir}/OmpLexer.tokens" />
 		<condition property="OmpLexerUpToDate">
 			<and>
 				<isset property="unchangedOmpLexerGrammar" />
@@ -337,6 +337,15 @@
 	</target>
 
 	<!-- Clean -->
+
+	<target name="cleanOmp" description="Delete all generated files.">
+		<delete file="${grammar.dir}/OmpLexer.tokens" />
+		<delete file="${real.src.dir}/preproc/common/OmpLexer.java" />
+		<delete file="${real.src.dir}/preproc/common/OmpLexer_PreprocessorLexer.java" />
+		<delete file="${grammar.dir}/OmpParser.tokens" />
+		<delete file="${real.src.dir}/parse/common/OmpParser.java" />
+		<delete file="${real.src.dir}/parse/common/OmpParser_CivlCParser.java" />
+	</target>
 
 	<target name="clean" description="Delete all generated files.">
 		<delete dir="${bin.dir}" />
