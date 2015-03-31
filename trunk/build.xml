@@ -159,12 +159,11 @@
 
 	<target name="OmpLexerDependencies" depends="CivlCParser">
 		<uptodate property="unchangedOmpLexerGrammar" srcfile="${grammar.dir}/OmpLexer.g" targetfile="${grammar.dir}/OmpLexer.tokens" />
-		<uptodate property="CivlCParserTokensBeforeOmpLexer" srcfile="${grammar.dir}/CivlCParser.g" targetfile="${grammar.dir}/OmpLexer.tokens" />
+		<uptodate property="CivlCParserTokensBeforeOmpLexer" srcfile="${real.src.dir}/parse/common/CivlCParser.java" targetfile="${grammar.dir}/OmpLexer.tokens" />
 		<condition property="OmpLexerUpToDate">
 			<and>
 				<isset property="unchangedOmpLexerGrammar" />
 				<isset property="CivlCParserTokensBeforeOmpLexer" />
-				<!--<isset property="PreprocessorLexerBeforeOmpLexer" />-->
 			</and>
 		</condition>
 	</target>
