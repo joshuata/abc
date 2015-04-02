@@ -154,4 +154,9 @@ public class CTranslationTest {
 	public void intChar() throws ABCException, IOException {
 		check("c/intChar");
 	}
+
+	@Test(expected = ABCException.class)
+	public void scanf() throws ABCException, IOException {
+		check("c/scanf");
+	}
 }
