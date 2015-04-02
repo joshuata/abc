@@ -1420,9 +1420,9 @@ public class NewSideEffectRemover extends BaseTransformer {
 	 */
 	private List<BlockItemNode> translateExpressionAsStatement(
 			ExpressionNode expr) {
-		if(expr == null)
+		if (expr == null)
 			return new LinkedList<BlockItemNode>();
-			
+
 		ExprTriple triple = translate(expr);
 		List<BlockItemNode> result;
 
@@ -1583,7 +1583,7 @@ public class NewSideEffectRemover extends BaseTransformer {
 		List<BlockItemNode> incItems = translateExpressionAsStatement(incrementer);
 
 		if (incItems.size() == 1
-				& incItems.get(0) instanceof ExpressionStatementNode) {
+				&& incItems.get(0) instanceof ExpressionStatementNode) {
 			// nothing to do
 			ExpressionNode newIncrementer = ((ExpressionStatementNode) incItems
 					.get(0)).getExpression();

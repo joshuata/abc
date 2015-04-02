@@ -123,6 +123,8 @@ public class ExpressionAnalyzer {
 
 	private Language language;
 
+	private SpecialFunctionCallAnalyzer specialCallAnalyzer;
+
 	// ************************** Constructors ****************************
 
 	ExpressionAnalyzer(EntityAnalyzer entityAnalyzer,
@@ -134,6 +136,7 @@ public class ExpressionAnalyzer {
 		this.astFactory = entityAnalyzer.astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
 		this.language = entityAnalyzer.configuration.getLanguage();
+		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(typeFactory);
 	}
 
 	// ************************* Exported Methods **************************
@@ -544,6 +547,8 @@ public class ExpressionAnalyzer {
 		FunctionType functionType;
 		int expectedNumArgs;
 		boolean hasVariableNumArgs;
+		boolean isSpecialFunction = false;
+		String functionName = null;
 
 		processExpression(functionNode);
 		{
@@ -578,6 +583,12 @@ public class ExpressionAnalyzer {
 			if (numArgs < expectedNumArgs)
 				throw error("Expected at least " + expectedNumArgs
 						+ " arguments, saw " + numArgs, node);
+			if (functionNode instanceof IdentifierExpressionNode) {
+				functionName = ((IdentifierExpressionNode) functionNode)
+						.getIdentifier().name();
+				isSpecialFunction = this.specialCallAnalyzer
+						.isSpecialFunction(functionName);
+			}
 		} else {
 			if (numArgs != expectedNumArgs)
 				throw error("Expected " + expectedNumArgs
@@ -593,11 +604,15 @@ public class ExpressionAnalyzer {
 
 			processExpression(argument);
 			addStandardConversions(argument);
-			if (!hasVariableNumArgs || i < expectedNumArgs) {
-				ObjectType lhsType = functionType.getParameterType(i);
-				UnqualifiedObjectType type = conversionFactory
-						.lvalueConversionType(lhsType);
+			if (!hasVariableNumArgs || i < expectedNumArgs || isSpecialFunction) {
+				ObjectType lhsType;
+				UnqualifiedObjectType type;
 
+				if (i < expectedNumArgs)
+					lhsType = functionType.getParameterType(i);
+				else
+					lhsType = this.specialCallAnalyzer.parameterType(functionName, i);
+				type = conversionFactory.lvalueConversionType(lhsType);
 				try {
 					convertRHS(argument, type);
 				} catch (UnsourcedException e) {
