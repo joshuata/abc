@@ -10,8 +10,8 @@ import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 
 /**
  * This class maintains the hard-coded information of analyzes the variable
- * parameters of some specific functions, like scanf, fscanf, whose varialbe
- * arguments should all be of pointer type.
+ * parameters of some specific functions, like <code>scanf, fscanf</code>, whose
+ * variable arguments should all be of pointer type.
  * 
  * @author Manchun Zheng
  *
@@ -69,13 +69,13 @@ public class SpecialFunctionCallAnalyzer {
 	 *            index of the parameter whose type is to be obtained
 	 * @return
 	 */
-	ObjectType parameterType(String function, int index) {
+	ObjectType variableParameterType(String function, int index) {
 		assert this.isSpecialFunction(function);
 		switch (function) {
 		case SCANF:
-			return this.parameterTypeOfScanf(index);
-		case FSCANF:
-			return this.parameterTypeOfScanf(index - 1);
+			return this.variableParameterTypeOfScanf(index);
+		case FSCANF:// fscanf has one more fixed parameter than scanf
+			return this.variableParameterTypeOfScanf(index - 1);
 		default:
 			throw new ABCUnsupportedException("The function " + function
 					+ " isn't a special function that needs "
@@ -83,7 +83,18 @@ public class SpecialFunctionCallAnalyzer {
 		}
 	}
 
-	ObjectType parameterTypeOfScanf(int index) {
+	/**
+	 * Returns the type of the parameter of the given index for
+	 * <code>scanf</code>. <code>scanf</code> is expecting any parameter with
+	 * index greater than 0 to be of pointer type, i.e.:
+	 * <code>scanf(char*, (void*)+);</code>
+	 * 
+	 * @param index
+	 *            The index of the parameter
+	 * @return the type of the parameter of the given index for scanf, which is
+	 *         always void*.
+	 */
+	private ObjectType variableParameterTypeOfScanf(int index) {
 		assert index > 0;
 		return this.voidPointerType;
 	}

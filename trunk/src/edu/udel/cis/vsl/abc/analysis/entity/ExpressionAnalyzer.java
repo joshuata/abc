@@ -611,7 +611,7 @@ public class ExpressionAnalyzer {
 				if (i < expectedNumArgs)
 					lhsType = functionType.getParameterType(i);
 				else
-					lhsType = this.specialCallAnalyzer.parameterType(functionName, i);
+					lhsType = this.specialCallAnalyzer.variableParameterType(functionName, i);
 				type = conversionFactory.lvalueConversionType(lhsType);
 				try {
 					convertRHS(argument, type);

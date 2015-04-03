@@ -159,4 +159,9 @@ public class CTranslationTest {
 	public void scanf() throws ABCException, IOException {
 		check("c/scanf");
 	}
+
+	@Test
+	public void fscanf() throws ABCException, IOException {
+		check("c/fscanf");
+	}
 }
