@@ -396,9 +396,10 @@ public class CompareCombiner implements Combiner {
 
 				if (var.getTypeNode().isInputQualified()) {
 					if (!inputs.containsKey(var.getName())) {
-						throw new ASTException(
-								"Implementation program does not contain specification input variable "
-										+ var.getName() + ".");
+						// throw new ASTException(
+						// "Implementation program does not contain specification input variable "
+						// + var.getName() + ".");
+						inputs.put(var.getName(), var.copy());
 					}
 				}
 			}
