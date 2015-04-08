@@ -98,6 +98,14 @@ public interface Preprocessor {
 	 */
 	void parse(PrintStream out, File file) throws PreprocessorException;
 
+	/**
+	 * 
+	 * @param macroDefs
+	 * @return a map ABC macro objects which are the preprocessed result of the
+	 *         given macro maps.
+	 * @throws PreprocessorException
+	 *             if the the preprocessor fails to process the macros.
+	 */
 	Map<String, Macro> getMacros(Map<String, String> macroDefs)
 			throws PreprocessorException;
 
