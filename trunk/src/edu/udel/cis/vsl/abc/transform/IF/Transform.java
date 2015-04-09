@@ -7,9 +7,8 @@ import java.util.Map;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.transform.common.CompareCombiner;
-import edu.udel.cis.vsl.abc.transform.common.NewSideEffectRemover;
-import edu.udel.cis.vsl.abc.transform.common.Pruner;
 import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
+import edu.udel.cis.vsl.abc.transform.common.Pruner;
 
 /**
  * This class manages the set of transformations provided by an execution of
@@ -48,7 +47,7 @@ public class Transform {
 					SideEffectRemover.SHORT_DESCRIPTION) {
 				@Override
 				public Transformer create(ASTFactory astFactory) {
-					return new NewSideEffectRemover(astFactory);
+					return new SideEffectRemover(astFactory);
 				}
 			},
 
