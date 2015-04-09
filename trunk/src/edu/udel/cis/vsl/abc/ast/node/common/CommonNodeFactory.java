@@ -187,7 +187,6 @@ import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
-//import edu.udel.cis.vsl.abc.ast.node.IF.statement.AssertNode;
 
 public class CommonNodeFactory implements NodeFactory {
 
@@ -856,10 +855,11 @@ public class CommonNodeFactory implements NodeFactory {
 	public OmpSyncNode newOmpMasterNode(Source source, StatementNode statement) {
 		return new CommonOmpSyncNode(source, OmpSyncNodeKind.MASTER, statement);
 	}
-	
+
 	@Override
 	public OmpSyncNode newOmpAtomicNode(Source source, StatementNode statement) {
-		return new CommonOmpSyncNode(source, OmpSyncNodeKind.OMPATOMIC, statement);
+		return new CommonOmpSyncNode(source, OmpSyncNodeKind.OMPATOMIC,
+				statement);
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package edu.udel.cis.vsl.abc.transform.IF;
 
 import edu.udel.cis.vsl.abc.ast.IF.AST;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -76,5 +78,24 @@ public interface Transformer {
 	 *             cannot handle
 	 */
 	AST transform(AST ast) throws SyntaxException;
+
+	/**
+	 * Produces a new {@link StringLiteralNode}.
+	 * 
+	 * @param method
+	 *            name of transformer method responsible for producing the new
+	 *            token; used to form the {@link Formation} that will ultimately
+	 *            be used in diagnostic message
+	 * @param representation
+	 *            the text of the string literal exactly as it would appear in a
+	 *            program source; this must include the surrounding (single or
+	 *            double) quotes
+	 * @return new string literal node
+	 * @throws SyntaxException
+	 *             if the <code>representation</code> does not conform to the
+	 *             C11 specification of string literals
+	 */
+	StringLiteralNode newStringLiteralNode(String method, String representation)
+			throws SyntaxException;
 
 }

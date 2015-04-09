@@ -2,6 +2,14 @@ package edu.udel.cis.vsl.abc.transform.IF;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.Formation;
+import edu.udel.cis.vsl.abc.token.IF.Source;
+import edu.udel.cis.vsl.abc.token.IF.StringToken;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
 /**
  * A very basic partial implementation of {@link Transformer}. Implements the
@@ -46,6 +54,22 @@ public abstract class BaseTransformer implements Transformer {
 	@Override
 	public String toString() {
 		return longName;
+	}
+
+	@Override
+	public StringLiteralNode newStringLiteralNode(String method,
+			String representation) throws SyntaxException {
+		TokenFactory tokenFactory = astFactory.getTokenFactory();
+		Formation formation = tokenFactory.newTransformFormation(longName,
+				method);
+		CToken token = tokenFactory.newCToken(CParser.STRING_LITERAL,
+				representation, formation);
+		StringToken stringToken = tokenFactory.newStringToken(token);
+		Source source = tokenFactory.newSource(stringToken);
+		StringLiteralNode result = nodeFactory.newStringLiteralNode(source,
+				representation, stringToken.getStringLiteral());
+
+		return result;
 	}
 
 }
