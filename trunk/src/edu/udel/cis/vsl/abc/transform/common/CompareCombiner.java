@@ -25,14 +25,20 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.token.IF.CToken;
+import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
+import edu.udel.cis.vsl.abc.token.IF.StringToken;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
+import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 import edu.udel.cis.vsl.abc.transform.IF.Combiner;
 import edu.udel.cis.vsl.abc.transform.IF.Transformer;
 
@@ -45,6 +51,8 @@ import edu.udel.cis.vsl.abc.transform.IF.Transformer;
  * 
  */
 public class CompareCombiner implements Combiner {
+
+	private final static String MY_NAME = "CompareCombiner";
 
 	/**
 	 * The node factory that creates new AST nodes.
@@ -555,12 +563,10 @@ public class CompareCombiner implements Combiner {
 		for (String outputName : specOutputs.keySet()) {
 			Source source = specOutputs.get(outputName).getSource();
 			List<ExpressionNode> args = new ArrayList<ExpressionNode>();
-			// StatementNode assertion;
 			FunctionCallNode assertEqualCall;
-			// OperatorNode assign;
 			VariableDeclarationNode specOutput = specOutputs.get(outputName);
 			VariableDeclarationNode implOutput = implOutputs.get(outputName);
-			// TypeNode outputType = specOutput.getTypeNode();
+			String message;
 
 			// don't compare outputs if only one program has output
 			// CIVL_output_system
@@ -568,67 +574,8 @@ public class CompareCombiner implements Combiner {
 			if (outputName.equals("CIVL_output_filesystem")
 					&& (specOutput == null || implOutput == null))
 				continue;
-			// if (outputType instanceof ArrayTypeNode) {
-			// ArrayTypeNode outputArrayType = (ArrayTypeNode) outputType;
-			// ForLoopNode forNode;
-			// VariableDeclarationNode loopIter = factory
-			// .newVariableDeclarationNode(source, factory
-			// .newIdentifierNode(source, "i"), factory
-			// .newBasicTypeNode(source, BasicTypeKind.INT),
-			// factory.newIntegerConstantNode(source, "0"));
-			// IdentifierExpressionNode loopIterID = factory
-			// .newIdentifierExpressionNode(source,
-			// factory.newIdentifierNode(source, "i"));
-			// CompoundStatementNode body;
-			//
-			// args.add(factory.newOperatorNode(specOutput.getSource(),
-			// Operator.ADDRESSOF,
-			// Arrays.asList((ExpressionNode) factory.newOperatorNode(
-			// source, Operator.SUBSCRIPT,
-			// Arrays.asList((ExpressionNode) factory
-			// .newIdentifierExpressionNode(specOutput
-			// .getSource(), specOutput
-			// .getIdentifier().copy()),
-			// loopIterID.copy())))));
-			// args.add(factory.newOperatorNode(implOutput.getSource(),
-			// Operator.ADDRESSOF,
-			// Arrays.asList((ExpressionNode) factory.newOperatorNode(
-			// source, Operator.SUBSCRIPT,
-			// Arrays.asList((ExpressionNode) factory
-			// .newIdentifierExpressionNode(implOutput
-			// .getSource(), implOutput
-			// .getIdentifier().copy()),
-			// loopIterID.copy())))));
-			// equalCall = factory.newFunctionCallNode(source,
-			// equalFunction.copy(), args, null);
-			// assign = factory.newOperatorNode(source, Operator.ASSIGN,
-			// Arrays.asList(factory.newIdentifierExpressionNode(
-			// source,
-			// factory.newIdentifierNode(source, "_isEqual")),
-			// equalCall));
-			// assertion = factory
-			// .newExpressionStatementNode(this.assertCall(source,
-			// factory.newIdentifierExpressionNode(source,
-			// factory.newIdentifierNode(source,
-			// "_isEqual"))));
-			// body = factory
-			// .newCompoundStatementNode(source, Arrays.asList(
-			// (BlockItemNode) factory
-			// .newExpressionStatementNode(assign),
-			// assertion));
-			// forNode = factory.newForLoopNode(source, factory
-			// .newForLoopInitializerNode(source,
-			// Arrays.asList(loopIter)), factory
-			// .newOperatorNode(source, Operator.LT, Arrays.asList(
-			// loopIterID.copy(), outputArrayType.getExtent()
-			// .copy())), factory.newOperatorNode(
-			// source, Operator.ASSIGN, Arrays.asList(loopIterID
-			// .copy(), factory.newOperatorNode(source,
-			// Operator.PLUS, Arrays.asList(loopIterID.copy(),
-			// factory.newIntegerConstantNode(source,
-			// "1"))))), body, null);
-			// result.add(forNode);
-			// } else {
+			message = "\"Specification and implementation have"
+					+ " different values for the output " + outputName + "!\"";
 			args.add(factory.newOperatorNode(specOutput.getSource(),
 					Operator.ADDRESSOF, Arrays.asList((ExpressionNode) factory
 							.newIdentifierExpressionNode(
@@ -639,35 +586,13 @@ public class CompareCombiner implements Combiner {
 							.newIdentifierExpressionNode(
 									implOutput.getSource(), implOutput
 											.getIdentifier().copy()))));
-			// args.add(factory.newStringLiteralNode(source, representation,
-			// d));
+			args.add(this.createStringLiteral(message));
 			assertEqualCall = factory.newFunctionCallNode(source,
 					assertEqualFunction.copy(), args, null);
-			// assign = factory.newOperatorNode(source, Operator.ASSIGN,
-			// Arrays.asList(factory.newIdentifierExpressionNode(
-			// source,
-			// factory.newIdentifierNode(source, "_isEqual")),
-			// equalCall));
-			// result.add(factory.newExpressionStatementNode(assign));
-			// assertion = factory
-			// .newExpressionStatementNode(this.assertCall(source,
-			// factory.newIdentifierExpressionNode(source,
-			// factory.newIdentifierNode(source,
-			// "_isEqual"))));
 			result.add(factory.newExpressionStatementNode(assertEqualCall));
-			// }
 		}
 		return result;
 	}
-
-	// private ExpressionNode assertCall(Source source, ExpressionNode
-	// expression) {
-	// return factory.newFunctionCallNode(
-	// source,
-	// factory.newIdentifierExpressionNode(source,
-	// factory.newIdentifierNode(source, "$assert")),
-	// Arrays.asList(expression), null);
-	// }
 
 	/**
 	 * Create a mapping from Entity to String where the entities are variables
@@ -710,5 +635,18 @@ public class CompareCombiner implements Combiner {
 			}
 		}
 		return null;
+	}
+
+	private StringLiteralNode createStringLiteral(String text)
+			throws SyntaxException {
+		TokenFactory tokenFactory = astFactory.getTokenFactory();
+		Formation formation = tokenFactory.newTransformFormation(MY_NAME,
+				"stringLiteral");
+		CToken ctoke = tokenFactory.newCToken(CParser.STRING_LITERAL, text,
+				formation);
+		StringToken stringToken = tokenFactory.newStringToken(ctoke);
+
+		return factory.newStringLiteralNode(tokenFactory.newSource(ctoke),
+				text, stringToken.getStringLiteral());
 	}
 }
