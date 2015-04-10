@@ -158,7 +158,7 @@ typedef struct cudaDeviceProp {
 
 /* flag type used to represent the status of a kernel instance
  */
-typedef enum {
+typedef enum _kernelStatus {
     _kernelStatusWaiting,
     _kernelStatusRunning,
     _kernelStatusFinished
@@ -166,51 +166,69 @@ typedef enum {
 
 /* type used to represent an instance of a Cuda kernel
  */
-typedef struct {
-  $proc process;        // the actual process executing this kernel
-  _kernelStatus status; // the kernel status
-} _kernelInstance;
+typedef struct _kernelInstance _kernelInstance;
+
+_kernelStatus getStatus(_kernelInstance*);
 
 /* a type that wraps a kernel instance for insertion into a list
  */
 typedef struct _kernelInstanceNode _kernelInstanceNode;
-struct _kernelInstanceNode {
-  _kernelInstance *instance;
-  _kernelInstanceNode  *next;
-};
+
+/* _kernelInstanceNode interface
+ */
+_kernelInstance *getInstance(_kernelInstanceNode*);
 
 /* a type used to represent a Cuda stream
  */
-typedef struct {
-    _kernelInstanceNode *mostRecent;  // the most recently enqueued instance
-    _Bool usable;                     // indicates whether or not this stream
-                                      // has been marked for deletion
-} _CUstream;
+typedef struct _CUstream _CUstream;
 typedef _CUstream* cudaStream_t;
+
+/* _CUstream interface
+ */
+_kernelInstanceNode *getMostRecent(cudaStream_t);
+
+_Bool isUsable(cudaStream_t);
+
+void setUsable(cudaStream_t, _Bool);
 
 /* a type that wraps a stream for insertion into a list
  */
 typedef struct _cudaStreamNode _cudaStreamNode;
-struct _cudaStreamNode {
-  cudaStream_t stream;
-  _cudaStreamNode *next;
-};
+
+/* _cudaStreamNode interface
+ */
+void setStream(_cudaStreamNode*, cudaStream_t);
+
+void setNext(_cudaStreamNode*, _cudaStreamNode*);
 
 /* a type used to represent a Cuda event
  */
-typedef struct {
-    _kernelInstance **instances;
-    int numInstances;
-} _CUevent;
+typedef struct _CUevent _CUevent;
 typedef _CUevent* cudaEvent_t;
+
+/* _CUevent interface
+ */
+_kernelInstance **getInstances(cudaEvent_t);
+
+void setInstances(cudaEvent_t, _kernelInstance**, int);
+
+int getNumInstances(cudaEvent_t);
+
 
 /* a type representing the state of a Cuda device
  */
-typedef struct {
-  _cudaStreamNode *headNode;
-  cudaStream_t nullStream;
-  int numStreams;
-} _cudaContext;
+typedef struct _cudaContext _cudaContext;
+
+/* _cudaContext interface
+ */
+int getNumStreams(_cudaContext*);
+
+_cudaStreamNode *getHeadNode(_cudaContext*);
+
+cudaStream_t getNullStream(_cudaContext*);
+
+void addNewStream(_cudaContext*, _cudaStreamNode*);
+
 
 /* Computes the one dimensional index of a grid cell at a given location
  * in a three dimensional grid of a given size
