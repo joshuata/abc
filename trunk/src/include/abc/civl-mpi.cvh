@@ -166,7 +166,7 @@ void* CMPI_PointerAdd(void*, int, MPI_Datatype);
 
 /* Assert that the size of the primitive type of the object pointed
    'buf' is consistent with the size of the given MPI_Datatype */
-void CMPI_AssertConsistentType(void * buf, int sizeofMPI_Datatype);
+void CMPI_AssertConsistentType(void * buf, MPI_Datatype datatype);
 #endif
 
 
