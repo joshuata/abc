@@ -28,6 +28,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode.BlockItemKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
@@ -194,14 +195,15 @@ public class PrunerWorker {
 
 			if (externalDef instanceof PragmaNode
 					|| externalDef instanceof StaticAssertionNode
-					|| isAssumeOrAssert(externalDef))
+					|| isAssumeOrAssert(externalDef)
+					|| externalDef instanceof StatementNode)
 				markReachable(externalDef);
 		}
 		explore(main);
 	}
 
 	private boolean isAssumeOrAssert(BlockItemNode item) {
-		if(item == null)
+		if (item == null)
 			return false;
 		if (item.blockItemKind() == BlockItemKind.STATEMENT) {
 			if (item instanceof ExpressionStatementNode) {
@@ -214,7 +216,7 @@ public class PrunerWorker {
 
 					if (function instanceof IdentifierExpressionNode) {
 						IdentifierExpressionNode funcID = (IdentifierExpressionNode) function;
-						String funcName=funcID.getIdentifier().name();
+						String funcName = funcID.getIdentifier().name();
 
 						if (funcName.equals("$assert")
 								|| funcName.equals("$assume"))
