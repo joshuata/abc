@@ -87,6 +87,8 @@ void $gcomm_destroy($gcomm gcomm);
 /* Returns $true iff gcomm points to a valid object. */
 _Bool $gcomm_defined($gcomm gcomm);
 
+void $gcomm_dup($comm comm, $comm newcomm);
+
 /* *************************** Functions of $comm ************************** */
 
 /* Creates a new local communicator object and returns a handle to it.
