@@ -130,6 +130,7 @@ int pthread_mutex_consistent(pthread_mutex_t *);
 int pthread_cond_wait(pthread_cond_t *, pthread_mutex_t *);
 int pthread_cond_signal(pthread_cond_t *);
 int pthread_cond_broadcast(pthread_cond_t *);
+pthread_t pthread_self(void);
 
 
 #endif

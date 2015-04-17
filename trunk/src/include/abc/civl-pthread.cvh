@@ -41,7 +41,7 @@ $proc $pthread_gpool_thread($pthread_gpool_t gpool, int index);
 $pthread_pool_t $pthread_pool_create($scope scope, $pthread_gpool_t gpool);
 
 /* Terminates this thread */
-void $pthread_pool_terminates($pthread_pool_t pool);
+void $pthread_pool_terminates($pthread_pool_t pool, void* value);
 
 _Bool $pthread_pool_get_terminated($pthread_pool_t pool);
 
@@ -50,5 +50,6 @@ _Bool $pthread_pool_is_terminated($pthread_pool_t pool, $proc pid);
 /* De-allocation a _pthread_gpool_t object */
 void $pthread_pool_destroy($pthread_pool_t pool);
 
+pthread_t $pthread_pool_thread($pthread_pool_t pool);
 
 #endif
