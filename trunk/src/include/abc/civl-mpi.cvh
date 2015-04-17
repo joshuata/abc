@@ -18,6 +18,8 @@
 #define ALLTOALLV_TAG    9989
 #define ALLTOALLW_TAG    9988
 #define BARRIER_TAG      9987
+#define COMMDUP_TAG      9986
+#define COMMFREE_TAG     9985
 
 /* Definition of CIVL-MPI */
 typedef enum __MPI_Sys_status__{
@@ -163,6 +165,18 @@ int CMPI_Scatterv(const void*, const int[], const
 		  MPI_Comm, char *);
 
 void* CMPI_PointerAdd(void*, int, MPI_Datatype);
+
+int CMPI_NewGcomm($scope, CMPI_Gcomm);
+
+CMPI_Gcomm CMPI_GetGcomm($scope, int);
+
+int CMPI_Comm_dup($scope, MPI_Comm, MPI_Comm *, char *);
+
+int CMPI_Comm_free(MPI_Comm *);
+
+$scope CMPI_Root_scope($comm);
+
+$scope CMPI_Proc_scope($comm);
 
 /* Assert that the size of the primitive type of the object pointed
    'buf' is consistent with the size of the given MPI_Datatype */
