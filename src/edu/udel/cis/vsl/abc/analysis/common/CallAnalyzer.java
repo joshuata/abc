@@ -162,7 +162,7 @@ public class CallAnalyzer implements Analyzer {
 	public void analyze(AST unit) throws SyntaxException {
 		ASTNode root = unit.getRootNode();
 		processProgram(root);
-		printCallGraph(root);
+		//printCallGraph(root);
 
 	}
 
