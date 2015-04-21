@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.ast.entity.IF;
 
 import java.util.Iterator;
+import java.util.Set;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -63,6 +64,30 @@ public interface Function extends OrdinaryEntity {
 	 * @return the function scope associated to this function
 	 */
 	Scope getScope();
+	
+	/**
+	 * Returns the set of functions that call this function either by name or 
+	 * through a pointer dereference.   Transitive calling relationships are not
+	 * reflected in this set, i.e., if a calls b which calls c, then a is not 
+	 * in getCallers() of c (unless of course a directly calls c as well).
+	 * 
+	 * The set is initially empty; a call to {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)} will populate it.
+	 * 
+	 * @return the set of functions that call this function
+	 */
+	Set<Function> getCallers();
+	
+	/**
+	 * Returns the set of functions called by this function either by name or 
+	 * through a pointer dereference.   Transitive calling relationships are not
+	 * reflected in this set, i.e., if a calls b which calls c, then c is not 
+	 * in getCallees() of a (unless of course a directly calls c as well).
+	 * 
+	 * The set is initially empty; a call to {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)} will populate it.
+	 * 
+	 * @return the set of functions called by this function
+	 */
+	Set<Function> getCallees();
 
 	/**
 	 * <p>
@@ -81,7 +106,7 @@ public interface Function extends OrdinaryEntity {
 
 	/**
 	 * Gets the list of postconditions specified in this function's contract.
-	 * The postcondition list is initially empty. Postconditions can be aded to
+	 * The postcondition list is initially empty. Postconditions can be added to
 	 * the list using method {@link #addPostcondition(ExpressionNode)}.
 	 * 
 	 * <p>

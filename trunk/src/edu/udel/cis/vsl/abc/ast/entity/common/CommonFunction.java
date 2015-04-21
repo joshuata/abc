@@ -1,8 +1,10 @@
 package edu.udel.cis.vsl.abc.ast.entity.common;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
@@ -17,6 +19,10 @@ import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 public class CommonFunction extends CommonOrdinaryEntity implements Function {
 
 	private boolean isInlined, doesNotReturn;
+	
+	private Set<Function> callers = new HashSet<Function>();
+
+	private Set<Function> callees = new HashSet<Function>();
 
 	private List<ExpressionNode> preconditions = new LinkedList<ExpressionNode>();
 
@@ -69,6 +75,16 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	@Override
 	public FunctionType getType() {
 		return (FunctionType) super.getType();
+	}
+	
+	@Override
+	public Set<Function> getCallers() {
+		return callees;
+	}
+
+	@Override
+	public Set<Function> getCallees() {
+		return callers;
 	}
 
 	@Override
