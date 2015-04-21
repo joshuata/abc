@@ -47,13 +47,6 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * 
  */
 public class CallAnalyzer implements Analyzer {
-	/*
-	 * This is work in progress.  Ultimately, these caller/callee relationships should
-	 * be embedded into the AST node.  Still thinking about which node to put it in, e.g.,
-	 * FunctionDefinitionNode or FunctionDeclarationNode or both?
-	 */
-	private Map<Function, Set<Entity>> callees;
-	private Map<Function, Set<Entity>> callers;
 	
 	/*
 	 * Traverse program
@@ -64,36 +57,16 @@ public class CallAnalyzer implements Analyzer {
 	 *    - for each call, c, do
 	 *       - add f to calls(c)
 	 *       - add c to calledFrom(f)
-	 *       
-	 * What is the unique defining entity for a function
-	 *     - extract it from a call node
-	 *     - extract a set that matches the type
-	 *    
 	 */
 	
 	// Handle FunctionTypeNode as well
 
 	private void processFunctionDefinitionNode(FunctionDefinitionNode funcNode) {
 		// children: identifier, type, contract (optional), body
-		FunctionTypeNode typeNode = funcNode.getTypeNode();
-		SequenceNode<ContractNode> contract = funcNode.getContract();
 		CompoundStatementNode body = funcNode.getBody();
-		SequenceNode<VariableDeclarationNode> paramsNode = typeNode
-				.getParameters();
 		Function fEntity = funcNode.getEntity();
 		
-		// For now just collect up the expressions in FunctionCallNodes
-		Set<Entity> myCallees;
-		if (callees.keySet().contains(fEntity)) {
-			myCallees = callees.get(fEntity);
-		} else {
-			myCallees = new HashSet<Entity>();
-			callees.put(fEntity, myCallees);
-		}
-		
-		System.out.println("Processing definition of function "+fEntity);
-
-		processFunctionBody(body, myCallees);
+		processFunctionBody(body, fEntity);
 	}
 
 	private void processFunctionDeclarationNode(FunctionDeclarationNode funcNode) {
@@ -112,14 +85,19 @@ public class CallAnalyzer implements Analyzer {
 		// TBD	
 	}
 	
-	private void processFunctionBody(ASTNode node, Set<Entity> callees) {
+	private void processFunctionBody(ASTNode node, Function caller) {
 		if (node instanceof FunctionCallNode) {
 			FunctionCallNode fcn = (FunctionCallNode)node;
 			
-			
 			if (fcn.getFunction() instanceof IdentifierExpressionNode) {
 				IdentifierNode calledFunId = ((IdentifierExpressionNode)fcn.getFunction()).getIdentifier();
-				callees.add(calledFunId.getEntity());
+				if (calledFunId.getEntity() instanceof Function) {
+					Function callee = (Function)calledFunId.getEntity();
+					caller.getCallees().add(callee);
+					callee.getCallers().add(caller);
+				} else {
+					assert false : "CallAnalyzer expected id in function call node to be a function";
+				}
 			} else {
 				System.out.println("Found indirect call to : "+fcn.getFunction());
 			}
@@ -128,12 +106,12 @@ public class CallAnalyzer implements Analyzer {
 			// Check arguments for nested calls
 			Iterable<ExpressionNode> args = fcn.getArguments();
 			for (ExpressionNode arg : args) {
-				processFunctionBody(arg, callees);
+				processFunctionBody(arg, caller);
 			}
 		} else if (node != null) {
 			Iterable<ASTNode> children = node.children();
 			for (ASTNode child : children) {
-				processFunctionBody(child, callees);
+				processFunctionBody(child, caller);
 			}
 		}
 	}
@@ -145,6 +123,29 @@ public class CallAnalyzer implements Analyzer {
 			Iterable<ASTNode> children = node.children();
 			for (ASTNode child : children) {
 				processProgram(child);
+			}
+		}
+	}
+	
+	private void printCallGraph(ASTNode node) {
+		if (node instanceof FunctionDefinitionNode) {
+			Function f = ((FunctionDefinitionNode)node).getEntity();
+			System.out.println("Function "+f+" is called by:");
+			for (Function caller : f.getCallers()) {
+				System.out.println("   "+caller);
+			}
+			if (f.getCallers().isEmpty()) 
+				System.out.println("   nothing");
+			System.out.println("and calls:");
+			for (Function callee : f.getCallees()) {
+				System.out.println("   "+callee);
+			}
+			if (f.getCallees().isEmpty()) 
+				System.out.println("   nothing");
+		} else if (node != null) {
+			Iterable<ASTNode> children = node.children();
+			for (ASTNode child : children) {
+				printCallGraph(child);
 			}
 		}
 	}
@@ -160,14 +161,8 @@ public class CallAnalyzer implements Analyzer {
 	@Override
 	public void analyze(AST unit) throws SyntaxException {
 		ASTNode root = unit.getRootNode();
-		callees = new HashMap<Function, Set<Entity>>();
 		processProgram(root);
-		for (Function caller : callees.keySet()) {
-			if (!callees.get(caller).isEmpty()) {
-				System.out.println("Function "+caller+" calls:");
-				System.out.println("   "+callees.get(caller));
-			}
-		}
+		printCallGraph(root);
 
 	}
 

@@ -21,18 +21,22 @@ public class StandardAnalyzer implements Analyzer {
 	private ScopeAnalyzer scopeAnalyzer;
 
 	private EntityAnalyzer entityAnalyzer;
+	
+	private CallAnalyzer callAnalyzer;
 
 	public StandardAnalyzer(Configuration configuration, ASTFactory astFactory,
 			EntityFactory entityFactory, ConversionFactory conversionFactory) {
 		scopeAnalyzer = new ScopeAnalyzer(entityFactory);
 		entityAnalyzer = new EntityAnalyzer(configuration, astFactory,
 				entityFactory, conversionFactory);
+		callAnalyzer = new CallAnalyzer();
 	}
 
 	@Override
 	public void analyze(AST unit) throws SyntaxException {
 		scopeAnalyzer.analyze(unit);
 		entityAnalyzer.analyze(unit);
+		callAnalyzer.analyze(unit);
 	}
 
 	@Override
