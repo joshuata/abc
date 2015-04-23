@@ -1647,6 +1647,11 @@ public class ASTPrettyPrinter {
 			result.append(" & ");
 			result.append(argWtP1);
 			break;
+		case BITANDEQ:
+			result.append(argWtP0);
+			result.append(" &= ");
+			result.append(argWtP1);
+			break;
 		case BITCOMPLEMENT:
 			result.append("~");
 			result.append(argWtP0);
@@ -1656,9 +1661,19 @@ public class ASTPrettyPrinter {
 			result.append(" | ");
 			result.append(argWtP1);
 			break;
+		case BITOREQ:
+			result.append(argWtP0);
+			result.append(" |= ");
+			result.append(argWtP1);
+			break;
 		case BITXOR:
 			result.append(argWtP0);
 			result.append(" ^ ");
+			result.append(argWtP1);
+			break;
+		case BITXOREQ:
+			result.append(argWtP0);
+			result.append(" ^= ");
 			result.append(argWtP1);
 			break;
 		case COMMA:
@@ -1732,9 +1747,19 @@ public class ASTPrettyPrinter {
 			result.append(" - ");
 			result.append(argWtP1);
 			break;
+		case MINUSEQ:
+			result.append(argWtP0);
+			result.append(" -= ");
+			result.append(argWtP1);
+			break;
 		case MOD:
 			result.append(argWtP0);
 			result.append(" % ");
+			result.append(argWtP1);
+			break;
+		case MODEQ:
+			result.append(argWtP0);
+			result.append(" %= ");
 			result.append(argWtP1);
 			break;
 		case NEQ:
@@ -1756,6 +1781,14 @@ public class ASTPrettyPrinter {
 			result.append(" += ");
 			result.append(arg1);
 			break;
+		case POSTDECREMENT:
+			result.append(arg0);
+			result.append("--");
+			break;
+		case POSTINCREMENT:
+			result.append(arg0);
+			result.append("++");
+			break;
 		case PREDECREMENT:
 			result.append("--");
 			result.append(arg0);
@@ -1764,22 +1797,24 @@ public class ASTPrettyPrinter {
 			result.append("++");
 			result.append(arg0);
 			break;
-		case POSTINCREMENT:
-			result.append(arg0);
-			result.append("++");
-			break;
-		case POSTDECREMENT:
-			result.append(arg0);
-			result.append("--");
-			break;
 		case SHIFTLEFT:
 			result.append(argWtP0);
 			result.append(" << ");
 			result.append(argWtP1);
 			break;
+		case SHIFTLEFTEQ:
+			result.append(argWtP0);
+			result.append(" <<= ");
+			result.append(argWtP1);
+			break;
 		case SHIFTRIGHT:
 			result.append(argWtP0);
 			result.append(" >> ");
+			result.append(argWtP1);
+			break;
+		case SHIFTRIGHTEQ:
+			result.append(argWtP0);
+			result.append(" >>= ");
 			result.append(argWtP1);
 			break;
 		case SUBSCRIPT:
@@ -1793,6 +1828,11 @@ public class ASTPrettyPrinter {
 			result.append(" * ");
 			result.append(argWtP1);
 			break;
+		case TIMESEQ:
+			result.append(argWtP0);
+			result.append(" -= ");
+			result.append(argWtP1);
+			break;
 		case UNARYMINUS:
 			result.append("-");
 			result.append(argWtP0);
@@ -1800,11 +1840,6 @@ public class ASTPrettyPrinter {
 		case UNARYPLUS:
 			result.append("+");
 			result.append(argWtP0);
-			break;
-		case MINUSEQ:
-			result.append(argWtP0);
-			result.append(" -= ");
-			result.append(argWtP1);
 			break;
 		default:
 			throw new ABCUnsupportedException(
