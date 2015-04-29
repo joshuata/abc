@@ -2,11 +2,7 @@
 #else
 #define __UNISTD__
 
-int sleep(int n){
-  return 0;
-}
+int sleep(int n);
 
-int usleep(int n){
-  return 0;
-}
+int usleep(int n);
 #endif

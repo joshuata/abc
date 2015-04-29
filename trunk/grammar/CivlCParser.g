@@ -1212,8 +1212,6 @@ statement
     | iterationStatement -> ^(STATEMENT iterationStatement)
     | jumpStatement -> ^(STATEMENT jumpStatement)
 //    | pragma -> ^(STATEMENT pragma)
-   // | assumeStatement -> ^(STATEMENT assumeStatement)
-    //| assertStatement -> ^(STATEMENT assertStatement)
     | whenStatement -> ^(STATEMENT whenStatement)
     | chooseStatement -> ^(STATEMENT chooseStatement)
     | atomicStatement -> ^(STATEMENT atomicStatement)
@@ -1431,18 +1429,6 @@ pragma
  */
 pragmaBody
 	:	(~ NEWLINE)+
-	;
-
-/* CIVL-C assume statement. TODO: make function.
- */
-assumeStatement
-	:	ASSUME expression SEMI -> ^(ASSUME expression)
-	;
-	
-/* CIVL-C assert statement. TODO: make function
- */
-assertStatement
-	:	ASSERT conditionalExpression (COLON conditionalExpression (COMMA conditionalExpression)*)? SEMI -> ^(ASSERT conditionalExpression conditionalExpression*)
 	;
 
 /* CIVL-C $when statement.  This is a guarded command.

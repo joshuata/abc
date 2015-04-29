@@ -48,8 +48,6 @@ public interface CParser {
 	public static final int AND = CivlCParser.AND;
 	public static final int ARROW = CivlCParser.ARROW;
 	public static final int ASSIGN = CivlCParser.ASSIGN;
-	public static final int ASSUME = CivlCParser.ASSUME;
-	public static final int ASSERT = CivlCParser.ASSERT;
 	public static final int AT = CivlCParser.AT;
 	public static final int ATOMIC = CivlCParser.ATOMIC;
 	public static final int AUTO = CivlCParser.AUTO;
@@ -194,7 +192,6 @@ public interface CParser {
 	public static final int RPAREN = CivlCParser.RPAREN;
 	public static final int RSLIST = CivlCParser.RSLIST;
 	public static final int RSQUARE = CivlCParser.RSQUARE;
-	// public static final int SCOPE = CivlCParser.SCOPE;
 	public static final int SCOPEOF = CivlCParser.SCOPEOF;
 	public static final int SChar = CivlCParser.SChar;
 	public static final int SELF = CivlCParser.SELF;
@@ -291,7 +288,7 @@ public interface CParser {
 	public static final int SCALAR_INITIALIZER = CivlCParser.SCALAR_INITIALIZER;
 	// public static final int SCOPE_LIST = CivlCParser.SCOPE_LIST;
 	// public static final int SCOPE_NAME = CivlCParser.SCOPE_NAME;
-	public static final int SPECIFIER_QUALIFIER_LIST = CivlCParser.SPECIFIER_QUALIFIER_LIST;	
+	public static final int SPECIFIER_QUALIFIER_LIST = CivlCParser.SPECIFIER_QUALIFIER_LIST;
 	public static final int STRUCT_DECLARATION = CivlCParser.STRUCT_DECLARATION;
 	public static final int STRUCT_DECLARATION_LIST = CivlCParser.STRUCT_DECLARATION_LIST;
 	public static final int STRUCT_DECLARATOR = CivlCParser.STRUCT_DECLARATOR;

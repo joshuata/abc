@@ -195,6 +195,7 @@ errno_t wcstombs_s(size_t * restrict retval,
           
 #ifdef _LINUX
 int rand_r(unsigned int *seedp);
+int posix_memalign(void **memptr, size_t alignment, size_t size); 
 #endif
           
 #endif
