@@ -148,7 +148,7 @@ c_keyword	:	AUTO | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
 		|	STATICASSERT | THREADLOCAL
 		;
 
-civl_keyword	:	//ASSERT | ASSUME |
+civl_keyword	:
             CHOOSE | COLLECTIVE
 		| 	ENSURES | FALSE
 		|	INPUT | INVARIANT | OUTPUT | PROC
