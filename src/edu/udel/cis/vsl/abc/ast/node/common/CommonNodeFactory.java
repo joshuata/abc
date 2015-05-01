@@ -17,12 +17,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.GuardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
@@ -100,11 +103,14 @@ import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonCompoundInitializerNo
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonDesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonFieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonAbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonAssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonDependsNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonEnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonEnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonGuardNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonRequiresNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonTypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonVariableDeclarationNode;
@@ -968,5 +974,21 @@ public class CommonNodeFactory implements NodeFactory {
 			ExpressionNode arg0, ExpressionNode arg1, ExpressionNode arg2) {
 		return new CommonOperatorNode(source, operator, Arrays.asList(arg0,
 				arg1, arg2));
+	}
+
+	@Override
+	public DependsNode newDependsNode(Source source, ExpressionNode expression) {
+		return new CommonDependsNode(source, expression);
+	}
+
+	@Override
+	public GuardNode newGuardNode(Source source, ExpressionNode expression) {
+		return new CommonGuardNode(source, expression);
+	}
+
+	@Override
+	public AssignsNode newAssignsNode(Source source,
+			SequenceNode<ExpressionNode> expressionList) {
+		return new CommonAssignsNode(source, expressionList);
 	}
 }

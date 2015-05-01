@@ -48,6 +48,7 @@ public interface CParser {
 	public static final int AND = CivlCParser.AND;
 	public static final int ARROW = CivlCParser.ARROW;
 	public static final int ASSIGN = CivlCParser.ASSIGN;
+	public static final int ASSIGNS = CivlCParser.ASSIGNS;
 	public static final int AT = CivlCParser.AT;
 	public static final int ATOMIC = CivlCParser.ATOMIC;
 	public static final int AUTO = CivlCParser.AUTO;
@@ -78,6 +79,7 @@ public interface CParser {
 	public static final int CONTINUE = CivlCParser.CONTINUE;
 	public static final int DEFAULT = CivlCParser.DEFAULT;
 	public static final int DEFINED = CivlCParser.DEFINED;
+	public static final int DEPENDS = CivlCParser.DEPENDS;
 	public static final int DERIV = CivlCParser.DERIV;
 	public static final int DIV = CivlCParser.DIV;
 	public static final int DIVEQ = CivlCParser.DIVEQ;
@@ -110,6 +112,7 @@ public interface CParser {
 	public static final int GLOBAL = CivlCParser.GLOBAL;
 	public static final int GT = CivlCParser.GT;
 	public static final int GTE = CivlCParser.GTE;
+	public static final int GUARD = CivlCParser.GUARD;
 	public static final int HASH = CivlCParser.HASH;
 	public static final int HASHHASH = CivlCParser.HASHHASH;
 	public static final int HEADER_NAME = CivlCParser.HEADER_NAME;

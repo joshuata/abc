@@ -11,12 +11,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.GuardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
@@ -1757,6 +1760,49 @@ public interface NodeFactory {
 	 */
 	EnsuresNode newEnsuresNode(Source source, ExpressionNode expression);
 
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$depends</code>
+	 * contract clause. This is used to specify the dependency relationship
+	 * between processes for a function.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$depends</code>
+	 *            clause, including the entire expression
+	 * @param expression
+	 *            the boolean expression which specifies a condition of
+	 *            dependency
+	 * @return the new <code>$depends</code> clause node
+	 */
+	DependsNode newDependsNode(Source source, ExpressionNode expression);
+
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$guard</code> contract
+	 * clause. This is used to specify the guard of a function.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$guard</code>
+	 *            clause, including the entire expression
+	 * @param expression
+	 *            the boolean expression which specifies the the guard
+	 * @return the new <code>$guard</code> clause node
+	 */
+	GuardNode newGuardNode(Source source, ExpressionNode expression);
+
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$assigns</code>
+	 * contract clause. This is used to specify the guard of a function.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$assigns</code>
+	 *            clause, including the entire expression
+	 * @param expressionList
+	 *            the expression list which specifies the memory units
+	 *            associated with the <code>$assigns</code> clause
+	 * @return the new <code>$assigns</code> clause node
+	 */
+	AssignsNode newAssignsNode(Source source,
+			SequenceNode<ExpressionNode> expressionList);
+
 	// external definitions...
 
 	/**
@@ -1939,7 +1985,7 @@ public interface NodeFactory {
 	 * @return The new OpenMP master node created.
 	 */
 	OmpSyncNode newOmpMasterNode(Source source, StatementNode statement);
-	
+
 	/**
 	 * Creates a new OpenMP atomic node, representing
 	 * <code>#pragma omp atomic...</code>. An atomic node has exactly one child

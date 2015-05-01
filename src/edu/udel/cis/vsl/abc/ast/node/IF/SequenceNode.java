@@ -67,4 +67,5 @@ public interface SequenceNode<T extends ASTNode> extends ASTNode, Iterable<T> {
 	 *            null
 	 */
 	void insertChildren(int index, List<T> list);
+
 }

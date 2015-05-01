@@ -1,0 +1,24 @@
+#ifdef __MEMORY__
+#else
+#define __MEMORY__
+
+typedef struct __memory__ $memory;
+
+/* holds if any memory unit may be modified by the
+ * current process now or in the future.
+ */
+_Bool $write($memory mem);
+
+/* holds if any memory unit may be read by the
+ * current process now or in the future.
+ */
+_Bool $read($memory mem);
+
+/* holds if any memory unit may be read or modified by the
+ * current process now or in the future.
+ */
+_Bool $access($memory mem){
+  return $write(mem) || $read(mem);
+}
+
+#endif

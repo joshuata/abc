@@ -11,12 +11,11 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.ArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -96,6 +95,11 @@ public interface ASTNode {
 		 */
 		COLLECTIVE,
 		/**
+		 * A node representing a contract item. A node of this kind can be
+		 * safely cast to {@link ContractNode}.
+		 */
+		CONTRACT,
+		/**
 		 * A list of declarations; such a list can occur as an initializer in a
 		 * <code>for</code> loop, for example. A node of this kind can be safely
 		 * cast to {@link DeclarationListNode}.
@@ -108,11 +112,6 @@ public interface ASTNode {
 		 * can be safely cast to {@link DesignationNode}.
 		 */
 		DESIGNATION,
-		/**
-		 * An "ensures" node encodes a post-condition in a procedure contract. A
-		 * node of this kind can be safely cast to {@link EnsuresNode}.
-		 */
-		ENSURES,
 		/**
 		 * An enumerator declaration node represents the declaration of a single
 		 * enumerator constant inside a complete <code>enum</code> definition. A
@@ -192,11 +191,6 @@ public interface ASTNode {
 		 * the source code. May be safely cast to {@link PragmaNode}.
 		 */
 		PRAGMA,
-		/**
-		 * A "requires" node represents a pre-condition in a CIVL-C procedure
-		 * contract. May be safely cast to {@link RequiresNode}.
-		 */
-		REQUIRES,
 		/**
 		 * A "result"" node represents a use of the special variable
 		 * <code>$result</code> in a post-condition in a CIVL-C procedure

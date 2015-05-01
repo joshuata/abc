@@ -2499,20 +2499,59 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 								.getChild(i);
 						int itemKind = itemTree.getType();
 						CommonTree exprTree = (CommonTree) itemTree.getChild(0);
-						ExpressionNode expr = translateExpression(exprTree,
-								scope);
 						ContractNode contractNode;
 						Source source = newSource(itemTree);
 
-						if (itemKind == ENSURES) {
-							contractNode = nodeFactory.newEnsuresNode(source,
-									expr);
-						} else if (itemKind == REQUIRES) {
-							contractNode = nodeFactory.newRequiresNode(source,
-									expr);
+						if (itemKind == ASSIGNS) {
+							int expressionKind = exprTree.getType();
+							List<ExpressionNode> argumentList = new ArrayList<>();
+
+							if (expressionKind == ARGUMENT_LIST) {
+								int numArgs = exprTree.getChildCount();
+
+								for (int j = 0; j < numArgs; j++) {
+									CommonTree argumentTree = (CommonTree) exprTree
+											.getChild(j);
+									ExpressionNode argumentNode = translateExpression(
+											argumentTree, scope);
+
+									argumentList.add(argumentNode);
+								}
+								contractNode = nodeFactory.newAssignsNode(
+										source, nodeFactory.newSequenceNode(
+												newSource(exprTree),
+												"$assigns arguments",
+												argumentList));
+							} else {
+								throw new SyntaxException(
+										"Invalid arguments for $assigns clause",
+										source);
+							}
 						} else {
-							throw error("Unknown kind of contract item: "
-									+ itemTree, itemTree);
+							ExpressionNode expr = translateExpression(exprTree,
+									scope);
+
+							switch (itemKind) {
+							case ENSURES:
+								contractNode = nodeFactory.newEnsuresNode(
+										source, expr);
+								break;
+							case REQUIRES:
+								contractNode = nodeFactory.newRequiresNode(
+										source, expr);
+								break;
+							case DEPENDS:
+								contractNode = nodeFactory.newDependsNode(
+										source, expr);
+								break;
+							case GUARD:
+								contractNode = nodeFactory.newGuardNode(source,
+										expr);
+								break;
+							default:
+								throw error("Unknown kind of contract item: "
+										+ itemTree, itemTree);
+							}
 						}
 						items.add(contractNode);
 					}

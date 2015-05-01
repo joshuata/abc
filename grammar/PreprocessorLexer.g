@@ -130,6 +130,7 @@ THREADLOCAL	:	'_Thread_local';
 // Be sure to add these to PreprocessorParser.g too, under c_keyword.
 
 ABSTRACT	:	'$abstract';
+ASSIGNS     :   '$assigns';
 AT			:	'@';
 BIG_O		:	'$O';
 CHOOSE		:	'$choose';
@@ -138,12 +139,14 @@ CIVLATOM	:	'$atom';
 CIVLFOR		:	'$for';
 COLLECTIVE	:	'$collective';
 CONTIN		:	'$contin';
+DEPENDS     :   '$depends';
 DERIV		:	'$D';
 DOMAIN		:	'$domain';
 ENSURES		:	'$ensures';
 EXISTS		: 	'$exists';
 FALSE		:	'$false';
 FORALL		:	'$forall';
+GUARD       :   '$guard';
 HERE		:	'$here';
 IMPLIES		:	'=>'	|	NotLineStart; // can the NotLineStart be removed?
 INPUT		:	'$input';

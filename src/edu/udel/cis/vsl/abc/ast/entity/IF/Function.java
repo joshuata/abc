@@ -64,26 +64,30 @@ public interface Function extends OrdinaryEntity {
 	 * @return the function scope associated to this function
 	 */
 	Scope getScope();
-	
+
 	/**
-	 * Returns the set of functions that call this function either by name or 
-	 * through a pointer dereference.   Transitive calling relationships are not
-	 * reflected in this set, i.e., if a calls b which calls c, then a is not 
-	 * in getCallers() of c (unless of course a directly calls c as well).
+	 * Returns the set of functions that call this function either by name or
+	 * through a pointer dereference. Transitive calling relationships are not
+	 * reflected in this set, i.e., if a calls b which calls c, then a is not in
+	 * getCallers() of c (unless of course a directly calls c as well).
 	 * 
-	 * The set is initially empty; a call to {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)} will populate it.
+	 * The set is initially empty; a call to
+	 * {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)}
+	 * will populate it.
 	 * 
 	 * @return the set of functions that call this function
 	 */
 	Set<Function> getCallers();
-	
+
 	/**
-	 * Returns the set of functions called by this function either by name or 
-	 * through a pointer dereference.   Transitive calling relationships are not
-	 * reflected in this set, i.e., if a calls b which calls c, then c is not 
-	 * in getCallees() of a (unless of course a directly calls c as well).
+	 * Returns the set of functions called by this function either by name or
+	 * through a pointer dereference. Transitive calling relationships are not
+	 * reflected in this set, i.e., if a calls b which calls c, then c is not in
+	 * getCallees() of a (unless of course a directly calls c as well).
 	 * 
-	 * The set is initially empty; a call to {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)} will populate it.
+	 * The set is initially empty; a call to
+	 * {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)}
+	 * will populate it.
 	 * 
 	 * @return the set of functions called by this function
 	 */
@@ -142,6 +146,18 @@ public interface Function extends OrdinaryEntity {
 	 *            a boolean expression
 	 */
 	void addPostcondition(ExpressionNode expression);
+
+	void addDepends(ExpressionNode expression);
+
+	void addAssigns(ExpressionNode expression);
+
+	void addGuard(ExpressionNode expression);
+
+	Iterator<ExpressionNode> getDepends();
+
+	Iterator<ExpressionNode> getGuard();
+
+	Iterator<ExpressionNode> getAssigns();
 
 	// TODO: perhaps more information is needed. About each parameter:
 	// does it have static extent? What is the extent (constant
