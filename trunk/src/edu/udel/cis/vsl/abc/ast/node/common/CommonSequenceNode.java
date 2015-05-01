@@ -122,5 +122,4 @@ public class CommonSequenceNode<T extends ASTNode> extends CommonASTNode
 	public void insertChildren(int index, List<T> list) {
 		insertChildrenAt(index, list);
 	}
-
 }

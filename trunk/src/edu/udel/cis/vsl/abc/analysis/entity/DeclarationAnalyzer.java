@@ -16,11 +16,15 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode.ContractKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.GuardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
@@ -177,21 +181,61 @@ public class DeclarationAnalyzer {
 		}
 		if (contract != null) {
 			for (ContractNode clause : contract) {
-				if (clause instanceof RequiresNode) {
+				ContractKind contractKind = clause.contractKind();
+
+				switch (contractKind) {
+				case REQUIRES: {
 					ExpressionNode expression = ((RequiresNode) clause)
 							.getExpression();
 
 					entityAnalyzer.expressionAnalyzer
 							.processExpression(expression);
 					result.addPrecondition(expression);
-				} else if (clause instanceof EnsuresNode) {
+					break;
+				}
+				case ENSURES: {
 					ExpressionNode expression = ((EnsuresNode) clause)
 							.getExpression();
 
 					entityAnalyzer.expressionAnalyzer
 							.processExpression(expression);
 					result.addPostcondition(expression);
-				} else {
+					break;
+				}
+				case DEPENDS: {
+					ExpressionNode expression = ((DependsNode) clause)
+							.getExpression();
+
+					entityAnalyzer.expressionAnalyzer
+							.processExpression(expression);
+					result.addDepends(expression);
+					break;
+				}
+				case ASSIGNS: {
+					SequenceNode<ExpressionNode> expressionList = ((AssignsNode) clause)
+							.getMemoryList();
+					int numExpressions = expressionList.numChildren();
+
+					for (int i = 0; i < numExpressions; i++) {
+						ExpressionNode expression = expressionList
+								.getSequenceChild(i);
+
+						entityAnalyzer.expressionAnalyzer
+								.processExpression(expression);
+						result.addAssigns(expression);
+					}
+					break;
+				}
+				case GUARD: {
+					ExpressionNode expression = ((GuardNode) clause)
+							.getExpression();
+
+					entityAnalyzer.expressionAnalyzer
+							.processExpression(expression);
+					result.addGuard(expression);
+					break;
+				}
+				default:
 					throw error("Unknown kind of contract clause", clause);
 				}
 			}

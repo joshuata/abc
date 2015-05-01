@@ -1518,8 +1518,11 @@ declarationList_opt
  * Child: expression
  */
 contractItem
-	: REQUIRES expression SEMI -> ^(REQUIRES expression)
-	| ENSURES expression SEMI -> ^(ENSURES expression)
+	: REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression)
+	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression)
+    | DEPENDS LCURLY expression RCURLY -> ^(DEPENDS expression)
+    | GUARD LCURLY expression RCURLY -> ^(GUARD expression)
+    | ASSIGNS LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS argumentExpressionList)
 	;
 
 /* A CIVL-C contract: sequence of 0 or more

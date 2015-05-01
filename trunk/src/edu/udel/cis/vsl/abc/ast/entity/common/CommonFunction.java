@@ -19,16 +19,21 @@ import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 public class CommonFunction extends CommonOrdinaryEntity implements Function {
 
 	private boolean isInlined, doesNotReturn;
-	
-	private Set<Function> callers = new HashSet<Function>();
 
-	private Set<Function> callees = new HashSet<Function>();
+	private Set<Function> callers = new HashSet<>();
 
-	private List<ExpressionNode> preconditions = new LinkedList<ExpressionNode>();
+	private Set<Function> callees = new HashSet<>();
 
-	private List<ExpressionNode> postconditions = new LinkedList<ExpressionNode>();
+	private List<ExpressionNode> preconditions = new LinkedList<>();
 
-	public CommonFunction(String name, ProgramEntity.LinkageKind linkage, Type type) {
+	private List<ExpressionNode> postconditions = new LinkedList<>();
+
+	private List<ExpressionNode> depends = new LinkedList<>();
+	private List<ExpressionNode> guards = new LinkedList<>();
+	private List<ExpressionNode> assigns = new LinkedList<>();
+
+	public CommonFunction(String name, ProgramEntity.LinkageKind linkage,
+			Type type) {
 		super(EntityKind.FUNCTION, name, linkage, type);
 	}
 
@@ -76,7 +81,7 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	public FunctionType getType() {
 		return (FunctionType) super.getType();
 	}
-	
+
 	@Override
 	public Set<Function> getCallers() {
 		return callees;
@@ -105,6 +110,36 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	@Override
 	public void addPostcondition(ExpressionNode expression) {
 		postconditions.add(expression);
+	}
+
+	@Override
+	public void addDepends(ExpressionNode expression) {
+		this.depends.add(expression);
+	}
+
+	@Override
+	public void addAssigns(ExpressionNode expression) {
+		this.assigns.add(expression);
+	}
+
+	@Override
+	public void addGuard(ExpressionNode expression) {
+		this.guards.add(expression);
+	}
+
+	@Override
+	public Iterator<ExpressionNode> getDepends() {
+		return this.depends.iterator();
+	}
+
+	@Override
+	public Iterator<ExpressionNode> getGuard() {
+		return this.guards.iterator();
+	}
+
+	@Override
+	public Iterator<ExpressionNode> getAssigns() {
+		return this.assigns.iterator();
 	}
 
 }

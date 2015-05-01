@@ -30,7 +30,12 @@ public class CommonEnsuresNode extends CommonASTNode implements EnsuresNode {
 
 	@Override
 	public NodeKind nodeKind() {
-		return NodeKind.ENSURES;
+		return NodeKind.CONTRACT;
+	}
+
+	@Override
+	public ContractKind contractKind() {
+		return ContractKind.ENSURES;
 	}
 
 }

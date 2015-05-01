@@ -17,11 +17,18 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode.ContractKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnumeratorDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.GuardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.RequiresNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
@@ -206,8 +213,8 @@ public class ASTPrettyPrinter {
 			out.print("NULL");
 	}
 
-	private static void pPrintSequenceNode(SequenceNode<ASTNode> sequence,
-			PrintStream out) {
+	private static void pPrintSequenceNode(
+			SequenceNode<? extends ASTNode> sequence, PrintStream out) {
 		int numChildren = sequence.numChildren();
 		for (int i = 0; i < numChildren; i++) {
 			ASTNode node = sequence.getSequenceChild(i);
@@ -507,6 +514,8 @@ public class ASTPrettyPrinter {
 		TypeNode returnType = typeNode.getReturnType();
 		SequenceNode<VariableDeclarationNode> paras = typeNode.getParameters();
 		int numOfParas = paras.numChildren();
+		SequenceNode<ContractNode> contracts = function.getContract();
+		int numContracts = contracts != null ? contracts.numChildren() : 0;
 
 		if (function instanceof AbstractFunctionDefinitionNode)
 			out.print("$abstract ");
@@ -525,6 +534,11 @@ public class ASTPrettyPrinter {
 		if (typeNode.hasVariableArgs())
 			out.print(", ...");
 		out.print(")");
+		for (int i = 0; i < numContracts; i++) {
+			out.print("\n");
+			pPrintContract(out, prefix + indention,
+					contracts.getSequenceChild(i));
+		}
 
 		if (function instanceof FunctionDefinitionNode) {
 			CompoundStatementNode body = ((FunctionDefinitionNode) function)
@@ -532,8 +546,70 @@ public class ASTPrettyPrinter {
 
 			out.print("\n");
 			pPrintCompoundStatement(out, prefix + indention, body, true, false);
-		} else
+		} else {
+			if (numContracts > 0) {
+				out.print("\n");
+				out.print(prefix);
+			}
 			out.print(";");
+		}
+	}
+
+	private static void pPrintContract(PrintStream out, String prefix,
+			ContractNode contract) {
+		ContractKind kind = contract.contractKind();
+
+		out.print(prefix);
+		switch (kind) {
+		case ASSIGNS: {
+			AssignsNode assigns = (AssignsNode) contract;
+
+			out.print("$assign");
+			out.print("{");
+			pPrintSequenceNode(assigns.getMemoryList(), out);
+			out.print("}");
+			break;
+		}
+		case DEPENDS: {
+			DependsNode depends = (DependsNode) contract;
+
+			out.print("$depends");
+			out.print("{");
+			out.print(expression2Pretty(depends.getExpression()));
+			out.print("}");
+			break;
+		}
+		case ENSURES: {
+			EnsuresNode ensures = (EnsuresNode) contract;
+
+			out.print("$ensures");
+			out.print("{");
+			out.print(expression2Pretty(ensures.getExpression()));
+			out.print("}");
+			break;
+		}
+		case GUARD: {
+			GuardNode guard = (GuardNode) contract;
+
+			out.print("$guard");
+			out.print("{");
+			out.print(expression2Pretty(guard.getExpression()));
+			out.print("}");
+			break;
+		}
+		case REQUIRES: {
+			RequiresNode requires = (RequiresNode) contract;
+
+			out.print("$requires");
+			out.print("{");
+			out.print(expression2Pretty(requires.getExpression()));
+			out.print("}");
+			break;
+		}
+		default:
+			throw new ABCUnsupportedException(
+					"pretty printing contract node of " + kind + " kind");
+		}
 	}
 
 	private static void pPrintCompoundStatement(PrintStream out, String prefix,
