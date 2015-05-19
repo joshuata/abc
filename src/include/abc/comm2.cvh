@@ -2,8 +2,7 @@
  * communication.
  */
 
-#ifdef __COMM__
-#else
+#ifndef __COMM__
 #define __COMM__
 
 /* includes civlc.cvh because this library references $scope */
@@ -57,32 +56,39 @@ typedef struct $comm * $comm;
 /* creates a new message, copying data from the specified buffer */ 
 $message $message_pack(int source, int dest, int tag, void *data, int size)
   $depends {$access(*data)}
+  $assigns {*data}
+  $reads {$nothing} // reads nothing implies assigns nothing
 ;
   
 /* returns the message source */ 
 int $message_source($message message)
   $depends {$false}
+  $reads {$nothing}
 ;
 
 /* returns the message tag */
 int $message_tag($message message)
   $depends {$false}
+  $reads {$nothing}
 ;
 
 /* returns the message destination */ 
 int $message_dest($message message)
   $depends {$false}
+  $reads {$nothing}
 ;
 
 /* returns the message size */ 
 int $message_size($message message)
   $depends {$false}
+  $reads {$nothing}
 ; 
 
 /* transfers message data to buf, throwing exception if message
  * size exceeds specified size */ 
 void $message_unpack($message message, void *buf, int size)
   $depends {$access(*buf)}
+  $assigns {*buf}
 ;
 
 /* ************************** Functions of $gcomm ************************** */
@@ -94,16 +100,19 @@ void $message_unpack($message message, void *buf, int size)
  * message-passing.  The new object will be allocated in the given scope. */
 $gcomm $gcomm_create($scope scope, int size)
   $depends {$false}
+  $reads {$nothing}
 ;
 
 /* De-allocation a __gcomm__ object */
 void $gcomm_destroy($gcomm gcomm)
-  $depends {*gcomm}
+  $depends {access(*gcomm)}
+  $assigns {*gcomm}
 ;
 
 /* Returns $true iff gcomm points to a valid object. */
 _Bool $gcomm_defined($gcomm gcomm)
   $depends {$false}
+  $assigns {$nothing}
 ;
 
 void $gcomm_dup($comm comm, $comm newcomm);
@@ -122,6 +131,7 @@ void $gcomm_dup($comm comm, $comm newcomm);
  * The new object will be allocated in the given scope. */
 $comm $comm_create($scope scope, $gcomm gcomm, int place)
   $depends {$false}
+  $assigns {$nothing}//tricky
 ;
 
 /* De-allocation a __comm__ object */
@@ -133,22 +143,23 @@ void $comm_destroy($comm comm)
 /* Returns the size (number of places) in the global communicator associated
  * to the given comm. */
 int $comm_size($comm comm)
-  $depends {$write(*comm)}
-  $reads {*comm}
+  $depends {$false}
+  $reads {$nothing} //tricky
 ;
 
 /* Returns the place of the local communicator.  This is the same as the
  * place argument used to create the local communicator. */
 int $comm_place($comm comm)
   $depends {$false}
+  $reads {$nothing}
 ;
 
 /* Adds the message to the appropriate message queue in the communication
  * universe specified by the comm.  The source of the message must equal
  * the place of the comm. */
 void $comm_enqueue($comm comm, $message message)
-			    $depends {$access(*comm)}
-			    $assigns {*comm}
+  $depends {$access(*comm)}
+  $assigns {*comm}
 ;
 
 /* Returns true iff a matching message exists in the communication universe
@@ -157,6 +168,7 @@ void $comm_enqueue($comm comm, $message message)
 _Bool $comm_probe($comm comm, int source, int tag)
   $depends {$write(*comm)}
   $reads {*comm}
+  $assigns {$nothing}
 ;
 
 /* Finds the first matching message and returns it without modifying
@@ -165,6 +177,7 @@ _Bool $comm_probe($comm comm, int source, int tag)
 $message $comm_seek($comm comm, int source, int tag)
   $depends {$write(*comm)}
   $reads {*comm}
+  $assigns {$nothing}
 ;
 
 /* Finds the first matching message, removes it from the communicator,
@@ -178,6 +191,7 @@ $message $comm_dequeue($comm comm, int source, int tag)
 _Bool $comm_defined($comm comm)
   $depends {$write(*comm)}
   $reads {*comm}
+  $assigns {$nothing}
 ;
 
 #endif
