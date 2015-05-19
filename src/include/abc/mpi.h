@@ -1,5 +1,4 @@
-#ifdef __MPI__
-#else
+#ifndef __MPI__
 #define __MPI__
 #include <op.h>
 #ifdef NULL

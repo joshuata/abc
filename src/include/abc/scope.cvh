@@ -2,8 +2,7 @@
  * scope operations.
  */
 
-#ifdef __SCOPE__
-#else
+#ifndef __SCOPE__
 #define __SCOPE__
 
 /* includes civlc.cvh because this library references $scope */

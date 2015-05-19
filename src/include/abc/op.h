@@ -1,5 +1,4 @@
-#ifdef __OP__
-#else
+#ifndef __OP__
 #define __OP__
 // Operation for collective reductions or collective operations
 // Note: The order of following operations are consistent with CIVL implementations,

@@ -1,5 +1,4 @@
-#ifdef __CIVLPTHREAD__
-#else
+#ifndef __CIVLPTHREAD__
 #define __CIVLPTHREAD__
 
 #include <civlc.cvh>

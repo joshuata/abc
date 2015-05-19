@@ -1,5 +1,4 @@
-#ifdef __SYSTIME__
-#else
+#ifndef __SYSTIME__
 #define __SYSTIME__
 
 typedef struct timezone timezone;

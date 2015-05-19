@@ -1,7 +1,6 @@
 /* ABC model of string.h */
 
-#ifdef __STRING__
-#else
+#ifndef __STRING__
 #define __STRING__
 
 #include <stddef.h>

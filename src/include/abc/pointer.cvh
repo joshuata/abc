@@ -2,8 +2,7 @@
  * pointer operations.
  */
 
-#ifdef __POINTER__
-#else
+#ifndef __POINTER__
 #define __POINTER__
 
 /* ******************************* Functions ******************************* */
