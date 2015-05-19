@@ -2,8 +2,7 @@
  * In CIVL-C, a sequence of type T is defined as an incomplete array of type T. 
  */
 
-#ifdef __SEQ__
-#else
+#ifndef __SEQ__
 #define __SEQ__
 
 /* ******************************* Functions ******************************* */

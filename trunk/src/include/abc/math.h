@@ -1,5 +1,4 @@
-#ifdef __MATH__
-#else
+#ifndef __MATH__
 #define __MATH__
 //two types
 #define float_t float      // floating-point type at least 

@@ -8,8 +8,7 @@ errors are changed to assertion violations with appropriate messages
 appropriate definitions are changed to input variables
 */
 
-#ifdef __PTHREAD__
-#else
+#ifndef __PTHREAD__
 #define __PTHREAD__
 #ifdef NULL
 #else

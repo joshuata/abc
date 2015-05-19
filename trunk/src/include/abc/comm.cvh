@@ -2,8 +2,7 @@
  * communication.
  */
 
-#ifdef __COMM__
-#else
+#ifndef __COMM__
 #define __COMM__
 
 /* includes civlc.cvh because this library references $scope */

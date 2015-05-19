@@ -1,7 +1,6 @@
 /* ABC model of stdlib.c */
 
-#ifdef __STDLIB__
-#else
+#ifndef __STDLIB__
 #define __STDLIB__
 
 /* Types defined */

@@ -1,7 +1,6 @@
 /* This header file defines the C library time.h */
 
-#ifdef __TIME__
-#else
+#ifndef __TIME__
 #define __TIME__
 
 typedef unsigned long int size_t;

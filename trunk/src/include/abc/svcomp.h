@@ -1,5 +1,4 @@
-#ifdef __SVCOMP__
-#else
+#ifndef __SVCOMP__
 #define __SVCOMP__
 void __VERIFIER_error(void);
 void __VERIFIER_assume(int);

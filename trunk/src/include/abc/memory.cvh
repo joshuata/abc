@@ -1,5 +1,4 @@
-#ifdef __MEMORY__
-#else
+#ifndef __MEMORY__
 #define __MEMORY__
 
 typedef struct __memory__ $memory;

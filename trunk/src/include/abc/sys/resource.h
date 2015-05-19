@@ -1,4 +1,3 @@
-#ifdef __SYS_RESOURCE__
-#else
+#ifndef __SYS_RESOURCE__
 #define __SYS_RESOURCE__
 #endif

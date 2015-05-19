@@ -2,8 +2,7 @@
  * including standard types and function prototypes.
  */
 
-#ifdef __CIVLC__
-#else
+#ifndef __CIVLC__
 #define __CIVLC__
 
 // Ignore GNU C extensions, for now...  done elsewhere                                        

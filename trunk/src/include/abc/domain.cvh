@@ -1,8 +1,7 @@
 /* This header file provides types and function prototypes for domains.
  */
 
-#ifdef __DOMAIN__
-#else
+#ifndef __DOMAIN__
 #define __DOMAIN__
 
 /* An enumerated type used to specify how domains are decomposed.
