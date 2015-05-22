@@ -13,6 +13,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
+import edu.udel.cis.vsl.abc.transform.IF.NameTransformer;
 
 /**
  * Transform an AST by modifying the names of entities.
@@ -20,7 +21,8 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * @author zirkel
  * 
  */
-public class NameTransformer extends BaseTransformer {
+public class CommonNameTransformer extends BaseTransformer implements
+		NameTransformer {
 
 	public final static String CODE = "name";
 	public final static String LONG_NAME = "NameTransformer";
@@ -32,7 +34,8 @@ public class NameTransformer extends BaseTransformer {
 	/** Map from identifier nodes to their new names. */
 	private Map<IdentifierNode, String> identifierNameMap;
 
-	public NameTransformer(Map<Entity, String> nameChanges, ASTFactory factory) {
+	public CommonNameTransformer(Map<Entity, String> nameChanges,
+			ASTFactory factory) {
 		super(CODE, LONG_NAME, SHORT_DESCRIPTION, factory);
 		this.nameChanges = nameChanges;
 	}

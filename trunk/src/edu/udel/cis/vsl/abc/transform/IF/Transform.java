@@ -5,10 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
+import edu.udel.cis.vsl.abc.transform.common.CommonNameTransformer;
 import edu.udel.cis.vsl.abc.transform.common.CompareCombiner;
-import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 import edu.udel.cis.vsl.abc.transform.common.Pruner;
+import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 /**
  * This class manages the set of transformations provided by an execution of
@@ -180,5 +182,10 @@ public class Transform {
 	 */
 	public static Combiner compareCombiner() {
 		return Transform.compareCombiner;
+	}
+
+	public static NameTransformer nameTransformer(
+			Map<Entity, String> newNameMap, ASTFactory astFactory) {
+		return new CommonNameTransformer(newNameMap, astFactory);
 	}
 }

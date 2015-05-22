@@ -123,7 +123,7 @@ public class CompareCombiner implements Combiner {
 		checkOutputs(specOutputs, implOutputs);
 		// systemFunctions = combineSystemFunctions(specRoot, implRoot);
 		// nodes.addAll(systemFunctions.values());
-		nameTransformer = new NameTransformer(renameVariables(
+		nameTransformer = new CommonNameTransformer(renameVariables(
 				specOutputs.values(), "_spec"), astFactory);
 		spec = nameTransformer.transform(spec);
 		// TODO: Check consistency of assumptions
