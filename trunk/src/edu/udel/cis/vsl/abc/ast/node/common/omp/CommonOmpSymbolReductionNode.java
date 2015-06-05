@@ -30,8 +30,7 @@ public class CommonOmpSymbolReductionNode extends CommonOmpReductionNode
 
 	@Override
 	public ASTNode copy() {
-		// TODO Auto-generated method stub
-		return null;
+		return new CommonOmpSymbolReductionNode(getSource(), this.operator(), this.variables().copy());
 	}
 
 	@Override
