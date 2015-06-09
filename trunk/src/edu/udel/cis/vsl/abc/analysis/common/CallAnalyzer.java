@@ -2,37 +2,22 @@ package edu.udel.cis.vsl.abc.analysis.common;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import edu.udel.cis.vsl.abc.analysis.IF.Analyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
-import edu.udel.cis.vsl.abc.ast.entity.IF.EntityFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
-import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ScopeParameterizedDeclarationNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IdentifierExpressionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.IfNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.LoopNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.statement.SwitchNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
+import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
+import edu.udel.cis.vsl.abc.ast.type.common.CommonFunctionType;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
@@ -41,48 +26,60 @@ import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
  * Calls through a function pointer are approximated by the set of functions whose type
  * matches the function pointer type.
  * 
- * This could be improved by various forms of points-to analysis.
+ * Analysis is two-phase: First "collect" the set of functions declared for each function type.
+ * Second "process" call nodes using the function-type relation to resolve indirect calls.
  * 
  * @author dwyer
  * 
  */
 public class CallAnalyzer implements Analyzer {
+	Map<FunctionType,Set<Function>> functionsOfAType = new HashMap<FunctionType,Set<Function>>();
 	
-	/*
-	 * Traverse program
-	 *    - collect function declarations
-	 * 
-	 * Traverse function bodies
-	 *    - let f be the function
-	 *    - for each call, c, do
-	 *       - add f to calls(c)
-	 *       - add c to calledFrom(f)
-	 */
-	
-	// Handle FunctionTypeNode as well
-
-	private void processFunctionDefinitionNode(FunctionDefinitionNode funcNode) {
-		// children: identifier, type, contract (optional), body
-		CompoundStatementNode body = funcNode.getBody();
-		Function fEntity = funcNode.getEntity();
+	private void collectProgram(ASTNode node) {
+		if (node instanceof FunctionDefinitionNode) {
+			collectFunctionDefinitionNode((FunctionDefinitionNode)node);
+		} else if (node instanceof FunctionDeclarationNode) {
+			// Will only reach this code if this is a prototype declaration
+			collectFunctionDeclarationNode((FunctionDeclarationNode)node);
+		} else if (node != null) {
+			for (ASTNode child : node.children()) {
+				collectProgram(child);
+			}
+		}
+	}
+	private void collectFunctionDefinitionNode(FunctionDefinitionNode funNode) {
+		Function fEntity = funNode.getEntity();
 		
-		processFunctionBody(body, fEntity);
+		FunctionType funType = (FunctionType) funNode.getTypeNode().getType();
+
+		collectFunctionType(funType);
+		
+		Set<Function> funsOfThisType = getFunctionsOfAType(funType);
+		funsOfThisType.add(fEntity);	
 	}
 
-	private void processFunctionDeclarationNode(FunctionDeclarationNode funcNode) {
-		// children: ident, type, contract.
-		FunctionTypeNode typeNode = funcNode.getTypeNode();
-		SequenceNode<ContractNode> contract = funcNode.getContract();
-		SequenceNode<VariableDeclarationNode> paramsNode = typeNode
-				.getParameters();
-
-		// TBD	
+	private void collectFunctionDeclarationNode(FunctionDeclarationNode funcNode) {
+		collectFunctionType((FunctionType)(funcNode.getTypeNode().getType()));
 	}
 	
-	private void processFunctionTypeNode(FunctionTypeNode funcTypeNode) {
-		// children: ???
-
-		// TBD	
+	private void collectFunctionType(FunctionType funType) {
+		if (getFunctionsOfAType(funType) == null) {
+			functionsOfAType.put(funType, new HashSet<Function>());
+		}
+	}
+		
+	private Set<Function> getFunctionsOfAType(FunctionType funType) {
+		for (FunctionType fType : functionsOfAType.keySet()) {
+			if (funType.compatibleWith(fType)) {
+				return functionsOfAType.get(fType);
+			}
+		}
+		return null;
+	}
+	
+	private void processFunctionDefinitionNode(FunctionDefinitionNode funcNode) {
+		Function fEntity = funcNode.getEntity();	
+		processFunctionBody(funcNode.getBody(), fEntity);
 	}
 	
 	private void processFunctionBody(ASTNode node, Function caller) {
@@ -91,26 +88,41 @@ public class CallAnalyzer implements Analyzer {
 			
 			if (fcn.getFunction() instanceof IdentifierExpressionNode) {
 				IdentifierNode calledFunId = ((IdentifierExpressionNode)fcn.getFunction()).getIdentifier();
+				
+				// Call directly to a function
 				if (calledFunId.getEntity() instanceof Function) {
 					Function callee = (Function)calledFunId.getEntity();
 					caller.getCallees().add(callee);
 					callee.getCallers().add(caller);
 				} else {
-					assert false : "CallAnalyzer expected id in function call node to be a function";
+					// Call through an expression (an identifier) 
+					PointerType pFunType = (PointerType)fcn.getFunction().getConvertedType();
+					FunctionType funType = (FunctionType)pFunType.referencedType();
+				
+					Set<Function> callees = getFunctionsOfAType(funType);
+					
+					assert callees != null : "CallAnalyzer: no function type for indirect call";
+					
+					for (Function callee : callees) {
+						caller.getCallees().add(callee);
+						callee.getCallers().add(caller);
+					}
 				}
-			} else {
-				System.out.println("Found indirect call to : "+fcn.getFunction());
+			} else {				
+				PointerType pFuncType = (PointerType)fcn.getFunction().getConvertedType();
+				Set<Function> callees = functionsOfAType.get(pFuncType.referencedType());
+				for (Function callee : callees) {
+					caller.getCallees().add(callee);
+					callee.getCallers().add(caller);
+				}
 			}
 			
-			
 			// Check arguments for nested calls
-			Iterable<ExpressionNode> args = fcn.getArguments();
-			for (ExpressionNode arg : args) {
+			for (ExpressionNode arg : fcn.getArguments()) {
 				processFunctionBody(arg, caller);
 			}
 		} else if (node != null) {
-			Iterable<ASTNode> children = node.children();
-			for (ASTNode child : children) {
+			for (ASTNode child : node.children()) {
 				processFunctionBody(child, caller);
 			}
 		}
@@ -120,14 +132,48 @@ public class CallAnalyzer implements Analyzer {
 		if (node instanceof FunctionDefinitionNode) {
 			processFunctionDefinitionNode((FunctionDefinitionNode)node);
 		} else if (node != null) {
-			Iterable<ASTNode> children = node.children();
-			for (ASTNode child : children) {
+			for (ASTNode child : node.children()) {
 				processProgram(child);
 			}
 		}
 	}
+
+	@Override
+	public void clear(AST unit) {
+		functionsOfAType.clear();
+		clearNode(unit.getRootNode());
+	}
 	
-	private void printCallGraph(ASTNode node) {
+	private void clearNode(ASTNode node) {
+		if (node != null) {
+			if (node instanceof FunctionDefinitionNode) {
+				Function f = ((FunctionDefinitionNode)node).getEntity();
+				if (f != null) {
+					Set<Function> callers = f.getCallers();
+					if (callers != null) callers.clear();
+					Set<Function> callees = f.getCallees();
+					if (callees != null) callees.clear();
+				}
+			}
+			for (ASTNode child : node.children()) {
+				clearNode(child);
+			}
+		}
+	}
+
+	@Override
+	public void analyze(AST unit) throws SyntaxException {
+		ASTNode root = unit.getRootNode();
+		collectProgram(root);
+		processProgram(root);
+	}
+	
+	static public void printCallGraph(AST unit) {
+		ASTNode root = unit.getRootNode();
+		printCallGraphNodes(root);
+	}
+	
+	static private void printCallGraphNodes(ASTNode node) {
 		if (node instanceof FunctionDefinitionNode) {
 			Function f = ((FunctionDefinitionNode)node).getEntity();
 			System.out.println("Function "+f+" is called by:");
@@ -143,27 +189,10 @@ public class CallAnalyzer implements Analyzer {
 			if (f.getCallees().isEmpty()) 
 				System.out.println("   nothing");
 		} else if (node != null) {
-			Iterable<ASTNode> children = node.children();
-			for (ASTNode child : children) {
-				printCallGraph(child);
+			for (ASTNode child : node.children()) {
+				printCallGraphNodes(child);
 			}
 		}
-	}
-
-
-	// Exported methods...
-
-	@Override
-	public void clear(AST unit) {
-		// TBD
-	}
-
-	@Override
-	public void analyze(AST unit) throws SyntaxException {
-		ASTNode root = unit.getRootNode();
-		processProgram(root);
-		//printCallGraph(root);
-
 	}
 
 }

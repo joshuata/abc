@@ -1,6 +1,5 @@
 package edu.udel.cis.vsl.abc.analysis.IF;
 
-import edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer;
 import edu.udel.cis.vsl.abc.analysis.common.StandardAnalyzer;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
@@ -68,35 +67,6 @@ public class Analysis {
 				.newConversionFactory(typeFactory);
 		Analyzer analyzer = newStandardAnalyzer(configuration, astFactory,
 				entityFactory, conversionFactory);
-
-		analyzer.clear(ast);
-		analyzer.analyze(ast);
-	}
-	
-	/**
-	 * Constructs a new "call" analyzer. This analyzer ...
-
-	 * @return the new call analyzer
-	 */
-	public static Analyzer newCallAnalyzer() {
-		return new CallAnalyzer();
-	}
-	
-	/**
-	 * A convenience method for performing the call analyses on an AST. This
-	 * creates a new call analyzer and then applies it to the given AST.
-	 * 
-	 * @param configuration
-	 *            the ABC application configuration
-	 * @param ast
-	 *            the AST
-	 * @throws SyntaxException
-	 *             if AST contains a syntax error
-	 * @see #newCallAnalyzer()
-	 */
-	public static void performCallAnalysis(Configuration configuration,
-			AST ast) throws SyntaxException {
-		Analyzer analyzer = newCallAnalyzer();
 
 		analyzer.clear(ast);
 		analyzer.analyze(ast);
