@@ -67,9 +67,11 @@ public interface Function extends OrdinaryEntity {
 
 	/**
 	 * Returns the set of functions that call this function either by name or
-	 * through a pointer dereference. Transitive calling relationships are not
-	 * reflected in this set, i.e., if a calls b which calls c, then a is not in
-	 * getCallers() of c (unless of course a directly calls c as well).
+	 * through a pointer dereference (the latter is relation is safely overapproximated). 
+	 * 
+	 * Transitive calling relationships are not reflected in this set, i.e., if a calls 
+	 * b which calls c, then a is not in getCallers() of c (unless of course a directly 
+	 * calls c as well).
 	 * 
 	 * The set is initially empty; a call to
 	 * {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)}
@@ -81,9 +83,10 @@ public interface Function extends OrdinaryEntity {
 
 	/**
 	 * Returns the set of functions called by this function either by name or
-	 * through a pointer dereference. Transitive calling relationships are not
-	 * reflected in this set, i.e., if a calls b which calls c, then c is not in
-	 * getCallees() of a (unless of course a directly calls c as well).
+	 * through a pointer dereference (the latter is relation is safely overapproximated).  
+	 * 
+	 * Transitive calling relationships are not reflected in this set, i.e., if a calls 
+	 * b which calls c, then c is not in getCallees() of a (unless of course a directly calls c as well).
 	 * 
 	 * The set is initially empty; a call to
 	 * {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)}

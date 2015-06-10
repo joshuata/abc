@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entity;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
@@ -75,6 +76,15 @@ public interface AST {
 	 * @return the node in this tree with the given id
 	 */
 	ASTNode getNode(int id);
+	
+	/**
+	 * Returns the entity for the main function.  Returns null if standard analyses
+	 * have yet to be performed.
+	 * 
+	 * @return the entity is the main function of the program
+	 */
+	Function getMain();
+	void setMain(Function f);
 
 	/**
 	 * Pretty-prints the entire tree. This should be a human-readable
