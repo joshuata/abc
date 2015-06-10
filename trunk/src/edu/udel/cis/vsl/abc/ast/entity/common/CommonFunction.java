@@ -21,8 +21,8 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	private boolean isInlined, doesNotReturn;
 
 	private Set<Function> callers = new HashSet<>();
-
 	private Set<Function> callees = new HashSet<>();
+	static Function mainFunction;
 
 	private List<ExpressionNode> preconditions = new LinkedList<>();
 

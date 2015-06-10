@@ -11,6 +11,7 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
+import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.OrdinaryEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -42,6 +43,8 @@ public class CommonAST implements AST {
 	private ArrayList<OrdinaryEntity> externalEntities;
 
 	private Collection<SourceFile> sourceFiles;
+	
+	private Function mainFunction = null;
 
 	public CommonAST(ASTFactory astFactory,
 			SequenceNode<BlockItemNode> root, boolean hasOmpPragma,
@@ -78,6 +81,16 @@ public class CommonAST implements AST {
 	@Override
 	public ASTNode getNode(int id) {
 		return nodes[id];
+	}
+	
+	@Override
+	public void setMain(Function f) {
+		mainFunction = f;
+	}
+	
+	@Override
+	public Function getMain() {
+		return mainFunction;
 	}
 
 	@Override
