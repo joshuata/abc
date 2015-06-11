@@ -68,4 +68,9 @@ public class CallGraphTest {
 	public void indirectcall() throws ABCException, IOException {
 		check("indirectcall");
 	}
+	
+	@Test
+	public void recursivecall() throws ABCException, IOException {
+		check("recursivecall");
+	}
 }
