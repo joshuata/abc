@@ -220,7 +220,9 @@ public class CallAnalyzer implements Analyzer {
 			}
 			System.out.println(" ]");
 			if (!seen.contains(callee)) {
+				seen.add(callee);
 				printCallGraphNodes(callee, pre+" ");
+				seen.remove(callee);
 			} else {
 				System.out.println(pre+" <recursion>");
 			}
