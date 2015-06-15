@@ -10,6 +10,7 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.FunctionConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.LvalueConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.NullPointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.PointerBoolConversion;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.RegularRangeToDomainConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.VoidPointerConversion;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
@@ -248,6 +249,12 @@ public class CommonConversionFactory implements ConversionFactory {
 	private boolean isBool(Type type) {
 		return type instanceof StandardBasicType
 				&& ((StandardBasicType) type).getBasicTypeKind() == BasicTypeKind.BOOL;
+	}
+
+	@Override
+	public RegularRangeToDomainConversion regularRangeToDomainConversion(
+			ObjectType rangeType, DomainType domainType) {
+		return new CommonRegularRangeToDomainConversion(rangeType, domainType);
 	}
 
 }

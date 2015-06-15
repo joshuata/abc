@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.analysis.entity;
 
 import java.util.Iterator;
 
+import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Label;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
@@ -53,6 +54,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
+import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -69,13 +71,20 @@ public class StatementAnalyzer {
 
 	private ExpressionAnalyzer expressionAnalyzer;
 
+	private TypeFactory typeFactory;
+
+	private ConversionFactory conversionFactory;
+
 	// ************************** Constructors ****************************
 
 	StatementAnalyzer(EntityAnalyzer entityAnalyzer,
-			ExpressionAnalyzer expressionAnalyzer) {
+			ExpressionAnalyzer expressionAnalyzer,
+			ConversionFactory conversionFactory, TypeFactory typeFactory) {
 		this.entityAnalyzer = entityAnalyzer;
 		this.nodeFactory = entityAnalyzer.nodeFactory;
 		this.expressionAnalyzer = expressionAnalyzer;
+		this.conversionFactory = conversionFactory;
+		this.typeFactory = typeFactory;
 	}
 
 	// ************************* Private Methods **************************
@@ -313,7 +322,13 @@ public class StatementAnalyzer {
 		}
 		expressionAnalyzer.processExpression(domainNode);
 		domainNodeType = domainNode.getConvertedType();
-		if (!(domainNodeType instanceof DomainType))
+		if (domainNodeType.equals(typeFactory.rangeType())) {
+			domainNode.addConversion(conversionFactory
+					.regularRangeToDomainConversion(
+							(ObjectType) domainNodeType,
+							typeFactory.domainType(1)));
+			domainNodeType = domainNode.getConvertedType();
+		} else if (!(domainNodeType instanceof DomainType))
 			throw error(
 					"Domain expression in $for/$parfor does not have $domain type",
 					domainNode);
