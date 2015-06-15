@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.ast.conversion.IF;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
+import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
@@ -289,6 +290,17 @@ public interface ConversionFactory {
 	 */
 	Conversion assignmentConversion(ExpressionNode rhs, Type newType)
 			throws UnsourcedException;
+
+	/**
+	 * When a range expression is used in $for or $parfor, it is converted
+	 * automatically to $domain type.
+	 * 
+	 * @param rangeType
+	 * @param domainType
+	 * @return
+	 */
+	RegularRangeToDomainConversion regularRangeToDomainConversion(
+			ObjectType rangeType, DomainType domainType);
 
 	/**
 	 * Is this expression a null pointer constant? Prerequisite: node has

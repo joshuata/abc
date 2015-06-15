@@ -115,7 +115,8 @@ public class EntityAnalyzer implements Analyzer {
 		this.expressionAnalyzer = new ExpressionAnalyzer(this,
 				conversionFactory, typeFactory);
 		this.compoundLiteralAnalyzer = new CompoundLiteralAnalyzer(this);
-		this.statementAnalyzer = new StatementAnalyzer(this, expressionAnalyzer);
+		this.statementAnalyzer = new StatementAnalyzer(this,
+				expressionAnalyzer, conversionFactory, typeFactory);
 		this.typeAnalyzer = new TypeAnalyzer(this, typeFactory);
 	}
 
