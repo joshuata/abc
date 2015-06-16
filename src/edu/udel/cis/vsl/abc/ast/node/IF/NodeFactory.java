@@ -11,7 +11,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsOrReadsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
@@ -1773,7 +1773,8 @@ public interface NodeFactory {
 	 *            dependency
 	 * @return the new <code>$depends</code> clause node
 	 */
-	DependsNode newDependsNode(Source source, ExpressionNode expression);
+	DependsNode newDependsNode(Source source, ExpressionNode condition,
+			SequenceNode<ExpressionNode> eventList);
 
 	/**
 	 * Constructs a new node representing a CIVL-C <code>$guard</code> contract
@@ -1800,7 +1801,22 @@ public interface NodeFactory {
 	 *            associated with the <code>$assigns</code> clause
 	 * @return the new <code>$assigns</code> clause node
 	 */
-	AssignsNode newAssignsNode(Source source,
+	AssignsOrReadsNode newAssignsNode(Source source, ExpressionNode condition,
+			SequenceNode<ExpressionNode> expressionList);
+
+	/**
+	 * Constructs a new node representing a CIVL-C <code>$reads</code> contract
+	 * clause. This is used to specify the guard of a function.
+	 * 
+	 * @param source
+	 *            source specification spanning the entire <code>$reads</code>
+	 *            clause, including the entire expression
+	 * @param expressionList
+	 *            the expression list which specifies the memory units
+	 *            associated with the <code>$reads</code> clause
+	 * @return the new <code>$reads</code> clause node
+	 */
+	AssignsOrReadsNode newReadsNode(Source source, ExpressionNode condition,
 			SequenceNode<ExpressionNode> expressionList);
 
 	// external definitions...

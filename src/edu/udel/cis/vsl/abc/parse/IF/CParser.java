@@ -101,6 +101,7 @@ public interface CParser {
 	public static final int EscapeSequence = CivlCParser.EscapeSequence;
 	public static final int ExponentPart = CivlCParser.ExponentPart;
 	public static final int FALSE = CivlCParser.FALSE;
+	public static final int FATOMIC = CivlCParser.FATOMIC;
 	public static final int FLOAT = CivlCParser.FLOAT;
 	public static final int FLOATING_CONSTANT = CivlCParser.FLOATING_CONSTANT;
 	public static final int FOR = CivlCParser.FOR;
@@ -183,6 +184,7 @@ public interface CParser {
 	public static final int PUNDEF = CivlCParser.PUNDEF;
 	public static final int QMARK = CivlCParser.QMARK;
 	public static final int RCURLY = CivlCParser.RCURLY;
+	public static final int READS=CivlCParser.READS;
 	public static final int REXCON = CivlCParser.REXCON;
 	public static final int RANGE = CivlCParser.RANGE;
 	public static final int REAL = CivlCParser.REAL;

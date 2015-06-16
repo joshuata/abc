@@ -146,6 +146,7 @@ ENSURES		:	'$ensures';
 EXISTS		: 	'$exists';
 FALSE		:	'$false';
 FORALL		:	'$forall';
+FATOMIC     :   '$fatomic';
 GUARD       :   '$guard';
 HERE		:	'$here';
 IMPLIES		:	'=>'	|	NotLineStart; // can the NotLineStart be removed?
@@ -162,6 +163,7 @@ RESULT		:	'$result';
 RSLIST		:	'|>';  // LSLIST and RSLIST enclose a scope list
 SCOPEOF		:	'$scopeof';
 SELF		:	'$self';
+READS       :   '$reads';
 ROOT		:	'$root';
 SPAWN		:	'$spawn';
 TRUE		:	'$true';

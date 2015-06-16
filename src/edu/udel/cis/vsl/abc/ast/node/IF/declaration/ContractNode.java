@@ -21,7 +21,7 @@ public interface ContractNode extends ASTNode {
 		/**
 		 * defines memory units assigned by the function
 		 */
-		ASSIGNS,
+		ASSIGNS_READS,
 		/**
 		 * defines features of the dependent processes of the current one
 		 */

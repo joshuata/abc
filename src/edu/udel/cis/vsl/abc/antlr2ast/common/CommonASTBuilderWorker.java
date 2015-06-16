@@ -2498,36 +2498,62 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 						CommonTree itemTree = (CommonTree) contractTree
 								.getChild(i);
 						int itemKind = itemTree.getType();
-						CommonTree exprTree = (CommonTree) itemTree.getChild(0);
 						ContractNode contractNode;
 						Source source = newSource(itemTree);
 
-						if (itemKind == ASSIGNS) {
-							int expressionKind = exprTree.getType();
+						if (itemKind == ASSIGNS || itemKind == READS
+								|| itemKind == DEPENDS) {
 							List<ExpressionNode> argumentList = new ArrayList<>();
+							int expressionCount = itemTree.getChildCount();
+							CommonTree conditionTree = null, listTree;
+							int listKind;
+							ExpressionNode condition = null;
+							SequenceNode<ExpressionNode> list;
 
-							if (expressionKind == ARGUMENT_LIST) {
-								int numArgs = exprTree.getChildCount();
+							if (expressionCount == 2) {
+								conditionTree = (CommonTree) itemTree
+										.getChild(0);
+								listTree = (CommonTree) itemTree.getChild(1);
+							} else {
+								listTree = (CommonTree) itemTree.getChild(0);
+							}
+							listKind = listTree.getType();
+							if (conditionTree != null) {
+								condition = translateExpression(conditionTree,
+										scope);
+							}
+							if (listKind == ARGUMENT_LIST) {
+								int numArgs = listTree.getChildCount();
 
 								for (int j = 0; j < numArgs; j++) {
-									CommonTree argumentTree = (CommonTree) exprTree
+									CommonTree argumentTree = (CommonTree) listTree
 											.getChild(j);
 									ExpressionNode argumentNode = translateExpression(
 											argumentTree, scope);
 
 									argumentList.add(argumentNode);
 								}
-								contractNode = nodeFactory.newAssignsNode(
-										source, nodeFactory.newSequenceNode(
-												newSource(exprTree),
-												"$assigns arguments",
-												argumentList));
+								list = nodeFactory.newSequenceNode(
+										newSource(listTree),
+										"$assigns/$reads/$depends arguments",
+										argumentList);
+								if (itemKind == ASSIGNS)
+									contractNode = nodeFactory.newAssignsNode(
+											source, condition, list);
+								else if (itemKind == READS)
+									contractNode = nodeFactory.newReadsNode(
+											source, condition, list);
+								else
+									contractNode = nodeFactory.newDependsNode(
+											source, condition, list);
 							} else {
 								throw new SyntaxException(
 										"Invalid arguments for $assigns clause",
 										source);
 							}
 						} else {
+							CommonTree exprTree = (CommonTree) itemTree
+									.getChild(0);
 							ExpressionNode expr = translateExpression(exprTree,
 									scope);
 
@@ -2538,10 +2564,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 								break;
 							case REQUIRES:
 								contractNode = nodeFactory.newRequiresNode(
-										source, expr);
-								break;
-							case DEPENDS:
-								contractNode = nodeFactory.newDependsNode(
 										source, expr);
 								break;
 							case GUARD:

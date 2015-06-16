@@ -16,7 +16,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.CompoundInitializerNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsOrReadsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode.ContractKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
@@ -203,27 +203,45 @@ public class DeclarationAnalyzer {
 					break;
 				}
 				case DEPENDS: {
-					ExpressionNode expression = ((DependsNode) clause)
-							.getExpression();
+					DependsNode depends = (DependsNode) clause;
+					ExpressionNode condition = depends.getCondition();
+					SequenceNode<ExpressionNode> eventList = depends
+							.getEventList();
+					int numEvents = eventList.numChildren();
 
-					entityAnalyzer.expressionAnalyzer
-							.processExpression(expression);
-					result.addDepends(expression);
+					if (condition != null)
+						entityAnalyzer.expressionAnalyzer
+								.processExpression(condition);
+					for (int i = 0; i < numEvents; i++) {
+						ExpressionNode event = eventList.getSequenceChild(i);
+
+						entityAnalyzer.expressionAnalyzer
+								.processExpression(event);
+					}
+					result.addDepends(depends);
 					break;
 				}
-				case ASSIGNS: {
-					SequenceNode<ExpressionNode> expressionList = ((AssignsNode) clause)
+				case ASSIGNS_READS: {
+					AssignsOrReadsNode assignsOrReads = (AssignsOrReadsNode) clause;
+					ExpressionNode condition = assignsOrReads.getCondition();
+					SequenceNode<ExpressionNode> expressionList = assignsOrReads
 							.getMemoryList();
 					int numExpressions = expressionList.numChildren();
 
+					if (condition != null)
+						entityAnalyzer.expressionAnalyzer
+								.processExpression(condition);
 					for (int i = 0; i < numExpressions; i++) {
 						ExpressionNode expression = expressionList
 								.getSequenceChild(i);
 
 						entityAnalyzer.expressionAnalyzer
 								.processExpression(expression);
-						result.addAssigns(expression);
 					}
+					if (assignsOrReads.isAssigns())
+						result.addAssigns(assignsOrReads);
+					else
+						result.addReads(assignsOrReads);
 					break;
 				}
 				case GUARD: {

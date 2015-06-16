@@ -17,7 +17,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsOrReadsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.EnsuresNode;
@@ -103,7 +103,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonCompoundInitializerNo
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonDesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonFieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonAbstractFunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonAssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonAssignsOrReadsNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonDependsNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonEnsuresNode;
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonEnumeratorDeclarationNode;
@@ -977,8 +977,9 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public DependsNode newDependsNode(Source source, ExpressionNode expression) {
-		return new CommonDependsNode(source, expression);
+	public DependsNode newDependsNode(Source source, ExpressionNode condition,
+			SequenceNode<ExpressionNode> eventList) {
+		return new CommonDependsNode(source, condition, eventList);
 	}
 
 	@Override
@@ -987,8 +988,18 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
-	public AssignsNode newAssignsNode(Source source,
+	public AssignsOrReadsNode newAssignsNode(Source source,
+			ExpressionNode condition,
 			SequenceNode<ExpressionNode> expressionList) {
-		return new CommonAssignsNode(source, expressionList);
+		return new CommonAssignsOrReadsNode(source, true, condition,
+				expressionList);
+	}
+
+	@Override
+	public AssignsOrReadsNode newReadsNode(Source source,
+			ExpressionNode condition,
+			SequenceNode<ExpressionNode> expressionList) {
+		return new CommonAssignsOrReadsNode(source, false, condition,
+				expressionList);
 	}
 }

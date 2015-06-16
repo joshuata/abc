@@ -10,6 +10,8 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Function;
 import edu.udel.cis.vsl.abc.ast.entity.IF.ProgramEntity;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Scope.ScopeKind;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsOrReadsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
@@ -28,9 +30,10 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 
 	private List<ExpressionNode> postconditions = new LinkedList<>();
 
-	private List<ExpressionNode> depends = new LinkedList<>();
+	private List<DependsNode> depends = new LinkedList<>();
 	private List<ExpressionNode> guards = new LinkedList<>();
-	private List<ExpressionNode> assigns = new LinkedList<>();
+	private List<AssignsOrReadsNode> assigns = new LinkedList<>();
+	private List<AssignsOrReadsNode> reads = new LinkedList<>();
 
 	public CommonFunction(String name, ProgramEntity.LinkageKind linkage,
 			Type type) {
@@ -113,13 +116,13 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	}
 
 	@Override
-	public void addDepends(ExpressionNode expression) {
-		this.depends.add(expression);
+	public void addDepends(DependsNode depends) {
+		this.depends.add(depends);
 	}
 
 	@Override
-	public void addAssigns(ExpressionNode expression) {
-		this.assigns.add(expression);
+	public void addAssigns(AssignsOrReadsNode assigns) {
+		this.assigns.add(assigns);
 	}
 
 	@Override
@@ -128,7 +131,7 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	}
 
 	@Override
-	public Iterator<ExpressionNode> getDepends() {
+	public Iterator<DependsNode> getDepends() {
 		return this.depends.iterator();
 	}
 
@@ -138,8 +141,18 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	}
 
 	@Override
-	public Iterator<ExpressionNode> getAssigns() {
+	public Iterator<AssignsOrReadsNode> getAssigns() {
 		return this.assigns.iterator();
+	}
+
+	@Override
+	public void addReads(AssignsOrReadsNode reads) {
+		this.reads.add(reads);
+	}
+
+	@Override
+	public Iterator<AssignsOrReadsNode> getReads() {
+		return this.reads.iterator();
 	}
 
 }

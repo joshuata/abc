@@ -3,6 +3,8 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
 import java.util.Iterator;
 import java.util.Set;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsOrReadsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDefinitionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
@@ -67,11 +69,12 @@ public interface Function extends OrdinaryEntity {
 
 	/**
 	 * Returns the set of functions that call this function either by name or
-	 * through a pointer dereference (the latter is relation is safely overapproximated). 
+	 * through a pointer dereference (the latter is relation is safely
+	 * overapproximated).
 	 * 
-	 * Transitive calling relationships are not reflected in this set, i.e., if a calls 
-	 * b which calls c, then a is not in getCallers() of c (unless of course a directly 
-	 * calls c as well).
+	 * Transitive calling relationships are not reflected in this set, i.e., if
+	 * a calls b which calls c, then a is not in getCallers() of c (unless of
+	 * course a directly calls c as well).
 	 * 
 	 * The set is initially empty; a call to
 	 * {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)}
@@ -83,10 +86,12 @@ public interface Function extends OrdinaryEntity {
 
 	/**
 	 * Returns the set of functions called by this function either by name or
-	 * through a pointer dereference (the latter is relation is safely overapproximated).  
+	 * through a pointer dereference (the latter is relation is safely
+	 * overapproximated).
 	 * 
-	 * Transitive calling relationships are not reflected in this set, i.e., if a calls 
-	 * b which calls c, then c is not in getCallees() of a (unless of course a directly calls c as well).
+	 * Transitive calling relationships are not reflected in this set, i.e., if
+	 * a calls b which calls c, then c is not in getCallees() of a (unless of
+	 * course a directly calls c as well).
 	 * 
 	 * The set is initially empty; a call to
 	 * {@link edu.udel.cis.vsl.abc.analysis.common.CallAnalyzer#analyze(edu.udel.cis.vsl.abc.ast.IF.AST)}
@@ -150,17 +155,21 @@ public interface Function extends OrdinaryEntity {
 	 */
 	void addPostcondition(ExpressionNode expression);
 
-	void addDepends(ExpressionNode expression);
+	void addDepends(DependsNode depends);
 
-	void addAssigns(ExpressionNode expression);
+	void addAssigns(AssignsOrReadsNode assigns);
+
+	void addReads(AssignsOrReadsNode reads);
 
 	void addGuard(ExpressionNode expression);
 
-	Iterator<ExpressionNode> getDepends();
+	Iterator<DependsNode> getDepends();
 
 	Iterator<ExpressionNode> getGuard();
 
-	Iterator<ExpressionNode> getAssigns();
+	Iterator<AssignsOrReadsNode> getAssigns();
+
+	Iterator<AssignsOrReadsNode> getReads();
 
 	// TODO: perhaps more information is needed. About each parameter:
 	// does it have static extent? What is the extent (constant
