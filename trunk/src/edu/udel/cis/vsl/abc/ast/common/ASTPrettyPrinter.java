@@ -17,7 +17,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.DesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.compound.FieldDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AbstractFunctionDefinitionNode;
-import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.AssignsOrReadsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.ContractNode.ContractKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
@@ -561,21 +561,36 @@ public class ASTPrettyPrinter {
 
 		out.print(prefix);
 		switch (kind) {
-		case ASSIGNS: {
-			AssignsNode assigns = (AssignsNode) contract;
+		case ASSIGNS_READS: {
+			AssignsOrReadsNode assignsOrReads = (AssignsOrReadsNode) contract;
+			ExpressionNode condition = assignsOrReads.getCondition();
 
-			out.print("$assign");
+			if (assignsOrReads.isAssigns())
+				out.print("$assign");
+			else
+				out.print("$reads");
+			if (condition != null) {
+				out.print(" [");
+				out.print(expression2Pretty(condition));
+				out.print("] ");
+			}
 			out.print("{");
-			pPrintSequenceNode(assigns.getMemoryList(), out);
+			pPrintSequenceNode(assignsOrReads.getMemoryList(), out);
 			out.print("}");
 			break;
 		}
 		case DEPENDS: {
 			DependsNode depends = (DependsNode) contract;
+			ExpressionNode condition = depends.getCondition();
 
 			out.print("$depends");
+			if (condition != null) {
+				out.print(" [");
+				out.print(expression2Pretty(condition));
+				out.print("] ");
+			}
 			out.print("{");
-			out.print(expression2Pretty(depends.getExpression()));
+			out.print(sequenceExpression2Pretty(depends.getEventList()));
 			out.print("}");
 			break;
 		}
@@ -1043,13 +1058,28 @@ public class ASTPrettyPrinter {
 		return result;
 	}
 
+	// private static StringBuffer sequenceExpression2Pretty(
+	// SequenceNode<IdentifierExpressionNode> sequence) {
+	// StringBuffer result = new StringBuffer();
+	// int numExpressions = sequence.numChildren();
+	//
+	// for (int i = 0; i < numExpressions; i++) {
+	// IdentifierExpressionNode expression = sequence.getSequenceChild(i);
+	//
+	// if (i != 0)
+	// result.append(", ");
+	// result.append(expression2Pretty(expression));
+	// }
+	// return result;
+	// }
+	//
 	private static StringBuffer sequenceExpression2Pretty(
-			SequenceNode<IdentifierExpressionNode> sequence) {
+			SequenceNode<? extends ExpressionNode> sequence) {
 		StringBuffer result = new StringBuffer();
 		int numExpressions = sequence.numChildren();
 
 		for (int i = 0; i < numExpressions; i++) {
-			IdentifierExpressionNode expression = sequence.getSequenceChild(i);
+			ExpressionNode expression = sequence.getSequenceChild(i);
 
 			if (i != 0)
 				result.append(", ");

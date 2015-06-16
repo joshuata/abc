@@ -812,6 +812,7 @@ functionSpecifier
     | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
       -> ^(ABSTRACT INTEGER_CONSTANT)
     | ABSTRACT -> ^(ABSTRACT)
+    | FATOMIC -> ^(FATOMIC)
     | GLOBAL
     ;
 
@@ -1518,12 +1519,23 @@ declarationList_opt
  * Child: expression
  */
 contractItem
-	: REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression)
-	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression)
-    | DEPENDS LCURLY expression RCURLY -> ^(DEPENDS expression)
-    | GUARD LCURLY expression RCURLY -> ^(GUARD expression)
-    | ASSIGNS LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS argumentExpressionList)
+	: separationLogicItem
+    | porItem
 	;
+
+separationLogicItem
+    :
+      REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression)
+	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression)
+    ;
+
+porItem
+    :
+      DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList)
+    | GUARD (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(GUARD expression? argumentExpressionList)
+    | ASSIGNS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS expression? argumentExpressionList)
+    | READS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(READS expression? argumentExpressionList)
+    ;
 
 /* A CIVL-C contract: sequence of 0 or more
  * contract items.

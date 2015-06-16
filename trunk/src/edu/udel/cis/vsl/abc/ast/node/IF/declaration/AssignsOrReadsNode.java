@@ -20,7 +20,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
  * @author Manchun Zheng
  * 
  */
-public interface AssignsNode extends ContractNode {
+public interface AssignsOrReadsNode extends ContractNode {
 
 	/**
 	 * Gets the list of memory associated with this node.
@@ -29,6 +29,12 @@ public interface AssignsNode extends ContractNode {
 	 */
 	SequenceNode<ExpressionNode> getMemoryList();
 
+	ExpressionNode getCondition();
+
 	@Override
-	AssignsNode copy();
+	AssignsOrReadsNode copy();
+	
+	boolean isAssigns();
+	
+	boolean isReads();
 }

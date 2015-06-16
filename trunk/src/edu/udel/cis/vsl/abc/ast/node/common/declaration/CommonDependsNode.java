@@ -2,6 +2,7 @@ package edu.udel.cis.vsl.abc.ast.node.common.declaration;
 
 import java.io.PrintStream;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DependsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.CommonASTNode;
@@ -9,8 +10,9 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonDependsNode extends CommonASTNode implements DependsNode {
 
-	public CommonDependsNode(Source source, ExpressionNode expression) {
-		super(source, expression);
+	public CommonDependsNode(Source source, ExpressionNode condition,
+			SequenceNode<ExpressionNode> eventList) {
+		super(source, condition, eventList);
 	}
 
 	@Override
@@ -20,7 +22,8 @@ public class CommonDependsNode extends CommonASTNode implements DependsNode {
 
 	@Override
 	public DependsNode copy() {
-		return new CommonDependsNode(getSource(), duplicate(getExpression()));
+		return new CommonDependsNode(getSource(), duplicate(getCondition()),
+				duplicate(getEventList()));
 	}
 
 	@Override
@@ -33,8 +36,14 @@ public class CommonDependsNode extends CommonASTNode implements DependsNode {
 		return ContractKind.DEPENDS;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ExpressionNode getExpression() {
+	public SequenceNode<ExpressionNode> getEventList() {
+		return (SequenceNode<ExpressionNode>) child(1);
+	}
+
+	@Override
+	public ExpressionNode getCondition() {
 		return (ExpressionNode) child(0);
 	}
 

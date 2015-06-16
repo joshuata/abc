@@ -12,6 +12,7 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOMAIN;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.DOUBLE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.ENUM;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.EXTERN;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.FATOMIC;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.FLOAT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.GLOBAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.INLINE;
@@ -149,6 +150,7 @@ public class SpecifierAnalysis {
 	boolean inlineSpecifier = false;
 	boolean noreturnSpecifier = false;
 	boolean abstractSpecifier = false;
+	boolean fatomicSpecifier = false;
 	boolean globalSpecifier = false;
 	// CIVL-C continuity for abstract functions: can occur only once
 	int continuity = 0;
@@ -299,6 +301,9 @@ public class SpecifierAnalysis {
 				break;
 			case GLOBAL:
 				globalSpecifier = true;
+				break;
+			case FATOMIC:
+				fatomicSpecifier = true;
 				break;
 			case ALIGNAS: {
 				int alignKind = ((CommonTree) node.getChild(0)).getType();

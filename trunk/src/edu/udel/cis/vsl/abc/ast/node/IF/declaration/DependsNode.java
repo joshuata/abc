@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.ast.node.IF.declaration;
 
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 
 /**
@@ -24,7 +25,9 @@ public interface DependsNode extends ContractNode {
 	 * @return the boolean condition which is the condition for the dependency
 	 *         relationship among processes.
 	 */
-	ExpressionNode getExpression();
+	SequenceNode<ExpressionNode> getEventList();
+
+	ExpressionNode getCondition();
 
 	@Override
 	DependsNode copy();

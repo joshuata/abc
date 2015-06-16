@@ -2,7 +2,6 @@
 
 void test(int a, int b)
   $depends {$true}
-$guard {$true}
 $assigns {a, b} ;
 /*{
   int c = a + b;
