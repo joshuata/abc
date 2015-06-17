@@ -118,9 +118,13 @@ public interface Type {
 		 */
 		FUNCTION,
 		/**
-		 * The CIVL-C heap type, represened by <code>$heap</code>
+		 * The CIVL-C heap type, represented by <code>$heap</code>
 		 */
 		HEAP,
+		/**
+		 * The CIVL-C memory type, represented by <code>$memory</code>
+		 */
+		MEMORY,
 		/**
 		 * An integer type which is not a standard basic type. The C Standard
 		 * allows a C implementation to provide additional integer types beyond

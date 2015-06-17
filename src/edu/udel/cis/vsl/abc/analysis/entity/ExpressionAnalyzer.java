@@ -136,7 +136,7 @@ public class ExpressionAnalyzer {
 		this.astFactory = entityAnalyzer.astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
 		this.language = entityAnalyzer.configuration.getLanguage();
-		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(typeFactory);
+		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(typeFactory, this.conversionFactory);
 	}
 
 	// ************************* Exported Methods **************************
@@ -604,6 +604,7 @@ public class ExpressionAnalyzer {
 
 			processExpression(argument);
 			addStandardConversions(argument);
+			specialCallAnalyzer.addConversionsForSpecialFunctions(functionName, argument);
 			if (!hasVariableNumArgs || i < expectedNumArgs || isSpecialFunction) {
 				ObjectType lhsType;
 				UnqualifiedObjectType type;

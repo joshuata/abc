@@ -2548,7 +2548,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 											source, condition, list);
 							} else {
 								throw new SyntaxException(
-										"Invalid arguments for $assigns clause",
+										"Invalid arguments for $assigns/$reads clause",
 										source);
 							}
 						} else {

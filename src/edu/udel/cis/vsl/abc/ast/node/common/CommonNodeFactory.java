@@ -1002,4 +1002,5 @@ public class CommonNodeFactory implements NodeFactory {
 		return new CommonAssignsOrReadsNode(source, false, condition,
 				expressionList);
 	}
+
 }

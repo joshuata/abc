@@ -22,6 +22,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType.FloatKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
+import edu.udel.cis.vsl.abc.ast.type.IF.MemoryType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
@@ -67,6 +68,8 @@ public class CommonTypeFactory implements TypeFactory {
 
 	private ObjectType heapType = null;
 
+	private MemoryType memoryType = null;
+
 	private ObjectType scopeType = null;
 
 	private DomainType domainType = null;
@@ -88,12 +91,12 @@ public class CommonTypeFactory implements TypeFactory {
 		((CommonType) type).setId(typeMap.size());
 		typeMap.put(type, type);
 		typeList.add(type);
-		
+
 		// Debugging:
-		
+
 		// System.out.println("Adding type: "+type.toString());
 		// System.out.flush();
-		
+
 	}
 
 	private Type canonicalize(Type type) {
@@ -890,6 +893,15 @@ public class CommonTypeFactory implements TypeFactory {
 			insert(heapType);
 		}
 		return heapType;
+	}
+
+	@Override
+	public MemoryType memoryType() {
+		if (memoryType == null) {
+			memoryType = new CommonMemoryType();
+			insert(memoryType);
+		}
+		return memoryType;
 	}
 
 	@Override

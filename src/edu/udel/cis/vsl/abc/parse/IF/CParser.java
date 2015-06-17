@@ -184,7 +184,7 @@ public interface CParser {
 	public static final int PUNDEF = CivlCParser.PUNDEF;
 	public static final int QMARK = CivlCParser.QMARK;
 	public static final int RCURLY = CivlCParser.RCURLY;
-	public static final int READS=CivlCParser.READS;
+	public static final int READS = CivlCParser.READS;
 	public static final int REXCON = CivlCParser.REXCON;
 	public static final int RANGE = CivlCParser.RANGE;
 	public static final int REAL = CivlCParser.REAL;

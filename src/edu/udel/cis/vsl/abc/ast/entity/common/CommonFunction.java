@@ -154,5 +154,4 @@ public class CommonFunction extends CommonOrdinaryEntity implements Function {
 	public Iterator<AssignsOrReadsNode> getReads() {
 		return this.reads.iterator();
 	}
-
 }

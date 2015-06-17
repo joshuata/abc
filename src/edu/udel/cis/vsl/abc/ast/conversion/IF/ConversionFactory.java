@@ -335,4 +335,13 @@ public interface ConversionFactory {
 	 */
 	boolean isPointerToObject(PointerType type);
 
+	/**
+	 * Returns the memory conversion with old type the given type.
+	 *
+	 * @param type
+	 *            any object type
+	 * @return memory conversion with old type being the given type and new type
+	 *         the memory type
+	 */
+	MemoryConversion memoryConversion(Type type);
 }

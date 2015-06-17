@@ -1791,7 +1791,7 @@ public interface NodeFactory {
 
 	/**
 	 * Constructs a new node representing a CIVL-C <code>$assigns</code>
-	 * contract clause. This is used to specify the guard of a function.
+	 * contract clause.
 	 * 
 	 * @param source
 	 *            source specification spanning the entire <code>$assigns</code>
@@ -1806,7 +1806,7 @@ public interface NodeFactory {
 
 	/**
 	 * Constructs a new node representing a CIVL-C <code>$reads</code> contract
-	 * clause. This is used to specify the guard of a function.
+	 * clause.
 	 * 
 	 * @param source
 	 *            source specification spanning the entire <code>$reads</code>
@@ -2193,5 +2193,4 @@ public interface NodeFactory {
 	 */
 	OmpWorksharingNode newWorksharingNode(Source source,
 			OmpWorksharingNodeKind kind);
-
 }
