@@ -8,6 +8,7 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.FunctionConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.LvalueConversion;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.MemoryConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.NullPointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.PointerBoolConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.RegularRangeToDomainConversion;
@@ -244,6 +245,11 @@ public class CommonConversionFactory implements ConversionFactory {
 			return pointerBoolConversion((PointerType) oldType);
 		throw error("No conversion from type of right hand side to that of left:\n"
 				+ oldType + "\n" + newType);
+	}
+	
+	@Override
+	public MemoryConversion memoryConversion(Type type) {
+		return new CommonMemoryConversion(type, typeFactory.memoryType());
 	}
 
 	private boolean isBool(Type type) {

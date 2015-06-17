@@ -4,9 +4,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * This class maintains the hard-coded information of analyzes the variable
@@ -20,6 +25,9 @@ public class SpecialFunctionCallAnalyzer {
 	// names of special functions handled in this class
 	private final static String SCANF = "scanf";
 	private final static String FSCANF = "fscanf";
+	private final static String ACCESS = "$access";
+	private final static String MODIFIED = "$write";
+	private final static String READ = "$read";
 
 	/** the type factory, for generating types. */
 	@SuppressWarnings("unused")
@@ -34,14 +42,21 @@ public class SpecialFunctionCallAnalyzer {
 	private final Set<String> specialFunctioinNames = new HashSet<>(
 			Arrays.asList(SCANF, FSCANF));
 
+	private final Set<String> memoryTypeFunctionNames = new HashSet<>(
+			Arrays.asList(ACCESS, MODIFIED, READ));
+
+	private ConversionFactory conversionFactory;
+
 	/**
 	 * Creates a new instance of special function call analyzer.
 	 * 
 	 * @param typeFactory
 	 *            The type factory to be used.
 	 */
-	public SpecialFunctionCallAnalyzer(TypeFactory typeFactory) {
+	public SpecialFunctionCallAnalyzer(TypeFactory typeFactory,
+			ConversionFactory conversionFactory) {
 		this.typeFactory = typeFactory;
+		this.conversionFactory = conversionFactory;
 		this.voidPointerType = typeFactory.pointerType(typeFactory.voidType());
 	}
 
@@ -81,6 +96,22 @@ public class SpecialFunctionCallAnalyzer {
 					+ " isn't a special function that needs "
 					+ "type checking of its variable parameters");
 		}
+	}
+
+	void addConversionsForSpecialFunctions(String functionName,
+			ExpressionNode argument) throws SyntaxException {
+		if (memoryTypeFunctionNames.contains(functionName)) {
+			this.addMemoryConversion(argument);
+		}
+	}
+
+	private void addMemoryConversion(ExpressionNode node)
+			throws SyntaxException {
+		Type oldType = node.getConvertedType();
+		Conversion conversion = conversionFactory.memoryConversion(oldType);
+
+		node.addConversion(conversion);
+
 	}
 
 	/**

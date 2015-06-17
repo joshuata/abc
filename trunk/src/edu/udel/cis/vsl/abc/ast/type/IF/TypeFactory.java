@@ -656,6 +656,9 @@ public interface TypeFactory {
 	/** Returns the heap type. */
 	ObjectType heapType();
 
+	/** Returns the memory type. */
+	MemoryType memoryType();
+
 	/** Returns the scope type */
 	ObjectType scopeType();
 

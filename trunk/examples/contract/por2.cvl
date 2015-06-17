@@ -1,0 +1,27 @@
+#include <civlc.cvh>
+#include <memory.cvh>
+
+enum CMD{
+  SEND, RECV
+};
+
+$fatomic void sendRecv(int cmd, void*buf)
+  $depends [cmd==SEND] {$write(buf)}
+  $depends [cmd==RECV] {$access(*buf)}
+  $assigns [cmd==SEND] {$nothing}
+  $assigns [cmd==RECV] {*buf}
+  $reads {*buf}
+{
+  if(cmd == SEND){
+    //send(*buf, ...);
+    int a = 0;
+
+    a++;
+  }else if(cmd==RECV){
+    //*buf=recv(...);
+    int a = 0;
+
+    a++;
+  }
+}
+

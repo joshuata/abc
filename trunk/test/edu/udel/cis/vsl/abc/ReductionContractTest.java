@@ -40,4 +40,9 @@ public class ReductionContractTest {
 	public void por() throws ABCException, IOException {
 		check("por");
 	}
+	
+	@Test
+	public void por2() throws ABCException, IOException {
+		check("por2");
+	}
 }

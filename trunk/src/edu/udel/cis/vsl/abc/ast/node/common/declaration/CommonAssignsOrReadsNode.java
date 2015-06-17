@@ -44,7 +44,10 @@ public class CommonAssignsOrReadsNode extends CommonASTNode implements
 
 	@Override
 	protected void printBody(PrintStream out) {
-		// TODO Auto-generated method stub
+		if (this.isAssigns)
+			out.print("$assigns");
+		else
+			out.print("$reads");
 	}
 
 	@Override
