@@ -136,7 +136,8 @@ public class ExpressionAnalyzer {
 		this.astFactory = entityAnalyzer.astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
 		this.language = entityAnalyzer.configuration.getLanguage();
-		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(typeFactory, this.conversionFactory);
+		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(typeFactory,
+				this.conversionFactory);
 	}
 
 	// ************************* Exported Methods **************************
@@ -604,7 +605,8 @@ public class ExpressionAnalyzer {
 
 			processExpression(argument);
 			addStandardConversions(argument);
-			specialCallAnalyzer.addConversionsForSpecialFunctions(functionName, argument);
+			specialCallAnalyzer.addConversionsForSpecialFunctions(functionName,
+					argument);
 			if (!hasVariableNumArgs || i < expectedNumArgs || isSpecialFunction) {
 				ObjectType lhsType;
 				UnqualifiedObjectType type;
@@ -612,7 +614,8 @@ public class ExpressionAnalyzer {
 				if (i < expectedNumArgs)
 					lhsType = functionType.getParameterType(i);
 				else
-					lhsType = this.specialCallAnalyzer.variableParameterType(functionName, i);
+					lhsType = this.specialCallAnalyzer.variableParameterType(
+							functionName, i);
 				type = conversionFactory.lvalueConversionType(lhsType);
 				try {
 					convertRHS(argument, type);
@@ -1429,8 +1432,10 @@ public class ExpressionAnalyzer {
 		Type type0 = addStandardConversions(arg0);
 		Type type1 = addStandardConversions(arg1);
 
-		if (!(type1 instanceof IntegerType))
-			throw error("Subscript does not have integer type:\n" + type1, arg1);
+		if (!(type1 instanceof IntegerType)
+				&& !(type1.equals(typeFactory.rangeType())))
+			throw error("Subscript does not have integer or range type:\n"
+					+ type1, arg1);
 		// the following will check pointer in any case
 		// if strict C, must also be pointer to complete object type:
 		if (isPointerToCompleteObjectType(type0))

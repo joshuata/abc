@@ -27,7 +27,8 @@ public interface ConstantNode extends ExpressionNode {
 		 */
 		SELF, 
 		STRING,
-		NOTHING
+		NOTHING,
+		WILDCARD
 	}
 	
 	ConstantKind constantKind();
