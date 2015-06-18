@@ -69,6 +69,11 @@ public class CommonSource implements Source {
 	public String getSummary(boolean abbreviated) {
 		return TokenUtils.summarizeRange(firstToken, lastToken, abbreviated);
 	}
+
+	@Override
+	public String getContent(boolean abbreviated) {
+		return TokenUtils.contentOfRange(firstToken, lastToken, abbreviated);
+	}
 }
 
 class SourceTokenIterator implements Iterator<CToken> {

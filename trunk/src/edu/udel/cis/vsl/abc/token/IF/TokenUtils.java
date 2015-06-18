@@ -161,6 +161,34 @@ public class TokenUtils {
 		}
 		return result;
 	}
+	
+	public static String contentOfRange(CToken first, CToken last,
+			boolean abbreviated) {
+		String result = summarizeRangeLocation(first, last, abbreviated);
+		String excerpt = "";
+//		int tokenCount = 0;
+		CToken token = first;
+
+		while (token != null && token != last) {
+			excerpt += token.getText();
+			token = token.getNext();
+//			tokenCount++;
+		}
+		if (token != null) {
+			if (token != last)
+				excerpt += " ... ";
+			excerpt += last.getText();
+		}
+		excerpt = quoteText(excerpt);
+		result = result + " " + excerpt;
+		{ // experimental
+			Formation formation = first.getFormation();
+
+			if (formation != null)
+				result += formation.suffix();
+		}
+		return result;
+	}
 
 	/**
 	 * A utility function to return the text of a token surrounded by double

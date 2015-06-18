@@ -900,12 +900,21 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			return translateDeriv(source, expressionTree, scope);
 		case DOTDOT:
 			return translateRegularRange(source, expressionTree, scope);
+		case ELLIPSIS:
+			return translateWildcard(source, expressionTree, scope);
 		default:
 			throw error("Unknown expression kind", expressionTree);
 		} // end switch
 	}
 
 	// Translation of Declarations and Types...
+
+	private ExpressionNode translateWildcard(Source source,
+			CommonTree expressionTree, SimpleScope scope)
+			throws SyntaxException {
+		// TODO ddd
+		return nodeFactory.newIntegerConstantNode(source, "0");
+	}
 
 	/**
 	 * If typeNode is a struct, union, or enumeration type node, make it in
