@@ -99,7 +99,7 @@ void $apply(void *obj1, $operation op, void *obj2, void *result);
 
 /* *************************** Elaborate tricks ************************** */
 /* elaborating a given variable */
-void elaborate(int x);
+void $elaborate(int x);
 
 int $next_time_count(void);
 
