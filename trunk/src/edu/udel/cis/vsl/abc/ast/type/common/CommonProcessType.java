@@ -51,4 +51,8 @@ public class CommonProcessType extends CommonObjectType implements
 		return other instanceof CommonProcessType;
 	}
 
+	@Override
+	public String toString() {
+		return "$proc";
+	}
 }
