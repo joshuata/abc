@@ -51,4 +51,8 @@ public class CommonScopeType extends CommonObjectType implements
 		return other instanceof CommonScopeType;
 	}
 
+	@Override
+	public String toString() {
+		return "$scope";
+	}
 }

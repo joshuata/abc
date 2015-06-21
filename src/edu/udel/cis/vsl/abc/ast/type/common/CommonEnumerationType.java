@@ -233,11 +233,6 @@ public class CommonEnumerationType extends CommonIntegerType implements
 	}
 
 	@Override
-	public String toString() {
-		return "EnumerationType[tag=" + tag + "]";
-	}
-
-	@Override
 	public void print(String prefix, PrintStream out, boolean abbrv) {
 		out.print("Enumeration[tag=" + tag + ", key=" + key + "]");
 		if (!abbrv && enumerators != null) {
@@ -368,4 +363,8 @@ public class CommonEnumerationType extends CommonIntegerType implements
 		return equivalent ? equivalentTo(other) : compatibleWith(other);
 	}
 
+	@Override
+	public String toString() {
+			return "enum " + tag;
+	}
 }

@@ -326,5 +326,23 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 		return equivalent ? equivalentTo(other, seen) : compatibleWith(other,
 				seen);
 	}
+	
+	@Override
+	public String toString(){
+		String result = "";
+		boolean isFirst=true;
+		
+		result += returnType.toString();
+		result += " (";
+		for(ObjectType parameterType:parameterTypes){
+			if(isFirst)
+				isFirst=false;
+			else
+				result +=", ";
+		result += parameterType.toString();
+		}
+		result += ")";
+		return result;
+	}
 
 }
