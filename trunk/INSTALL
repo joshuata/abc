@@ -11,7 +11,7 @@ openjdk-7-jdk.
 (http://ant.apache.org).
 
 3. Download the tgz archive of VSL dependencies from 
-   http://vsl.cis.udel.edu/tools/vsl_depend,
+   http://vsl.cis.udel.edu/lib/tools/vsl_depend,
    choosing the right .tgz according to your platform:
 	
 	vsl_linux32-1.0.tgz	- 32-bit linux
