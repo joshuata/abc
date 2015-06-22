@@ -35,7 +35,7 @@ openjdk-7-jdk.
 
 2. If you already have the VSL dependencies library, you may
 skip this step.  Otherwise, download the archive of VSL
-dependencies from http://vsl.cis.udel.edu/tools/vsl_depend,
+dependencies from http://vsl.cis.udel.edu/lib/tools/vsl_depend,
 choosing the version for your OS type (32-bit linux,
 64-bit linux, or 64-bit OS X).  Unzip and untar the
 downloaded .tgz file and you will have a folder named "vsl".
