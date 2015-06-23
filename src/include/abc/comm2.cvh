@@ -158,7 +158,7 @@ int $comm_place($comm comm)
  * universe specified by the comm.  The source of the message must equal
  * the place of the comm. */
 void $comm_enqueue($comm comm, $message message)
-  $depends {$access(*comm)}
+  $depends {$call($comm_enqueue(comm, $any))}
   $assigns {*comm}
 ;
 
@@ -183,7 +183,7 @@ $message $comm_seek($comm comm, int source, int tag)
 /* Finds the first matching message, removes it from the communicator,
  * and returns the message */
 $message $comm_dequeue($comm comm, int source, int tag)
-  $depends {$access(*comm)}
+  $depends {$call($comm_dequeue(comm, $any, $any))}
   $assigns {*comm}
 ;
 

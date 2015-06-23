@@ -5,12 +5,12 @@ enum CMD{
   SEND, RECV
 };
 
-$fatomic void sendRecv(int cmd, void*buf)
-  $depends [cmd==SEND] {$write(buf)}
+$atomic_f void sendRecv(enum CMD cmd, void*buf, int**array)
+  $depends [cmd==SEND] {$write(buf), $calls(sendRecv(cmd, buf, ...))}
   $depends [cmd==RECV] {$access(*buf)}
   $assigns [cmd==SEND] {$nothing}
   $assigns [cmd==RECV] {*buf}
-  $reads {*buf}
+  $reads {array[2 .. 5][...], *buf}
 {
   if(cmd == SEND){
     //send(*buf, ...);

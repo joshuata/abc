@@ -902,6 +902,9 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			return translateRegularRange(source, expressionTree, scope);
 		case ELLIPSIS:
 			return translateWildcard(source, expressionTree, scope);
+		case CALLS:
+			return nodeFactory.newCallsNode(source,
+					translateCall(source, expressionTree, scope));
 		default:
 			throw error("Unknown expression kind", expressionTree);
 		} // end switch
@@ -912,8 +915,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	private ExpressionNode translateWildcard(Source source,
 			CommonTree expressionTree, SimpleScope scope)
 			throws SyntaxException {
-		// TODO ddd
-		return nodeFactory.newIntegerConstantNode(source, "0");
+		return nodeFactory.newWildcardNode(source);
 	}
 
 	/**

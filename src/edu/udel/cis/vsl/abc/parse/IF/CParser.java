@@ -61,6 +61,7 @@ public interface CParser {
 	public static final int BOOL = CivlCParser.BOOL;
 	public static final int BREAK = CivlCParser.BREAK;
 	public static final int BinaryExponentPart = CivlCParser.BinaryExponentPart;
+	public static final int CALLS = CivlCParser.CALLS;
 	public static final int CASE = CivlCParser.CASE;
 	public static final int CChar = CivlCParser.CChar;
 	public static final int CHAR = CivlCParser.CHAR;
