@@ -18,6 +18,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.CallsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
@@ -46,6 +47,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
@@ -215,6 +217,9 @@ public class ExpressionAnalyzer {
 				break;
 			case SPAWN:
 				processSpawn((SpawnNode) node);
+				break;
+			case CALLS:
+				processCalls((CallsNode) node);
 				break;
 			default:
 				throw new ABCRuntimeException("Unreachable");
@@ -465,6 +470,8 @@ public class ExpressionAnalyzer {
 			// type is process type, already set
 		} else if (node instanceof HereOrRootNode) {
 			// type is scope type, already set
+		} else if (node instanceof WildcardNode) {
+			node.setInitialType(typeFactory.voidType());
 		} else
 			throw new RuntimeException("Unknown kind of constant node: " + node);
 		if (node.getInitialType() == null)
@@ -630,6 +637,11 @@ public class ExpressionAnalyzer {
 	private void processSpawn(SpawnNode node) throws SyntaxException {
 		processFunctionCall(node.getCall());
 		node.setInitialType(typeFactory.processType());
+	}
+
+	private void processCalls(CallsNode node) throws SyntaxException {
+		processFunctionCall(node.getCall());
+		node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
 	}
 
 	private void processGenericSelection(GenericSelectionNode node)
@@ -1433,7 +1445,8 @@ public class ExpressionAnalyzer {
 		Type type1 = addStandardConversions(arg1);
 
 		if (!(type1 instanceof IntegerType)
-				&& !(type1.equals(typeFactory.rangeType())))
+				&& !(type1.equals(typeFactory.rangeType()))
+				&& !(arg1 instanceof WildcardNode))
 			throw error("Subscript does not have integer or range type:\n"
 					+ type1, arg1);
 		// the following will check pointer in any case

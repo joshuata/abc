@@ -26,6 +26,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.CallsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
@@ -50,6 +51,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
@@ -842,6 +844,21 @@ public interface NodeFactory {
 	 * @return the new expression node
 	 */
 	SizeofNode newSizeofNode(Source source, SizeableNode argument);
+
+	/**
+	 * Constructs a new CIVL-C $calls expression. A spawn expression has the
+	 * form <code>$calls</code> followed by a function call expression. Hence a
+	 * calls node has one argument, which is a function call node.
+	 * 
+	 * @param source
+	 *            source information for the occurrence of the entire
+	 *            <code>$calls</code> expression, including the entire function
+	 *            call
+	 * @param callNode
+	 *            the function call node
+	 * @return the new $calls expression node
+	 */
+	CallsNode newCallsNode(Source source, FunctionCallNode callNode);
 
 	/**
 	 * Constructs a new CIVL-C spawn expression. A spawn expression has the form
@@ -2193,4 +2210,6 @@ public interface NodeFactory {
 	 */
 	OmpWorksharingNode newWorksharingNode(Source source,
 			OmpWorksharingNodeKind kind);
+
+	WildcardNode newWildcardNode(Source source);
 }

@@ -203,7 +203,7 @@ c_keyword	:	AUTO | ASSIGNS | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
 		|	ABSTRACT | BIG_O | CONTIN | DERIV | FORALL | EXISTS | UNIFORM
 		|	REAL | CIVLFOR | PARFOR | DOMAIN | RANGE
 		| 	GLOBAL | SHARED
-        |   FATOMIC
+        |   FATOMIC | CALLS
 		;
 
 punctuator	:	nonPoundPunctuator | HASH ;

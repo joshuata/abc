@@ -16,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.VoidPointerConversion;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.IntegerConstantNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
@@ -208,6 +209,10 @@ public class CommonConversionFactory implements ConversionFactory {
 			throws UnsourcedException {
 		Type oldType = rhs.getConvertedType();
 
+		if (rhs instanceof WildcardNode) {
+			// wildcard node has void type, which means that it can be any type
+			return null;
+		}
 		if (newType.kind() == TypeKind.SCOPE || newType.equals(oldType))
 			return null;
 		if (oldType instanceof DomainType && newType instanceof DomainType)
@@ -246,7 +251,7 @@ public class CommonConversionFactory implements ConversionFactory {
 		throw error("No conversion from type of right hand side to that of left:\n"
 				+ oldType + "\n" + newType);
 	}
-	
+
 	@Override
 	public MemoryConversion memoryConversion(Type type) {
 		return new CommonMemoryConversion(type, typeFactory.memoryType());

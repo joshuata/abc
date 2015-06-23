@@ -33,6 +33,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.CallsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
@@ -566,7 +567,7 @@ public class ASTPrettyPrinter {
 			ExpressionNode condition = assignsOrReads.getCondition();
 
 			if (assignsOrReads.isAssigns())
-				out.print("$assign");
+				out.print("$assigns");
 			else
 				out.print("$reads");
 			if (condition != null) {
@@ -1586,6 +1587,12 @@ public class ASTPrettyPrinter {
 			result.append("$spawn ");
 			result.append(functionCall2Pretty(((SpawnNode) expression)
 					.getCall()));
+			break;
+		case CALLS:
+			result.append("$calls(");
+			result.append(functionCall2Pretty(((CallsNode) expression)
+					.getCall()));
+			result.append(")");
 			break;
 		default:
 			throw new ABCUnsupportedException(

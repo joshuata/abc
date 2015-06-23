@@ -32,6 +32,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.VariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.CallsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
@@ -56,6 +57,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
@@ -116,6 +118,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonTypedefDeclaration
 import edu.udel.cis.vsl.abc.ast.node.common.declaration.CommonVariableDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonAlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonArrowNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCallsNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCastNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCharacterConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonCollectiveExpressionNode;
@@ -139,6 +142,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSelfNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSpawnNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonStringLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonWildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonOrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonSwitchLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.common.omp.CommonOmpDeclarativeNode;
@@ -699,6 +703,11 @@ public class CommonNodeFactory implements NodeFactory {
 	}
 
 	@Override
+	public CallsNode newCallsNode(Source source, FunctionCallNode callNode) {
+		return new CommonCallsNode(source, callNode);
+	}
+
+	@Override
 	public RemoteExpressionNode newRemoteExpressionNode(Source source,
 			ExpressionNode left, IdentifierExpressionNode right) {
 		return new CommonRemoteExpressionNode(source, left, right);
@@ -1001,6 +1010,11 @@ public class CommonNodeFactory implements NodeFactory {
 			SequenceNode<ExpressionNode> expressionList) {
 		return new CommonAssignsOrReadsNode(source, false, condition,
 				expressionList);
+	}
+
+	@Override
+	public WildcardNode newWildcardNode(Source source) {
+		return new CommonWildcardNode(source);
 	}
 
 }

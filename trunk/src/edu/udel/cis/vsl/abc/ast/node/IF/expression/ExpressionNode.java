@@ -65,7 +65,7 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		 * An arrow (<code>e->f</code>) expression; can be cast to
 		 * {@link ArrowNode}.
 		 */
-		ARROW,
+		ARROW, CALLS,
 		/**
 		 * A cast expression, which has the form <code>(typeName)expr</code>;
 		 * can be cast to {@link CastNode}.

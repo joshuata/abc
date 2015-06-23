@@ -166,7 +166,7 @@ constant
 	| FLOATING_CONSTANT
 	| CHARACTER_CONSTANT
 	| SELF | PROCNULL | TRUE | FALSE | RESULT
-	| HERE | ROOT
+	| HERE | ROOT | ELLIPSIS
 	;
 
 enumerationConstant
@@ -289,7 +289,7 @@ argumentExpressionList
 	: -> ^(ARGUMENT_LIST)
 	| assignmentExpression (COMMA assignmentExpression)*
 	  -> ^(ARGUMENT_LIST assignmentExpression+)
-	;
+	 ;
 
 /* 6.5.3 */
 unaryExpression
@@ -311,6 +311,7 @@ unaryExpression
 	| ALIGNOF LPAREN typeName RPAREN
 	  -> ^(ALIGNOF typeName)
 	| spawnExpression
+    | callsExpression
 	;
 
 
@@ -319,6 +320,14 @@ spawnExpression
 	: SPAWN postfixExpressionRoot LPAREN 
 	  argumentExpressionList RPAREN 
 	  -> ^(SPAWN LPAREN postfixExpressionRoot ABSENT
+	       argumentExpressionList RPAREN)
+	;
+
+/* CIVL $calls expression */
+callsExpression
+	: CALLS LPAREN postfixExpressionRoot LPAREN 
+	  argumentExpressionList RPAREN RPAREN
+	  -> ^(CALLS LPAREN postfixExpressionRoot ABSENT
 	       argumentExpressionList RPAREN)
 	;
 

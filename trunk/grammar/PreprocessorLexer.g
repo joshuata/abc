@@ -133,6 +133,7 @@ ABSTRACT	:	'$abstract';
 ASSIGNS     :   '$assigns';
 AT			:	'@';
 BIG_O		:	'$O';
+CALLS       :   '$calls';
 CHOOSE		:	'$choose';
 CIVLATOMIC	:	'$atomic';
 CIVLATOM	:	'$atom';
@@ -146,7 +147,7 @@ ENSURES		:	'$ensures';
 EXISTS		: 	'$exists';
 FALSE		:	'$false';
 FORALL		:	'$forall';
-FATOMIC     :   '$fatomic';
+FATOMIC     :   '$atomic_f';
 GUARD       :   '$guard';
 HERE		:	'$here';
 IMPLIES		:	'=>'	|	NotLineStart; // can the NotLineStart be removed?
