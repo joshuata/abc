@@ -3,7 +3,7 @@ package edu.udel.cis.vsl.abc.ast.conversion.common;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 
-public class CommonConversion implements Conversion {
+public abstract class CommonConversion implements Conversion {
 
 	private final static int classCode = CommonConversion.class.hashCode();
 

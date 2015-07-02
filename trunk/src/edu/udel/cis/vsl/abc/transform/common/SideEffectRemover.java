@@ -1311,9 +1311,10 @@ public class SideEffectRemover extends BaseTransformer {
 			return translateSizeof((SizeofNode) expression);
 		case SPAWN:
 			return translateSpawn((SpawnNode) expression);
+		default:
+			throw new ABCUnsupportedException("removing side-effects for "
+					+ kind + " expression");
 		}
-		throw new ABCRuntimeException("Unexpected kind of expression (" + kind
-				+ ") in " + expression);
 	}
 
 	// Declarations...
@@ -1425,16 +1426,11 @@ public class SideEffectRemover extends BaseTransformer {
 
 		ExprTriple triple = translate(expr);
 		List<BlockItemNode> result;
+		ExpressionNode newExpr = triple.getNode();
 
 		// expr part of triple may contain function call/spawn
 		// makesef(triple);
 		result = triple.getBefore();
-
-		ExpressionNode newExpr = triple.getNode();
-		// ExpressionKind kind = newExpr.expressionKind();
-
-		// if(kind!=ExpressionKind.IDENTIFIER_EXPRESSION &&
-		// kind!=ExpressionKind.CONSTANT)
 		if (!newExpr.isSideEffectFree(true)
 				&& !containsEquiv(triple.getBefore(), newExpr)
 				&& !containsEquiv(triple.getAfter(), newExpr))
@@ -1831,7 +1827,7 @@ public class SideEffectRemover extends BaseTransformer {
 	}
 
 	/**
-	 * TODO Given a statement, computes a list of block items whose execution is
+	 * Given a statement, computes a list of block items whose execution is
 	 * equivalent to the execution of the statement, but which are all in normal
 	 * form. May result in the modification of the statement.
 	 * 
@@ -1841,10 +1837,6 @@ public class SideEffectRemover extends BaseTransformer {
 	 */
 	List<BlockItemNode> translateStatement(StatementNode statement) {
 		switch (statement.statementKind()) {
-		// case ASSERT:
-		// return translateAssert((AssertNode) statement);
-		// case ASSUME:
-		// return translateAssume((AssumeNode) statement);
 		case ATOMIC:
 			return translateAtomic((AtomicNode) statement);
 		case CHOOSE:
@@ -2035,7 +2027,7 @@ public class SideEffectRemover extends BaseTransformer {
 	}
 
 	/**
-	 * TODO
+	 * 
 	 * 
 	 * @param choose
 	 * @return
@@ -2091,9 +2083,8 @@ public class SideEffectRemover extends BaseTransformer {
 	}
 
 	/**
-	 * TODO simplify me using translateGeneric? Returns a list of block items in
-	 * normal form that is equivalent to the given struct or union type
-	 * declaration.
+	 * Returns a list of block items in normal form that is equivalent to the
+	 * given struct or union type declaration.
 	 * 
 	 * @param structOrUnion
 	 * @return
@@ -2212,42 +2203,22 @@ public class SideEffectRemover extends BaseTransformer {
 	@Override
 	public AST transform(AST ast) throws SyntaxException {
 		SequenceNode<BlockItemNode> rootNode = ast.getRootNode();
+		AST newAST;
+		List<BlockItemNode> newBlockItems = new ArrayList<>();
 
 		assert this.astFactory == ast.getASTFactory();
 		assert this.nodeFactory == astFactory.getNodeFactory();
 		ast.release();
-
-		List<BlockItemNode> newBlockItems = new ArrayList<>();
-
 		for (int i = 0; i < rootNode.numChildren(); i++) {
 			BlockItemNode node = rootNode.getSequenceChild(i);
 			List<BlockItemNode> normalNodes = this.translateBlockItem(node);
 
 			removeNodes(normalNodes);
 			newBlockItems.addAll(normalNodes);
-			// if (node instanceof VariableDeclarationNode) {
-			// List<BlockItemNode> sefNodes = this
-			// .translateVariableDeclaration((VariableDeclarationNode) node);
-			//
-			// node.remove();
-			// if (sefNodes.size() == 1)
-			// rootNode.setChild(i, sefNodes.get(0));
-			// else
-			// rootNode.setChild(
-			// i,
-			// nodeFactory.newCompoundStatementNode(
-			// node.getSource(), sefNodes));
-			// } else if (node instanceof FunctionDefinitionNode) {
-			// normalizeFunctionDefinition((FunctionDefinitionNode) node);
-			// }
 		}
 		rootNode = nodeFactory.newTranslationUnitNode(rootNode.getSource(),
 				newBlockItems);
-
-		AST newAST = astFactory.newAST(rootNode, ast.getSourceFiles());
-
-		// newAST.prettyPrint(System.out, false);
-
+		newAST = astFactory.newAST(rootNode, ast.getSourceFiles());
 		return newAST;
 	}
 

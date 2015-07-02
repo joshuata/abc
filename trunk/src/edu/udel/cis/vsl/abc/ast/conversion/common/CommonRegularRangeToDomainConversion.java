@@ -21,4 +21,9 @@ public class CommonRegularRangeToDomainConversion extends CommonConversion
 	public DomainType getNewType() {
 		return (DomainType) super.getNewType();
 	}
+
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.REG_RANGE_DOMAIN;
+	}
 }

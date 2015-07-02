@@ -26,4 +26,9 @@ public class CommonFunctionConversion extends CommonConversion implements
 		return "Function" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.FUNCTION;
+	}
+
 }

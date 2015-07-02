@@ -26,4 +26,8 @@ public class CommonCompatibleStructureOrUnionConversion extends
 		return "CompatibleStructureOrUnion" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.COMPATIBLE_STRUCT_UNION;
+	}
 }

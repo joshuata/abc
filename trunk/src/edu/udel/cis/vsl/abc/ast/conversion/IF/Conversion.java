@@ -15,6 +15,34 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 public interface Conversion {
 
 	/**
+	 * Kind of conversions
+	 */
+	public enum ConversionKind {
+		/** can be safely casted to {@link ArithmeticConversion} */
+		ARITHMETIC,
+		/** can be safely casted to {@link ArrayConversion} */
+		ARRAY,
+		/** can be safely casted to {@link CompatiblePointerConversion} */
+		COMPATIBLE_POINTER,
+		/** can be safely casted to {@link CompatibleStructureOrUnionConversion} */
+		COMPATIBLE_STRUCT_UNION,
+		/** can be safely casted to {@link FunctionConversion} */
+		FUNCTION,
+		/** can be safely casted to {@link LvalueConversion} */
+		LVALUE,
+		/** can be safely casted to {@link MemoryConversion} */
+		MEMORY,
+		/** can be safely casted to {@link NullPointerConversion} */
+		NULL_POINTER,
+		/** can be safely casted to {@link PointerBoolConversion} */
+		POINTER_BOOL,
+		/** can be safely casted to {@link RegularRangeToDomainConversion} */
+		REG_RANGE_DOMAIN,
+		/** can be safely casted to {@link VoidPointerConversion} */
+		VOID_POINTER
+	}
+
+	/**
 	 * Returns the type of the entity before applying this conversion.
 	 * 
 	 * @return the pre-conversion type
@@ -27,5 +55,12 @@ public interface Conversion {
 	 * @return the post-conversion type
 	 */
 	Type getNewType();
+
+	/**
+	 * Returns the kind of the conversion.
+	 * 
+	 * @return the kind of the conversion
+	 */
+	ConversionKind conversionKind();
 
 }

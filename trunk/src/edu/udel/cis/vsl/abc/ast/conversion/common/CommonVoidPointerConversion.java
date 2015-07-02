@@ -25,4 +25,9 @@ public class CommonVoidPointerConversion extends CommonConversion implements
 		return "VoidPointer" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.VOID_POINTER;
+	}
+
 }

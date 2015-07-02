@@ -26,4 +26,8 @@ public class CommonNullPointerConversion extends CommonConversion implements
 		return "NullPointer" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.NULL_POINTER;
+	}
 }

@@ -27,4 +27,9 @@ public class CommonPointerBoolConversion extends CommonConversion implements
 		return "PointerBool" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.POINTER_BOOL;
+	}
+
 }

@@ -26,4 +26,9 @@ public class CommonArithmeticConversion extends CommonConversion implements
 		return "Arithmetic" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.ARITHMETIC;
+	}
+
 }
