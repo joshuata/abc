@@ -27,4 +27,9 @@ public class CommonLvalueConversion extends CommonConversion implements
 		return "Lvalue" + super.toString();
 	}
 
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.LVALUE;
+	}
+
 }

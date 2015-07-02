@@ -25,4 +25,9 @@ public class CommonCompatiblePointerConversion extends CommonConversion
 	public String toString() {
 		return "CompatiblePointer" + super.toString();
 	}
+
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.COMPATIBLE_POINTER;
+	}
 }

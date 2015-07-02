@@ -20,4 +20,10 @@ public class CommonMemoryConversion extends CommonConversion implements
 	public String toString() {
 		return "Memory" + super.toString();
 	}
+
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.MEMORY;
+	}
+
 }

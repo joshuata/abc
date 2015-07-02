@@ -26,4 +26,9 @@ public class CommonArrayConversion extends CommonConversion implements
 	public String toString() {
 		return "Array" + super.toString();
 	}
+
+	@Override
+	public ConversionKind conversionKind() {
+		return ConversionKind.ARRAY;
+	}
 }
