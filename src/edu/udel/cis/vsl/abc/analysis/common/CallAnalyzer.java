@@ -140,8 +140,6 @@ public class CallAnalyzer implements Analyzer {
 
 					Set<Function> callees = getFunctionsOfAType(funType);
 
-					// assert callees != null :
-					// "CallAnalyzer: no function type for indirect call";
 					if (callees != null)
 						for (Function callee : callees) {
 							caller.getCallees().add(callee);
@@ -149,13 +147,14 @@ public class CallAnalyzer implements Analyzer {
 						}
 				}
 			} else {
-				PointerType pFuncType = (PointerType) fcn.getFunction()
+				FunctionType funType = (FunctionType) fcn.getFunction()
 						.getConvertedType();
-				Set<Function> callees = functionsOfAType.get(pFuncType
-						.referencedType());
-				for (Function callee : callees) {
-					caller.getCallees().add(callee);
-					callee.getCallers().add(caller);
+				Set<Function> callees = functionsOfAType.get(funType);
+				if (callees != null) {
+					for (Function callee : callees) {
+						caller.getCallees().add(callee);
+						callee.getCallers().add(caller);
+					}
 				}
 			}
 
@@ -209,6 +208,7 @@ public class CallAnalyzer implements Analyzer {
 	public void analyze(AST unit) throws SyntaxException {
 		currentAST = unit;
 		ASTNode root = unit.getRootNode();
+		
 		collectProgram(root);
 		processProgram(root);
 	}
