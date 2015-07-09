@@ -7,6 +7,7 @@
 
 /* includes civlc.cvh because this library references $scope */
 #include <civlc.cvh>
+#include <bundle.cvh>
 
 /* ********************************* Types ********************************* */
 
@@ -71,7 +72,7 @@ $collect_checker $collect_checker_create($scope scope,
 void $collect_checker_destroy($collect_checker checker);
 
 /* Do a check for a collecive operation of one process */
-void $collect_check($collect_checker checker, int place, int nprocs,
-		    int routine_tag, int root, int op, int numTypes, void * datatypes);
+_Bool $collect_check($collect_checker checker, int place, int nprocs,
+		    $bundle entries);
 
 #endif

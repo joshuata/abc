@@ -3,6 +3,7 @@
 
 #include <civlc.cvh>
 #include <comm.cvh>
+#include <bundle.cvh>
 
 #define BCAST_TAG        9999
 #define REDUCE_TAG       9998
@@ -180,6 +181,24 @@ $scope CMPI_Proc_scope($comm);
 /* Assert that the size of the primitive type of the object pointed
    'buf' is consistent with the size of the given MPI_Datatype */
 void CMPI_AssertConsistentType(void * buf, MPI_Datatype datatype);
+
+/* Create a $bundle type object which contains a sequence of entries
+   that identify a group of consistent MPI collective routines. MPI
+   collective routines should be reached by every process in the same
+   communicator with the same order 
+   Arguments:
+   comm: the MPI communicator all the processes are belong to.
+   routineTag: the tag indicating a collective routine.
+   root: rank of the root process
+   op: a int type object representing the enumerator of the MPI_Op, 
+       if MPI_Op is not part of the arguments of the collective routine, 
+       this argument should be set 0.
+   numDatatypes: the number of datatypes involved in the messages.
+   datatypes: the datatype array stores datatypes enumerators involved in 
+              the message.
+*/
+$bundle CMPI_CreateCoroutineEntries(int routineTag, int root, 
+				    int op, int numDatatypes, int * datatypes);
 #endif
 
 
