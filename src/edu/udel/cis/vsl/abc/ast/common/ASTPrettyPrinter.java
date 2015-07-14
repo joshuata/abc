@@ -1143,6 +1143,11 @@ public class ASTPrettyPrinter {
 				out.print("\n");
 				pPrintStatement(out, myIndent, bodyNode, true, false);
 			}
+			if (bodyNode != null
+					&& !(bodyNode instanceof CompoundStatementNode)) {
+				out.print("\n");
+				out.print(prefix);
+			}
 			out.print("while(");
 			out.print(condition);
 			out.print(");");

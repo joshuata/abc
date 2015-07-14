@@ -29,7 +29,7 @@ public class SideEffectRemoverTest {
 				.compileAndLink(new File[] { file }, Language.CIVL_C);
 
 		program.applyTransformers(codes);
-		// program.prettyPrint(System.out);
+		program.prettyPrint(System.out);
 
 		Program outputProgram = f.compileAndLink(new File[] { outputFile },
 				Language.CIVL_C);
@@ -85,5 +85,10 @@ public class SideEffectRemoverTest {
 	@Test
 	public void types() throws ABCException, IOException {
 		check("types.c");
+	}
+
+	@Test
+	public void doWhile() throws ABCException, IOException {
+		check("doWhile.c");
 	}
 }

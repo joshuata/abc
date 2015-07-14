@@ -1482,12 +1482,14 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param stmt
 	 *            any non-null statement
-	 * @return a compound statement equivalent to the given one
+	 * @return a compound statement equivalent to the given one with parent
+	 *         being null
 	 */
 	private CompoundStatementNode makeCompound(StatementNode stmt) {
-		if (stmt instanceof CompoundStatementNode)
+		if (stmt instanceof CompoundStatementNode) {
+			stmt.remove();
 			return (CompoundStatementNode) stmt;
-		else {
+		} else {
 			stmt.remove();
 			return nodeFactory.newCompoundStatementNode(stmt.getSource(),
 					Arrays.asList((BlockItemNode) stmt));
@@ -1589,7 +1591,6 @@ public class SideEffectRemover extends BaseTransformer {
 		} else {
 			CompoundStatementNode body = makeCompound(forLoop.getBody());
 
-			body.remove();
 			forLoop.setBody(body);
 			body.insertChildren(body.numChildren(), incItems);
 			forLoop.setIncrementer(null);
@@ -1618,7 +1619,6 @@ public class SideEffectRemover extends BaseTransformer {
 			Source condSource = cond.getSource();
 			CompoundStatementNode body = makeCompound(loop.getBody());
 
-			body.remove();
 			loop.setBody(body);
 			condItems.add(nodeFactory.newIfNode(condSource, nodeFactory
 					.newOperatorNode(condSource, Operator.NOT,
@@ -1694,16 +1694,66 @@ public class SideEffectRemover extends BaseTransformer {
 		doLoop.setCondition(condTriple.getNode());
 
 		List<BlockItemNode> condItems = condTriple.getBefore();
+		List<BlockItemNode> result = new LinkedList<>();
 
 		if (condItems.isEmpty()) {
 			// nothing to do
 		} else {
 			CompoundStatementNode body = makeCompound(doLoop.getBody());
+			List<BlockItemNode> newCondItems = new LinkedList<>();
 
-			body.insertChildren(body.numChildren(), condItems);
-			doLoop.setCondition(condTriple.getNode());
+			for (BlockItemNode item : condItems) {
+				if (item instanceof VariableDeclarationNode) {
+					VariableDeclarationNode variable = (VariableDeclarationNode) item;
+					StatementNode assign = initializer2Assignment(variable);
+
+					result.add(pureDeclaration(variable));
+					if (assign != null)
+						newCondItems.add(assign);
+				} else
+					newCondItems.add(item);
+			}
+
+			body.insertChildren(body.numChildren(), newCondItems);
+			doLoop.setBody(body);
+			// doLoop.setCondition(condTriple.getNode());
 		}
-		return Arrays.asList((BlockItemNode) doLoop);
+		result.add(doLoop);
+		if (result.size() > 1) {
+			removeNodes(result);
+			StatementNode compound = nodeFactory.newCompoundStatementNode(
+					doLoop.getSource(), result);
+
+			result.clear();
+			result.add(compound);
+		}
+		return result;
+	}
+
+	private StatementNode initializer2Assignment(
+			VariableDeclarationNode variable) {
+		InitializerNode initializer = variable.getInitializer();
+
+		if (initializer == null)
+			return null;
+		assert initializer instanceof ExpressionNode;
+
+		ExpressionNode rhs = ((ExpressionNode) initializer).copy();
+		ExpressionNode lhs = nodeFactory.newIdentifierExpressionNode(
+				variable.getSource(), variable.getIdentifier().copy());
+		ExpressionNode assign = nodeFactory.newOperatorNode(
+				variable.getSource(), Operator.ASSIGN, Arrays.asList(lhs, rhs));
+
+		return nodeFactory.newExpressionStatementNode(assign);
+	}
+
+	private VariableDeclarationNode pureDeclaration(
+			VariableDeclarationNode variable) {
+		if (variable.getInitializer() == null)
+			return variable;
+		return this.nodeFactory.newVariableDeclarationNode(
+				variable.getSource(), variable.getIdentifier().copy(), variable
+						.getTypeNode().copy());
 	}
 
 	/**
@@ -2219,6 +2269,7 @@ public class SideEffectRemover extends BaseTransformer {
 		rootNode = nodeFactory.newTranslationUnitNode(rootNode.getSource(),
 				newBlockItems);
 		newAST = astFactory.newAST(rootNode, ast.getSourceFiles());
+		// newAST.prettyPrint(System.out, true);
 		return newAST;
 	}
 
