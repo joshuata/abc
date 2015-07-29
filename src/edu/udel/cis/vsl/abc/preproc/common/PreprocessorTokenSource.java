@@ -1658,7 +1658,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 				try {
 					StringToken result;
 
-					if (pureStringTokens.size() == 1) {
+					if (pureStringTokens.size() != 1) {
 						result = tokenFactory.newStringToken(pureStringTokens);
 					} else {
 						result = tokenFactory.newStringToken(pureStringTokens
