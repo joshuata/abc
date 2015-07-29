@@ -1521,34 +1521,35 @@ public class PreprocessorTokenSource implements CTokenSource {
 		}
 	}
 
-//	/**
-//	 * Returns the token for node that follows the next node in DFS order, or
-//	 * null if there is no such node.
-//	 * 
-//	 * @return the token of the node that follows the next node
-//	 */
-//	private Token peek() {
-//		CommonTree node = (CommonTree) getSuccessorNode(getNextInputNode());
-//
-//		if (node == null)
-//			return null;
-//		return node.getToken();
-//	}
+	// /**
+	// * Returns the token for node that follows the next node in DFS order, or
+	// * null if there is no such node.
+	// *
+	// * @return the token of the node that follows the next node
+	// */
+	// private Token peek() {
+	// CommonTree node = (CommonTree) getSuccessorNode(getNextInputNode());
+	//
+	// if (node == null)
+	// return null;
+	// return node.getToken();
+	// }
 
-//	/**
-//	 * Determines whether the token that follows the next node in DFS order has
-//	 * the given type. If the token is null, returns false.
-//	 * 
-//	 * @param tokenType
-//	 *            a token type
-//	 * @return true iff the token of the node that follows the next node has
-//	 *         type tokenType
-//	 */
-//	private boolean peekAheadHasType(int tokenType) {
-//		Token token = peek();
-//
-//		return token != null && token.getType() == tokenType;
-//	}
+	// /**
+	// * Determines whether the token that follows the next node in DFS order
+	// has
+	// * the given type. If the token is null, returns false.
+	// *
+	// * @param tokenType
+	// * a token type
+	// * @return true iff the token of the node that follows the next node has
+	// * type tokenType
+	// */
+	// private boolean peekAheadHasType(int tokenType) {
+	// Token token = peek();
+	//
+	// return token != null && token.getType() == tokenType;
+	// }
 
 	private boolean peekAheadSkipWSHasType(int tokenType) {
 		CommonTree node = (CommonTree) getSuccessorNode(getNextInputNode());
@@ -1655,9 +1656,14 @@ public class PreprocessorTokenSource implements CTokenSource {
 				}
 				stringLiteralBuffer.clear();
 				try {
-					StringToken result = tokenFactory
-							.newStringToken(pureStringTokens);
+					StringToken result;
 
+					if (pureStringTokens.size() == 1) {
+						result = tokenFactory.newStringToken(pureStringTokens);
+					} else {
+						result = tokenFactory.newStringToken(pureStringTokens
+								.get(0));
+					}
 					addOutputHelper(result);
 				} catch (SyntaxException e) {
 					throw new PreprocessorException(e.getMessage(),
