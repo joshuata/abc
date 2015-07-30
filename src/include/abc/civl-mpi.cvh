@@ -105,7 +105,7 @@ typedef enum {
 #endif
 
 /* Definition of CMPI_Gcomm and MPI_Comm */
-typedef struct $mpi_gcomm $mpi_gcomm;
+typedef struct $mpi_gcomm $mpi_gcomm; 
 
 /****************************** Helper Functions **********************************/
 int sizeofDatatype(MPI_Datatype);
