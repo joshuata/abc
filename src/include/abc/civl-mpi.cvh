@@ -22,11 +22,11 @@
 #define COMMFREE_TAG     9985
 
 /* Definition of CIVL-MPI */
-typedef enum __MPI_Sys_status__{
+typedef enum _mpi_sys_status_{
   __UNINIT,
   __INIT,
   __FINALIZED
-}__MPI_Sys_status__;
+}$mpi_sys_status;
 
 /**************************** Redundent Definitions *******************************/
 /* The independence between civlmpi.cvh and mpi.h causes redundent definition */
@@ -105,82 +105,82 @@ typedef enum {
 #endif
 
 /* Definition of CMPI_Gcomm and MPI_Comm */
-typedef struct CMPI_Gcomm CMPI_Gcomm;
+typedef struct $mpi_gcomm $mpi_gcomm;
 
 /****************************** Helper Functions **********************************/
 int sizeofDatatype(MPI_Datatype);
 
-void CMPI_Set_status(__MPI_Sys_status__ newStatus);
+void $mpi_set_status($mpi_sys_status newStatus);
 
-__MPI_Sys_status__ CMPI_Get_status(void);
+$mpi_sys_status $mpi_get_status(void);
 
 /************************** MPI LIB Implementations *******************************/
-$abstract double CMPI_time(int i);
+$abstract double $mpi_time(int i);
 
-CMPI_Gcomm CMPI_Gcomm_create($scope, int);
+$mpi_gcomm $mpi_gcomm_create($scope, int);
 
-void CMPI_Gcomm_destroy(CMPI_Gcomm);
+void $mpi_gcomm_destroy($mpi_gcomm);
 
-MPI_Comm CMPI_Comm_create($scope, CMPI_Gcomm , int);
+MPI_Comm $mpi_comm_create($scope, $mpi_gcomm, int);
 
-void CMPI_Comm_destroy(MPI_Comm);
+void $mpi_comm_destroy(MPI_Comm);
 
-int _MPI_Init(void);
+int $mpi_init(void);
 
-int _MPI_Finalize(void);
+int $mpi_finalize(void);
 
-int CMPI_Send(const void *, int, MPI_Datatype, int, int, $comm);
+int $mpi_send(const void *, int, MPI_Datatype, int, int, $comm);
 
-int CMPI_Recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *);
+int $mpi_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *);
 
-int CMPI_Sendrecv(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
+int $mpi_sendrecv(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 		  int dest, int sendtag, void *recvbuf, int recvcount, 
 		  MPI_Datatype recvtype, int source, int recvtag,
 		  $comm comm, MPI_Status *status);
 
-int CMPI_Collective_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *, 
+int $mpi_collective_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *, 
 			 char *);
 
-int CMPI_Bcast(void *, int, MPI_Datatype, int, int, MPI_Comm, char *);
+int $mpi_bcast(void *, int, MPI_Datatype, int, int, MPI_Comm, char *);
 
-int CMPI_Reduce(const void*, void*, int,
+int $mpi_reduce(const void*, void*, int,
 		MPI_Datatype, MPI_Op, int, int,
 		MPI_Comm, char *);
 
-int CMPI_Gather(const void*, int, MPI_Datatype, 
+int $mpi_gather(const void*, int, MPI_Datatype, 
 	       void*, int, MPI_Datatype, int, int, MPI_Comm, char *);
 
-int CMPI_Gatherv(const void*, int, MPI_Datatype,
+int $mpi_gatherv(const void*, int, MPI_Datatype,
 		void*, const int[], const int[],
 		 MPI_Datatype, int, int, 
 		 MPI_Comm, char *);
 
-int CMPI_Scatter(const void*, int, MPI_Datatype, 
+int $mpi_scatter(const void*, int, MPI_Datatype, 
 		 void*, int, MPI_Datatype, int,
 		 int, MPI_Comm, char *);
 
-int CMPI_Scatterv(const void*, const int[], const
+int $mpi_scatterv(const void*, const int[], const
 		 int[], MPI_Datatype, void* ,
 		 int, MPI_Datatype, int, int,
 		  MPI_Comm, char *);
 
-void* CMPI_PointerAdd(void*, int, MPI_Datatype);
+void* $mpi_pointerAdd(void*, int, MPI_Datatype);
 
-int CMPI_NewGcomm($scope, CMPI_Gcomm);
+int $mpi_newGcomm($scope, $mpi_gcomm);
 
-CMPI_Gcomm CMPI_GetGcomm($scope, int);
+$mpi_gcomm $mpi_getGcomm($scope, int);
 
-int CMPI_Comm_dup($scope, MPI_Comm, MPI_Comm *, char *);
+int $mpi_comm_dup($scope, MPI_Comm, MPI_Comm *, char *);
 
-int CMPI_Comm_free(MPI_Comm *);
+int $mpi_comm_free(MPI_Comm *);
 
-$scope CMPI_Root_scope($comm);
+$scope $mpi_root_scope($comm);
 
-$scope CMPI_Proc_scope($comm);
+$scope $mpi_proc_scope($comm);
 
 /* Assert that the size of the primitive type of the object pointed
    'buf' is consistent with the size of the given MPI_Datatype */
-void CMPI_AssertConsistentType(void * buf, MPI_Datatype datatype);
+void $mpi_assertConsistentType(void * buf, MPI_Datatype datatype);
 
 /* Create a $bundle type object which contains a sequence of entries
    that identify a group of consistent MPI collective routines. MPI
@@ -197,7 +197,7 @@ void CMPI_AssertConsistentType(void * buf, MPI_Datatype datatype);
    datatypes: the datatype array stores datatypes enumerators involved in 
               the message.
 */
-$bundle CMPI_CreateCoroutineEntries(int routineTag, int root, 
+$bundle $mpi_createCoroutineEntries(int routineTag, int root, 
 				    int op, int numDatatypes, int * datatypes);
 #endif
 
