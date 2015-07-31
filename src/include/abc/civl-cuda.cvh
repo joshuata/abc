@@ -158,25 +158,25 @@ typedef struct cudaDeviceProp {
 
 /* flag type used to represent the status of a kernel instance
  */
-typedef enum _kernelStatus {
-    _kernelStatusWaiting,
-    _kernelStatusRunning,
-    _kernelStatusFinished
-} _kernelStatus;
+typedef enum $cuda_kernel_status {
+    $cuda_kernel_status_waiting,
+    $cuda_kernel_status_running,
+    $cuda_kernel_status_finished
+} $cuda_kernel_status;
 
 /* type used to represent an instance of a Cuda kernel
  */
-typedef struct _kernelInstance _kernelInstance;
+typedef struct $cuda_kernel_instance $cuda_kernel_instance_t;
 
-_kernelStatus getStatus(_kernelInstance*);
+$cuda_kernel_status $cuda_get_status($cuda_kernel_instance_t*);
 
 /* a type that wraps a kernel instance for insertion into a list
  */
-typedef struct _kernelInstanceNode _kernelInstanceNode;
+typedef struct $cuda_kernel_instance_node $cuda_kernel_instance_node_t;
 
-/* _kernelInstanceNode interface
+/* $cuda_kernel_instance_node_t interface
  */
-_kernelInstance *getInstance(_kernelInstanceNode*);
+$cuda_kernel_instance_t *$cuda_get_instance($cuda_kernel_instance_node_t*);
 
 /* a type used to represent a Cuda stream
  */
@@ -185,21 +185,21 @@ typedef _CUstream* cudaStream_t;
 
 /* _CUstream interface
  */
-_kernelInstanceNode *getMostRecent(cudaStream_t);
+$cuda_kernel_instance_node_t *$cuda_get_most_recent(cudaStream_t);
 
-_Bool isUsable(cudaStream_t);
+_Bool $cuda_is_usable(cudaStream_t);
 
-void setUsable(cudaStream_t, _Bool);
+void $cuda_set_usable(cudaStream_t, _Bool);
 
 /* a type that wraps a stream for insertion into a list
  */
-typedef struct _cudaStreamNode _cudaStreamNode;
+typedef struct $cuda_stream_node $cuda_stream_node_t;
 
-/* _cudaStreamNode interface
+/* $cuda_stream_node_t interface
  */
-void setStream(_cudaStreamNode*, cudaStream_t);
+void $cuda_set_stream($cuda_stream_node_t*, cudaStream_t);
 
-void setNext(_cudaStreamNode*, _cudaStreamNode*);
+void $cuda_set_next($cuda_stream_node_t*, $cuda_stream_node_t*);
 
 /* a type used to represent a Cuda event
  */
@@ -208,139 +208,139 @@ typedef _CUevent* cudaEvent_t;
 
 /* _CUevent interface
  */
-_kernelInstance **getInstances(cudaEvent_t);
+$cuda_kernel_instance_t **$cuda_get_instances(cudaEvent_t);
 
-void setInstances(cudaEvent_t, _kernelInstance**, int);
+void $cuda_set_instances(cudaEvent_t, $cuda_kernel_instance_t**, int);
 
-int getNumInstances(cudaEvent_t);
+int $cuda_get_num_instances(cudaEvent_t);
 
 
 /* a type representing the state of a Cuda device
  */
-typedef struct _cudaContext _cudaContext;
+typedef struct $cuda_context $cuda_context_t;
 
-/* _cudaContext interface
+/* $cuda_context_t interface
  */
-int getNumStreams(_cudaContext*);
+int $cuda_get_num_streams($cuda_context_t*);
 
-_cudaStreamNode *getHeadNode(_cudaContext*);
+$cuda_stream_node_t *$cuda_get_head_node($cuda_context_t*);
 
-cudaStream_t getNullStream(_cudaContext*);
+cudaStream_t $cuda_get_null_stream($cuda_context_t*);
 
-void addNewStream(_cudaContext*, _cudaStreamNode*);
+void $cuda_add_new_stream($cuda_context_t*, $cuda_stream_node_t*);
 
 
 /* Computes the one dimensional index of a grid cell at a given location
  * in a three dimensional grid of a given size
  */
-int _index (dim3 size, uint3 location);
+int $cuda_index (dim3 size, uint3 location);
 
 /* Lifts a single integer x into a three dimensional vector representing
  * a one dimensional grid of length x
  */
-dim3 _toDim3(int x);
+dim3 $cuda_to_dim3(int x);
 
 /* Given a three dimensional vector representing a grid of size dim,
  * create and destroy a process, in parallel, for each cell in the grid. 
  * The location of the cell is passed to the spawning function.
  */
-void _runProcs(dim3 dim, void spawningFunction(uint3));
+void $cuda_run_procs(dim3 dim, void spawningFunction(uint3));
 
 // ------------------------------------------------
 
 /* $wait on a given process is it is non-null
  */
-void _tryWait($proc p);
+void $cuda_try_wait($proc p);
 
 /* The current state of the GPU
  */
-_cudaContext _context;
+$cuda_context_t $cuda_current_context;
 
-/* malloc and initialize a new _kernelInstance
+/* malloc and initialize a new $cuda_kernel_instance_t
  */
-_kernelInstance *_kernelInstanceCreate(void);
+$cuda_kernel_instance_t *$cuda_kernel_instance_create(void);
 
-/* cleanup and free a given _kernelInstance
+/* cleanup and free a given $cuda_kernel_instance_t
  */
-void _kernelInstanceDestroy(_kernelInstance *i);
+void $cuda_kernel_instance_destroy($cuda_kernel_instance_t *i);
 
-/* malloc and initialize a new _kernelInstanceNode
+/* malloc and initialize a new $cuda_kernel_instance_node_t
  */
-_kernelInstanceNode *_kernelInstanceNodeCreate(void);
+$cuda_kernel_instance_node_t *$cuda_kernel_instance_node_tCreate(void);
 
-/* cleanup and free a given _kernelInstanceNode
+/* cleanup and free a given $cuda_kernel_instance_node_t
  */
-void _kernelInstanceNodeDestroy(_kernelInstanceNode *node);
+void $cuda_kernel_instance_node_destroy($cuda_kernel_instance_node_t *node);
 
 /* malloc and initialize a new stream
  */
-cudaStream_t _streamCreate(void);
+cudaStream_t $cuda_stream_create(void);
 
 /* block until the most recently enqueued process on the given stream
  * has terminated (meaning all kernels in that stream have completed)
  */
-void _streamWait(cudaStream_t s);
+void $cuda_stream_wait(cudaStream_t s);
 
 /* block until no more streams have kernels executing
  */
-void _streamWaitAll(void);
+void $cuda_stream_wait_all(void);
 
 /* cleanup and free a given stream
  */
-void _streamDestroy(cudaStream_t s);
+void $cuda_stream_destroy(cudaStream_t s);
 
-/* malloc and initialize a new _cudaStreamNode
+/* malloc and initialize a new $cuda_stream_node_t
  */
-_cudaStreamNode *_streamNodeCreate(void);
+$cuda_stream_node_t *$cuda_stream_node_create(void);
 
-/* cleanup and free a given _cudaStreamNode
+/* cleanup and free a given $cuda_stream_node_t
  */
-void _streamNodeDestroy(_cudaStreamNode *node);
+void $cuda_stream_node_destroy($cuda_stream_node_t *node);
 
 /* destroy all stream nodes contained in the context
  */
-void _streamNodeDestroyAll(void);
+void $cuda_stream_node_destroy_all(void);
 
 /* malloc and initialize a new event
  */
-cudaEvent_t _eventCreate(void);
+cudaEvent_t $cuda_event_create(void);
 
-/* block until all _kernelInstances contained in this event have
+/* block until all $cuda_kernel_instance_ts contained in this event have
  * completed
  */
-void _eventWait(cudaEvent_t e);
+void $cuda_event_wait(cudaEvent_t e);
 
 /* cleanup and free a given event
  */
-void _eventDestroy(cudaEvent_t e);
+void $cuda_event_destroy(cudaEvent_t e);
 
 /* initialize the cuda context. must be called before any cuda functions.
  */
-void _cudaInit(void);
+void $cuda_init(void);
 
 /* cleanup the cuda context. must be called after all cuda functions.
  */
-void _cudaFinalize(void);
+void $cuda_finalize(void);
 
 /* returns an array of pointers to the most recently enqueued kernel
  * of each stream.
  */
-_kernelInstance **_allMostRecentKernels(void);
+$cuda_kernel_instance_t **$cuda_all_most_recent_kernels(void);
 
 /* create a kernel instance for the given function k, and enqueue it
  * onto the given stream.
  */
-void _enqueueKernel(cudaStream_t stream, void (*k)(_kernelInstance*, cudaEvent_t));
+void $cuda_enqueue_kernel(cudaStream_t stream, void (*k)($cuda_kernel_instance_t*, cudaEvent_t));
 
 /* called by kernel processes. wait on the given event, then update
  * the status of the calling kernel to indicate it has finished waiting
  */
-void _waitInQueue (_kernelInstance *this, cudaEvent_t e);
+void $cuda_wait_in_queue ($cuda_kernel_instance_t *this, cudaEvent_t e);
 
 /* called by kernel processes. update the status of the calling kernel
  * to indicate that it has completed execution
  */
-void _kernelFinish(_kernelInstance *k);
+void $cuda_kernel_finish($cuda_kernel_instance_t *k);
 
 #endif
 
