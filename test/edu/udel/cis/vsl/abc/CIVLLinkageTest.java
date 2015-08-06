@@ -58,14 +58,6 @@ public class CIVLLinkageTest {
 	}
 
 	@Test
-	public void ring() throws ParseException, SyntaxException,
-			PreprocessorException {
-		assertTrue(compileAndLink(new String[] { "comm/ring.c",
-				"comm/concurrency.cvl", "comm/comm.cvl", "comm/mpi.cvl" },
-				new File[] { new File(root, "comm") }));
-	}
-
-	@Test
 	public void messageUnpack() throws ParseException, SyntaxException,
 			PreprocessorException {
 		assertTrue(compileAndLink(new String[] { "comm/messageUnpack.cvl",

@@ -29,4 +29,27 @@ typedef struct $domain_decomposition {
 $domain_decomposition $domain_partition($domain domain, 
       $domain_strategy strategy, int n);
 
+/* returns the index-th range of the given domain
+   index should be between 1 and the dimension of dom minus 1.
+ */
+$range $range_of_rectangular_domain($domain dom, int index);
+
+/* returns the upper bound of a regular range */
+int $high_of_regular_range($range range);
+
+/* returns the lower bound of a regular range */
+int $low_of_regular_range($range range);
+
+/* returns the step of a regular range */
+int $step_of_regular_range($range range);
+
+/* is this domain a rectangular domain? */
+_Bool $is_rectangular_domain($domain domain);
+
+/* is this range a regular range? */
+_Bool $is_regular_range($range range);
+
+/* returns the dimension of the given domain */
+int $dimension_of($domain domain);
+
 #endif

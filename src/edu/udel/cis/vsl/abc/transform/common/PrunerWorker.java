@@ -17,6 +17,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.PragmaNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.StaticAssertionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.InitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.OrdinaryDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.TypedefDeclarationNode;
@@ -196,10 +197,18 @@ public class PrunerWorker {
 			if (externalDef instanceof PragmaNode
 					|| externalDef instanceof StaticAssertionNode
 					|| isAssumeOrAssert(externalDef)
-					|| externalDef instanceof StatementNode)
+					|| externalDef instanceof StatementNode
+					|| isElaborateDomainFunction(externalDef))
 				markReachable(externalDef);
 		}
 		explore(main);
+	}
+
+	private boolean isElaborateDomainFunction(BlockItemNode item) {
+		if ((item != null) && item instanceof FunctionDeclarationNode)
+			return ((FunctionDeclarationNode) item).getIdentifier().name()
+					.equals("$elaborate_rectangular_domain");
+		return false;
 	}
 
 	private boolean isAssumeOrAssert(BlockItemNode item) {
