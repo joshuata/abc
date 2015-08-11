@@ -252,7 +252,8 @@ public class ExpressionAnalyzer {
 		UnqualifiedObjectType type = conversionFactory
 				.lvalueConversionType(lhsType);
 
-		addStandardConversions(rhs);
+		if (!typeFactory.isArrayOfCharType(lhsType))
+			addStandardConversions(rhs);
 		convertRHS(rhs, type);
 		return type;
 	}

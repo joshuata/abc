@@ -913,4 +913,16 @@ public class CommonTypeFactory implements TypeFactory {
 		return scopeType;
 	}
 
+	@Override
+	public boolean isArrayOfCharType(Type type) {
+		if (type instanceof ArrayType) {
+			ObjectType elementType = ((ArrayType) type).getElementType();
+
+			if (elementType instanceof StandardBasicType) {
+				return ((StandardBasicType) elementType).getBasicTypeKind() == BasicTypeKind.CHAR;
+			}
+		}
+		return false;
+	}
+
 }
