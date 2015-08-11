@@ -779,4 +779,12 @@ public interface TypeFactory {
 			boolean restrictQualified, boolean inputQualified,
 			boolean outputQualified);
 
+	/**
+	 * Is the given type an array-of-char type?
+	 * 
+	 * @param type
+	 * @return
+	 */
+	boolean isArrayOfCharType(Type type);
+
 }

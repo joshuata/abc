@@ -213,6 +213,8 @@ public class CommonConversionFactory implements ConversionFactory {
 			// wildcard node has void type, which means that it can be any type
 			return null;
 		}
+		if(typeFactory.isArrayOfCharType(oldType) && typeFactory.isArrayOfCharType(newType))
+			return null;
 		if (newType.kind() == TypeKind.SCOPE || newType.equals(oldType))
 			return null;
 		if (oldType instanceof DomainType && newType instanceof DomainType)
