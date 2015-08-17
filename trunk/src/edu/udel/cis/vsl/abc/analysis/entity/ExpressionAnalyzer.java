@@ -138,8 +138,8 @@ public class ExpressionAnalyzer {
 		this.astFactory = entityAnalyzer.astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
 		this.language = entityAnalyzer.configuration.getLanguage();
-		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(typeFactory,
-				this.conversionFactory);
+		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(
+				this.entityAnalyzer, typeFactory, this.conversionFactory);
 	}
 
 	// ************************* Exported Methods **************************
@@ -584,6 +584,12 @@ public class ExpressionAnalyzer {
 		// It might be appropriate to factor out these Cuda-specific checks into
 		// a separate function
 
+		if (functionNode instanceof IdentifierExpressionNode) {
+			functionName = ((IdentifierExpressionNode) functionNode)
+					.getIdentifier().name();
+		}
+		specialCallAnalyzer.hasSufficientArgumentsForPrintf(node, functionName,
+				node.getArguments());
 		expectedNumArgs = functionType.getNumParameters();
 		hasVariableNumArgs = functionType.hasVariableArgs();
 		if (hasVariableNumArgs) {
@@ -592,12 +598,8 @@ public class ExpressionAnalyzer {
 			if (numArgs < expectedNumArgs)
 				throw error("Expected at least " + expectedNumArgs
 						+ " arguments, saw " + numArgs, node);
-			if (functionNode instanceof IdentifierExpressionNode) {
-				functionName = ((IdentifierExpressionNode) functionNode)
-						.getIdentifier().name();
-				isSpecialFunction = this.specialCallAnalyzer
-						.isSpecialFunction(functionName);
-			}
+			isSpecialFunction = this.specialCallAnalyzer
+					.isSpecialFunction(functionName);
 		} else {
 			if (numArgs != expectedNumArgs)
 				throw error("Expected " + expectedNumArgs
