@@ -6,7 +6,10 @@ import java.util.Set;
 
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.FunctionCallNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
@@ -25,9 +28,13 @@ public class SpecialFunctionCallAnalyzer {
 	// names of special functions handled in this class
 	private final static String SCANF = "scanf";
 	private final static String FSCANF = "fscanf";
+	private final static String PRINTF = "printf";
+	private final static String FPRINTF = "fprintf";
 	private final static String ACCESS = "$access";
 	private final static String MODIFIED = "$write";
 	private final static String READ = "$read";
+
+	private EntityAnalyzer entityAnalyzer;
 
 	/** the type factory, for generating types. */
 	@SuppressWarnings("unused")
@@ -53,11 +60,12 @@ public class SpecialFunctionCallAnalyzer {
 	 * @param typeFactory
 	 *            The type factory to be used.
 	 */
-	public SpecialFunctionCallAnalyzer(TypeFactory typeFactory,
-			ConversionFactory conversionFactory) {
+	public SpecialFunctionCallAnalyzer(EntityAnalyzer entityAnalyzer,
+			TypeFactory typeFactory, ConversionFactory conversionFactory) {
 		this.typeFactory = typeFactory;
 		this.conversionFactory = conversionFactory;
 		this.voidPointerType = typeFactory.pointerType(typeFactory.voidType());
+		this.entityAnalyzer = entityAnalyzer;
 	}
 
 	/**
@@ -69,6 +77,63 @@ public class SpecialFunctionCallAnalyzer {
 	 */
 	boolean isSpecialFunction(String function) {
 		return this.specialFunctioinNames.contains(function);
+	}
+
+	/**
+	 * checks if a fprintf/printf call has sufficient arguments as requested by
+	 * the format string. An syntax exception is thrown if arguments are
+	 * insufficient, otherwise, true is returned.
+	 * 
+	 * @param call
+	 * @param function
+	 * @param arguments
+	 * @return true if the function is not a printf/fprintf call or there are
+	 *         sufficient arguments.
+	 * @throws SyntaxException
+	 *             if arguments are insufficient
+	 */
+	boolean hasSufficientArgumentsForPrintf(FunctionCallNode call,
+			String function, SequenceNode<ExpressionNode> arguments)
+			throws SyntaxException {
+		boolean isPrintf = false;
+		boolean isFprintf = false;
+		int formatIndex = 0;
+		int numArgsForPrint = arguments.numChildren() - 1;
+		ExpressionNode formatString;
+
+		if (function.equals(FPRINTF))
+			isFprintf = true;
+		else if (function.equals(PRINTF))
+			isPrintf = true;
+		if (!isPrintf && !isFprintf)
+			return true;
+		if (isFprintf) {
+			formatIndex++;
+			numArgsForPrint--;
+		}
+		formatString = arguments.getSequenceChild(formatIndex);
+		if (formatString instanceof StringLiteralNode) {
+			String format = ((StringLiteralNode) formatString)
+					.getStringRepresentation();
+			int numFormats;
+			String realFormat = format.replaceAll("%%", "");
+			String formatArgumentsString = "arguments";
+			String printArgumentsString = "are";
+
+			numFormats = realFormat.split("%", -1).length - 1;
+			if (numFormats == 1)
+				formatArgumentsString = "argument";
+			if (numArgsForPrint == 1)
+				printArgumentsString = "is";
+			if (numFormats > numArgsForPrint)
+				throw this.entityAnalyzer.error("insufficient arguments for "
+						+ function + ": the format string " + format
+						+ " is requring " + numFormats + " subsequent "
+						+ formatArgumentsString + " while only "
+						+ numArgsForPrint + " " + printArgumentsString
+						+ " provided.", call);
+		}
+		return true;
 	}
 
 	/**
@@ -129,4 +194,5 @@ public class SpecialFunctionCallAnalyzer {
 		assert index > 0;
 		return this.voidPointerType;
 	}
+
 }
