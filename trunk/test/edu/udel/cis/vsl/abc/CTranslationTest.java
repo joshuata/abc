@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
 /**
  * Checks a number of simple C programs to make sure they pass on the parsing
@@ -163,6 +164,11 @@ public class CTranslationTest {
 	@Test
 	public void fscanf() throws ABCException, IOException {
 		check("c/fscanf");
+	}
+
+	@Test(expected = SyntaxException.class)
+	public void printfBad() throws ABCException, IOException {
+		check("c/printfBad");
 	}
 
 	@Test
