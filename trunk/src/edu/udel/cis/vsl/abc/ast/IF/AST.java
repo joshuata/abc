@@ -166,6 +166,9 @@ public interface AST {
 	 */
 	boolean equiv(AST that);
 
+	/**
+	 * removes the entities of this AST.
+	 */
 	void clearEntities();
 
 	/**
