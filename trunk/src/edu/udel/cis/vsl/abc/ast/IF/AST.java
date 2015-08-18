@@ -76,14 +76,15 @@ public interface AST {
 	 * @return the node in this tree with the given id
 	 */
 	ASTNode getNode(int id);
-	
+
 	/**
-	 * Returns the entity for the main function.  Returns null if standard analyses
-	 * have yet to be performed.
+	 * Returns the entity for the main function. Returns null if standard
+	 * analyses have yet to be performed.
 	 * 
 	 * @return the entity is the main function of the program
 	 */
 	Function getMain();
+
 	void setMain(Function f);
 
 	/**
@@ -144,8 +145,25 @@ public interface AST {
 	 */
 	void add(OrdinaryEntity entity);
 
+	/**
+	 * Returns the first difference between this AST and that AST.
+	 * 
+	 * @param that
+	 *            The AST to be compared with this AST
+	 * @return The difference of this AST and that AST, null if both ASTs are
+	 *         equivalent.
+	 */
 	DifferenceObject diff(AST that);
 
+	/**
+	 * Compares this AST with that AST to see if they are equivalent. Two AST
+	 * are considered equivalent if they have the same structure of equivalent
+	 * AST nodes.
+	 * 
+	 * @param that
+	 *            The AST to be compared with this AST
+	 * @return true iff this AST is equivalent with that AST
+	 */
 	boolean equiv(AST that);
 
 	void clearEntities();
