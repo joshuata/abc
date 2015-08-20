@@ -1534,7 +1534,7 @@ contractItem
 
 collectiveQualifier
     : COLLECTIVE LPAREN proc=conditionalExpression 
-                 RPAREN body=conditionalExpression
+                 RPAREN LCURLY body=conditionalExpression RCURLY
       -> ^(COLLECTIVE $proc $body)
     ;
 
@@ -1543,6 +1543,7 @@ separationLogicItem
       REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression)
     | REQUIRES collectiveQualifier -> ^(REQUIRES collectiveQualifier)
 	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression)
+    | ENSURES collectiveQualifier -> ^(ENSURES collectiveQualifier)
     ;
 
 porItem
