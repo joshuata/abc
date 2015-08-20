@@ -3,6 +3,7 @@
 
 #include <civlc.cvh>
 #include <comm.cvh>
+#include <concurrency.cvh>
 #include <bundle.cvh>
 
 #define BCAST_TAG        9999
@@ -199,6 +200,9 @@ void $mpi_assertConsistentType(void * buf, MPI_Datatype datatype);
 */
 $bundle $mpi_createCoroutineEntries(int routineTag, int root, 
 				    int op, int numDatatypes, int * datatypes);
+/* System function */
+void $mpi_coassert(MPI_Comm, _Bool);
+
 #endif
 
 

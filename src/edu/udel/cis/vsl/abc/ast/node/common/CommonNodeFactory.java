@@ -715,10 +715,9 @@ public class CommonNodeFactory implements NodeFactory {
 
 	@Override
 	public CollectiveExpressionNode newCollectiveExpressionNode(Source source,
-			ExpressionNode processPointerExpression,
-			ExpressionNode lengthExpression, ExpressionNode body) {
-		return new CommonCollectiveExpressionNode(source,
-				processPointerExpression, lengthExpression, body);
+			ExpressionNode processesExpression, ExpressionNode bodyExpression) {
+		return new CommonCollectiveExpressionNode(source, processesExpression,
+				bodyExpression);
 	}
 
 	@Override

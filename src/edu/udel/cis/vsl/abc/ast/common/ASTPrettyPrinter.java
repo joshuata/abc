@@ -35,6 +35,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.AlignOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CallsNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DerivativeExpressionNode;
@@ -48,6 +49,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.RegularRangeNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.RemoteExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
@@ -1532,9 +1534,15 @@ public class ASTPrettyPrinter {
 				result.append(")");
 			break;
 		}
-		// TODO
-		// case COLLECTIVE:
-		// break;
+		case COLLECTIVE:
+			ExpressionNode procsGroupNode = ((CollectiveExpressionNode) expression)
+					.getProcessesGroupExpression();
+			ExpressionNode bodyNode = ((CollectiveExpressionNode) expression)
+					.getBody();
+
+			result.append("$collective(" + expression2Pretty(procsGroupNode));
+			result.append(") { " + expression2Pretty(bodyNode) + " }");
+			break;
 		case COMPOUND_LITERAL:
 			return compoundLiteral2Pretty((CompoundLiteralNode) expression);
 		case CONSTANT: {
@@ -1598,6 +1606,13 @@ public class ASTPrettyPrinter {
 			result.append(functionCall2Pretty(((CallsNode) expression)
 					.getCall()));
 			result.append(")");
+			break;
+		case REMOTE_REFERENCE:
+			result.append(expression2Pretty(((RemoteExpressionNode) expression)
+					.getProcessExpression()));
+			result.append("@");
+			result.append(expression2Pretty(((RemoteExpressionNode) expression)
+					.getIdentifierNode()));
 			break;
 		default:
 			throw new ABCUnsupportedException(

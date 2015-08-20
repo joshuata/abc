@@ -167,8 +167,7 @@ public class ExpressionAnalyzer {
 			case COLLECTIVE: {
 				CollectiveExpressionNode collective = (CollectiveExpressionNode) node;
 
-				processExpression(collective.getProcessPointerExpression());
-				processExpression(collective.getLengthExpression());
+				processExpression(collective.getProcessesGroupExpression());
 				processExpression(collective.getBody());
 				node.setInitialType(typeFactory.basicType(BasicTypeKind.BOOL));
 				break;
