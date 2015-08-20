@@ -10,9 +10,8 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 		implements CollectiveExpressionNode {
 
 	public CommonCollectiveExpressionNode(Source source,
-			ExpressionNode processPointerExpression,
-			ExpressionNode lengthExpression, ExpressionNode body) {
-		super(source, processPointerExpression, lengthExpression, body);
+			ExpressionNode processesGroupExpression, ExpressionNode bodyNode) {
+		super(source, processesGroupExpression, bodyNode);
 	}
 
 	@Override
@@ -21,18 +20,13 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 	}
 
 	@Override
-	public ExpressionNode getProcessPointerExpression() {
+	public ExpressionNode getProcessesGroupExpression() {
 		return (ExpressionNode) child(0);
 	}
 
 	@Override
-	public ExpressionNode getLengthExpression() {
-		return (ExpressionNode) child(1);
-	}
-
-	@Override
 	public ExpressionNode getBody() {
-		return (ExpressionNode) child(2);
+		return (ExpressionNode) child(1);
 	}
 
 	@Override
@@ -43,8 +37,8 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 	@Override
 	public CollectiveExpressionNode copy() {
 		return new CommonCollectiveExpressionNode(getSource(),
-				duplicate(getProcessPointerExpression()),
-				duplicate(getLengthExpression()), duplicate(getBody()));
+				duplicate((ExpressionNode) child(0)),
+				duplicate((ExpressionNode) child(1)));
 	}
 
 	@Override
@@ -54,24 +48,17 @@ public class CommonCollectiveExpressionNode extends CommonExpressionNode
 
 	@Override
 	public boolean isSideEffectFree(boolean errorsAreSideEffects) {
-		return getBody().isSideEffectFree(errorsAreSideEffects)
-				&& getLengthExpression().isSideEffectFree(errorsAreSideEffects)
-				&& getProcessPointerExpression().isSideEffectFree(
-						errorsAreSideEffects);
+		return getProcessesGroupExpression().isSideEffectFree(
+				errorsAreSideEffects);
 	}
 
 	@Override
-	public void setProcessPointerExpression(ExpressionNode arg) {
+	public void setProcessesGroupExpression(ExpressionNode arg) {
 		setChild(0, arg);
 	}
 
 	@Override
-	public void setLengthExpression(ExpressionNode arg) {
-		setChild(1, arg);
-	}
-
-	@Override
 	public void setBody(ExpressionNode arg) {
-		setChild(2, arg);
+		setChild(1, arg);
 	}
 }

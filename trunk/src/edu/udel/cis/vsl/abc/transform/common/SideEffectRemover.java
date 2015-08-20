@@ -1212,21 +1212,21 @@ public class SideEffectRemover extends BaseTransformer {
 
 	private ExprTriple translateCollective(CollectiveExpressionNode expression) {
 		ExprTriple result = new ExprTriple(expression);
-		ExprTriple e0 = translate(expression.getProcessPointerExpression());
-		ExprTriple e1 = translate(expression.getLengthExpression());
+		ExprTriple e0 = translate(expression.getProcessesGroupExpression());
+		// ExprTriple e1 = translate(expression.getLengthExpression());
 		ExprTriple e2 = translate(expression.getBody());
 
 		makesef(e0);
-		makesef(e1);
+		// makesef(e1);
 		makesef(e2);
-		expression.setProcessPointerExpression(e0.getNode());
-		expression.setLengthExpression(e1.getNode());
+		expression.setProcessesGroupExpression(e0.getNode());
+		// expression.setLengthExpression(e1.getNode());
 		expression.setBody(e2.getNode());
 		result.addAllBefore(e0.getBefore());
-		result.addAllBefore(e1.getBefore());
+		// result.addAllBefore(e1.getBefore());
 		result.addAllBefore(e2.getBefore());
 		result.addAllAfter(e0.getAfter());
-		result.addAllAfter(e1.getAfter());
+		// result.addAllAfter(e1.getAfter());
 		result.addAllAfter(e2.getAfter());
 		return result;
 	}

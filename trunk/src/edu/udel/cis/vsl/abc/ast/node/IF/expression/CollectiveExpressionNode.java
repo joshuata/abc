@@ -35,7 +35,7 @@ public interface CollectiveExpressionNode extends ExpressionNode {
 	 * @return the pointer to the first proc in the sequence of procs involved
 	 *         in the collective operation
 	 */
-	ExpressionNode getProcessPointerExpression();
+	ExpressionNode getProcessesGroupExpression();
 
 	/**
 	 * Sets the process pointer expression argument.
@@ -43,24 +43,7 @@ public interface CollectiveExpressionNode extends ExpressionNode {
 	 * @param arg
 	 *            the new value for the process pointer expression argument
 	 */
-	void setProcessPointerExpression(ExpressionNode arg);
-
-	/**
-	 * Gets the expression of integer type which evaluates to the number of
-	 * processes involved in the collective operation (<code>nprocs</code>).
-	 * 
-	 * @return the expression yielding the number of processes involved in the
-	 *         collective operation
-	 */
-	ExpressionNode getLengthExpression();
-
-	/**
-	 * Sets the length expression argument.
-	 * 
-	 * @param arg
-	 *            the new value for the length expression argument
-	 */
-	void setLengthExpression(ExpressionNode arg);
+	void setProcessesGroupExpression(ExpressionNode arg);
 
 	/**
 	 * Returns the "body" of the collective expression (<code>expr</code>).

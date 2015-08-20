@@ -887,9 +887,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 					translateExpression(
 							(CommonTree) expressionTree.getChild(0), scope),
 					translateExpression(
-							(CommonTree) expressionTree.getChild(1), scope),
-					translateExpression(
-							(CommonTree) expressionTree.getChild(2), scope));
+							(CommonTree) expressionTree.getChild(1), scope));
 		case FORALL:
 			return translateForall(source, expressionTree, scope);
 		case UNIFORM:

@@ -915,8 +915,7 @@ public interface NodeFactory {
 	 * @return the new collective expression node with given children
 	 */
 	CollectiveExpressionNode newCollectiveExpressionNode(Source source,
-			ExpressionNode processPointerExpression,
-			ExpressionNode lengthExpression, ExpressionNode body);
+			ExpressionNode processesExpression, ExpressionNode bodyExpression);
 
 	/**
 	 * Constructs a new CIVL-C <code>$scopeof</code> expression node. This is an
@@ -2212,4 +2211,5 @@ public interface NodeFactory {
 			OmpWorksharingNodeKind kind);
 
 	WildcardNode newWildcardNode(Source source);
+
 }
