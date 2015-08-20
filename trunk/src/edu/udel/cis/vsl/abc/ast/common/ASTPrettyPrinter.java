@@ -1614,6 +1614,9 @@ public class ASTPrettyPrinter {
 			result.append(expression2Pretty(((RemoteExpressionNode) expression)
 					.getIdentifierNode()));
 			break;
+		case RESULT:
+			result.append("$result");
+			break;
 		default:
 			throw new ABCUnsupportedException(
 					"pretty print of expression node of " + kind + " kind");
