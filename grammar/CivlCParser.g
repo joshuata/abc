@@ -535,7 +535,12 @@ commaExpression
 	  ( COMMA y=assignmentExpression
 	    -> ^(OPERATOR COMMA ^(ARGUMENT_LIST $x $y))
 	  )*
-	;
+	 ;
+
+collectiveBody
+    : conditionalExpression
+    | CALL
+    ;
 
 /* The most general class of expressions.
  * Includes a CIVL-C "collective" expression,
@@ -543,9 +548,8 @@ commaExpression
  */
 expression
 	: COLLECTIVE LPAREN proc=conditionalExpression
-	  COMMA intExpr=conditionalExpression RPAREN
-	  body=conditionalExpression
-	  -> ^(COLLECTIVE $proc $intExpr $body)
+	   RPAREN body=collectiveBody
+	  -> ^(COLLECTIVE $proc $body)
 	| commaExpression
 	;
 			
@@ -1532,20 +1536,12 @@ contractItem
     | porItem
 	;
 
-collectiveQualifier
-    : COLLECTIVE LPAREN proc=conditionalExpression 
-                 RPAREN LCURLY body=conditionalExpression RCURLY
-      -> ^(COLLECTIVE $proc $body RCURLY)
-    ;
-
 separationLogicItem
     :
       REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression RCURLY)
-    | REQUIRES collectiveQualifier -> ^(REQUIRES collectiveQualifier)
 	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression RCURLY)
-    | ENSURES collectiveQualifier -> ^(ENSURES collectiveQualifier)
-    ;
 
+    ;
 porItem
     :
       DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList RCURLY)
