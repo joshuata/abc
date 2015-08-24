@@ -1535,23 +1535,23 @@ contractItem
 collectiveQualifier
     : COLLECTIVE LPAREN proc=conditionalExpression 
                  RPAREN LCURLY body=conditionalExpression RCURLY
-      -> ^(COLLECTIVE $proc $body)
+      -> ^(COLLECTIVE $proc $body RCURLY)
     ;
 
 separationLogicItem
     :
-      REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression)
+      REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression RCURLY)
     | REQUIRES collectiveQualifier -> ^(REQUIRES collectiveQualifier)
-	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression)
+	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression RCURLY)
     | ENSURES collectiveQualifier -> ^(ENSURES collectiveQualifier)
     ;
 
 porItem
     :
-      DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList)
-    | GUARD (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(GUARD expression? argumentExpressionList)
-    | ASSIGNS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS expression? argumentExpressionList)
-    | READS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(READS expression? argumentExpressionList)
+      DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList RCURLY)
+    | GUARD (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(GUARD expression? argumentExpressionList RCURLY)
+    | ASSIGNS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS expression? argumentExpressionList RCURLY)
+    | READS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(READS expression? argumentExpressionList RCURLY)
     ;
 
 /* A CIVL-C contract: sequence of 0 or more
