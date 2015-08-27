@@ -949,6 +949,9 @@ public class SideEffectRemover extends BaseTransformer {
 		case ASSIGN:
 			result = translateAssign(expression);
 			break;
+		// case AT:
+		// result=translateAt(expression);
+		// break;
 		case DEREFERENCE:
 			result = translateDereference(expression);
 			break;
@@ -965,6 +968,7 @@ public class SideEffectRemover extends BaseTransformer {
 		case POSTDECREMENT:
 			result = translateIncrementOrDecrement(expression);
 			break;
+		case AT:
 		case BITAND:
 		case BITCOMPLEMENT:
 		case BITOR:
@@ -1013,6 +1017,12 @@ public class SideEffectRemover extends BaseTransformer {
 		}
 		return result;
 	}
+
+	// private ExprTriple translateAt(OperatorNode expression) {
+	// dd
+	//
+	// return null;
+	// }
 
 	/**
 	 * Translates a <code>sizeof</code> expression to an equivalent triple.
