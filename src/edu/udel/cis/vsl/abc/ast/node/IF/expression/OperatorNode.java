@@ -37,6 +37,11 @@ public interface OperatorNode extends ExpressionNode {
 		 */
 		ASSIGN,
 		/**
+		 * The CIVL-C "remote" operator <code>@</code>, as in
+		 * <code>expr0 @ expr</code>.
+		 */
+		AT,
+		/**
 		 * The CIVL-C "big-O" operator <code>$O</code>, as in
 		 * <code>$O(h*h)</code>, which is used to specify the asymptotic
 		 * complexity of an expression as a parameter approaches zero.
