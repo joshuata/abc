@@ -774,6 +774,9 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		case STAREQ:
 			operator = Operator.TIMESEQ;
 			break;
+		case AT:
+			operator = Operator.AT;
+			break;
 		default:
 			throw error("Unknown operator :", operatorTree);
 		}

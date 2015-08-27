@@ -730,6 +730,9 @@ public class ExpressionAnalyzer {
 		case ASSIGN: // = standard assignment operator
 			processASSIGN(node);
 			break;
+		case AT:
+			processAT(node);
+			break;
 		case BIG_O: // big-O expresion
 			processBIG_O(node);
 			break;
@@ -817,6 +820,18 @@ public class ExpressionAnalyzer {
 		default:
 			throw new RuntimeException("Unknown operator: " + operator);
 		}
+	}
+
+	private void processAT(OperatorNode node) throws SyntaxException {
+		ExpressionNode arg0 = node.getArgument(0);
+		ExpressionNode arg1 = node.getArgument(1);
+		Type type0 = addStandardConversions(arg0), type1 = addStandardConversions(arg1);
+
+		if (!(type1 instanceof IntegerType))
+			throw error(
+					"The right-hand-side operand of @ must have integer type",
+					arg1);
+		node.setInitialType(type0);
 	}
 
 	private void processQuantifiedExpression(QuantifiedExpressionNode node)

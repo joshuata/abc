@@ -252,9 +252,9 @@ postfixExpression
 	  | p=PLUSPLUS
 	    -> ^(OPERATOR POST_INCREMENT[$p]
 	         ^(ARGUMENT_LIST $postfixExpression))
-	  | // CIVL-C @ operator: remote reference like x@f
-	    AT IDENTIFIER
-	    -> ^(AT $postfixExpression IDENTIFIER)
+	  //| // CIVL-C @ operator: remote reference like x@f
+	    //AT IDENTIFIER
+	    //-> ^(AT $postfixExpression IDENTIFIER)
 	  | m=MINUSMINUS
 	    -> ^(OPERATOR POST_DECREMENT[$m]
 	         ^(ARGUMENT_LIST $postfixExpression))
@@ -345,15 +345,23 @@ castExpression
 	  -> ^(CAST typeName castExpression $l)
 	| unaryExpression
 	;
+	
+// TODO
+remoteExpression
+	:(castExpression -> castExpression)
+	( AT y=castExpression
+	  -> ^(OPERATOR AT ^(ARGUMENT_LIST $remoteExpression $y))
+    )*
+	;
 
 /* 6.5.5 */
 multiplicativeExpression
-	: (castExpression -> castExpression)
-	( STAR y=castExpression
+	: (remoteExpression -> remoteExpression)
+	( STAR y=remoteExpression
 	  -> ^(OPERATOR STAR ^(ARGUMENT_LIST $multiplicativeExpression $y))
-	| DIV y=castExpression
+	| DIV y=remoteExpression
 	  -> ^(OPERATOR DIV ^(ARGUMENT_LIST $multiplicativeExpression $y))
-    | MOD y=castExpression
+    | MOD y=remoteExpression
 	  -> ^(OPERATOR MOD ^(ARGUMENT_LIST $multiplicativeExpression $y))
     )*
 	;
@@ -1544,10 +1552,10 @@ separationLogicItem
     ;
 porItem
     :
-      DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList RCURLY)
-    | GUARD (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(GUARD expression? argumentExpressionList RCURLY)
-    | ASSIGNS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS expression? argumentExpressionList RCURLY)
-    | READS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(READS expression? argumentExpressionList RCURLY)
+      DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList)
+    | GUARD (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(GUARD expression? argumentExpressionList)
+    | ASSIGNS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS expression? argumentExpressionList)
+    | READS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(READS expression? argumentExpressionList )
     ;
 
 /* A CIVL-C contract: sequence of 0 or more
