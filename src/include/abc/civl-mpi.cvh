@@ -203,6 +203,8 @@ $bundle $mpi_createCoroutineEntries(int routineTag, int root,
 /* System function */
 void $mpi_coassert(MPI_Comm, _Bool);
 
+_Bool isRecvBufEmpty(int);
+
 #endif
 
 
