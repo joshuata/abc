@@ -89,6 +89,21 @@ import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.TokenFactory;
 
+/**
+ * This is responsible for translating an OpenMP pragma into OpenMP AST nodes.
+ * Note: the source is first parsed by the general parser (CivlCParser), and
+ * then at the AST builder phase, the OMPPragmaHandler is triggered to translate
+ * the OpenMP pragma.
+ * 
+ * The input is a general pragma node produced by applying the general parser
+ * (CivlCParser) to the pragma source. Since the OpenMP parser uses extra tokens
+ * provided by OmpLexer, it needs to mark those tokens explicitly, which are all
+ * considered as "IDENTIFIER" by CivlCParser; see
+ * {@link #markTokens(PragmaNode)}.
+ * 
+ * @author Manchun Zheng
+ *
+ */
 public class OMPPragmaHandler implements PragmaHandler {
 
 	private ParseTree parseTree;
@@ -123,7 +138,7 @@ public class OMPPragmaHandler implements PragmaHandler {
 	 *            The list of C tokens to be translated.
 	 * @return
 	 */
-	private void modifyTokens(PragmaNode pragmaNode) {
+	private void markTokens(PragmaNode pragmaNode) {
 		int number = pragmaNode.getNumTokens();
 
 		for (CToken token : pragmaNode.getTokens()) {
@@ -644,7 +659,7 @@ public class OMPPragmaHandler implements PragmaHandler {
 		CTokenSource tokenSource;
 		TokenStream tokens;
 
-		modifyTokens(pragmaNode);
+		markTokens(pragmaNode);
 		tokenSource = pragmaNode.newTokenSource();
 		tokens = new CommonTokenStream(tokenSource);
 		try {
