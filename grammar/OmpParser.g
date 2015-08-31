@@ -20,7 +20,7 @@ tokens
 	FOR_CLAUSE;
 }
 
-/* ANTLR 3.4 doesn't allow redefinition of headers in composite grammars.
+/* ANTLR 3.5 doesn't allow redefinition of headers in composite grammars.
 Our solution for this is: add the header (package, imported package)
 to the generated java file in ant.
 @header
