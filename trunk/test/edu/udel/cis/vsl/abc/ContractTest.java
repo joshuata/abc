@@ -11,7 +11,7 @@ import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.program.IF.Program;
 
-public class ReductionContractTest {
+public class ContractTest {
 
 	private static boolean debug = false;
 
@@ -40,9 +40,14 @@ public class ReductionContractTest {
 	public void por() throws ABCException, IOException {
 		check("por");
 	}
-	
+
 	@Test
 	public void por2() throws ABCException, IOException {
 		check("por2");
+	}
+
+	@Test
+	public void contracts() throws ABCException, IOException {
+		check("contracts");
 	}
 }
