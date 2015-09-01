@@ -18,4 +18,8 @@ _Bool $read($memory mem,...);
  */
 _Bool $access($memory mem,...);
 
+_Bool $inc(void*ptr);
+
+_Bool $dec(void*ptr);
+
 #endif
