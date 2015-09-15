@@ -77,7 +77,7 @@ void $apply(void *obj1, $operation op, void *obj2, void *result);
 void $elaborate(int x);
 
 /* Elaborates the given domain */
-void $elaborate_rectangular_domain($domain dom);
+void $elaborate_domain($domain dom);
 
 /* get a unique non-negative integer number for time count */
 int $next_time_count(void);
