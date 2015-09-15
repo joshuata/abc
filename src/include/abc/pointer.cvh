@@ -57,10 +57,11 @@ _Bool $leaf_nodes_equal_to(void *obj, int value);
 _Bool $has_leaf_node_equal_to(void *obj, int value);
 
 /*
-  is the given pointer a valid one, i.e, it is not NULL
-  and is referring to some valid dyscope.
+  can the given pointer be safely referenced?
+  A derefable pointer is not NULL
+  and is referring to a memory location of some dyscope.
 */
-_Bool $is_valid_pointer(void *ptr);
+_Bool $is_derefable_pointer(void *ptr);
 
 /* 
    Gives a pointer addition operation. Note that the input pointer will always be
