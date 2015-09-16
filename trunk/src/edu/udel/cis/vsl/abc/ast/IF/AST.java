@@ -90,7 +90,7 @@ public interface AST {
 	/**
 	 * Pretty-prints the entire tree. This should be a human-readable
 	 * representation.
-	 * */
+	 */
 	void print(PrintStream out);
 
 	/**
