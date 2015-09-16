@@ -545,18 +545,13 @@ commaExpression
 	  )*
 	 ;
 
-collectiveBody
-    : conditionalExpression
-    | CALL
-    ;
-
 /* The most general class of expressions.
  * Includes a CIVL-C "collective" expression,
  * and all expressions defined previously.
  */
 expression
 	: COLLECTIVE LPAREN proc=conditionalExpression
-	   RPAREN body=collectiveBody
+	   RPAREN body=conditionalExpression
 	  -> ^(COLLECTIVE $proc $body)
 	| commaExpression
 	;
