@@ -972,8 +972,6 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 				.getChild(0);
 		CommonTree initDeclaratorList = (CommonTree) declarationTree
 				.getChild(1);
-		CommonTree contractTree = (CommonTree) declarationTree.getChild(2);
-		SequenceNode<ContractNode> contract = getContract(contractTree, scope);
 		SpecifierAnalysis analysis = newSpecifierAnalysis(declarationSpecifiers);
 		int numDeclarators = initDeclaratorList.getChildCount();
 		ArrayList<BlockItemNode> definitionList = new ArrayList<BlockItemNode>();
@@ -1046,6 +1044,10 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			} else if (isFunction(data.type, scope)) {
 				FunctionTypeNode typeNode = (FunctionTypeNode) data.type;
 				FunctionDeclarationNode declaration;
+				CommonTree contractTree = (CommonTree) declarationTree
+						.getChild(2);
+				SequenceNode<ContractNode> contract = getContract(contractTree,
+						scope);
 
 				if (analysis.abstractSpecifier) {
 					declaration = nodeFactory
