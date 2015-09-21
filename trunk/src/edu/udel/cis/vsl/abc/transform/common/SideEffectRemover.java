@@ -123,6 +123,7 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * 
  * @author Timothy K. Zirkel
  * @author Stephen F. Siegel
+ * @author Manchun Zheng
  */
 public class SideEffectRemover extends BaseTransformer {
 
@@ -1859,6 +1860,15 @@ public class SideEffectRemover extends BaseTransformer {
 		}
 		removeNodes(blockItems);
 		result.add(makeBlockItem(compound.getSource(), blockItems));
+		if (result.size() == 1) {
+			BlockItemNode node = result.get(0);
+
+			if (!(node instanceof CompoundStatementNode))
+				result = Arrays
+						.asList((BlockItemNode) this.nodeFactory
+								.newCompoundStatementNode(compound.getSource(),
+										result));
+		}
 		return result;
 	}
 

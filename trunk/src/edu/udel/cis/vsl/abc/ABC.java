@@ -131,6 +131,8 @@ public class ABC {
 		out.println("  show symbol and type tables");
 		out.println("-time");
 		out.println("  show time for each phase");
+		out.println("-diff");
+		out.println("  show the difference of two ASTs");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
 		for (String code : Transform.getCodes()) {
@@ -166,6 +168,7 @@ public class ABC {
 		boolean pretty = true;
 		boolean tables = false; // show symbol and type tables
 		boolean showTime = false;
+		boolean showDiff = false;
 		List<String> transformCodes = new LinkedList<>();
 		Language language = null;
 		TranslationTask result = new TranslationTask();
@@ -243,6 +246,8 @@ public class ABC {
 				tables = true;
 			} else if (arg.equals("-time")) {
 				showTime = true;
+			} else if (arg.equals("-diff")) {
+				showDiff = true;
 			} else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
 					language = Language.C;
@@ -282,6 +287,7 @@ public class ABC {
 		result.setShowTables(tables);
 		result.setShowTime(showTime);
 		result.setPreprocOnly(preprocOnly);
+		result.setShowDiff(showDiff);
 		result.addAllTransformCodes(transformCodes);
 		return result;
 	}
@@ -314,7 +320,12 @@ public class ABC {
 		}
 		frontEnd = new FrontEnd();
 		try {
-			frontEnd.showTranslation(config);
+
+			if (config.doShowDiff()) {
+				frontEnd.compileAndCompare(config);
+			} else {
+				frontEnd.showTranslation(config);
+			}
 		} catch (PreprocessorException e) {
 			err.println(e.toString());
 			err.flush();

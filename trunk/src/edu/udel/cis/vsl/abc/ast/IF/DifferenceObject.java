@@ -55,8 +55,8 @@ public class DifferenceObject {
 	private String getNodeInfo(ASTNode node) {
 		StringBuffer buf = new StringBuffer();
 
-		buf.append(node.toString());
-		buf.append(" at ");
+		buf.append(node.prettyRepresentation());
+		buf.append("    at ");
 		buf.append(node.getSource().getSummary(false));
 		return buf.toString();
 	}

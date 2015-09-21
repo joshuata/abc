@@ -14,6 +14,7 @@ import edu.udel.cis.vsl.abc.antlr2ast.IF.Antlr2AST;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.IF.ASTs;
+import edu.udel.cis.vsl.abc.ast.IF.DifferenceObject;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversions;
 import edu.udel.cis.vsl.abc.ast.entity.IF.Entities;
@@ -294,8 +295,8 @@ public class FrontEnd {
 	 * analysis results. Equivalent to invoking
 	 * {@link #compile(File, Language, File[], File[], Map) with the default
 	 * values {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS},
-	 * {@link ABC#DEFAULT_USER_INCLUDE_PATHS}, {@link ABC#DEFAULT_IMPLICIT_MACROS} for
-	 * the last three arguments.
+	 * {@link ABC#DEFAULT_USER_INCLUDE_PATHS},
+	 * {@link ABC#DEFAULT_IMPLICIT_MACROS} for the last three arguments.
 	 * 
 	 * @param file
 	 *            the file to compile
@@ -314,8 +315,7 @@ public class FrontEnd {
 	public AST compile(File file, Language language)
 			throws PreprocessorException, SyntaxException, ParseException {
 		return compile(file, language, ABC.DEFAULT_SYSTEM_INCLUDE_PATHS,
-				ABC.DEFAULT_USER_INCLUDE_PATHS,
-				ABC.DEFAULT_IMPLICIT_MACROS);
+				ABC.DEFAULT_USER_INCLUDE_PATHS, ABC.DEFAULT_IMPLICIT_MACROS);
 	}
 
 	/**
@@ -401,8 +401,8 @@ public class FrontEnd {
 	 * Compiles and links the specified files. Equivalent to invoking
 	 * {@link #compileAndLink(File[], Language, File[], File[], Map)} with the
 	 * default values {@link ABC#DEFAULT_SYSTEM_INCLUDE_PATHS},
-	 * {@link ABC#DEFAULT_USER_INCLUDE_PATHS}, {@link ABC#DEFAULT_IMPLICIT_MACROS} for
-	 * the last three arguments.
+	 * {@link ABC#DEFAULT_USER_INCLUDE_PATHS},
+	 * {@link ABC#DEFAULT_IMPLICIT_MACROS} for the last three arguments.
 	 * 
 	 * @param files
 	 *            the source files to compile
@@ -423,8 +423,7 @@ public class FrontEnd {
 			throws PreprocessorException, SyntaxException, ParseException {
 		return compileAndLink(files, language,
 				ABC.DEFAULT_SYSTEM_INCLUDE_PATHS,
-				ABC.DEFAULT_USER_INCLUDE_PATHS,
-				ABC.DEFAULT_IMPLICIT_MACROS);
+				ABC.DEFAULT_USER_INCLUDE_PATHS, ABC.DEFAULT_IMPLICIT_MACROS);
 	}
 
 	/**
@@ -596,5 +595,29 @@ public class FrontEnd {
 		// + PreprocessorTokenSource.nextToken_calls);
 		// }
 		out.flush();
+	}
+
+	public void compileAndCompare(TranslationTask task)
+			throws PreprocessorException, SyntaxException, ParseException {
+		int nfiles = task.getFiles().length;
+		File file1, file2;
+		FrontEnd frontEnd1 = new FrontEnd(), frontEnd2 = new FrontEnd();
+		AST ast1, ast2;
+		DifferenceObject diffObj;
+
+		if (nfiles != 2) {
+			System.out.println("-showDiff requires exactly two files.");
+			return;
+		}
+		file1 = task.getFiles()[0];
+		file2 = task.getFiles()[1];
+		ast1 = frontEnd1.compile(file1, task.getLanguage());
+		ast2 = frontEnd2.compile(file2, task.getLanguage());
+		diffObj = ast1.diff(ast2);
+		if (diffObj == null)
+			System.out.println("The AST of " + file1.getName()
+					+ " is equivalent to that of " + file2.getName() + ".");
+		else
+			diffObj.print(System.out);
 	}
 }
