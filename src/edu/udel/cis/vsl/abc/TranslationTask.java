@@ -83,6 +83,11 @@ public class TranslationTask {
 	private boolean showTime;
 
 	/**
+	 * Shows the difference of two ASTs.
+	 */
+	private boolean showDiff;
+
+	/**
 	 * Constructs a new task with language C, empty system and user include
 	 * paths, output stream {@link System#out}, not preproc only, verbose, no
 	 * files, no transform codes.
@@ -274,8 +279,16 @@ public class TranslationTask {
 		return showTime;
 	}
 
+	public boolean doShowDiff() {
+		return this.showDiff;
+	}
+
 	public void setShowTime(boolean showTime) {
 		this.showTime = showTime;
+	}
+
+	public void setShowDiff(boolean showDiff) {
+		this.showDiff = showDiff;
 	}
 
 }
