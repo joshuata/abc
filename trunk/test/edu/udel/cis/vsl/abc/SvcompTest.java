@@ -34,6 +34,7 @@ public class SvcompTest {
 		ABC.main(args);
 	}
 
+	// this test checks for the GNU C feature __attribute__(...)
 	@Test
 	public void queue_ok_longest_true() throws ABCException, IOException {
 		check(this.filename("queue_ok_longest_true-unreach-call.c"));
