@@ -99,6 +99,13 @@ public interface Preprocessor {
 	void parse(PrintStream out, File file) throws PreprocessorException;
 
 	/**
+	 * return the macros defined for the programs, including implicit macros and
+	 * macros defined in the given map.<br>
+	 * Default macros are:<br>
+	 * 
+	 * <pre>
+	 * #define __atrribute(X)__
+	 * </pre>
 	 * 
 	 * @param macroDefs
 	 * @return a map ABC macro objects which are the preprocessed result of the
