@@ -208,19 +208,14 @@ $bundle $mpi_createCoroutineEntries(int routineTag, int root,
 void $mpi_coassert(MPI_Comm, _Bool);
 
 /*********** Section: contract system functions ***********/
-/* Contract system functions (CSF) are functions that calls to them
-   will be treated as expressions in CIVL model. CIVL model may add
-   more arguments on CSF thus the declarations here allows uncertaion
-   number of arguments. However, only arguments explicitly defined and
-   required and ones added by CIVL model are significant. Other
-   arguments will be ignored and removed */
+/* Contract system functions are functions that calls to them will be
+   treated as expressions in CIVL model. CIVL model may add more
+   arguments on those functions thus the declarations here allows
+   uncertaion number of arguments. However, only arguments explicitly
+   defined and required and ones added by CIVL model are
+   significant. Other arguments will be ignored and removed */
 
-/* A contract system function which can only be used in a collective
-   expression in a contract. A call to this function means: the buffer
-   which stores messages from a source process to the caller process
-   is empty. The source process is decided by the place 'x' and a MPI
-   communicator specified by collective expression. */
-_Bool $mpi_isRecvBufEmpty(int x, ...);
+_Bool $mpi_isRecvBufEmpty(int x);
 
 #endif
 
