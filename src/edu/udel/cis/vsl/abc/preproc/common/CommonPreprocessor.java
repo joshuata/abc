@@ -45,7 +45,7 @@ public class CommonPreprocessor implements Preprocessor {
 	@Override
 	public Map<String, Macro> getMacros(Map<String, String> macroDefs)
 			throws PreprocessorException {
-		if (macroDefs != null && macroDefs.size() > 0) {
+		// if (macroDefs != null && macroDefs.size() > 0) {
 			try {
 				// use temporary file to store the macro definitions
 				File temp = File.createTempFile(
@@ -79,8 +79,8 @@ public class CommonPreprocessor implements Preprocessor {
 				// why doesn't this throw an exception????????
 				return new HashMap<String, Macro>();
 			}
-		} else
-			return new HashMap<String, Macro>();
+//		} else
+//			return new HashMap<String, Macro>();
 	}
 
 	/**
