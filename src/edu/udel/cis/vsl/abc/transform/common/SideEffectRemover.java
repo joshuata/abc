@@ -1620,6 +1620,10 @@ public class SideEffectRemover extends BaseTransformer {
 		// cond: purify. if before is non-trivial then transform to
 		// while (1) { befores; if (!expr) break; body}
 		ExpressionNode cond = loop.getCondition();
+
+		if (cond == null)
+			return;
+
 		ExprTriple condTriple = translate(cond);
 
 		purify(condTriple);
