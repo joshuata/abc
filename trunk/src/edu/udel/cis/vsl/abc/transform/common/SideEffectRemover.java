@@ -961,6 +961,7 @@ public class SideEffectRemover extends BaseTransformer {
 		case UNARYMINUS:
 		case UNARYPLUS:
 		case BIG_O:
+		case BITCOMPLEMENT:
 			result = translateGenericUnaryOperator(expression);
 			break;
 		case PREINCREMENT:
@@ -971,7 +972,6 @@ public class SideEffectRemover extends BaseTransformer {
 			break;
 		case AT:
 		case BITAND:
-		case BITCOMPLEMENT:
 		case BITOR:
 		case BITXOR:
 		case PLUS:
