@@ -16,6 +16,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Field;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
+import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
@@ -138,6 +139,9 @@ public class CompoundLiteralAnalyzer {
 			for (int i = 0; i < numFields; i++)
 				children[i].setParent(result);
 			return result;
+		}
+		case QUALIFIED: {
+			return makeTypeTree(((QualifiedObjectType) type).getBaseType());
 		}
 		default:
 			return new LiteralScalarTypeNode(type);
