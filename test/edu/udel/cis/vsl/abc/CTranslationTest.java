@@ -175,4 +175,9 @@ public class CTranslationTest {
 	public void chars() throws ABCException, IOException {
 		check("chars");
 	}
+
+	@Test
+	public void struct() throws ABCException, IOException {
+		check("c/struct");
+	}
 }
