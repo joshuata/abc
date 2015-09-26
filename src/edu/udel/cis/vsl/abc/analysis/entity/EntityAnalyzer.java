@@ -112,7 +112,7 @@ public class EntityAnalyzer implements Analyzer {
 		this.declarationAnalyzer = new DeclarationAnalyzer(this);
 		declarationAnalyzer.setIgnoredTypes(standardTypes
 				.getStandardTypeNames());
-		this.expressionAnalyzer = new ExpressionAnalyzer(configuration, this,
+		this.expressionAnalyzer = new ExpressionAnalyzer(this,
 				conversionFactory, typeFactory);
 		this.compoundLiteralAnalyzer = new CompoundLiteralAnalyzer(this);
 		this.statementAnalyzer = new StatementAnalyzer(this,
