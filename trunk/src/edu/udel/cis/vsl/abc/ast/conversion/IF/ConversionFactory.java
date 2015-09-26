@@ -5,12 +5,14 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ArithmeticType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
+import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
 /**
@@ -288,8 +290,8 @@ public interface ConversionFactory {
 	 *            applying lvalue conversion to the left hand side.
 	 * @throws UnsourcedException
 	 */
-	Conversion assignmentConversion(ExpressionNode rhs, Type newType)
-			throws UnsourcedException;
+	Conversion assignmentConversion(Configuration config, ExpressionNode rhs,
+			Type newType) throws UnsourcedException;
 
 	/**
 	 * When a range expression is used in $for or $parfor, it is converted
@@ -344,4 +346,25 @@ public interface ConversionFactory {
 	 *         the memory type
 	 */
 	MemoryConversion memoryConversion(Type type);
+
+	/**
+	 * creates a pointer-to-integer type conversion
+	 * 
+	 * @param oldType
+	 * @param newType
+	 * @return
+	 */
+	Pointer2IntegerConversion pointer2IntegerConversion(PointerType oldType,
+			IntegerType newType);
+
+	/**
+	 * creates a integer-to-pointer type conversion
+	 * 
+	 * @param oldType
+	 * @param newType
+	 * @return
+	 */
+	Integer2PointerConversion integer2PointerConversion(IntegerType oldType,
+			PointerType newType);
+
 }

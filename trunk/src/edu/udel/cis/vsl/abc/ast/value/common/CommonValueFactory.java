@@ -257,10 +257,15 @@ public class CommonValueFactory implements ValueFactory {
 				imaginaryPart));
 	}
 
+	// TODO use constant 2 temporarily to see if there are further errors for
+	// svcomp benchmarks
 	@Override
-	public TypeValue sizeofValue(Type type) {
-		return (TypeValue) canonic(new CommonTypeValue(typeFactory.size_t(),
-				TypeValueKind.SIZEOF, type));
+	public Value sizeofValue(Type type) {
+		return integerValue(
+				(IntegerType) typeFactory.basicType(BasicTypeKind.INT),
+				BigInteger.valueOf(2));
+		// return (TypeValue) canonic(new CommonTypeValue(typeFactory.size_t(),
+		// TypeValueKind.SIZEOF, type));
 	}
 
 	@Override
@@ -422,6 +427,8 @@ public class CommonValueFactory implements ValueFactory {
 	private Value evaluateCast(Type castType, Value value)
 			throws UnsourcedException {
 		// TODO: cast concrete numeric types if you can, pointer types, ...
+		if (castType.compatibleWith(value.getType()))
+			return value;
 		return canonic(new CommonCastValue(castType, value));
 	}
 

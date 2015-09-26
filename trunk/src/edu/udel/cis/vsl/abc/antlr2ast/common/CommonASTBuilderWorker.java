@@ -74,6 +74,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
@@ -110,6 +111,12 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	private Map<String, PragmaHandler> pragmaMap = new HashMap<>();
 
 	/**
+	 * the configuraiton of this translation task, e.g, if svcomp mode is
+	 * enabled
+	 */
+	private Configuration config;
+
+	/**
 	 * The number of anonymous tagged entities (structs, unions, enums)
 	 * encountered so far. Used to assign a unique name to each anonymous
 	 * entity.
@@ -129,13 +136,14 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	 *            the CTokenSource used to produce the ANTLR tree
 	 * 
 	 */
-	public CommonASTBuilderWorker(ParseTree parseTree, ASTFactory astFactory,
-			PragmaFactory pragmaFactory) {
+	public CommonASTBuilderWorker(Configuration config, ParseTree parseTree,
+			ASTFactory astFactory, PragmaFactory pragmaFactory) {
 		this.parseTree = parseTree;
 		this.nodeFactory = astFactory.getNodeFactory();
 		this.tokenFactory = astFactory.getTokenFactory();
 		this.rootTree = parseTree.getRoot();
 		this.pragmaFactory = pragmaFactory;
+		this.config = config;
 	}
 
 	/* ************************* Private Methods ************************** */
@@ -1203,17 +1211,27 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			structDeclList = null;
 		} else {
 			int numFields = declListTree.getChildCount();
-			List<FieldDeclarationNode> fieldDecls = new LinkedList<FieldDeclarationNode>();
 
-			for (int i = 0; i < numFields; i++) {
-				CommonTree declTree = (CommonTree) declListTree.getChild(i);
-				List<FieldDeclarationNode> fieldDeclarations = translateFieldDeclaration(
-						declTree, scope);
+			if (numFields > 0) {
+				List<FieldDeclarationNode> fieldDecls = new LinkedList<FieldDeclarationNode>();
 
-				fieldDecls.addAll(fieldDeclarations);
+				for (int i = 0; i < numFields; i++) {
+					CommonTree declTree = (CommonTree) declListTree.getChild(i);
+					List<FieldDeclarationNode> fieldDeclarations = translateFieldDeclaration(
+							declTree, scope);
+
+					fieldDecls.addAll(fieldDeclarations);
+				}
+				structDeclList = nodeFactory.newSequenceNode(
+						newSource(declListTree), "FieldDeclarations",
+						fieldDecls);
+			} else {
+				if (this.config != null && this.config.svcomp()) {
+					structDeclList = null;
+				} else {
+					throw this.error("empty struct is not allowed", structTree);
+				}
 			}
-			structDeclList = nodeFactory.newSequenceNode(
-					newSource(declListTree), "FieldDeclarations", fieldDecls);
 		}
 		return nodeFactory.newStructOrUnionTypeNode(wholeSource, isStruct, tag,
 				structDeclList);

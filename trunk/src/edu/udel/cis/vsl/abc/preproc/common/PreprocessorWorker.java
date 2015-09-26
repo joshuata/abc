@@ -8,6 +8,7 @@ import java.util.Map;
 import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
@@ -54,6 +55,11 @@ public class PreprocessorWorker {
 	 */
 	private TokenFactory tokenFactory = Tokens.newTokenFactory();
 
+	/**
+	 * The configuration of the translation task
+	 */
+	private Configuration config;
+
 	/* ******************* Package-private static fields ******************* */
 
 	/**
@@ -86,10 +92,11 @@ public class PreprocessorWorker {
 	 *            the predefined macros, including those specified in command
 	 *            line
 	 */
-	public PreprocessorWorker(CommonPreprocessor preprocessor,
+	public PreprocessorWorker(Configuration config, CommonPreprocessor preprocessor,
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> macros) {
 		this.preprocessor = preprocessor;
+		this.config = config;
 		if (systemIncludePaths == null)
 			this.systemIncludePaths = defaultSystemIncludes;
 		else
@@ -121,9 +128,9 @@ public class PreprocessorWorker {
 			Map<String, Macro> macroMap, TokenFactory tokenFactory,
 			boolean tmpFile) throws PreprocessorException {
 		PreprocessorParser parser = preprocessor.parser(file);
-		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
-				parser, systemIncludePaths, userIncludePaths, macroMap,
-				tokenFactory, this, tmpFile);
+		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(
+				this.config, file, parser, systemIncludePaths,
+				userIncludePaths, macroMap, tokenFactory, this, tmpFile);
 
 		return tokenSource;
 	}
@@ -260,9 +267,9 @@ public class PreprocessorWorker {
 					+ " syntax errors occurred while scanning included file "
 					+ file);
 
-		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(file,
-				parser, systemIncludePaths, userIncludePaths, macroMap,
-				tokenFactory, this, false);
+		PreprocessorTokenSource tokenSource = new PreprocessorTokenSource(
+				this.config, file, parser, systemIncludePaths,
+				userIncludePaths, macroMap, tokenFactory, this, false);
 
 		return tokenSource;
 	}

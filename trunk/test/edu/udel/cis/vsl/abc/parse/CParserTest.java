@@ -23,7 +23,7 @@ public class CParserTest {
 	private static boolean debug = false;
 
 	private static Preprocessor preprocessor = Preprocess
-			.newPreprocessorFactory().newPreprocessor();
+			.newPreprocessorFactory().newPreprocessor(null);
 
 	private static PrintStream out = System.out;
 

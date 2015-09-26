@@ -24,6 +24,9 @@ import edu.udel.cis.vsl.abc.ast.entity.IF.Scope;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.Nodes;
+import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FunctionDeclarationNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Types;
@@ -131,8 +134,8 @@ public class FrontEnd {
 	 * 
 	 * @return the new Preprocessor
 	 */
-	public Preprocessor getPreprocessor() {
-		return preprocessorFactory.newPreprocessor();
+	public Preprocessor getPreprocessor(Configuration config) {
+		return preprocessorFactory.newPreprocessor(config);
 	}
 
 	/**
@@ -236,14 +239,15 @@ public class FrontEnd {
 	 *             if the file violates some aspect of the syntax of the
 	 *             language
 	 * */
-	public AST parse(File file, File[] systemIncludePaths,
+	public AST parse(Language language, File file, File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros)
 			throws PreprocessorException, SyntaxException, ParseException {
-		Preprocessor preprocessor = getPreprocessor();
+		Configuration config = language == Language.C ? c_config : civl_config;
+		Preprocessor preprocessor = getPreprocessor(config);
 		CTokenSource tokens = preprocessor.outputTokenSource(
 				systemIncludePaths, userIncludePaths, implicitMacros, file);
 		ParseTree parseTree = parser.parse(tokens);
-		AST ast = builder.getTranslationUnit(parseTree);
+		AST ast = builder.getTranslationUnit(config, parseTree);
 
 		return ast;
 	}
@@ -282,8 +286,8 @@ public class FrontEnd {
 	public AST compile(File file, Language language, File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros)
 			throws PreprocessorException, SyntaxException, ParseException {
-		AST result = parse(file, systemIncludePaths, userIncludePaths,
-				implicitMacros);
+		AST result = parse(language, file, systemIncludePaths,
+				userIncludePaths, implicitMacros);
 		Analyzer analyzer = getStandardAnalyzer(language);
 
 		analyzer.analyze(result);
@@ -378,7 +382,8 @@ public class FrontEnd {
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> implicitMacros) throws PreprocessorException,
 			SyntaxException, ParseException {
-		Preprocessor preprocessor = getPreprocessor();
+		Configuration config = language == Language.C ? c_config : civl_config;
+		Preprocessor preprocessor = getPreprocessor(config);
 		Analyzer analyzer = getStandardAnalyzer(language);
 		ProgramFactory programFactory = getProgramFactory(analyzer);
 		int n = files.length;
@@ -391,7 +396,7 @@ public class FrontEnd {
 					files[i]);
 			ParseTree parseTree = parser.parse(tokens);
 
-			asts[i] = builder.getTranslationUnit(parseTree);
+			asts[i] = builder.getTranslationUnit(config, parseTree);
 		}
 		result = programFactory.newProgram(asts);
 		return result;
@@ -482,13 +487,18 @@ public class FrontEnd {
 		boolean pretty = task.doPrettyPrint();
 		boolean tables = task.doShowTables();
 		int nfiles = task.getFiles().length;
-		FrontEnd frontEnd = new FrontEnd();
-		Preprocessor preprocessor = frontEnd.getPreprocessor();
+		Configuration config = task.getLanguage() == Language.C ? c_config
+				: civl_config;
+
+		this.updateConfiguration(task, config);
+
+		Preprocessor preprocessor = this.getPreprocessor(config);
 		AST[] asts = new AST[nfiles];
 		Map<String, String> macroNames = task.getMacros();
 		Map<String, Macro> implicitMacros = preprocessor.getMacros(macroNames);
 		boolean showTime = task.doShowTime();
 		Timer timer = showTime ? new Timer(out) : new Timer();
+		boolean silent = task.doSilent();
 
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
@@ -546,7 +556,7 @@ public class FrontEnd {
 					out.flush();
 					timer.markTime("print ANTLR tree");
 				}
-				asts[i] = builder.getTranslationUnit(parseTree);
+				asts[i] = builder.getTranslationUnit(config, parseTree);
 				timer.markTime("build AST for " + filename);
 				if (verbose) {
 					out.println(bar + " Raw Translation Unit for " + filename
@@ -564,17 +574,17 @@ public class FrontEnd {
 		if (!task.isPreprocOnly()) {
 			Program program;
 
-			program = frontEnd.link(asts, task.getLanguage());
+			program = link(asts, task.getLanguage());
 			timer.markTime("link " + asts.length + " translation units");
 			if (verbose) {
 				out.println(bar + " Program " + bar);
 				timer.markTime("print linked program");
 			}
 			for (String code : task.getTransformCodes()) {
-				Transformer transformer = frontEnd.getTransformer(code);
+				Transformer transformer = getTransformer(code);
 
 				if (verbose) {
-					frontEnd.printProgram(out, program, pretty, tables);
+					printProgram(out, program, pretty, tables);
 					out.println();
 					out.println(bar + " Program after " + transformer + " "
 							+ bar);
@@ -584,17 +594,42 @@ public class FrontEnd {
 				timer.markTime("apply transformer "
 						+ transformer.getShortDescription());
 			}
-			if (!showTime)
-				frontEnd.printProgram(out, program, pretty, tables);
+			if (!showTime && !silent)
+				printProgram(out, program, pretty, tables);
+			if (task.doUnkownFunc()) {
+				printUnknownFunctions(out, program);
+			}
 		}
-		if (!showTime)
+		if (!showTime && !silent)
 			preprocessor.printSourceFiles(out);
-		// if (showTime) {
-		// // also show counts for now:
-		// out.println("Calls to PreprocessorTokenSource.nextToken(): "
-		// + PreprocessorTokenSource.nextToken_calls);
-		// }
 		out.flush();
+	}
+
+	/**
+	 * prints file scope functions that are used but no definitions are ever
+	 * provided
+	 * 
+	 * @param program
+	 */
+	private void printUnknownFunctions(PrintStream out, Program program) {
+		SequenceNode<BlockItemNode> root = program.getAST().getRootNode();
+		int i = 0;
+
+		for (BlockItemNode item : root) {
+			if (item instanceof FunctionDeclarationNode) {
+				FunctionDeclarationNode function = (FunctionDeclarationNode) item;
+
+				if (function.getEntity().getDefinition() == null) {
+					if (i > 0)
+						System.out.print(",");
+					System.out.print(function.getName());
+					i++;
+				}
+			}
+		}
+		if (i > 0)
+			System.out.println();
+
 	}
 
 	public void compileAndCompare(TranslationTask task)
@@ -604,11 +639,14 @@ public class FrontEnd {
 		FrontEnd frontEnd1 = new FrontEnd(), frontEnd2 = new FrontEnd();
 		AST ast1, ast2;
 		DifferenceObject diffObj;
+		Configuration config = task.getLanguage() == Language.C ? c_config
+				: civl_config;
 
 		if (nfiles != 2) {
 			System.out.println("-showDiff requires exactly two files.");
 			return;
 		}
+		this.updateConfiguration(task, config);
 		file1 = task.getFiles()[0];
 		file2 = task.getFiles()[1];
 		ast1 = frontEnd1.compile(file1, task.getLanguage());
@@ -619,5 +657,9 @@ public class FrontEnd {
 					+ " is equivalent to that of " + file2.getName() + ".");
 		else
 			diffObj.print(System.out);
+	}
+
+	private void updateConfiguration(TranslationTask task, Configuration config) {
+		config.setSvcomp(task.doSvcomp());
 	}
 }

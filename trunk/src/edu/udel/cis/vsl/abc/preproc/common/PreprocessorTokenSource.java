@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -22,6 +23,7 @@ import org.antlr.runtime.TokenSource;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.preproc.IF.IllegalMacroArgumentException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
@@ -188,11 +190,11 @@ public class PreprocessorTokenSource implements CTokenSource {
 	 *             if and IOException or RecognitionException occurs while
 	 *             scanning and parsing the source file
 	 */
-	public PreprocessorTokenSource(File source, PreprocessorParser parser,
-			File[] systemIncludePaths, File[] userIncludePaths,
-			Map<String, Macro> macroMap, TokenFactory tokenFactory,
-			PreprocessorWorker worker, boolean tmpFile)
-			throws PreprocessorException {
+	public PreprocessorTokenSource(Configuration config, File source,
+			PreprocessorParser parser, File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> macroMap,
+			TokenFactory tokenFactory, PreprocessorWorker worker,
+			boolean tmpFile) throws PreprocessorException {
 		assert systemIncludePaths != null;
 		assert userIncludePaths != null;
 		this.tokenFactory = tokenFactory;
@@ -200,6 +202,25 @@ public class PreprocessorTokenSource implements CTokenSource {
 		this.originalSourceFile = getOrMakeSourceFile(source, tmpFile);
 		try {
 			CommonTree tree = (CommonTree) parser.file().getTree();
+
+			// public CommonToken(CharStream input, int type, int channel, int
+			// start, int stop) {
+
+			if (!tmpFile && (config != null && config.svcomp())) {
+				CommonToken svcomp = new CommonToken(tree.getToken()
+						.getInputStream(), 80, 0, -1, -1);
+				CommonToken include = new CommonToken(tree.getToken()
+						.getInputStream(), 136, 0, -1, -1);
+
+				svcomp.setText("<svcomp.h>");
+				include.setText("#include");
+
+				CommonTree includeSvcomp = new CommonTree(include);
+
+				includeSvcomp.addChild(new CommonTree(svcomp));
+				tree.insertChild(0, includeSvcomp);
+			}
+
 			Formation history = tokenFactory.newInclusion(originalSourceFile);
 			StringPredicate macroDefinedPredicate = new MacroDefinedPredicate(
 					macroMap);
@@ -227,7 +248,7 @@ public class PreprocessorTokenSource implements CTokenSource {
 			File[] systemIncludePaths, File[] userIncludePaths,
 			TokenFactory tokenFactory, PreprocessorWorker worker,
 			boolean tmpFile) throws PreprocessorException {
-		this(source, parser, systemIncludePaths, userIncludePaths,
+		this(null, source, parser, systemIncludePaths, userIncludePaths,
 				new HashMap<String, Macro>(), tokenFactory, worker, tmpFile);
 	}
 

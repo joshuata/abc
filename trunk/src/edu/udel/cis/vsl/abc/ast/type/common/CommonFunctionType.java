@@ -78,12 +78,15 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 		return hasVariableArgs;
 	}
 
+	// TODO need to make it an option to turn switch checking
 	@Override
 	public int getNumParameters() {
 		if (parameterTypes == null)
-			throw new ASTException(
-					"The parameters for the function have not been specified."
-							+ "\nNote that a prototype for a function with 0 parameters must have the form \"f(void)\"");
+			return 0;
+		// throw new ASTException(
+		// "The parameters for the function have not been specified."
+		// +
+		// "\nNote that a prototype for a function with 0 parameters must have the form \"f(void)\"");
 		return parameterTypes.size();
 	}
 
@@ -326,20 +329,20 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 		return equivalent ? equivalentTo(other, seen) : compatibleWith(other,
 				seen);
 	}
-	
+
 	@Override
-	public String toString(){
+	public String toString() {
 		String result = "";
-		boolean isFirst=true;
-		
+		boolean isFirst = true;
+
 		result += returnType.toString();
 		result += " (";
-		for(ObjectType parameterType:parameterTypes){
-			if(isFirst)
-				isFirst=false;
+		for (ObjectType parameterType : parameterTypes) {
+			if (isFirst)
+				isFirst = false;
 			else
-				result +=", ";
-		result += parameterType.toString();
+				result += ", ";
+			result += parameterType.toString();
 		}
 		result += ")";
 		return result;

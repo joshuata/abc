@@ -40,7 +40,7 @@ public class PreprocessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		p = new CommonPreprocessor();
+		p = new CommonPreprocessor(null);
 	}
 
 	private void readSource(TokenSource source) throws PreprocessorException {

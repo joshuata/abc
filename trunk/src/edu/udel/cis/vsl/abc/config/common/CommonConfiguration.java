@@ -8,6 +8,8 @@ public class CommonConfiguration implements Configuration {
 
 	Language language = Language.C;
 
+	private boolean svcomp = false;
+
 	/** number of bits for smallest object that is not a bit-field (byte) */
 	BigInteger CHAR_BIT = new BigInteger("8");
 
@@ -206,6 +208,16 @@ public class CommonConfiguration implements Configuration {
 	@Override
 	public BigInteger charMax() {
 		return signedCharMax();
+	}
+
+	@Override
+	public boolean svcomp() {
+		return this.svcomp;
+	}
+
+	@Override
+	public void setSvcomp(boolean svcomp) {
+		this.svcomp = svcomp;
 	}
 
 }

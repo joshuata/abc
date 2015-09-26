@@ -32,7 +32,7 @@ public class LinkTest {
 
 	public final static PrintStream out = System.out;
 
-	public final static boolean debug = false;
+	public final static boolean debug = true;
 
 	private File root = new File(new File("examples"), "link");
 
@@ -59,7 +59,6 @@ public class LinkTest {
 			out.println();
 			actual.prettyPrint(out, false);
 		}
-
 		assertTrue(actual.getRootNode().equiv(expected.getRootNode()));
 	}
 

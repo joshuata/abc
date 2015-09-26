@@ -10,7 +10,9 @@ import edu.udel.cis.vsl.abc.ast.node.IF.IdentifierNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.FieldDeclarationNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
+import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 
 public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
@@ -49,7 +51,12 @@ public class CommonStructureOrUnionTypeNode extends CommonTypeNode implements
 
 	@Override
 	public StructureOrUnionType getType() {
-		return (StructureOrUnionType) super.getType();
+		Type type=super.getType();
+		
+		if (type instanceof QualifiedObjectType){
+			return (StructureOrUnionType) ((QualifiedObjectType)type).getBaseType();
+		}
+		return (StructureOrUnionType) type;
 	}
 
 	@Override
