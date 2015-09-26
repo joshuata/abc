@@ -124,15 +124,13 @@ public class ExpressionAnalyzer {
 
 	private IntegerType intType;
 
-	private Language language;
-
 	private SpecialFunctionCallAnalyzer specialCallAnalyzer;
 
 	private Configuration config;
 
 	// ************************** Constructors ****************************
 
-	ExpressionAnalyzer(Configuration config, EntityAnalyzer entityAnalyzer,
+	ExpressionAnalyzer(EntityAnalyzer entityAnalyzer,
 			ConversionFactory conversionFactory, TypeFactory typeFactory) {
 		this.entityAnalyzer = entityAnalyzer;
 		this.conversionFactory = conversionFactory;
@@ -140,10 +138,10 @@ public class ExpressionAnalyzer {
 		this.intType = typeFactory.signedIntegerType(SignedIntKind.INT);
 		this.astFactory = entityAnalyzer.astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
-		this.language = entityAnalyzer.configuration.getLanguage();
+		// this.language = entityAnalyzer.configuration.getLanguage();
 		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(
 				this.entityAnalyzer, typeFactory, this.conversionFactory);
-		this.config = config;
+		this.config = entityAnalyzer.configuration;
 	}
 
 	// ************************* Exported Methods **************************
@@ -195,7 +193,8 @@ public class ExpressionAnalyzer {
 				processGenericSelection((GenericSelectionNode) node);
 				break;
 			case IDENTIFIER_EXPRESSION:
-				processIdentifierExpression((IdentifierExpressionNode) node);
+				processIdentifierExpression((IdentifierExpressionNode) node,
+						true);
 				break;
 			case OPERATOR:
 				processOperator((OperatorNode) node);
@@ -690,15 +689,16 @@ public class ExpressionAnalyzer {
 		return result;
 	}
 
-	private void processIdentifierExpression(IdentifierExpressionNode node)
-			throws SyntaxException {
+	private void processIdentifierExpression(IdentifierExpressionNode node,
+			boolean isFirstRound) throws SyntaxException {
 		IdentifierNode identifierNode = node.getIdentifier();
 		String name = identifierNode.name();
 		OrdinaryEntity entity = node.getScope().getLexicalOrdinaryEntity(name);
 		EntityKind kind;
 
-		if (entity == null)
+		if (entity == null) {
 			throw error("Undeclared identifier " + name, node);
+		}
 		kind = entity.getEntityKind();
 		switch (kind) {
 		case VARIABLE:
@@ -902,7 +902,7 @@ public class ExpressionAnalyzer {
 				.getIdentifierNode();
 
 		processExpression(left);
-		processIdentifierExpression(identifierExpression);
+		processIdentifierExpression(identifierExpression, true);
 		node.setInitialType(identifierExpression.getInitialType());
 	}
 
@@ -1829,7 +1829,7 @@ public class ExpressionAnalyzer {
 	 */
 	private boolean isPointerToCompleteObjectType(Type type) {
 		if (type instanceof PointerType) {
-			if (language == Language.CIVL_C)
+			if (config.getLanguage() == Language.CIVL_C)
 				return true;
 			else {
 				Type baseType = ((PointerType) type).referencedType();
