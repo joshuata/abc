@@ -85,7 +85,27 @@ public class TranslationTask {
 	/**
 	 * Shows the difference of two ASTs.
 	 */
-	private boolean showDiff;
+	private boolean showDiff = false;
+
+	/**
+	 * allows GNU C features?
+	 */
+	private boolean gnuc = false;
+
+	/**
+	 * don't print parsing result
+	 */
+	private boolean silent = false;
+
+	/**
+	 * prints functions that are used but without no definitions are given
+	 */
+	private boolean unkownFunc = false;
+
+	/**
+	 * turns on special configuration for svcomp, including GNU-C features.
+	 */
+	private boolean svcomp = false;
 
 	/**
 	 * Constructs a new task with language C, empty system and user include
@@ -289,6 +309,68 @@ public class TranslationTask {
 
 	public void setShowDiff(boolean showDiff) {
 		this.showDiff = showDiff;
+	}
+
+	/**
+	 * @return the gnuc
+	 */
+	public boolean doGnuc() {
+		return gnuc;
+	}
+
+	/**
+	 * @param gnuc
+	 *            the gnuc to set
+	 */
+	public void setGnuc(boolean gnuc) {
+		this.gnuc = gnuc;
+	}
+
+	/**
+	 * @return the silent
+	 */
+	public boolean doSilent() {
+		return silent;
+	}
+
+	/**
+	 * @param silent
+	 *            the silent to set
+	 */
+	public void setSilent(boolean silent) {
+		this.silent = silent;
+	}
+
+	/**
+	 * @return the unkownFunc
+	 */
+	public boolean doUnkownFunc() {
+		return unkownFunc;
+	}
+
+	/**
+	 * @param unkownFunc
+	 *            the unkownFunc to set
+	 */
+	public void setUnkownFunc(boolean unkownFunc) {
+		this.unkownFunc = unkownFunc;
+	}
+
+	/**
+	 * @return the svcomp
+	 */
+	public boolean doSvcomp() {
+		return svcomp;
+	}
+
+	/**
+	 * @param svcomp
+	 *            the svcomp to set
+	 */
+	public void setSvcomp(boolean svcomp) {
+		this.svcomp = svcomp;
+		if (svcomp)
+			this.setGnuc(true);
 	}
 
 }

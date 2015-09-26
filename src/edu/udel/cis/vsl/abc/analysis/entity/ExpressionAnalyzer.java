@@ -69,6 +69,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -127,9 +128,11 @@ public class ExpressionAnalyzer {
 
 	private SpecialFunctionCallAnalyzer specialCallAnalyzer;
 
+	private Configuration config;
+
 	// ************************** Constructors ****************************
 
-	ExpressionAnalyzer(EntityAnalyzer entityAnalyzer,
+	ExpressionAnalyzer(Configuration config, EntityAnalyzer entityAnalyzer,
 			ConversionFactory conversionFactory, TypeFactory typeFactory) {
 		this.entityAnalyzer = entityAnalyzer;
 		this.conversionFactory = conversionFactory;
@@ -140,6 +143,7 @@ public class ExpressionAnalyzer {
 		this.language = entityAnalyzer.configuration.getLanguage();
 		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(
 				this.entityAnalyzer, typeFactory, this.conversionFactory);
+		this.config = config;
 	}
 
 	// ************************* Exported Methods **************************
@@ -587,8 +591,9 @@ public class ExpressionAnalyzer {
 			functionName = ((IdentifierExpressionNode) functionNode)
 					.getIdentifier().name();
 		}
-		specialCallAnalyzer.hasSufficientArgumentsForPrintf(node, functionName,
-				node.getArguments());
+		if (functionName != null)
+			specialCallAnalyzer.hasSufficientArgumentsForPrintf(node,
+					functionName, node.getArguments());
 		expectedNumArgs = functionType.getNumParameters();
 		hasVariableNumArgs = functionType.hasVariableArgs();
 		if (hasVariableNumArgs) {
@@ -1986,7 +1991,7 @@ public class ExpressionAnalyzer {
 	private void convertRHS(ExpressionNode rightNode, Type type)
 			throws UnsourcedException {
 		Conversion rightConversion = conversionFactory.assignmentConversion(
-				rightNode, type);
+				config, rightNode, type);
 
 		if (rightConversion != null)
 			rightNode.addConversion(rightConversion);

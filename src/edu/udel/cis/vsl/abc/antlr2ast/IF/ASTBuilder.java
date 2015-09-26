@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.antlr2ast.IF;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.ASTNode;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 
@@ -18,12 +19,16 @@ public interface ASTBuilder {
 	 * Builds the AST specified by a {@link ParseTree} which represents a
 	 * translation unit.
 	 * 
+	 * @param config
+	 *            the configuration of the translation task, e.g., if svcomp is
+	 *            enabled
 	 * @return the AST
 	 * @throws SyntaxException
 	 *             if something is wrong with the object being translated into
 	 *             an ABC
 	 */
-	AST getTranslationUnit(ParseTree tree) throws SyntaxException;
+	AST getTranslationUnit(Configuration config, ParseTree tree)
+			throws SyntaxException;
 
 	/**
 	 * Creates a worker which can be used to perform more specific translation

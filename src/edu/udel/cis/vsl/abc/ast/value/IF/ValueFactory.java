@@ -163,7 +163,7 @@ public interface ValueFactory {
 	ComplexValue complexValue(FloatingType type, RealFloatingValue realPart,
 			RealFloatingValue imaginaryPart);
 
-	TypeValue sizeofValue(Type type);
+	Value sizeofValue(Type type);
 
 	TypeValue alignofValue(Type type);
 

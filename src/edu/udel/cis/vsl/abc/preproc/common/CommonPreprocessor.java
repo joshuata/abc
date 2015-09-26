@@ -17,6 +17,7 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
 import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser.file_return;
@@ -42,45 +43,59 @@ public class CommonPreprocessor implements Preprocessor {
 
 	private ArrayList<SourceFile> sourceFiles = new ArrayList<>();
 
+	private Configuration config;
+
+	public CommonPreprocessor(Configuration config) {
+		this.config = config;
+	}
+
 	@Override
 	public Map<String, Macro> getMacros(Map<String, String> macroDefs)
 			throws PreprocessorException {
 		// if (macroDefs != null && macroDefs.size() > 0) {
-			try {
-				// use temporary file to store the macro definitions
-				File temp = File.createTempFile(
-						"tmp" + System.currentTimeMillis(), ".h");
-				// Write to temp file
-				BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
-				PreprocessorWorker worker;
-				PreprocessorTokenSource tokenSource;
-				Token token;
+		try {
+			// use temporary file to store the macro definitions
+			File temp = File.createTempFile("tmp" + System.currentTimeMillis(),
+					".h");
+			// Write to temp file
+			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
+			PreprocessorWorker worker;
+			PreprocessorTokenSource tokenSource;
+			Token token;
 
-				// for now, put this here.  Find a better place:
-				tmpOut.write("#define __attribute__(X)\n");
-				
-				for (String macro : macroDefs.keySet())
-					tmpOut.write("#define " + macro + " "
-							+ macroDefs.get(macro) + "\r\n");
-				tmpOut.close();
-				worker = new PreprocessorWorker(this,
-						PreprocessorWorker.defaultSystemIncludes,
-						PreprocessorWorker.defaultSystemIncludes,
-						new HashMap<String, Macro>());
-				tokenSource = worker.outputTokenSource(temp, true);
-				do {
-					token = tokenSource.nextToken();
-				} while (token.getType() != PreprocessorLexer.EOF);
-				// delete the temporary file
-				temp.delete();
-				return tokenSource.macroMap;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				// why doesn't this throw an exception????????
-				return new HashMap<String, Macro>();
-			}
-//		} else
-//			return new HashMap<String, Macro>();
+			// macros for GNU C features
+			// for now, put this here. Find a better place:
+			if (this.config != null && this.config.svcomp())
+				tmpOut.write("#define __attribute__(X)\r\n");
+			// tmpOut.write("#define __asm__(X)\r\n");
+			// tmpOut.write("#define __const const\r\n");
+			// tmpOut.write("#define __extension__\r\n");
+			// tmpOut.write("#define __inline inline\r\n");
+			// tmpOut.write("#define __restrict restrict\r\n");
+			// tmpOut.write("#define __thread _Thread_local\r\n");
+			for (String macro : macroDefs.keySet())
+				tmpOut.write("#define " + macro + " " + macroDefs.get(macro)
+						+ "\r\n");
+			tmpOut.write("\r\n");
+			tmpOut.close();
+			worker = new PreprocessorWorker(config, this,
+					PreprocessorWorker.defaultSystemIncludes,
+					PreprocessorWorker.defaultSystemIncludes,
+					new HashMap<String, Macro>());
+			tokenSource = worker.outputTokenSource(temp, true);
+			do {
+				token = tokenSource.nextToken();
+			} while (token.getType() != PreprocessorLexer.EOF);
+			// delete the temporary file
+			temp.delete();
+			return tokenSource.macroMap;
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			// why doesn't this throw an exception????????
+			return new HashMap<String, Macro>();
+		}
+		// } else
+		// return new HashMap<String, Macro>();
 	}
 
 	/**
@@ -208,7 +223,7 @@ public class CommonPreprocessor implements Preprocessor {
 	public PreprocessorTokenSource outputTokenSource(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
 			File file) throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(this,
+		PreprocessorWorker worker = new PreprocessorWorker(config, this,
 				systemIncludePaths, userIncludePaths, implicitMacros);
 
 		return worker.outputTokenSource(file, false);
@@ -218,7 +233,7 @@ public class CommonPreprocessor implements Preprocessor {
 	public CTokenSource outputTokenSource(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
 			String filename) throws PreprocessorException, IOException {
-		PreprocessorWorker worker = new PreprocessorWorker(this,
+		PreprocessorWorker worker = new PreprocessorWorker(config, this,
 				systemIncludePaths, userIncludePaths, implicitMacros);
 
 		return worker.outputTokenSource(filename);
@@ -241,7 +256,7 @@ public class CommonPreprocessor implements Preprocessor {
 	public void printOutputTokens(File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros,
 			PrintStream out, File file) throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(this,
+		PreprocessorWorker worker = new PreprocessorWorker(config, this,
 				systemIncludePaths, userIncludePaths, implicitMacros);
 		PreprocessorTokenSource source = worker.outputTokenSource(file, false);
 
@@ -254,7 +269,7 @@ public class CommonPreprocessor implements Preprocessor {
 	public void printOutput(File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> implicitMacros, PrintStream out, File file)
 			throws PreprocessorException {
-		PreprocessorWorker worker = new PreprocessorWorker(this,
+		PreprocessorWorker worker = new PreprocessorWorker(config, this,
 				systemIncludePaths, userIncludePaths, implicitMacros);
 		PreprocessorTokenSource source = worker.outputTokenSource(file, false);
 
@@ -353,7 +368,7 @@ public class CommonPreprocessor implements Preprocessor {
 	 */
 	public final static void main(String[] args) throws PreprocessorException {
 		String filename = args[0];
-		CommonPreprocessor p = new CommonPreprocessor();
+		CommonPreprocessor p = new CommonPreprocessor(null);
 		File file = new File(filename);
 
 		if (debug)

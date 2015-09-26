@@ -121,6 +121,8 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * form.
  * </p>
  * 
+ * TODO: check if a contract contains side-effects and report an error
+ * 
  * @author Timothy K. Zirkel
  * @author Stephen F. Siegel
  * @author Manchun Zheng

@@ -7,6 +7,7 @@ import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.SequenceNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -17,13 +18,18 @@ public class CommonASTBuilder implements ASTBuilder {
 
 	private PragmaFactory pragmaFactory;
 
+	private Configuration config;
+
 	public CommonASTBuilder(ASTFactory astFactory, CParser parser) {
 		this.astFactory = astFactory;
 		pragmaFactory = new CommonPragmaFactory(this, parser);
 	}
 
 	@Override
-	public AST getTranslationUnit(ParseTree tree) throws SyntaxException {
+	public AST getTranslationUnit(Configuration config, ParseTree tree)
+			throws SyntaxException {
+		this.config = config;
+
 		ASTBuilderWorker worker = getWorker(tree);
 		SequenceNode<BlockItemNode> rootNode = worker.translateRoot();
 		AST ast = astFactory.newAST(rootNode, tree.getSourceFiles());
@@ -33,7 +39,8 @@ public class CommonASTBuilder implements ASTBuilder {
 
 	@Override
 	public ASTBuilderWorker getWorker(ParseTree tree) {
-		return new CommonASTBuilderWorker(tree, astFactory, pragmaFactory);
+		return new CommonASTBuilderWorker(config, tree, astFactory,
+				pragmaFactory);
 	}
 
 	@Override

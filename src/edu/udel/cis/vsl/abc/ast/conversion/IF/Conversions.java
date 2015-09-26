@@ -16,6 +16,8 @@ public class Conversions {
 	/**
 	 * Produce a new conversion factory which uses the given type factory.
 	 * 
+	 * @param config
+	 *            the configuration of the translation task
 	 * @param typeFactory
 	 *            a type factory
 	 * @return the new conversion factory
@@ -23,5 +25,4 @@ public class Conversions {
 	public static ConversionFactory newConversionFactory(TypeFactory typeFactory) {
 		return new CommonConversionFactory(typeFactory);
 	}
-
 }

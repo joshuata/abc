@@ -7,9 +7,11 @@ import edu.udel.cis.vsl.abc.ast.conversion.IF.CompatibleStructureOrUnionConversi
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.ConversionFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.FunctionConversion;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.Integer2PointerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.LvalueConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.MemoryConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.NullPointerConversion;
+import edu.udel.cis.vsl.abc.ast.conversion.IF.Pointer2IntegerConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.PointerBoolConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.RegularRangeToDomainConversion;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.VoidPointerConversion;
@@ -22,6 +24,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.FunctionType;
+import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
@@ -33,6 +36,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
 public class CommonConversionFactory implements ConversionFactory {
@@ -205,15 +209,16 @@ public class CommonConversionFactory implements ConversionFactory {
 	}
 
 	@Override
-	public Conversion assignmentConversion(ExpressionNode rhs, Type newType)
-			throws UnsourcedException {
+	public Conversion assignmentConversion(Configuration config,
+			ExpressionNode rhs, Type newType) throws UnsourcedException {
 		Type oldType = rhs.getConvertedType();
 
 		if (rhs instanceof WildcardNode) {
 			// wildcard node has void type, which means that it can be any type
 			return null;
 		}
-		if(typeFactory.isArrayOfCharType(oldType) && typeFactory.isArrayOfCharType(newType))
+		if (typeFactory.isArrayOfCharType(oldType)
+				&& typeFactory.isArrayOfCharType(newType))
 			return null;
 		if (newType.kind() == TypeKind.SCOPE || newType.equals(oldType))
 			return null;
@@ -242,14 +247,26 @@ public class CommonConversionFactory implements ConversionFactory {
 
 			if (isPointerToObject(type1) && isPointerToVoid(type2)
 					|| isPointerToObject(type2) && isPointerToVoid(type1)) {
-				checkQualifierConsistency(type1, type2, false);
+				if (config == null || !config.svcomp())
+					checkQualifierConsistency(type1, type2, false);
 				return voidPointerConversion(type1, type2);
 			}
-			checkQualifierConsistency(type1, type2, true);
+			if (config == null || !config.svcomp())
+				checkQualifierConsistency(type1, type2, true);
 			return new CommonCompatiblePointerConversion(type1, type2);
 		}
 		if (oldType instanceof PointerType && isBool(newType))
 			return pointerBoolConversion((PointerType) oldType);
+		if (config != null && config.svcomp()) {
+			if (oldType instanceof PointerType
+					&& newType instanceof IntegerType)
+				return this.pointer2IntegerConversion((PointerType) oldType,
+						(IntegerType) newType);
+			if (oldType instanceof IntegerType
+					&& newType instanceof PointerType)
+				return this.integer2PointerConversion((IntegerType) oldType,
+						(PointerType) newType);
+		}
 		throw error("No conversion from type of right hand side to that of left:\n"
 				+ oldType + "\n" + newType);
 	}
@@ -268,6 +285,18 @@ public class CommonConversionFactory implements ConversionFactory {
 	public RegularRangeToDomainConversion regularRangeToDomainConversion(
 			ObjectType rangeType, DomainType domainType) {
 		return new CommonRegularRangeToDomainConversion(rangeType, domainType);
+	}
+
+	@Override
+	public Pointer2IntegerConversion pointer2IntegerConversion(
+			PointerType oldType, IntegerType newType) {
+		return new CommonPointer2IntegerConversion(oldType, newType);
+	}
+
+	@Override
+	public Integer2PointerConversion integer2PointerConversion(
+			IntegerType oldType, PointerType newType) {
+		return new CommonInteger2PointerConversion(oldType, newType);
 	}
 
 }

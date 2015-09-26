@@ -133,6 +133,12 @@ public class ABC {
 		out.println("  show time for each phase");
 		out.println("-diff");
 		out.println("  show the difference of two ASTs");
+		out.println("-svcomp");
+		out.println("  turn on special setting for svcomp benchmarks");
+		out.println("-gnuc");
+		out.println("  support GNU C features");
+		out.print("-unknownFunc");
+		out.println("  print functions that are used in the program but no definition is given");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
 		for (String code : Transform.getCodes()) {
@@ -169,6 +175,10 @@ public class ABC {
 		boolean tables = false; // show symbol and type tables
 		boolean showTime = false;
 		boolean showDiff = false;
+		boolean gnuc = false;
+		boolean silent = false;
+		boolean unkownFunc = false;
+		boolean svcomp = false;
 		List<String> transformCodes = new LinkedList<>();
 		Language language = null;
 		TranslationTask result = new TranslationTask();
@@ -248,6 +258,12 @@ public class ABC {
 				showTime = true;
 			} else if (arg.equals("-diff")) {
 				showDiff = true;
+			} else if (arg.equals("-gnuc")) {
+				gnuc = true;
+			} else if (arg.equals("-unknownFunc")) {
+				unkownFunc = true;
+			} else if (arg.equals("-svcomp")) {
+				svcomp = true;
 			} else if (arg.startsWith("-lang")) {
 				if (arg.equals("-lang=C"))
 					language = Language.C;
@@ -255,6 +271,8 @@ public class ABC {
 					language = Language.CIVL_C;
 				else
 					err("Unknown command line option: " + arg);
+			} else if (arg.equals("-silent")) {
+				silent = true;
 			} else if (arg.startsWith("-")) {
 				// try transform code...
 				String code = arg.substring(1);
@@ -288,6 +306,10 @@ public class ABC {
 		result.setShowTime(showTime);
 		result.setPreprocOnly(preprocOnly);
 		result.setShowDiff(showDiff);
+		result.setGnuc(gnuc);
+		result.setSilent(silent);
+		result.setUnkownFunc(unkownFunc);
+		result.setSvcomp(svcomp);
 		result.addAllTransformCodes(transformCodes);
 		return result;
 	}
@@ -307,9 +329,15 @@ public class ABC {
 		TranslationTask config = null;
 		FrontEnd frontEnd;
 		PrintStream err = System.err, out = System.out;
+		boolean silent = false;
 
-		out.println("ABC v" + version + " of " + date
-				+ " -- http://vsl.cis.udel.edu/abc\n");
+		for (String arg : args) {
+			if (arg.equals("-silent"))
+				silent = true;
+		}
+		if (!silent)
+			out.println("ABC v" + version + " of " + date
+					+ " -- http://vsl.cis.udel.edu/abc\n");
 		out.flush();
 		try {
 			config = parseCommandLine(args);

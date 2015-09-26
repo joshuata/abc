@@ -28,6 +28,8 @@ public interface Conversion {
 		COMPATIBLE_STRUCT_UNION,
 		/** can be safely casted to {@link FunctionConversion} */
 		FUNCTION,
+		/** can be safely casted to {@link Integer2PointerConversion} */
+		INTEGER_POINTER,
 		/** can be safely casted to {@link LvalueConversion} */
 		LVALUE,
 		/** can be safely casted to {@link MemoryConversion} */
@@ -36,6 +38,8 @@ public interface Conversion {
 		NULL_POINTER,
 		/** can be safely casted to {@link PointerBoolConversion} */
 		POINTER_BOOL,
+		/** can be safely casted to {@link Pointer2IntegerConversion} */
+		POINTER_INTEGER,
 		/** can be safely casted to {@link RegularRangeToDomainConversion} */
 		REG_RANGE_DOMAIN,
 		/** can be safely casted to {@link VoidPointerConversion} */

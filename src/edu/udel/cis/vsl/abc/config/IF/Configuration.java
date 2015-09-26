@@ -92,4 +92,13 @@ public interface Configuration {
 	boolean inRangeSignedLongInt(BigInteger value);
 
 	boolean inRangeSignedLongLongInt(BigInteger value);
+
+	/**
+	 * is svcomp feature enabled?
+	 * 
+	 * @return
+	 */
+	boolean svcomp();
+
+	void setSvcomp(boolean value);
 }
