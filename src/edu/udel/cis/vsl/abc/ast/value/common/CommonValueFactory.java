@@ -261,11 +261,11 @@ public class CommonValueFactory implements ValueFactory {
 	// svcomp benchmarks
 	@Override
 	public Value sizeofValue(Type type) {
-		return integerValue(
-				(IntegerType) typeFactory.basicType(BasicTypeKind.INT),
-				BigInteger.valueOf(2));
-		// return (TypeValue) canonic(new CommonTypeValue(typeFactory.size_t(),
-		// TypeValueKind.SIZEOF, type));
+		// return integerValue(
+		// (IntegerType) typeFactory.basicType(BasicTypeKind.INT),
+		// BigInteger.valueOf(2));
+		return (TypeValue) canonic(new CommonTypeValue(typeFactory.size_t(),
+				TypeValueKind.SIZEOF, type));
 	}
 
 	@Override
