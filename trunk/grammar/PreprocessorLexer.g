@@ -285,7 +285,7 @@ HexadecimalFloatingConstant
 
 fragment
 HexFractionalConstant
-		:	HexadecimalDigit* DOT Digit+
+		:	HexadecimalDigit* DOT HexadecimalDigit+
 		|	HexadecimalDigit+ DOT 
 		;
 
