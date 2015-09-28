@@ -60,6 +60,7 @@ public class SvcompTest {
 		check(this.file("function.c"));
 	}
 
+	@Ignore
 	@Test
 	public void array() throws ABCException, IOException {
 		check(this.file("array.c"));
@@ -70,6 +71,7 @@ public class SvcompTest {
 		check(this.file("svcompHeader.c"));
 	}
 
+	@Ignore
 	@Test
 	public void integerpromotion_false() throws ABCException, IOException {
 		check(this.file("integerpromotion_false-unreach-call.i"));
@@ -80,11 +82,13 @@ public class SvcompTest {
 		check(this.file("pointerIntConversions.c"));
 	}
 
+	@Ignore
 	@Test
 	public void sssc12_variant() throws ABCException, IOException {
 		check(this.file("sssc12_variant_true-unreach-call.i"));
 	}
 
+	@Ignore
 	@Test
 	public void simple_loop5() throws ABCException, IOException {
 		check(this.file("31_simple_loop5_vs_true-unreach-call.i"));
@@ -103,17 +107,19 @@ public class SvcompTest {
 		check(this.file("emptyStruct.c"));
 	}
 
+	@Ignore
 	@Test
 	public void sll_to_dll_rev() throws ABCException, IOException {
 		check(this.file("sll_to_dll_rev_false-unreach-call.i"));
 	}
 
+	@Ignore
 	@Test
 	public void parport() throws ABCException, IOException {
 		check(this.file("parport_true-unreach-call.i.cil.c"));
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void cs_fib() throws ABCException, IOException {
 		check(this.file("cs_fib_false-unreach-call.i"));
