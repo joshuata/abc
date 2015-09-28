@@ -3,7 +3,9 @@ package edu.udel.cis.vsl.abc;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.antlr.runtime.CommonToken;
 
@@ -614,16 +616,25 @@ public class FrontEnd {
 	private void printUnknownFunctions(PrintStream out, Program program) {
 		SequenceNode<BlockItemNode> root = program.getAST().getRootNode();
 		int i = 0;
+		Set<String> functionNames = new HashSet<>();
 
 		for (BlockItemNode item : root) {
 			if (item instanceof FunctionDeclarationNode) {
 				FunctionDeclarationNode function = (FunctionDeclarationNode) item;
 
 				if (function.getEntity().getDefinition() == null) {
-					if (i > 0)
-						System.out.print(",");
-					System.out.print(function.getName());
-					i++;
+					String functionName = function.getName();
+
+					if (!functionNames.contains(functionName)) {
+						if (i == 0)
+							System.out
+									.println("==== functions without definition ====");
+						else
+							System.out.print(",");
+						System.out.print(functionName);
+						functionNames.add(functionName);
+						i++;
+					}
 				}
 			}
 		}
