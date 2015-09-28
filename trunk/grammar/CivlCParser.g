@@ -704,8 +704,8 @@ structOrUnion
  * Children: structDeclaration
  */
 structDeclarationList
-	: structDeclaration+
-	  -> ^(STRUCT_DECLARATION_LIST structDeclaration+)
+	: structDeclaration*
+	  -> ^(STRUCT_DECLARATION_LIST structDeclaration*)
 	;
 
 /* 6.7.2.1
