@@ -2,8 +2,6 @@ package edu.udel.cis.vsl.abc;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -17,7 +15,7 @@ public class SvcompTest {
 	 * Turn on a lot of output for debugging? Set this to true only in your
 	 * local copy. Be sure to set it back to false before committing!
 	 */
-	@SuppressWarnings("unused")
+	// @SuppressWarnings("unused")
 	private static boolean debug = false;
 
 	private static File root = new File(new File("examples"), "svcomp");
@@ -30,66 +28,66 @@ public class SvcompTest {
 	public void tearDown() throws Exception {
 	}
 
-	private String filename(String name) {
-		return new File(root, name).getPath();
+	private File file(String name) {
+		return new File(root, name);
 	}
 
-	private void check(String... args) throws ABCException, IOException {
-		List<String> newArgs = new ArrayList<>();
-		String[] finalArgs;
+	private void check(File file) throws ABCException, IOException {
+		TranslationTask task = new TranslationTask();
+		FrontEnd frontEnd = new FrontEnd();
 
-		newArgs.add("-svcomp");
-		newArgs.add("-sef");
-		newArgs.add("-prune");
-		for (int i = 0; i < args.length; i++)
-			newArgs.add(args[i]);
-		finalArgs = new String[newArgs.size()];
-		newArgs.toArray(finalArgs);
-		ABC.main(finalArgs);
+		task.setVerbose(debug);
+		task.setSilent(true);
+		task.setUnkownFunc(true);
+		task.setSvcomp(true);
+		task.addTransformCode("sef");
+		task.addTransformCode("prune");
+		task.setFiles(new File[] { file });
+		frontEnd.showTranslation(task);
 	}
 
 	// this test checks for the GNU C feature __attribute__(...)
 	@Test
 	public void queue_ok_longest_true() throws ABCException, IOException {
-		check(this.filename("queue_ok_longest_true-unreach-call.c"));
+		check(this.file("queue_ok_longest_true-unreach-call.c"));
 	}
 
 	// this test checks for the GNU C feature that allows zero parameter for a
-	// function prototype, non-return-type function
+	// function prototype, non-return-type function, implicit functions
 	@Ignore
 	@Test
 	public void function() throws ABCException, IOException {
-		check(this.filename("function.c"));
+		check(this.file("function.c"));
 	}
 
 	@Test
 	public void array() throws ABCException, IOException {
-		check(this.filename("array.c"));
+		check(this.file("array.c"));
 	}
 
 	@Test
 	public void svcompHeader() throws ABCException, IOException {
-		check(this.filename("svcompHeader.c"));
+		check(this.file("svcompHeader.c"));
 	}
 
 	@Test
 	public void integerpromotion_false() throws ABCException, IOException {
-		check(this.filename("integerpromotion_false-unreach-call.i"));
+		check(this.file("integerpromotion_false-unreach-call.i"));
 	}
 
 	@Test
 	public void pointerIntConversions() throws ABCException, IOException {
-		check(this.filename("pointerIntConversions.c"));
+		check(this.file("pointerIntConversions.c"));
 	}
 
 	@Test
 	public void sssc12_variant() throws ABCException, IOException {
-		check(this.filename("sssc12_variant_true-unreach-call.i"));
+		check(this.file("sssc12_variant_true-unreach-call.i"));
 	}
 
 	@Test
 	public void simple_loop5() throws ABCException, IOException {
-		check(this.filename("31_simple_loop5_vs_true-unreach-call.i"));
+		check(this.file("31_simple_loop5_vs_true-unreach-call.i"));
 	}
 
 	// implicit functions
@@ -97,33 +95,33 @@ public class SvcompTest {
 	@Test
 	public void cdaudio_simpl1() throws ABCException, IOException {
 		check(this
-				.filename("cdaudio_simpl1_false-unreach-call_true-termination.cil.c"));
+				.file("cdaudio_simpl1_false-unreach-call_true-termination.cil.c"));
 	}
 
 	@Test
 	public void emptyStruct() throws ABCException, IOException {
-		check(this.filename("emptyStruct.c"));
+		check(this.file("emptyStruct.c"));
 	}
 
 	@Test
 	public void sll_to_dll_rev() throws ABCException, IOException {
-		check(this.filename("sll_to_dll_rev_false-unreach-call.i"));
+		check(this.file("sll_to_dll_rev_false-unreach-call.i"));
 	}
 
 	@Test
 	public void parport() throws ABCException, IOException {
-		check(this.filename("parport_true-unreach-call.i.cil.c"));
+		check(this.file("parport_true-unreach-call.i.cil.c"));
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void cs_fib() throws ABCException, IOException {
-		check(this.filename("cs_fib_false-unreach-call.i"));
+		check(this.file("cs_fib_false-unreach-call.i"));
 	}
 
 	@Ignore
 	@Test
 	public void fpointer() throws ABCException, IOException {
-		check(this.filename("fpointer.c"));
+		check(this.file("fpointer.c"));
 	}
 }
