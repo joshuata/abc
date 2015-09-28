@@ -69,8 +69,8 @@ public class OmpTranslationTest {
 			SyntaxException, ParseException {
 		AST ast = fe.compile(new File(root, "dijkstra_openmp.c"),
 				Language.CIVL_C);
-		Program p = fe.getProgramFactory(
-				fe.getStandardAnalyzer(Language.CIVL_C)).newProgram(ast);
+		Program p = fe.getProgramFactory(fe.getStandardAnalyzer()).newProgram(
+				ast);
 
 		p.applyTransformers(codes);
 	}
@@ -168,7 +168,7 @@ public class OmpTranslationTest {
 	public void vecAdd_fix() throws ABCException, IOException {
 		check("vecAdd_fix");
 	}
-	
+
 	@Test
 	public void test() throws ABCException, IOException {
 		check("test");

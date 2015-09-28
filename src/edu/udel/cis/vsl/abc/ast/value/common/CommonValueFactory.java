@@ -58,6 +58,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.UnionValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.VariableReference;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -87,14 +88,18 @@ public class CommonValueFactory implements ValueFactory {
 
 	private Value SINT_ONE, SINT_ZERO;
 
+	private Configuration configuration;
+
 	// Constructors...
 
-	public CommonValueFactory(TypeFactory typeFactory) {
+	public CommonValueFactory(Configuration configuration,
+			TypeFactory typeFactory) {
 		this.typeFactory = typeFactory;
 		SINT = typeFactory.signedIntegerType(SignedIntKind.INT);
 		CHAR = (IntegerType) typeFactory.basicType(BasicTypeKind.CHAR);
 		SINT_ONE = integerValue(SINT, 1);
 		SINT_ZERO = integerValue(SINT, 0);
+		this.configuration = configuration;
 	}
 
 	// Exported methods...
@@ -257,15 +262,16 @@ public class CommonValueFactory implements ValueFactory {
 				imaginaryPart));
 	}
 
-	// TODO use constant 2 temporarily to see if there are further errors for
-	// svcomp benchmarks
+	// TODO fixed the value of size of different types in svcomp mode
 	@Override
 	public Value sizeofValue(Type type) {
-		// return integerValue(
-		// (IntegerType) typeFactory.basicType(BasicTypeKind.INT),
-		// BigInteger.valueOf(2));
-		return (TypeValue) canonic(new CommonTypeValue(typeFactory.size_t(),
-				TypeValueKind.SIZEOF, type));
+		if (this.configuration.svcomp())
+			return integerValue(
+					(IntegerType) typeFactory.basicType(BasicTypeKind.INT),
+					BigInteger.valueOf(2));
+		else
+			return (TypeValue) canonic(new CommonTypeValue(
+					typeFactory.size_t(), TypeValueKind.SIZEOF, type));
 	}
 
 	@Override

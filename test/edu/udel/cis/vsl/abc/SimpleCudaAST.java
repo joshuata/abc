@@ -21,6 +21,8 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Values;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
+import edu.udel.cis.vsl.abc.config.IF.Configurations;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Formation;
 import edu.udel.cis.vsl.abc.token.IF.Source;
@@ -33,13 +35,16 @@ import edu.udel.cis.vsl.abc.token.common.SystemFormation;
 
 public class SimpleCudaAST {
 
+	private static Configuration configuration = Configurations
+			.newMinimalConfiguration();
 	private static Formation sysForm = new SystemFormation("System Formation",
 			-1);
 	private static CToken firstTok = new CommonCToken(0, "first", sysForm);
 	private static CToken lastTok = new CommonCToken(0, "first", sysForm);
 	private static Source source = new CommonSource(firstTok, lastTok);
 	private static TypeFactory typeF = Types.newTypeFactory();
-	private static ValueFactory valueF = Values.newValueFactory(typeF);
+	private static ValueFactory valueF = Values.newValueFactory(configuration,
+			typeF);
 	private static NodeFactory nodeF = Nodes.newNodeFactory(typeF, valueF);
 	private static TokenFactory tokenF = Tokens.newTokenFactory();
 	private static ASTFactory astF = ASTs.newASTFactory(nodeF, tokenF, typeF);
