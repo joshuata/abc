@@ -147,8 +147,19 @@ public class CallAnalyzer implements Analyzer {
 						}
 				}
 			} else {
-				FunctionType funType = (FunctionType) fcn.getFunction()
-						.getConvertedType();
+				Type funcExpressionType = fcn.getFunction().getConvertedType();
+				FunctionType funType;
+
+				// the type of the function expression in a function call could
+				// be either function type or pointer to function type
+				if (funcExpressionType instanceof FunctionType) {
+					funType = (FunctionType) funcExpressionType;
+				} else {
+					assert (funcExpressionType instanceof PointerType);
+					funType = (FunctionType) ((PointerType) funcExpressionType)
+							.referencedType();
+				}
+
 				Set<Function> callees = functionsOfAType.get(funType);
 				if (callees != null) {
 					for (Function callee : callees) {
@@ -208,7 +219,7 @@ public class CallAnalyzer implements Analyzer {
 	public void analyze(AST unit) throws SyntaxException {
 		currentAST = unit;
 		ASTNode root = unit.getRootNode();
-		
+
 		collectProgram(root);
 		processProgram(root);
 	}
