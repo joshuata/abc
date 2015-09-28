@@ -47,6 +47,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.UnqualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -70,7 +71,8 @@ public class TypeAnalyzer {
 
 	private ValueFactory valueFactory;
 
-	private Language language;
+	private Configuration configuration;
+	// private Language language;
 
 	/**
 	 * The type used for enumerators, i.e., the elements of enumeration types.
@@ -89,7 +91,7 @@ public class TypeAnalyzer {
 		this.valueFactory = entityAnalyzer.valueFactory;
 		this.enumeratorType = (IntegerType) typeFactory
 				.basicType(BasicTypeKind.INT);
-		this.language = entityAnalyzer.configuration.getLanguage();
+		this.configuration = entityAnalyzer.configuration;
 	}
 
 	// ************************** Private Methods **************************
@@ -149,7 +151,8 @@ public class TypeAnalyzer {
 			throw error("Non-object type used for element type of array type",
 					elementTypeNode);
 		elementType = (ObjectType) tempElementType;
-		if (language == Language.C && !isParameter && !elementType.isComplete())
+		if (configuration.getLanguage() == Language.C && !isParameter
+				&& !elementType.isComplete())
 			throw error("Element type of array type is not complete",
 					elementTypeNode);
 		// C11 6.7.3(3):

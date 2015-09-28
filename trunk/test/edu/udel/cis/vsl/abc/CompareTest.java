@@ -37,8 +37,8 @@ public class CompareTest {
 				program1.getAST());
 		if (debug)
 			combinedAST.prettyPrint(out, false);
-		compositeProgram = f.getProgramFactory(
-				f.getStandardAnalyzer(Language.CIVL_C)).newProgram(combinedAST);
+		compositeProgram = f.getProgramFactory(f.getStandardAnalyzer())
+				.newProgram(combinedAST);
 		if (debug)
 			compositeProgram.prettyPrint(out);
 	}

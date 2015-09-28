@@ -78,6 +78,9 @@ public class FrontEnd {
 
 	private final static String bar = "===================";
 
+	private Configuration configuration = Configurations
+			.newMinimalConfiguration();
+
 	private TokenFactory sourceFactory = Tokens.newTokenFactory();
 
 	private PreprocessorFactory preprocessorFactory = Preprocess
@@ -87,7 +90,8 @@ public class FrontEnd {
 
 	private TypeFactory typeFactory = Types.newTypeFactory();
 
-	private ValueFactory valueFactory = Values.newValueFactory(typeFactory);
+	private ValueFactory valueFactory = Values.newValueFactory(configuration,
+			typeFactory);
 
 	private NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
 			valueFactory);
@@ -102,13 +106,8 @@ public class FrontEnd {
 
 	private ASTBuilder builder = Antlr2AST.newASTBuilder(astFactory, parser);
 
-	private Configuration c_config;
-
-	private Configuration civl_config;
-
-	private Analyzer analyzer_c;
-
-	private Analyzer analyzer_civl;
+	private Analyzer analyzer = Analysis.newStandardAnalyzer(configuration,
+			astFactory, entityFactory, conversionFactory);
 
 	/**
 	 * Constructs a new front end. The front end can be used repeatedly to
@@ -118,14 +117,9 @@ public class FrontEnd {
 	 * 
 	 */
 	public FrontEnd() {
-		c_config = Configurations.newMinimalConfiguration();
-		c_config.setLanguage(Language.C);
-		civl_config = Configurations.newMinimalConfiguration();
-		civl_config.setLanguage(Language.CIVL_C);
-		analyzer_c = Analysis.newStandardAnalyzer(c_config, astFactory,
-				entityFactory, conversionFactory);
-		analyzer_civl = Analysis.newStandardAnalyzer(civl_config, astFactory,
-				entityFactory, conversionFactory);
+		// analyzer = Analysis.newStandardAnalyzer(configuration, astFactory,
+		// entityFactory, conversionFactory);
+		// valueFactory = Values.newValueFactory(configuration, typeFactory);
 	}
 
 	/**
@@ -136,8 +130,8 @@ public class FrontEnd {
 	 * 
 	 * @return the new Preprocessor
 	 */
-	public Preprocessor getPreprocessor(Configuration config) {
-		return preprocessorFactory.newPreprocessor(config);
+	public Preprocessor getPreprocessor() {
+		return preprocessorFactory.newPreprocessor(configuration);
 	}
 
 	/**
@@ -179,12 +173,10 @@ public class FrontEnd {
 	 * (2) the {@link Type} of every expression, (3) the {@link Entity}
 	 * associated to every identifier.
 	 * 
-	 * @param language
-	 *            the language of the AST being analyzed
 	 * @return a standard Analyzer for that language
 	 */
-	public Analyzer getStandardAnalyzer(Language language) {
-		return language == Language.C ? analyzer_c : analyzer_civl;
+	public Analyzer getStandardAnalyzer() {
+		return this.analyzer;
 	}
 
 	/**
@@ -218,6 +210,8 @@ public class FrontEnd {
 	 * information on types, identifiers, entities, and so on. This result is
 	 * known as a "raw" translation unit.
 	 * 
+	 * @param language
+	 *            the language of the translation unit
 	 * @param file
 	 *            the file to parse
 	 * @param systemIncludePaths
@@ -244,13 +238,17 @@ public class FrontEnd {
 	public AST parse(Language language, File file, File[] systemIncludePaths,
 			File[] userIncludePaths, Map<String, Macro> implicitMacros)
 			throws PreprocessorException, SyntaxException, ParseException {
-		Configuration config = language == Language.C ? c_config : civl_config;
-		Preprocessor preprocessor = getPreprocessor(config);
-		CTokenSource tokens = preprocessor.outputTokenSource(
-				systemIncludePaths, userIncludePaths, implicitMacros, file);
-		ParseTree parseTree = parser.parse(tokens);
-		AST ast = builder.getTranslationUnit(config, parseTree);
+		Preprocessor preprocessor;
+		CTokenSource tokens;
+		ParseTree parseTree;
+		AST ast;
 
+		this.configuration.setLanguage(language);
+		preprocessor = getPreprocessor();
+		tokens = preprocessor.outputTokenSource(systemIncludePaths,
+				userIncludePaths, implicitMacros, file);
+		parseTree = parser.parse(tokens);
+		ast = builder.getTranslationUnit(configuration, parseTree);
 		return ast;
 	}
 
@@ -290,7 +288,7 @@ public class FrontEnd {
 			throws PreprocessorException, SyntaxException, ParseException {
 		AST result = parse(language, file, systemIncludePaths,
 				userIncludePaths, implicitMacros);
-		Analyzer analyzer = getStandardAnalyzer(language);
+		Analyzer analyzer = getStandardAnalyzer();
 
 		analyzer.analyze(result);
 		return result;
@@ -343,10 +341,14 @@ public class FrontEnd {
 	 */
 	public Program link(AST[] translationUnits, Language language)
 			throws SyntaxException {
-		Analyzer analyzer = getStandardAnalyzer(language);
-		ProgramFactory programFactory = getProgramFactory(analyzer);
-		Program result = programFactory.newProgram(translationUnits);
+		Analyzer analyzer;
+		ProgramFactory programFactory;
+		Program result;
 
+		this.configuration.setLanguage(language);
+		analyzer = getStandardAnalyzer();
+		programFactory = getProgramFactory(analyzer);
+		result = programFactory.newProgram(translationUnits);
 		return result;
 	}
 
@@ -384,21 +386,24 @@ public class FrontEnd {
 			File[] systemIncludePaths, File[] userIncludePaths,
 			Map<String, Macro> implicitMacros) throws PreprocessorException,
 			SyntaxException, ParseException {
-		Configuration config = language == Language.C ? c_config : civl_config;
-		Preprocessor preprocessor = getPreprocessor(config);
-		Analyzer analyzer = getStandardAnalyzer(language);
-		ProgramFactory programFactory = getProgramFactory(analyzer);
+		Preprocessor preprocessor;
+		Analyzer analyzer;
+		ProgramFactory programFactory;
 		int n = files.length;
 		AST[] asts = new AST[n];
 		Program result;
 
+		this.configuration.setLanguage(language);
+		preprocessor = getPreprocessor();
+		analyzer = getStandardAnalyzer();
+		programFactory = getProgramFactory(analyzer);
 		for (int i = 0; i < n; i++) {
 			CTokenSource tokens = preprocessor.outputTokenSource(
 					systemIncludePaths, userIncludePaths, implicitMacros,
 					files[i]);
 			ParseTree parseTree = parser.parse(tokens);
 
-			asts[i] = builder.getTranslationUnit(config, parseTree);
+			asts[i] = builder.getTranslationUnit(configuration, parseTree);
 		}
 		result = programFactory.newProgram(asts);
 		return result;
@@ -489,19 +494,17 @@ public class FrontEnd {
 		boolean pretty = task.doPrettyPrint();
 		boolean tables = task.doShowTables();
 		int nfiles = task.getFiles().length;
-		Configuration config = task.getLanguage() == Language.C ? c_config
-				: civl_config;
-
-		this.updateConfiguration(task, config);
-
-		Preprocessor preprocessor = this.getPreprocessor(config);
+		Preprocessor preprocessor;
 		AST[] asts = new AST[nfiles];
 		Map<String, String> macroNames = task.getMacros();
-		Map<String, Macro> implicitMacros = preprocessor.getMacros(macroNames);
+		Map<String, Macro> implicitMacros;
 		boolean showTime = task.doShowTime();
 		Timer timer = showTime ? new Timer(out) : new Timer();
 		boolean silent = task.doSilent();
 
+		this.updateConfiguration(task);
+		preprocessor = this.getPreprocessor();
+		implicitMacros = preprocessor.getMacros(macroNames);
 		for (int i = 0; i < nfiles; i++) {
 			File file = task.getFiles()[i];
 			String filename = file.getName();
@@ -558,7 +561,7 @@ public class FrontEnd {
 					out.flush();
 					timer.markTime("print ANTLR tree");
 				}
-				asts[i] = builder.getTranslationUnit(config, parseTree);
+				asts[i] = builder.getTranslationUnit(configuration, parseTree);
 				timer.markTime("build AST for " + filename);
 				if (verbose) {
 					out.println(bar + " Raw Translation Unit for " + filename
@@ -650,14 +653,12 @@ public class FrontEnd {
 		FrontEnd frontEnd1 = new FrontEnd(), frontEnd2 = new FrontEnd();
 		AST ast1, ast2;
 		DifferenceObject diffObj;
-		Configuration config = task.getLanguage() == Language.C ? c_config
-				: civl_config;
 
 		if (nfiles != 2) {
 			System.out.println("-showDiff requires exactly two files.");
 			return;
 		}
-		this.updateConfiguration(task, config);
+		this.updateConfiguration(task);
 		file1 = task.getFiles()[0];
 		file2 = task.getFiles()[1];
 		ast1 = frontEnd1.compile(file1, task.getLanguage());
@@ -670,7 +671,12 @@ public class FrontEnd {
 			diffObj.print(System.out);
 	}
 
-	private void updateConfiguration(TranslationTask task, Configuration config) {
-		config.setSvcomp(task.doSvcomp());
+	private void updateConfiguration(TranslationTask task) {
+		configuration.setLanguage(task.getLanguage());
+		configuration.setSvcomp(task.doSvcomp());
+	}
+
+	public Configuration getConfiguration() {
+		return this.configuration;
 	}
 }
