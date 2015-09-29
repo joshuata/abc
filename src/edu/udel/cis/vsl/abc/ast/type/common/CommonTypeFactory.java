@@ -925,4 +925,9 @@ public class CommonTypeFactory implements TypeFactory {
 		return false;
 	}
 
+	@Override
+	public boolean isVoidType(Type type) {
+		return type instanceof CommonVoidType;
+	}
+
 }

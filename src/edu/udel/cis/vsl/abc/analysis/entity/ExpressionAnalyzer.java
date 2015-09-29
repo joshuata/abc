@@ -1169,9 +1169,16 @@ public class ExpressionAnalyzer {
 			type = typeFactory.qualify((ObjectType) type, constQ, volatileQ,
 					restrictQ, false, false);
 		} else {
-			throw error(
-					"Incompatible types for second and third arguments of conditional operator:\n"
-							+ type1 + "\n" + type2, node);
+			if (this.config == null
+					|| !config.svcomp()
+					|| (type1.kind() != TypeKind.VOID && type2.kind() != TypeKind.VOID))
+				throw error(
+						"Incompatible types for second and third arguments of conditional operator:\n"
+								+ type1 + "\n" + type2, node);
+			if (type1.kind() == TypeKind.VOID)
+				type = type2;
+			else
+				type = type1;
 		}
 		node.setInitialType(type);
 	}
