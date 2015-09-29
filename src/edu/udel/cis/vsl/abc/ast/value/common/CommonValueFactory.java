@@ -31,6 +31,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.FloatingType;
 import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
+import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardSignedIntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardSignedIntegerType.SignedIntKind;
@@ -38,6 +39,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.StandardUnsignedIntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardUnsignedIntegerType.UnsignedIntKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.AddressValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.ArrayElementReference;
@@ -59,6 +61,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.VariableReference;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Architecture;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
 import edu.udel.cis.vsl.abc.token.IF.StringLiteral;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -262,16 +265,104 @@ public class CommonValueFactory implements ValueFactory {
 				imaginaryPart));
 	}
 
-	// TODO fixed the value of size of different types in svcomp mode
 	@Override
 	public Value sizeofValue(Type type) {
-		if (this.configuration.svcomp())
-			return integerValue(
-					(IntegerType) typeFactory.basicType(BasicTypeKind.INT),
-					BigInteger.valueOf(2));
-		else
-			return (TypeValue) canonic(new CommonTypeValue(
-					typeFactory.size_t(), TypeValueKind.SIZEOF, type));
+		if (this.configuration.svcomp()) {
+			int sizeofType = this.sizeofType(type);
+
+			if (sizeofType > 0)
+				return integerValue(
+						(IntegerType) typeFactory.basicType(BasicTypeKind.INT),
+						BigInteger.valueOf(sizeofType));
+
+		}
+		return (TypeValue) canonic(new CommonTypeValue(typeFactory.size_t(),
+				TypeValueKind.SIZEOF, type));
+	}
+
+	/**
+	 * For svcomp, there are two architectures: 32-bit and 64-bit.
+	 * 
+	 * https://wiki.debian.org/ArchitectureSpecificsMemo For 32-bit, uses i386
+	 * in the above link; for 64-bit, amd64.
+	 * 
+	 * short int long long long float double long double void*
+	 * 
+	 * The size of types is factoring out here:
+	 * <ul>
+	 * <li>sizeof(short)=2</li>
+	 * <li>sizeof(int)=4</li>
+	 * <li>sizeof(long)=sizeof(void*)</li>
+	 * <li>sizeof(long long)=8</li>
+	 * <li>sizeof(float)=4</li>
+	 * <li>sizeof(double)=8</li>
+	 * <li>sizeof(void*)=4 if 32-bit; 8 if 64-bit.</li>
+	 * </ul>
+	 * 
+	 * @return returns the size (a positive integer) of the given type; or -1 if
+	 *         the size of that type is not specified or can't be decided
+	 *         statically.
+	 */
+	private int sizeofType(Type type) {
+		if (this.configuration.architecture() == Architecture.UNKNOWN)
+			return -1;
+
+		TypeKind typeKind = type.kind();
+
+		switch (typeKind) {
+		case BASIC: {
+			StandardBasicType basicType = (StandardBasicType) type;
+			BasicTypeKind basicKind = basicType.getBasicTypeKind();
+
+			switch (basicKind) {
+			case SIGNED_CHAR:
+			case UNSIGNED_CHAR:
+			case CHAR:
+				return 1;
+			case DOUBLE:
+				return 8;
+			case FLOAT:
+				return 4;
+			case UNSIGNED:
+			case INT:
+				return 4;
+			case UNSIGNED_LONG:
+			case LONG:
+				if (this.configuration.architecture() == Architecture._32_BIT)
+					return 4;
+				else
+					return 8;
+			case UNSIGNED_LONG_LONG:
+			case LONG_LONG:
+				return 8;
+			case UNSIGNED_SHORT:
+			case SHORT:
+				return 2;
+			default:
+				return -1;
+			}
+		}
+		case ARRAY: {
+			ArrayType arrayType = (ArrayType) type;
+			int sizeOfEleType = this.sizeofType(arrayType.getElementType());
+			IntegerValue size = arrayType.getConstantSize();
+
+			if (size == null || sizeOfEleType < 0)
+				return -1;
+			return size.getIntegerValue().intValue() * sizeOfEleType;
+		}
+		case OTHER_INTEGER:
+			return 4;
+		case POINTER: {
+			if (this.configuration.architecture() == Architecture._32_BIT)
+				return 4;
+			else
+				return 8;
+		}
+		default: {
+			return -1;
+		}
+		}
 	}
 
 	@Override

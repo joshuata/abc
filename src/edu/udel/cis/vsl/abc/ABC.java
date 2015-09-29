@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Architecture;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 import edu.udel.cis.vsl.abc.parse.IF.ParseException;
@@ -141,6 +142,8 @@ public class ABC {
 		out.println("  print functions that are used in the program but no definition is given");
 		out.println("-lang=[c|civlc]");
 		out.println("  set language (default determined by file suffix)");
+		out.println("-arch=[i386|amd64|unknown]");
+		out.println("  set the architecture, unknown by default");
 		for (String code : Transform.getCodes()) {
 			String description = Transform.getShortDescription(code);
 
@@ -179,6 +182,7 @@ public class ABC {
 		boolean silent = false;
 		boolean unkownFunc = false;
 		boolean svcomp = false;
+		Architecture architecture = Architecture.UNKNOWN;
 		List<String> transformCodes = new LinkedList<>();
 		Language language = null;
 		TranslationTask result = new TranslationTask();
@@ -271,6 +275,15 @@ public class ABC {
 					language = Language.CIVL_C;
 				else
 					err("Unknown command line option: " + arg);
+			} else if (arg.startsWith("-arch")) {
+				if (arg.equals("-arch=i386"))
+					architecture = Architecture._32_BIT;
+				else if (arg.equals("-arch=amd64"))
+					architecture = Architecture._64_BIT;
+				else if (arg.equals("-arch=unknown"))
+					architecture = Architecture.UNKNOWN;
+				else
+					err("Unknown command line option: " + arg);
 			} else if (arg.equals("-silent")) {
 				silent = true;
 			} else if (arg.startsWith("-")) {
@@ -310,6 +323,7 @@ public class ABC {
 		result.setSilent(silent);
 		result.setUnkownFunc(unkownFunc);
 		result.setSvcomp(svcomp);
+		result.setArchitecture(architecture);
 		result.addAllTransformCodes(transformCodes);
 		return result;
 	}
