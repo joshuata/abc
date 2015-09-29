@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.antlr.runtime.CharStream;
+import org.antlr.runtime.CommonToken;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -163,11 +165,28 @@ public class CommonPreprocessor implements Preprocessor {
 	 * @throws PreprocessorException
 	 *             if an I/O error occurs in attempting to open the file
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public PreprocessorParser parser(File file) throws PreprocessorException {
 		PreprocessorLexer lexer = lexer(file);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
+		if (config.svcomp()) {
+			int numTokens = tokenStream.getNumberOfOnChannelTokens();
+			// the second last token is the token before EOF
+			Token secondLastToken = tokenStream.get(numTokens - 2);
+
+			if (secondLastToken.getType() != PreprocessorParser.NEWLINE) {
+				Token newLineToken = new CommonToken(
+						secondLastToken.getInputStream(),
+						PreprocessorParser.NEWLINE,
+						secondLastToken.getChannel(), -1, -1);
+
+				newLineToken.setText("\n");
+				((List<Token>) tokenStream.getTokens()).add(numTokens - 1,
+						newLineToken);
+			}
+		}
 		return new PreprocessorParser(tokenStream);
 	}
 

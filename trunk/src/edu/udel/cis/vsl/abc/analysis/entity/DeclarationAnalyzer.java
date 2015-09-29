@@ -598,12 +598,13 @@ public class DeclarationAnalyzer {
 			if (declaration.hasNoreturnFunctionSpecifier())
 				function.setDoesNotReturn(true);
 		} else {
-			if (declaration.hasInlineFunctionSpecifier() != function
-					.isInlined())
-				throw error(
-						"Disagreement on inline function specifier at function declaration."
-								+ "  Previous declaration was at "
-								+ previousDeclaration.getSource(), declaration);
+			// it is OK that the two 
+			// if (declaration.hasInlineFunctionSpecifier() != function
+			// .isInlined())
+			// throw error(
+			// "Disagreement on inline function specifier at function declaration."
+			// + "  Previous declaration was at "
+			// + previousDeclaration.getSource(), declaration);
 			if (declaration.hasNoreturnFunctionSpecifier() != function
 					.doesNotReturn())
 				throw error(
