@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Architecture;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
 
 public class SvcompTest {
@@ -42,6 +43,7 @@ public class SvcompTest {
 		task.setSvcomp(true);
 		task.addTransformCode("sef");
 		task.addTransformCode("prune");
+		task.setArchitecture(Architecture._32_BIT);
 		task.setFiles(new File[] { file });
 		frontEnd.showTranslation(task);
 	}
@@ -117,7 +119,6 @@ public class SvcompTest {
 		check(this.file("cs_fib_false-unreach-call.i"));
 	}
 
-	@Ignore
 	@Test
 	public void fpointer() throws ABCException, IOException {
 		check(this.file("fpointer.c"));
