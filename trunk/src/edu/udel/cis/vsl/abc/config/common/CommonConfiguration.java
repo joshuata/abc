@@ -10,6 +10,8 @@ public class CommonConfiguration implements Configuration {
 
 	private boolean svcomp = false;
 
+	private Architecture architecture = Architecture.UNKNOWN;
+
 	/** number of bits for smallest object that is not a bit-field (byte) */
 	BigInteger CHAR_BIT = new BigInteger("8");
 
@@ -218,6 +220,16 @@ public class CommonConfiguration implements Configuration {
 	@Override
 	public void setSvcomp(boolean svcomp) {
 		this.svcomp = svcomp;
+	}
+	
+	@Override
+	public void setArchitecture(Architecture arch) {
+		this.architecture = arch;
+	}
+
+	@Override
+	public Architecture architecture() {
+		return this.architecture;
 	}
 
 }

@@ -17,6 +17,10 @@ import java.math.BigInteger;
  */
 public interface Configuration {
 
+	public enum Architecture {
+		_32_BIT, _64_BIT, UNKNOWN
+	}
+
 	public static enum Language {
 		/** The programming language C, as specified in the C11 Standard */
 		C,
@@ -101,4 +105,14 @@ public interface Configuration {
 	boolean svcomp();
 
 	void setSvcomp(boolean value);
+
+	/**
+	 * the architecture of this translation task, which could be 32-bit, 64-bit,
+	 * or unknown.
+	 * 
+	 * @return
+	 */
+	Architecture architecture();
+
+	void setArchitecture(Architecture arch);
 }

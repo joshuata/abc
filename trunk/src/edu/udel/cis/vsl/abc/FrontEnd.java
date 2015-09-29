@@ -674,6 +674,7 @@ public class FrontEnd {
 	private void updateConfiguration(TranslationTask task) {
 		configuration.setLanguage(task.getLanguage());
 		configuration.setSvcomp(task.doSvcomp());
+		configuration.setArchitecture(task.doArchitecture());
 	}
 
 	public Configuration getConfiguration() {

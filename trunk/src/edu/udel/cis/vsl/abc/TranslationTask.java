@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import edu.udel.cis.vsl.abc.config.IF.Configuration.Architecture;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 
 /**
@@ -106,6 +107,12 @@ public class TranslationTask {
 	 * turns on special configuration for svcomp, including GNU-C features.
 	 */
 	private boolean svcomp = false;
+
+	/**
+	 * the architecture to be assumed for this translation task, unknown by
+	 * default
+	 */
+	private Architecture architecture = Architecture.UNKNOWN;
 
 	/**
 	 * Constructs a new task with language C, empty system and user include
@@ -371,6 +378,14 @@ public class TranslationTask {
 		this.svcomp = svcomp;
 		if (svcomp)
 			this.setGnuc(true);
+	}
+
+	public Architecture doArchitecture() {
+		return architecture;
+	}
+
+	public void setArchitecture(Architecture architecture) {
+		this.architecture = architecture;
 	}
 
 }
