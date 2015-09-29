@@ -171,7 +171,7 @@ public class CommonPreprocessor implements Preprocessor {
 		PreprocessorLexer lexer = lexer(file);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 
-		if (config.svcomp()) {
+		if (config != null && config.svcomp()) {
 			int numTokens = tokenStream.getNumberOfOnChannelTokens();
 			// the second last token is the token before EOF
 			Token secondLastToken = tokenStream.get(numTokens - 2);
