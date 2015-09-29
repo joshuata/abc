@@ -1,6 +1,8 @@
 #ifndef __GNU_C__
 #define __GNU_C__
 
+#define alloca(size)   __builtin_alloca (size)
+
 typedef unsigned long int size_t;
 typedef struct {int id;} __builtin_va_list;
 
