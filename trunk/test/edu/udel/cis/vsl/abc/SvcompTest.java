@@ -54,7 +54,6 @@ public class SvcompTest {
 
 	// this test checks for the GNU C feature that allows zero parameter for a
 	// function prototype, non-return-type function, implicit functions
-	@Ignore
 	@Test
 	public void function() throws ABCException, IOException {
 		check(this.file("function.c"));
@@ -123,4 +122,20 @@ public class SvcompTest {
 	public void fpointer() throws ABCException, IOException {
 		check(this.file("fpointer.c"));
 	}
+
+	@Test
+	public void noEOF() throws ABCException, IOException {
+		check(this.file("noEOF.c"));
+	}
+
+	@Test
+	public void parts() throws ABCException, IOException {
+		check(this.file("Parts_true-termination.c"));
+	}
+
+	@Test
+	public void cond() throws ABCException, IOException {
+		check(this.file("cond.c"));
+	}
+
 }

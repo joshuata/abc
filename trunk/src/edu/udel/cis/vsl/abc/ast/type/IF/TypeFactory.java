@@ -787,4 +787,12 @@ public interface TypeFactory {
 	 */
 	boolean isArrayOfCharType(Type type);
 
+	/**
+	 * Is the given type a void type?
+	 * 
+	 * @param type
+	 * @return
+	 */
+	boolean isVoidType(Type type);
+
 }
