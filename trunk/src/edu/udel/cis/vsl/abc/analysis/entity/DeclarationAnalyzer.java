@@ -41,7 +41,6 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
-import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
@@ -61,7 +60,10 @@ public class DeclarationAnalyzer {
 	 */
 	private EntityAnalyzer entityAnalyzer;
 
-	private Configuration configuration;
+	/**
+	 * Is the compilation mode CIVL-C?
+	 */
+	private boolean civl;
 
 	/**
 	 * Typedefs which name types in this set will be ignored in file scope.
@@ -79,8 +81,7 @@ public class DeclarationAnalyzer {
 	 */
 	DeclarationAnalyzer(EntityAnalyzer entityAnalyzer) {
 		this.entityAnalyzer = entityAnalyzer;
-		// civl = entityAnalyzer.configuration.getLanguage() == Language.CIVL_C;
-		this.configuration = entityAnalyzer.configuration;
+		civl = entityAnalyzer.configuration.getLanguage() == Language.CIVL_C;
 	}
 
 	// ************************* Exported Methods *************************
@@ -385,7 +386,7 @@ public class DeclarationAnalyzer {
 		}
 		hasNoStorageClass = hasNoStorageClass(node);
 		if (node.hasExternStorage()
-				|| (isFunction && hasNoStorageClass && (isFileScope || !civl()))) {
+				|| (isFunction && hasNoStorageClass && (isFileScope || !civl))) {
 			OrdinaryEntity previous = scope.getLexicalOrdinaryEntity(name);
 
 			if (previous == null) {
@@ -402,7 +403,7 @@ public class DeclarationAnalyzer {
 		}
 		// if you are in C mode and this is a function, throw an
 		// exception.
-		if (isFunction && !civl())
+		if (isFunction && !civl)
 			throw error(
 					"C11 6.7.1(7) states: \"The declaration of an "
 							+ " identifier for a function that has block scope shall "
@@ -471,7 +472,7 @@ public class DeclarationAnalyzer {
 		// the same function
 		if (linkage == LinkageKind.NONE) {
 			if (entity != null) {
-				if (!(civl() && isFunction && scope.getScopeKind() == ScopeKind.BLOCK))
+				if (!(civl && isFunction && scope.getScopeKind() == ScopeKind.BLOCK))
 					throw error("Redeclaration of identifier with no linkage. "
 							+ "Original declaration was at "
 							+ entity.getDeclaration(0).getSource(), identifier);
@@ -598,13 +599,12 @@ public class DeclarationAnalyzer {
 			if (declaration.hasNoreturnFunctionSpecifier())
 				function.setDoesNotReturn(true);
 		} else {
-			// it is OK that the two 
-			// if (declaration.hasInlineFunctionSpecifier() != function
-			// .isInlined())
-			// throw error(
-			// "Disagreement on inline function specifier at function declaration."
-			// + "  Previous declaration was at "
-			// + previousDeclaration.getSource(), declaration);
+			if (declaration.hasInlineFunctionSpecifier() != function
+					.isInlined())
+				throw error(
+						"Disagreement on inline function specifier at function declaration."
+								+ "  Previous declaration was at "
+								+ previousDeclaration.getSource(), declaration);
 			if (declaration.hasNoreturnFunctionSpecifier() != function
 					.doesNotReturn())
 				throw error(
@@ -653,12 +653,5 @@ public class DeclarationAnalyzer {
 				processGotos(child);
 		}
 	}
-
-	/**
-	 * Is the compilation mode CIVL-C?
-	 */
-	private boolean civl() {
-		return this.configuration.getLanguage() == Language.CIVL_C;
-	};
 
 }
