@@ -14,10 +14,10 @@ appropriate definitions are changed to input variables
 #else
 #define NULL ((void*)0)
 #endif
-#ifdef __SVCOMP__
+/*#ifdef __SVCOMP__
 #else
 #include <svcomp.h>
-#endif
+#endif*/
 
 // don't think this should be here, but this is using CIVL's $proc
 // need to talk about it...
@@ -79,6 +79,7 @@ typedef struct pthread_attr_t pthread_attr_t;
 typedef struct pthread_rwlockattr_t pthread_rwlockattr_t;
 typedef struct pthread_rwlock_t pthread_rwlock_t;
 typedef struct pthread_cond_t pthread_cond_t;
+typedef int pthread_condattr_t;
 typedef struct pthread_t pthread_t;
 
 pthread_mutex_t PTHREAD_MUTEX_INITIALIZER;// {0,$proc_null,0,0,{0,0,0,PTHREAD_MUTEX_NORMAL,0}}
