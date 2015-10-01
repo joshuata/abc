@@ -24,7 +24,7 @@ typedef unsigned long int size_t;
 
 void __VERIFIER_error(void);
 void __VERIFIER_assume(int);
-void __VERIFIER_assert(_Bool);
+void __VERIFIER_assert(int);
 extern int printf(const char * restrict format, ...);
 extern void* malloc(size_t size);
 extern void assert(_Bool);
