@@ -141,6 +141,7 @@ public class EntityAnalyzer implements Analyzer {
 			processBlockItemNode((BlockItemNode) child);
 		}
 		findTentativeDefinitions(rootScope);
+		this.expressionAnalyzer.processUnknownIdentifiers();
 	}
 
 	// Package private methods...

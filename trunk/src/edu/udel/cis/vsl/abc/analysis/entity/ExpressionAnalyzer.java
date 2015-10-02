@@ -1,5 +1,8 @@
 package edu.udel.cis.vsl.abc.analysis.entity;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import edu.udel.cis.vsl.abc.ast.IF.ASTException;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.conversion.IF.Conversion;
@@ -127,6 +130,8 @@ public class ExpressionAnalyzer {
 	private SpecialFunctionCallAnalyzer specialCallAnalyzer;
 
 	private Configuration config;
+
+	private List<IdentifierExpressionNode> unknownIdentifiers = new LinkedList<>();
 
 	// ************************** Constructors ****************************
 
@@ -258,6 +263,12 @@ public class ExpressionAnalyzer {
 			addStandardConversions(rhs);
 		convertRHS(rhs, type);
 		return type;
+	}
+
+	void processUnknownIdentifiers() throws SyntaxException {
+		for (IdentifierExpressionNode identifier : this.unknownIdentifiers) {
+			this.processIdentifierExpression(identifier, false);
+		}
 	}
 
 	/**
@@ -564,7 +575,8 @@ public class ExpressionAnalyzer {
 		processExpression(functionNode);
 		{
 			Type tmpType = functionNode.getType();
-			TypeKind tmpKind = tmpType.kind();
+			TypeKind tmpKind = tmpType == null ? TypeKind.FUNCTION : tmpType
+					.kind();
 
 			if (tmpKind == TypeKind.POINTER) {
 				tmpType = ((PointerType) tmpType).referencedType();
@@ -593,51 +605,55 @@ public class ExpressionAnalyzer {
 		if (functionName != null)
 			specialCallAnalyzer.hasSufficientArgumentsForPrintf(node,
 					functionName, node.getArguments());
-		expectedNumArgs = functionType.getNumParameters();
-		hasVariableNumArgs = functionType.hasVariableArgs();
-		if (hasVariableNumArgs) {
-			// if function has variable number of args then the number of
-			// actual parameters must be at least the number expected
-			if (numArgs < expectedNumArgs)
-				throw error("Expected at least " + expectedNumArgs
-						+ " arguments, saw " + numArgs, node);
-			isSpecialFunction = this.specialCallAnalyzer
-					.isSpecialFunction(functionName);
-		} else {
-			if (numArgs != expectedNumArgs)
-				throw error("Expected " + expectedNumArgs
-						+ " arguments but saw " + numArgs, node);
-		}
-		for (int i = 0; i < numContextArgs; i++) {
-			ExpressionNode argument = node.getContextArgument(i);
+		if (functionType != null) {
+			expectedNumArgs = functionType.getNumParameters();
+			hasVariableNumArgs = functionType.hasVariableArgs();
+			if (hasVariableNumArgs) {
+				// if function has variable number of args then the number of
+				// actual parameters must be at least the number expected
+				if (numArgs < expectedNumArgs)
+					throw error("Expected at least " + expectedNumArgs
+							+ " arguments, saw " + numArgs, node);
+				isSpecialFunction = this.specialCallAnalyzer
+						.isSpecialFunction(functionName);
+			} else {
+				if (numArgs != expectedNumArgs)
+					throw error("Expected " + expectedNumArgs
+							+ " arguments but saw " + numArgs, node);
+			}
+			for (int i = 0; i < numContextArgs; i++) {
+				ExpressionNode argument = node.getContextArgument(i);
 
-			processExpression(argument);
-		}
-		for (int i = 0; i < numArgs; i++) {
-			ExpressionNode argument = node.getArgument(i);
+				processExpression(argument);
+			}
+			for (int i = 0; i < numArgs; i++) {
+				ExpressionNode argument = node.getArgument(i);
 
-			processExpression(argument);
-			addStandardConversions(argument);
-			specialCallAnalyzer.addConversionsForSpecialFunctions(functionName,
-					argument);
-			if (!hasVariableNumArgs || i < expectedNumArgs || isSpecialFunction) {
-				ObjectType lhsType;
-				UnqualifiedObjectType type;
+				processExpression(argument);
+				addStandardConversions(argument);
+				specialCallAnalyzer.addConversionsForSpecialFunctions(
+						functionName, argument);
+				if (!hasVariableNumArgs || i < expectedNumArgs
+						|| isSpecialFunction) {
+					ObjectType lhsType;
+					UnqualifiedObjectType type;
 
-				if (i < expectedNumArgs)
-					lhsType = functionType.getParameterType(i);
-				else
-					lhsType = this.specialCallAnalyzer.variableParameterType(
-							functionName, i);
-				type = conversionFactory.lvalueConversionType(lhsType);
-				try {
-					convertRHS(argument, type);
-				} catch (UnsourcedException e) {
-					throw error(e, argument);
+					if (i < expectedNumArgs)
+						lhsType = functionType.getParameterType(i);
+					else
+						lhsType = this.specialCallAnalyzer
+								.variableParameterType(functionName, i);
+					type = conversionFactory.lvalueConversionType(lhsType);
+					try {
+						convertRHS(argument, type);
+					} catch (UnsourcedException e) {
+						throw error(e, argument);
+					}
 				}
 			}
 		}
-		node.setInitialType(functionType.getReturnType());
+		node.setInitialType(functionType == null ? this.typeFactory
+				.basicType(BasicTypeKind.INT) : functionType.getReturnType());
 	}
 
 	private void processSpawn(SpawnNode node) throws SyntaxException {
@@ -697,7 +713,12 @@ public class ExpressionAnalyzer {
 		EntityKind kind;
 
 		if (entity == null) {
-			throw error("Undeclared identifier " + name, node);
+			if (isFirstRound && config.svcomp()) {
+				this.unknownIdentifiers.add(node);
+				return;
+			} else {
+				throw error("Undeclared identifier " + name, node);
+			}
 		}
 		kind = entity.getEntityKind();
 		switch (kind) {
