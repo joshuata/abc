@@ -164,7 +164,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 
 	private SpecifierAnalysis newSpecifierAnalysis(CommonTree specifiers)
 			throws SyntaxException {
-		return new SpecifierAnalysis(specifiers, parseTree);
+		return new SpecifierAnalysis(specifiers, parseTree, this.config);
 	}
 
 	private boolean isFunction(TypeNode type, SimpleScope scope)
@@ -1116,11 +1116,19 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			result = nodeFactory
 					.newVoidTypeNode(newSource(analysis.typeSpecifierNode));
 			break;
-		case BASIC:
-			result = nodeFactory.newBasicTypeNode(
-					newSource(analysis.specifierListNode),
+		case BASIC: {
+			Source source;
+
+			if (analysis.specifierListNode.getChildCount() == 0)
+				source = this.tokenFactory.newSource(tokenFactory.newCToken(
+						CParser.IDENTIFIER, analysis.basicTypeKind.toString(),
+						tokenFactory.newSystemFormation("system")));
+			else
+				source = newSource(analysis.specifierListNode);
+			result = nodeFactory.newBasicTypeNode(source,
 					analysis.basicTypeKind);
 			break;
+		}
 		case TYPEDEF_NAME: {
 			CommonTree typedefNameTree = (CommonTree) analysis.typeSpecifierNode;
 			CommonTree identifierTree = (CommonTree) typedefNameTree
@@ -2421,6 +2429,7 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		// .getChild(5);
 		// SequenceNode<VariableDeclarationNode> scopeListNode =
 		// translateScopeListDef(scopeListTree);
+		// if(specifiers)
 		SpecifierAnalysis analysis = newSpecifierAnalysis(specifiers);
 		TypeNode baseType = newSpecifierType(analysis, newScope);
 		DeclaratorData data = processDeclarator(declarator, baseType, newScope);

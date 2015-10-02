@@ -1510,7 +1510,14 @@ scope Symbols; // "function scope"
     $Symbols::enumerationConstants = new HashSet<String>();
     $Symbols::isFunctionDefinition = true;
 }
-	: declarationSpecifiers
+	: declarator
+	  contract
+	  declarationList_opt
+	  compoundStatement
+	  -> ^(FUNCTION_DEFINITION ^(DECLARATION_SPECIFIERS) declarator
+	       declarationList_opt compoundStatement contract
+	      )
+    | declarationSpecifiers
 	  declarator
 	  contract
 	  declarationList_opt
@@ -1579,11 +1586,14 @@ scope DeclarationScope;
  * is not a block item, but in CIVL-C it is.
  */
 blockItem
-	: 	( (declarationSpecifiers declarator contract
-	   	    declarationList_opt LCURLY)=>
-		  functionDefinition
-		| declaration
-		) 
+	:
+	  (declarator contract
+	   	  declarationList_opt LCURLY)=>
+	  functionDefinition
+    | (declarationSpecifiers declarator contract
+	   	  declarationList_opt LCURLY)=>
+	  functionDefinition
+	| declaration	
 	| pragma
     | statement
 	;

@@ -45,6 +45,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
@@ -161,6 +162,7 @@ public class SpecifierAnalysis {
 	// alignment specifiers
 	List<CommonTree> alignmentTypeNodes = new LinkedList<CommonTree>();
 	List<CommonTree> alignmentExpressionNodes = new LinkedList<CommonTree>();
+	private Configuration configuration;
 
 	/**
 	 * Creates a new analysis object and conducts the analysis. The
@@ -171,10 +173,11 @@ public class SpecifierAnalysis {
 	 * @param specifierListNode
 	 * @throws SyntaxException
 	 */
-	SpecifierAnalysis(CommonTree specifierListNode, ParseTree parseTree)
-			throws SyntaxException {
+	SpecifierAnalysis(CommonTree specifierListNode, ParseTree parseTree,
+			Configuration configuration) throws SyntaxException {
 		this.specifierListNode = specifierListNode;
 		this.parseTree = parseTree;
+		this.configuration = configuration;
 		analyze();
 	}
 
@@ -185,157 +188,167 @@ public class SpecifierAnalysis {
 	private void analyze() throws SyntaxException {
 		int numChildren = specifierListNode.getChildCount();
 
-		for (int i = 0; i < numChildren; i++) {
-			CommonTree node = (CommonTree) specifierListNode.getChild(i);
-			int kind = node.getType();
+		if (numChildren == 0) {
+			if (this.configuration.svcomp()) {
+				typeNameKind = TypeNodeKind.BASIC;
+				basicTypeKind = BasicTypeKind.INT;
+			} else
+				error("Declaration is missing a type name", specifierListNode);
+		} else {
+			for (int i = 0; i < numChildren; i++) {
+				CommonTree node = (CommonTree) specifierListNode.getChild(i);
+				int kind = node.getType();
 
-			switch (kind) {
-			case CHAR:
-			case SHORT:
-			case INT:
-			case LONG:
-			case FLOAT:
-			case DOUBLE:
-			case REAL:
-			case SIGNED:
-			case UNSIGNED:
-			case BOOL:
-			case COMPLEX:
-				set.add(kind);
-				setTypeNameKind(TypeNodeKind.BASIC);
-				if (basicSpecifierNodes == null)
-					basicSpecifierNodes = new LinkedList<CommonTree>();
-				basicSpecifierNodes.add(node);
-				break;
-			case VOID:
-				voidTypeCount++;
-				setTypeNameKind(TypeNodeKind.VOID);
-				setTypeSpecifierNode(node);
-				break;
-			case ATOMIC:
-				if (node.getChildCount() > 0) {
-					atomicTypeCount++;
-					setTypeNameKind(TypeNodeKind.ATOMIC);
+				switch (kind) {
+				case CHAR:
+				case SHORT:
+				case INT:
+				case LONG:
+				case FLOAT:
+				case DOUBLE:
+				case REAL:
+				case SIGNED:
+				case UNSIGNED:
+				case BOOL:
+				case COMPLEX:
+					set.add(kind);
+					setTypeNameKind(TypeNodeKind.BASIC);
+					if (basicSpecifierNodes == null)
+						basicSpecifierNodes = new LinkedList<CommonTree>();
+					basicSpecifierNodes.add(node);
+					break;
+				case VOID:
+					voidTypeCount++;
+					setTypeNameKind(TypeNodeKind.VOID);
 					setTypeSpecifierNode(node);
-				} else {
-					atomicQualifier = true;
-				}
-				break;
-			case STRUCT:
-				structTypeCount++;
-				setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
-				setTypeSpecifierNode(node);
-				break;
-			case UNION:
-				unionTypeCount++;
-				setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
-				setTypeSpecifierNode(node);
-				break;
-			case ENUM:
-				enumTypeCount++;
-				setTypeNameKind(TypeNodeKind.ENUMERATION);
-				setTypeSpecifierNode(node);
-				break;
-			case TYPEDEF_NAME:
-				typedefNameCount++;
-				setTypeNameKind(TypeNodeKind.TYPEDEF_NAME);
-				setTypeSpecifierNode(node);
-				break;
-			case DOMAIN:
-				domainTypeCount++;
-				setTypeNameKind(TypeNodeKind.DOMAIN);
-				setTypeSpecifierNode(node);
-				// if (node.getChildCount() != 0) {
-				// CommonTree child = (CommonTree) node.getChild(0);
-				//
-				// if (child.getToken().getType() != CParser.ABSENT)
-				// domainDimension = parseInt(child);
-				// }
-				break;
-			case RANGE:
-				rangeTypeCount++;
-				setTypeNameKind(TypeNodeKind.RANGE);
-				setTypeSpecifierNode(node);
-				break;
-			case CONST:
-				constQualifier = true;
-				break;
-			case RESTRICT:
-				restrictQualifier = true;
-				break;
-			case VOLATILE:
-				volatileQualifier = true;
-				break;
-			case INPUT:
-				inputQualifier = true;
-				break;
-			case OUTPUT:
-				outputQualifier = true;
-				break;
-			case TYPEDEF:
-				typedefCount++;
-				break;
-			case EXTERN:
-				externCount++;
-				break;
-			case STATIC:
-				staticCount++;
-				break;
-			case THREADLOCAL:
-				threadLocalCount++;
-				break;
-			case AUTO:
-				autoCount++;
-				break;
-			case REGISTER:
-				registerCount++;
-				break;
-			case SHARED:
-				sharedCount++;
-				break;
-			case INLINE:
-				inlineSpecifier = true;
-				break;
-			case NORETURN:
-				noreturnSpecifier = true;
-				break;
-			case GLOBAL:
-				globalSpecifier = true;
-				break;
-			case FATOMIC:
-				fatomicSpecifier = true;
-				break;
-			case ALIGNAS: {
-				int alignKind = ((CommonTree) node.getChild(0)).getType();
-				CommonTree argument = (CommonTree) node.getChild(1);
+					break;
+				case ATOMIC:
+					if (node.getChildCount() > 0) {
+						atomicTypeCount++;
+						setTypeNameKind(TypeNodeKind.ATOMIC);
+						setTypeSpecifierNode(node);
+					} else {
+						atomicQualifier = true;
+					}
+					break;
+				case STRUCT:
+					structTypeCount++;
+					setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
+					setTypeSpecifierNode(node);
+					break;
+				case UNION:
+					unionTypeCount++;
+					setTypeNameKind(TypeNodeKind.STRUCTURE_OR_UNION);
+					setTypeSpecifierNode(node);
+					break;
+				case ENUM:
+					enumTypeCount++;
+					setTypeNameKind(TypeNodeKind.ENUMERATION);
+					setTypeSpecifierNode(node);
+					break;
+				case TYPEDEF_NAME:
+					typedefNameCount++;
+					setTypeNameKind(TypeNodeKind.TYPEDEF_NAME);
+					setTypeSpecifierNode(node);
+					break;
+				case DOMAIN:
+					domainTypeCount++;
+					setTypeNameKind(TypeNodeKind.DOMAIN);
+					setTypeSpecifierNode(node);
+					// if (node.getChildCount() != 0) {
+					// CommonTree child = (CommonTree) node.getChild(0);
+					//
+					// if (child.getToken().getType() != CParser.ABSENT)
+					// domainDimension = parseInt(child);
+					// }
+					break;
+				case RANGE:
+					rangeTypeCount++;
+					setTypeNameKind(TypeNodeKind.RANGE);
+					setTypeSpecifierNode(node);
+					break;
+				case CONST:
+					constQualifier = true;
+					break;
+				case RESTRICT:
+					restrictQualifier = true;
+					break;
+				case VOLATILE:
+					volatileQualifier = true;
+					break;
+				case INPUT:
+					inputQualifier = true;
+					break;
+				case OUTPUT:
+					outputQualifier = true;
+					break;
+				case TYPEDEF:
+					typedefCount++;
+					break;
+				case EXTERN:
+					externCount++;
+					break;
+				case STATIC:
+					staticCount++;
+					break;
+				case THREADLOCAL:
+					threadLocalCount++;
+					break;
+				case AUTO:
+					autoCount++;
+					break;
+				case REGISTER:
+					registerCount++;
+					break;
+				case SHARED:
+					sharedCount++;
+					break;
+				case INLINE:
+					inlineSpecifier = true;
+					break;
+				case NORETURN:
+					noreturnSpecifier = true;
+					break;
+				case GLOBAL:
+					globalSpecifier = true;
+					break;
+				case FATOMIC:
+					fatomicSpecifier = true;
+					break;
+				case ALIGNAS: {
+					int alignKind = ((CommonTree) node.getChild(0)).getType();
+					CommonTree argument = (CommonTree) node.getChild(1);
 
-				if (alignKind == CParser.TYPE) {
-					alignmentTypeNodes.add(argument);
-				} else if (kind == CParser.EXPR) {
-					alignmentExpressionNodes.add(argument);
-				} else {
-					throw error("Unexpected kind of ALIGN_AS argument", node);
+					if (alignKind == CParser.TYPE) {
+						alignmentTypeNodes.add(argument);
+					} else if (kind == CParser.EXPR) {
+						alignmentExpressionNodes.add(argument);
+					} else {
+						throw error("Unexpected kind of ALIGN_AS argument",
+								node);
+					}
+					break;
 				}
-				break;
-			}
-			case ABSTRACT:
-				abstractSpecifier = true;
-				if (node.getChildCount() == 0) {
-					continuity = 0;
-				} else {
-					continuity = parseInt((CommonTree) node.getChild(0));
+				case ABSTRACT:
+					abstractSpecifier = true;
+					if (node.getChildCount() == 0) {
+						continuity = 0;
+					} else {
+						continuity = parseInt((CommonTree) node.getChild(0));
+					}
+					break;
+				default:
+					throw error("Unknown declaration specifier", node);
 				}
-				break;
-			default:
-				throw error("Unknown declaration specifier", node);
 			}
-		}
-		if (typeNameKind == null)
-			throw error("Declaration is missing a type name", specifierListNode);
-		if (typeNameKind == TypeNodeKind.BASIC) {
-			basicTypeKind = BasicMultiset.getBasicTypeKind(set);
-			if (basicTypeKind == null)
-				throw error("Illegal type specifiers", specifierListNode);
+			if (typeNameKind == null)
+				throw error("Declaration is missing a type name",
+						specifierListNode);
+			if (typeNameKind == TypeNodeKind.BASIC) {
+				basicTypeKind = BasicMultiset.getBasicTypeKind(set);
+				if (basicTypeKind == null)
+					throw error("Illegal type specifiers", specifierListNode);
+			}
 		}
 	}
 
