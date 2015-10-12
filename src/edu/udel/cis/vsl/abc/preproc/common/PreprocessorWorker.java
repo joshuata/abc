@@ -1,6 +1,7 @@
 package edu.udel.cis.vsl.abc.preproc.common;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -92,9 +93,9 @@ public class PreprocessorWorker {
 	 *            the predefined macros, including those specified in command
 	 *            line
 	 */
-	public PreprocessorWorker(Configuration config, CommonPreprocessor preprocessor,
-			File[] systemIncludePaths, File[] userIncludePaths,
-			Map<String, Macro> macros) {
+	public PreprocessorWorker(Configuration config,
+			CommonPreprocessor preprocessor, File[] systemIncludePaths,
+			File[] userIncludePaths, Map<String, Macro> macros) {
 		this.preprocessor = preprocessor;
 		this.config = config;
 		if (systemIncludePaths == null)
@@ -177,6 +178,8 @@ public class PreprocessorWorker {
 	CharStream findInternalSystemFile(File path, String filename) {
 		File file = new File(path, filename);
 
+		if (file.getAbsoluteFile().equals(Preprocessor.ABC_INCLUDE_PATH))
+			return null;
 		try {
 			CharStream charStream = PreprocessorUtils
 					.newFilteredCharStreamFromResource(filename,
@@ -245,19 +248,26 @@ public class PreprocessorWorker {
 		PreprocessorLexer lexer;
 		int numErrors;
 
-		file = findFile(userIncludePaths, filename);
-		if (file == null)
-			file = findFile(systemIncludePaths, filename);
-		if (file == null) {
-			// charStream = PreprocessorUtils.newFilteredCharStreamFromResource(
-			// filename, "/" + filename);
-			charStream = findInternalSystemFile(filename);
-
-			if (charStream == null)
-				return null;
+		try {
 			file = new File(filename);
-		} else {
 			charStream = PreprocessorUtils.newFilteredCharStreamFromFile(file);
+		} catch (FileNotFoundException fof) {
+			file = findFile(userIncludePaths, filename);
+			if (file == null)
+				file = findFile(systemIncludePaths, filename);
+			if (file == null) {
+				// charStream =
+				// PreprocessorUtils.newFilteredCharStreamFromResource(
+				// filename, "/" + filename);
+				charStream = findInternalSystemFile(filename);
+
+				if (charStream == null)
+					return null;
+				file = new File(filename);
+			} else {
+				charStream = PreprocessorUtils
+						.newFilteredCharStreamFromFile(file);
+			}
 		}
 		lexer = new PreprocessorLexer(charStream);
 		parser = new PreprocessorParser(new CommonTokenStream(lexer));
