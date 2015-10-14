@@ -45,7 +45,8 @@ public class SimpleCudaAST {
 	private static TypeFactory typeF = Types.newTypeFactory();
 	private static ValueFactory valueF = Values.newValueFactory(configuration,
 			typeF);
-	private static NodeFactory nodeF = Nodes.newNodeFactory(typeF, valueF);
+	private static NodeFactory nodeF = Nodes.newNodeFactory(configuration,
+			typeF, valueF);
 	private static TokenFactory tokenF = Tokens.newTokenFactory();
 	private static ASTFactory astF = ASTs.newASTFactory(nodeF, tokenF, typeF);
 
