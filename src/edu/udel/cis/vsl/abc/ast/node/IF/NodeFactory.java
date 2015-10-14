@@ -94,6 +94,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
@@ -2209,6 +2210,13 @@ public interface NodeFactory {
 	 */
 	OmpWorksharingNode newWorksharingNode(Source source,
 			OmpWorksharingNodeKind kind);
+
+	/**
+	 * gets the configuration associated with this translation task.
+	 * 
+	 * @return the configuration associated with this translation task.
+	 */
+	Configuration configuration();
 
 	WildcardNode newWildcardNode(Source source);
 
