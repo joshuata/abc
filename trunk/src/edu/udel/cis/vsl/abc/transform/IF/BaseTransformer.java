@@ -3,6 +3,7 @@ package edu.udel.cis.vsl.abc.transform.IF;
 import edu.udel.cis.vsl.abc.ast.IF.ASTFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.NodeFactory;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.Formation;
@@ -39,6 +40,15 @@ public abstract class BaseTransformer implements Transformer {
 		this.shortDescription = shortDescription;
 		this.astFactory = astFactory;
 		this.nodeFactory = astFactory.getNodeFactory();
+	}
+
+	/**
+	 * gets the configuration associated with this translation task
+	 * 
+	 * @return the configuration associated with this translation task
+	 */
+	protected Configuration getConfiguration() {
+		return this.nodeFactory.configuration();
 	}
 
 	@Override

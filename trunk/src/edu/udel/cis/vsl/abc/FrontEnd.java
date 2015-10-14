@@ -93,8 +93,8 @@ public class FrontEnd {
 	private ValueFactory valueFactory = Values.newValueFactory(configuration,
 			typeFactory);
 
-	private NodeFactory nodeFactory = Nodes.newNodeFactory(typeFactory,
-			valueFactory);
+	private NodeFactory nodeFactory = Nodes.newNodeFactory(configuration,
+			typeFactory, valueFactory);
 
 	private ASTFactory astFactory = ASTs.newASTFactory(nodeFactory,
 			sourceFactory, typeFactory);
