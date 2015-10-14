@@ -539,11 +539,11 @@ assignmentOperator
  * Child 1.1: arg1
  */
 commaExpression
-	: ( x=assignmentExpression -> assignmentExpression)
+	: ( assignmentExpression -> assignmentExpression )
 	  ( COMMA y=assignmentExpression
-	    -> ^(OPERATOR COMMA ^(ARGUMENT_LIST $x $y))
+	    -> ^(OPERATOR COMMA ^(ARGUMENT_LIST $commaExpression $y))
 	  )*
-	 ;
+	;
 
 /* The most general class of expressions.
  * Includes a CIVL-C "collective" expression,
