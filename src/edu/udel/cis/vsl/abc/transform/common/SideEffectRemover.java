@@ -1,5 +1,6 @@
 package edu.udel.cis.vsl.abc.transform.common;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +31,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ArrowNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CastNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CollectiveExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.CompoundLiteralNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.ConstantNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.DotNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.ExpressionNode.ExpressionKind;
@@ -72,17 +74,29 @@ import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.AtomicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
+import edu.udel.cis.vsl.abc.ast.type.IF.IntegerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.PointerType;
 import edu.udel.cis.vsl.abc.ast.type.IF.QualifiedObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.StructureOrUnionType;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type;
+import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
+import edu.udel.cis.vsl.abc.ast.value.IF.CharacterValue;
+import edu.udel.cis.vsl.abc.ast.value.IF.IntegerValue;
+import edu.udel.cis.vsl.abc.ast.value.IF.StringValue;
+import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
 import edu.udel.cis.vsl.abc.token.IF.Source;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
+
+// add extra parameter to all the expression translation methods
+// boolean voidExpr: if true, this means the expression return value
+// will not be used.  therefore you have to make sure all
+// real side-effects and error side-effects are in the before/after.
 
 /**
  * <p>
@@ -93,7 +107,9 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * <p>
  * An expression is <strong>side-effect-free</strong> if it does not contain a
  * function call or any subexpression which can modify the state (such as an
- * assignment).
+ * assignment). In this definition, an expression which may cause an exception
+ * (division by 0, illegal pointer dereference, etc.) is NOT considered to be a
+ * side-effect.
  * </p>
  * 
  * <p>
@@ -119,6 +135,14 @@ import edu.udel.cis.vsl.abc.transform.IF.BaseTransformer;
  * e, then e is in normal form - for other kinds of statements: all its member
  * expressions are side-effect-free and all its member statements are in normal
  * form.
+ * </p>
+ * 
+ * <p>
+ * A triple is in normal form if all of the statements in the before and after
+ * clauses are in normal form and the expression is in normal form. The goal of
+ * most of the methods below is to produce a triple in normal form which is
+ * equivalent to a given expression or statement. In some cases an additional
+ * goal is that the expression be side-effect-free.
  * </p>
  * 
  * TODO: check if a contract contains side-effects and report an error
@@ -271,32 +295,51 @@ public class SideEffectRemover extends BaseTransformer {
 	}
 
 	/**
-	 * Modifies the triple by introducing a new temporary variable t whose type
-	 * is same as the type of the expression, appending a declaration for t to
-	 * the before clause, moving all the after clauses to the end of the before
-	 * clause, and replacing the expression with t. The result is a triple
-	 * equivalent to original but with a side-effect-free expression and an
-	 * empty after clause.
+	 * Modifies the triple to an equivalent form but with a side-effect-free or
+	 * <code>null</code> (if <code>isVoid</code>) expression, and an empty after
+	 * list.
+	 * 
+	 * <p>
+	 * If <code>isVoid</code>, moves the expression to the before list as an
+	 * expression statement, then adds all the after clauses to the before list.
+	 * </p>
+	 * 
+	 * <p>
+	 * If not <code>isVoid</code>, introduces a new temporary variable t whose
+	 * type is same as the type of the expression, appends a declaration for t
+	 * to the before clause, moves all the after clauses to the end of the
+	 * before clause, and replaces the expression with t.
+	 * </p>
 	 * 
 	 * @param triple
 	 *            any triple
+	 * @param isVoid
+	 *            is the result of the expression needed (and not just its
+	 *            side-effects)?
 	 */
-	private void shift(ExprTriple triple) {
+	private void shift(ExprTriple triple, boolean isVoid) {
 		ExpressionNode expression = triple.getNode();
 		Source source = expression.getSource();
-		String tmpId = tempVariablePrefix + tempVariableCounter;
 
-		tempVariableCounter++;
 		expression.remove();
+		if (isVoid) {
+			triple.addBefore(nodeFactory.newExpressionStatementNode(expression));
+			triple.setNode(null);
+		} else {
+			String tmpId = tempVariablePrefix + tempVariableCounter;
 
-		VariableDeclarationNode decl = nodeFactory.newVariableDeclarationNode(
-				source, nodeFactory.newIdentifierNode(source, tmpId),
-				typeNode(source, expression.getType()), expression);
+			tempVariableCounter++;
 
-		triple.getBefore().add(decl);
+			VariableDeclarationNode decl = nodeFactory
+					.newVariableDeclarationNode(source,
+							nodeFactory.newIdentifierNode(source, tmpId),
+							typeNode(source, expression.getType()), expression);
+
+			triple.setNode(nodeFactory.newIdentifierExpressionNode(source,
+					nodeFactory.newIdentifierNode(source, tmpId)));
+			triple.getBefore().add(decl);
+		}
 		triple.getBefore().addAll(triple.getAfter());
-		triple.setNode(nodeFactory.newIdentifierExpressionNode(source,
-				nodeFactory.newIdentifierNode(source, tmpId)));
 		triple.setAfter(new LinkedList<BlockItemNode>());
 	}
 
@@ -307,13 +350,16 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param triple
 	 *            any triple
+	 * @param isVoid
+	 *            is the result of the expression needed (and not just its
+	 *            side-effects)?
 	 * @return <code>true</code> iff the triple changed
 	 */
 	private boolean emptyAfter(ExprTriple triple) {
 		if (triple.getAfter().isEmpty()) {
 			return false;
 		} else {
-			shift(triple);
+			shift(triple, false);
 			return true;
 		}
 	}
@@ -321,11 +367,14 @@ public class SideEffectRemover extends BaseTransformer {
 	/**
 	 * Makes the triple expression side-effect-free and the "after" clauses
 	 * empty. If the triple already satisfies those properties, this does
-	 * nothing and return <code>false</code>. Otherwise, it performs a
+	 * nothing and returns <code>false</code>. Otherwise, it performs a
 	 * {@link #shift(ExprTriple)} and returns <code>true</code>.
 	 * 
 	 * @param triple
 	 *            any triple
+	 * @param isVoid
+	 *            is the result of the expression needed (and not just its
+	 *            side-effects)?
 	 * @return <code>true</code> iff the triple changed
 	 */
 	private boolean purify(ExprTriple triple) {
@@ -334,7 +383,7 @@ public class SideEffectRemover extends BaseTransformer {
 			assert triple.getNode().parent() == null;
 			return false;
 		} else {
-			shift(triple);
+			shift(triple, false);
 			assert triple.getNode().parent() == null;
 			return true;
 		}
@@ -354,7 +403,7 @@ public class SideEffectRemover extends BaseTransformer {
 		if (triple.getNode().isSideEffectFree(false)) {
 			return false;
 		} else {
-			shift(triple);
+			shift(triple, false);
 			return true;
 		}
 	}
@@ -404,7 +453,7 @@ public class SideEffectRemover extends BaseTransformer {
 		case ARROW: {
 			// p->f = (*p).f
 			ArrowNode arrow = (ArrowNode) lhs;
-			ExprTriple result = translate(arrow.getStructurePointer());
+			ExprTriple result = translate(arrow.getStructurePointer(), false);
 
 			purify(result);
 			arrow.setStructurePointer(result.getNode());
@@ -414,7 +463,7 @@ public class SideEffectRemover extends BaseTransformer {
 		case DOT: {
 			// e.f
 			DotNode dotNode = (DotNode) lhs;
-			ExprTriple result = translate(dotNode.getStructure());
+			ExprTriple result = translate(dotNode.getStructure(), false);
 
 			purify(result);
 			dotNode.setStructure(result.getNode());
@@ -429,7 +478,7 @@ public class SideEffectRemover extends BaseTransformer {
 
 			switch (op) {
 			case DEREFERENCE: { // *p
-				ExprTriple result = translate(opNode.getArgument(0));
+				ExprTriple result = translate(opNode.getArgument(0), false);
 
 				purify(result);
 				opNode.setArgument(0, result.getNode());
@@ -441,8 +490,8 @@ public class SideEffectRemover extends BaseTransformer {
 				// expr can be a LHSExpression of array type (like a[j][k])
 				// expr can be an expression of pointer type
 
-				ExprTriple t1 = translate(opNode.getArgument(0)), t2 = translate(opNode
-						.getArgument(1));
+				ExprTriple t1 = translate(opNode.getArgument(0), false), t2 = translate(
+						opNode.getArgument(1), false);
 
 				purify(t1);
 				purify(t2);
@@ -497,9 +546,13 @@ public class SideEffectRemover extends BaseTransformer {
 	 *            operators {@link Operator#PREINCREMENT},
 	 *            {@link Operator#POSTINCREMENT}, {@link Operator#PREDECREMENT},
 	 *            {@link Operator#POSTDECREMENT}.
-	 * @return an equivalent triple
+	 * @param isVoid
+	 *            is the value of this expression not needed?
+	 * @return an equivalent triple in normal form; expression field will be
+	 *         <code>null</code> iff <code>isVoid</code>
 	 */
-	private ExprTriple translateIncrementOrDecrement(OperatorNode opNode) {
+	private ExprTriple translateIncrementOrDecrement(OperatorNode opNode,
+			boolean isVoid) {
 		Source source = opNode.getSource();
 		Operator op = opNode.getOperator();
 		Operator unaryOp;
@@ -542,6 +595,13 @@ public class SideEffectRemover extends BaseTransformer {
 			result.addBefore(assignment);
 		else
 			result.addAfter(assignment);
+		if (isVoid) {
+			// must make sure to not erase any exception-side-effects.
+			// this is guaranteed here because the lhs already occurs
+			// in the assignment, which is being kept in any case.
+			// exception-side-effects only need to happen ONCE
+			result.setNode(null);
+		}
 		return result;
 	}
 
@@ -565,15 +625,18 @@ public class SideEffectRemover extends BaseTransformer {
 	 * @param assign
 	 *            an assignment node (operator node for which the operator is
 	 *            {@link Operator.ASSIGN}
-	 * @return a triple equivalent to the given expression
+	 * @param isVoid
+	 *            is the value of this expression not needed?
+	 * @return an equivalent triple in normal form; expression field will be
+	 *         <code>null</code> iff <code>isVoid</code>
 	 */
-	private ExprTriple translateAssign(OperatorNode assign) {
+	private ExprTriple translateAssign(OperatorNode assign, boolean isVoid) {
 		assert assign.getOperator() == Operator.ASSIGN;
 
 		ExpressionNode lhs = assign.getArgument(0);
 		ExpressionNode rhs = assign.getArgument(1);
 		ExprTriple leftTriple = lhsTranslate(lhs);
-		ExprTriple rightTriple = translate(rhs);
+		ExprTriple rightTriple = translate(rhs, false);
 
 		emptyAfter(rightTriple);
 
@@ -584,7 +647,7 @@ public class SideEffectRemover extends BaseTransformer {
 		assign.setArgument(1, newRhs);
 		assign.remove();
 
-		ExprTriple result = new ExprTriple(newLhs.copy());
+		ExprTriple result = new ExprTriple(isVoid ? null : newLhs.copy());
 
 		result.addAllBefore(leftTriple.getBefore());
 		result.addAllBefore(rightTriple.getBefore());
@@ -604,18 +667,60 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param dereference
 	 *            a pointer dereference expression
-	 * @return an equvialent triple
+	 * @param isVoid
+	 *            is the value of this expression not needed?
+	 * @return an equivalent triple in normal form; expression field will be
+	 *         <code>null</code> iff <code>isVoid</code>
 	 */
-	private ExprTriple translateDereference(OperatorNode dereference) {
+	private ExprTriple translateDereference(OperatorNode dereference,
+			boolean isVoid) {
 		Operator operator = dereference.getOperator();
-		ExprTriple result = translate(dereference.getArgument(0));
+		ExprTriple result = translate(dereference.getArgument(0), false);
 
 		assert operator == Operator.DEREFERENCE;
 		makesef(result);
 		dereference.setArgument(0, result.getNode());
-		result.setNode(dereference);
+		if (isVoid) {
+			// in this case we need to keep the dereference
+			// because it might have an exception side-effect (illegal
+			// dereference)
+			result.addBefore(nodeFactory
+					.newExpressionStatementNode(dereference));
+			result.setNode(null);
+		} else {
+			result.setNode(dereference);
+		}
 		return result;
 	}
+
+	// /**
+	// * Does this kind of expression possibly generate an exception. This is
+	// * referring to the expression itself, not the children. In other words,
+	// if
+	// * all children are exception-less, is it possible the evaluation of this
+	// * expression could throw an exception?
+	// *
+	// * @param expression
+	// * any expression node, non-<code>null</code>
+	// * @return <code>true</code> iff this kind of expression can lead to an
+	// * exception
+	// */
+	// private boolean hasException(ExpressionNode expression) {
+	// ExpressionKind kind = expression.expressionKind();
+	//
+	// switch (kind) {
+	// case ARROW:
+	// case CAST:
+	// case FUNCTION_CALL:
+	// case GENERIC_SELECTION:
+	// case SPAWN:
+	// return true;
+	// case OPERATOR:
+	// return hasException(((OperatorNode) expression).getOperator());
+	// default:
+	// return false;
+	// }
+	// }
 
 	/**
 	 * Translates most binary operator expressions to an equivalent triple. This
@@ -631,19 +736,32 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param opNode
 	 *            a binary operator expression
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return an equivalent triple
 	 */
-	private ExprTriple translateGenericBinaryOperator(OperatorNode opNode) {
-		ExprTriple leftTriple = translate(opNode.getArgument(0));
-		ExprTriple rightTriple = translate(opNode.getArgument(1));
+	private ExprTriple translateGenericBinaryOperator(OperatorNode opNode,
+			boolean isVoid) {
+		ExprTriple leftTriple = translate(opNode.getArgument(0), false);
+		ExprTriple rightTriple = translate(opNode.getArgument(1), false);
 
 		makesef(leftTriple);
 		makesef(rightTriple);
 		opNode.setArgument(0, leftTriple.getNode());
 		opNode.setArgument(1, rightTriple.getNode());
+		if (isVoid) {
+			// because the evaluation of the expression may lead to
+			// undefined behaviors, we cannot entirely eliminate it,
+			// but we do not need to store the result
+			opNode.remove();
+			leftTriple
+					.addBefore(nodeFactory.newExpressionStatementNode(opNode));
+			leftTriple.setNode(null);
+		} else {
+			leftTriple.setNode(opNode);
+		}
 		leftTriple.addAllBefore(rightTriple.getBefore());
 		leftTriple.addAllAfter(rightTriple.getAfter());
-		leftTriple.setNode(opNode);
 		return leftTriple;
 	}
 
@@ -659,14 +777,26 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param opNode
 	 *            a unary operator node
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return equivalent triple
 	 */
-	private ExprTriple translateGenericUnaryOperator(OperatorNode opNode) {
-		ExprTriple result = translate(opNode.getArgument(0));
+	private ExprTriple translateGenericUnaryOperator(OperatorNode opNode,
+			boolean isVoid) {
+		ExprTriple result = translate(opNode.getArgument(0), false);
 
 		makesef(result);
 		opNode.setArgument(0, result.getNode());
-		result.setNode(opNode);
+		if (isVoid) {
+			// because the evaluation of the expression may lead to
+			// undefined behaviors, we cannot entirely eliminate it,
+			// but we do not need to store the result
+			opNode.remove();
+			result.addBefore(nodeFactory.newExpressionStatementNode(opNode));
+			result.setNode(null);
+		} else {
+			result.setNode(opNode);
+		}
 		return result;
 	}
 
@@ -699,30 +829,38 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param callNode
 	 *            a function call node
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return an equivalent triple with empty after
 	 */
-	private ExprTriple translateFunctionCall(FunctionCallNode callNode) {
-		ExprTriple functionTriple = translate(callNode.getFunction());
+	private ExprTriple translateFunctionCall(FunctionCallNode callNode,
+			boolean isVoid) {
+		ExprTriple functionTriple = translate(callNode.getFunction(), false);
 		int numContextArgs = callNode.getNumberOfContextArguments();
 		int numArgs = callNode.getNumberOfArguments();
 		ExprTriple result = new ExprTriple(callNode);
 
+		// you need the result of the function expression (even if isVoid)...
 		purify(functionTriple);
 		callNode.setFunction(functionTriple.getNode());
 		result.addAllBefore(functionTriple.getBefore());
 		for (int i = 0; i < numContextArgs; i++) {
-			ExprTriple triple = translate(callNode.getContextArgument(i));
+			ExprTriple triple = translate(callNode.getContextArgument(i), false);
 
 			purify(triple);
 			result.addAllBefore(triple.getBefore());
 			callNode.setContextArgument(i, triple.getNode());
 		}
 		for (int i = 0; i < numArgs; i++) {
-			ExprTriple triple = translate(callNode.getArgument(i));
+			ExprTriple triple = translate(callNode.getArgument(i), false);
 
 			purify(triple);
 			result.addAllBefore(triple.getBefore());
 			callNode.setArgument(i, triple.getNode());
+		}
+		if (isVoid) {
+			// shift the call to the begin clause without a temporary variable:
+			shift(result, true);
 		}
 		return result;
 	}
@@ -734,13 +872,18 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param spawn
 	 *            a spawn node
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return an equivalent triple
 	 */
-	private ExprTriple translateSpawn(SpawnNode spawn) {
-		ExprTriple result = translate(spawn.getCall());
+	private ExprTriple translateSpawn(SpawnNode spawn, boolean isVoid) {
+		ExprTriple result = translate(spawn.getCall(), false);
 
 		spawn.setCall((FunctionCallNode) result.getNode());
 		result.setNode(spawn);
+		if (isVoid) {
+			shift(result, true);
+		}
 		return result;
 	}
 
@@ -755,9 +898,12 @@ public class SideEffectRemover extends BaseTransformer {
 	 * @param opNode
 	 *            an operator node using one of the generalized assignment
 	 *            operators (but not the standard assignment operator)
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return an equivalent triple
 	 */
-	private ExprTriple translateGeneralAssignment(OperatorNode opNode) {
+	private ExprTriple translateGeneralAssignment(OperatorNode opNode,
+			boolean isVoid) {
 		Operator assignmentOp = opNode.getOperator();
 		Operator binaryOp;
 
@@ -800,7 +946,7 @@ public class SideEffectRemover extends BaseTransformer {
 		ExpressionNode lhs = opNode.getArgument(0);
 		ExpressionNode rhs = opNode.getArgument(1);
 		ExprTriple result = lhsTranslate(lhs);
-		ExprTriple rightTriple = translate(rhs);
+		ExprTriple rightTriple = translate(rhs, false);
 
 		purify(rightTriple);
 
@@ -817,6 +963,9 @@ public class SideEffectRemover extends BaseTransformer {
 
 		result.addAllBefore(rightTriple.getBefore());
 		result.addBefore(assignment);
+		if (isVoid) {
+			result.setNode(null);
+		}
 		return result;
 	}
 
@@ -836,23 +985,18 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param expression
 	 *            a comma expression
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return result of converting expression to side-effect-free triple
 	 */
-	private ExprTriple translateComma(OperatorNode expression) {
-		ExprTriple leftTriple = translate(expression.getArgument(0));
-		ExprTriple rightTriple = translate(expression.getArgument(1));
+	private ExprTriple translateComma(OperatorNode expression, boolean isVoid) {
+		// the result of the left arg is not needed:
+		ExprTriple leftTriple = translate(expression.getArgument(0), true);
+		// the result of the right arg might be needed:
+		ExprTriple rightTriple = translate(expression.getArgument(1), isVoid);
 		ExprTriple result = new ExprTriple(rightTriple.getNode());
-		ExpressionNode e1 = leftTriple.getNode();
 
 		result.addAllBefore(leftTriple.getBefore());
-		if (!e1.isSideEffectFree(true)
-				&& !containsEquiv(leftTriple.getBefore(), e1)
-				&& !containsEquiv(leftTriple.getAfter(), e1)) {
-			// Note that we consider errors as side effects for a comma
-			// operation left hand side, because if there are no possible
-			// side effects we'll just remove the left hand argument.
-			result.addBefore(nodeFactory.newExpressionStatementNode(e1));
-		}
 		result.addAllBefore(leftTriple.getAfter());
 		result.addAllBefore(rightTriple.getBefore());
 		result.addAllAfter(rightTriple.getAfter());
@@ -865,20 +1009,28 @@ public class SideEffectRemover extends BaseTransformer {
 	 * 
 	 * @param conditional
 	 *            the conditional expression
+	 * @param isVoid
+	 *            is the value of this expression not needed?
 	 * @return result of translation
 	 */
-	private ExprTriple translateConditional(OperatorNode conditional) {
+	private ExprTriple translateConditional(OperatorNode conditional,
+			boolean isVoid) {
 		Source source = conditional.getSource();
 		Operator operator = conditional.getOperator();
-		ExprTriple condTriple = translate(conditional.getArgument(0));
-		ExprTriple triple1 = translate(conditional.getArgument(1));
-		ExprTriple triple2 = translate(conditional.getArgument(2));
+		// the result of the test is needed:
+		ExprTriple condTriple = translate(conditional.getArgument(0), false);
+		// the results of the true/false clauses may or may not be needed:
+		ExprTriple triple1 = translate(conditional.getArgument(1), isVoid);
+		ExprTriple triple2 = translate(conditional.getArgument(2), isVoid);
 		ExprTriple result;
 
 		assert operator == Operator.CONDITIONAL;
 		purify(condTriple);
-		makesef(triple1);
-		makesef(triple2);
+
+		if (!isVoid) {
+			makesef(triple1);
+			makesef(triple2);
+		}
 
 		List<BlockItemNode> b0 = condTriple.getBefore();
 		ExpressionNode e0 = condTriple.getNode();
@@ -887,11 +1039,24 @@ public class SideEffectRemover extends BaseTransformer {
 		ExpressionNode e1 = triple1.getNode(), e2 = triple2.getNode();
 
 		if (b1.isEmpty() && b2.isEmpty() && a1.isEmpty() && a2.isEmpty()) {
-			conditional.setChild(0, e0);
-			conditional.setChild(1, e1);
-			conditional.setChild(2, e2);
-			result = new ExprTriple(conditional);
+			if (isVoid) {
+				assert e1 == null && e2 == null;
+				result = new ExprTriple(null);
+			} else {
+				conditional.setChild(0, e0);
+				conditional.setChild(1, e1);
+				conditional.setChild(2, e2);
+				result = new ExprTriple(conditional);
+			}
 			result.addAllBefore(b0);
+		} else if (isVoid) {
+			result = new ExprTriple(null);
+			result.addAllBefore(b0);
+			b1.addAll(a1);
+			b2.addAll(a2);
+			result.addBefore(nodeFactory.newIfNode(source, e0,
+					nodeFactory.newCompoundStatementNode(source, b1),
+					nodeFactory.newCompoundStatementNode(source, b2)));
 		} else {
 			String tmpId = tempVariablePrefix + (tempVariableCounter++);
 			VariableDeclarationNode decl = nodeFactory
@@ -945,18 +1110,16 @@ public class SideEffectRemover extends BaseTransformer {
 	 *            any operator expression
 	 * @return an equivalent triple
 	 */
-	private ExprTriple translateOperatorExpression(OperatorNode expression) {
+	private ExprTriple translateOperatorExpression(OperatorNode expression,
+			boolean isVoid) {
 		ExprTriple result;
 
 		switch (expression.getOperator()) {
 		case ASSIGN:
-			result = translateAssign(expression);
+			result = translateAssign(expression, isVoid);
 			break;
-		// case AT:
-		// result=translateAt(expression);
-		// break;
 		case DEREFERENCE:
-			result = translateDereference(expression);
+			result = translateDereference(expression, isVoid);
 			break;
 		case ADDRESSOF:
 		case NOT:
@@ -964,13 +1127,13 @@ public class SideEffectRemover extends BaseTransformer {
 		case UNARYPLUS:
 		case BIG_O:
 		case BITCOMPLEMENT:
-			result = translateGenericUnaryOperator(expression);
+			result = translateGenericUnaryOperator(expression, isVoid);
 			break;
 		case PREINCREMENT:
 		case PREDECREMENT:
 		case POSTINCREMENT:
 		case POSTDECREMENT:
-			result = translateIncrementOrDecrement(expression);
+			result = translateIncrementOrDecrement(expression, isVoid);
 			break;
 		case AT:
 		case BITAND:
@@ -993,7 +1156,7 @@ public class SideEffectRemover extends BaseTransformer {
 		case MOD:
 		case SHIFTLEFT:
 		case SHIFTRIGHT:
-			result = translateGenericBinaryOperator(expression);
+			result = translateGenericBinaryOperator(expression, isVoid);
 			break;
 		case BITANDEQ:
 		case BITOREQ:
@@ -1005,13 +1168,13 @@ public class SideEffectRemover extends BaseTransformer {
 		case MODEQ:
 		case SHIFTLEFTEQ:
 		case SHIFTRIGHTEQ:
-			result = translateGeneralAssignment(expression);
+			result = translateGeneralAssignment(expression, isVoid);
 			break;
 		case COMMA:
-			result = translateComma(expression);
+			result = translateComma(expression, isVoid);
 			break;
 		case CONDITIONAL:
-			result = translateConditional(expression);
+			result = translateConditional(expression, isVoid);
 			break;
 		default:
 			throw new ABCRuntimeException("Unexpected operator: "
@@ -1021,12 +1184,6 @@ public class SideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	// private ExprTriple translateAt(OperatorNode expression) {
-	// dd
-	//
-	// return null;
-	// }
-
 	/**
 	 * Translates a <code>sizeof</code> expression to an equivalent triple.
 	 * 
@@ -1034,15 +1191,21 @@ public class SideEffectRemover extends BaseTransformer {
 	 *            any {@link SizeofNode}
 	 * @return equivalent triple
 	 */
-	private ExprTriple translateSizeof(SizeofNode expression) {
+	private ExprTriple translateSizeof(SizeofNode expression, boolean isVoid) {
 		SizeableNode arg = expression.getArgument();
 		ExprTriple triple;
 
 		if (arg instanceof ExpressionNode) {
-			triple = translate((ExpressionNode) arg);
+			triple = translate((ExpressionNode) arg, false);
 			makesef(triple);
-			expression.setArgument(triple.getNode());
-			triple.setNode(expression);
+			if (isVoid) {
+				triple.addBefore(nodeFactory.newExpressionStatementNode(triple
+						.getNode()));
+				triple.setNode(null);
+			} else {
+				expression.setArgument(triple.getNode());
+				triple.setNode(expression);
+			}
 		} else if (arg instanceof TypeNode) {
 			SETriple typeTriple = translateGenericNode(arg);
 
@@ -1062,28 +1225,34 @@ public class SideEffectRemover extends BaseTransformer {
 	 *            an instance of {@link ScopeOfNode}
 	 * @return equivalent triple
 	 */
-	private ExprTriple translateScopeOf(ScopeOfNode expression) {
-		ExprTriple result = translate(expression.expression());
+	private ExprTriple translateScopeOf(ScopeOfNode expression, boolean isVoid) {
+		ExprTriple result = translate(expression.expression(), false);
 
 		makesef(result);
 		expression.setExpression(result.getNode());
 		result.setNode(expression);
+		if (isVoid) {
+			shift(result, true);
+		}
 		return result;
 	}
 
+	/**
+	 * A remote reference can occur only in contract, which should not have
+	 * side-effects.
+	 * 
+	 * @param expression
+	 * @return
+	 */
 	private ExprTriple translateRemoteReference(RemoteExpressionNode expression) {
-		ExprTriple result = translate(expression.getProcessExpression());
-
-		makesef(result);
-		expression.setProcessExpression(result.getNode());
-		result.setNode(expression);
-		return result;
+		return new ExprTriple(expression);
 	}
 
-	private ExprTriple translateRegularRange(RegularRangeNode expression) {
+	private ExprTriple translateRegularRange(RegularRangeNode expression,
+			boolean isVoid) {
 		ExpressionNode step = expression.getStep();
-		ExprTriple lowTriple = translate(expression.getLow()), hiTriple = translate(expression
-				.getHigh());
+		ExprTriple lowTriple = translate(expression.getLow(), false), hiTriple = translate(
+				expression.getHigh(), false);
 
 		makesef(lowTriple);
 		makesef(hiTriple);
@@ -1097,18 +1266,21 @@ public class SideEffectRemover extends BaseTransformer {
 		result.addAllAfter(lowTriple.getAfter());
 		result.addAllAfter(hiTriple.getAfter());
 		if (step != null) {
-			ExprTriple stepTriple = translate(expression.getStep());
+			ExprTriple stepTriple = translate(expression.getStep(), false);
 
 			makesef(stepTriple);
 			expression.setStep(stepTriple.getNode());
 			result.addAllBefore(stepTriple.getBefore());
 			result.addAllAfter(stepTriple.getAfter());
 		}
+		if (isVoid) {
+			shift(result, true);
+		}
 		return result;
 	}
 
 	private ExprTriple translateQuantifiedExpression(
-			QuantifiedExpressionNode expression) {
+			QuantifiedExpressionNode expression, boolean isVoid) {
 		// should never have side-effects: check it in Analyzer
 		return new ExprTriple(expression);
 	}
@@ -1119,17 +1291,21 @@ public class SideEffectRemover extends BaseTransformer {
 						+ " in side-effect remover");
 	}
 
-	private ExprTriple translateDot(DotNode expression) {
-		ExprTriple result = translate(expression.getStructure());
+	private ExprTriple translateDot(DotNode expression, boolean isVoid) {
+		ExprTriple result = translate(expression.getStructure(), false);
 
 		makesef(result);
 		expression.setStructure(result.getNode());
 		result.setNode(expression);
+		if (isVoid) {
+			shift(result, true);
+		}
 		return result;
 	}
 
 	/**
-	 * Translates an initializer node.
+	 * Translates an initializer node. By definition, an initializer cannot be a
+	 * void expression since it occurs within an assignment expression.
 	 * 
 	 * @param node
 	 *            an initializer node
@@ -1140,7 +1316,7 @@ public class SideEffectRemover extends BaseTransformer {
 	private SETriple translateInitializer(InitializerNode node,
 			boolean emptyAfter) {
 		if (node instanceof ExpressionNode) {
-			ExprTriple triple = translate((ExpressionNode) node);
+			ExprTriple triple = translate((ExpressionNode) node, false);
 
 			emptyAfter(triple);
 			return triple;
@@ -1175,7 +1351,7 @@ public class SideEffectRemover extends BaseTransformer {
 					} else if (designator instanceof ArrayDesignatorNode) {
 						ExpressionNode indexNode = ((ArrayDesignatorNode) designator)
 								.getIndex();
-						ExprTriple triple = translate(indexNode);
+						ExprTriple triple = translate(indexNode, false);
 
 						if (emptyAfter) {
 							purify(triple);
@@ -1211,7 +1387,8 @@ public class SideEffectRemover extends BaseTransformer {
 	 *            a compound literal expression
 	 * @return result of translation
 	 */
-	private ExprTriple translateCompoundLiteral(CompoundLiteralNode expression) {
+	private ExprTriple translateCompoundLiteral(CompoundLiteralNode expression,
+			boolean isVoid) {
 		CompoundInitializerNode ciNode = expression.getInitializerList();
 		SETriple triple = translateCompoundInitializer(ciNode, false);
 		ExprTriple result = new ExprTriple(expression);
@@ -1220,14 +1397,18 @@ public class SideEffectRemover extends BaseTransformer {
 				.getNode());
 		result.setBefore(triple.getBefore());
 		result.setAfter(triple.getAfter());
+		if (isVoid) {
+			shift(result, true);
+		}
 		return result;
 	}
 
 	private ExprTriple translateCollective(CollectiveExpressionNode expression) {
 		ExprTriple result = new ExprTriple(expression);
-		ExprTriple e0 = translate(expression.getProcessesGroupExpression());
+		ExprTriple e0 = translate(expression.getProcessesGroupExpression(),
+				false);
 		// ExprTriple e1 = translate(expression.getLengthExpression());
-		ExprTriple e2 = translate(expression.getBody());
+		ExprTriple e2 = translate(expression.getBody(), false);
 
 		makesef(e0);
 		// makesef(e1);
@@ -1244,15 +1425,22 @@ public class SideEffectRemover extends BaseTransformer {
 		return result;
 	}
 
-	private ExprTriple translateCast(CastNode expression) {
-		// mallocs need to keep their casts, i.e., no
-		// tmp=malloc | (int*)tmp | ...
+	private ExprTriple translateCast(CastNode expression, boolean isVoid) {
 		ExpressionNode arg = expression.getArgument();
-		ExprTriple triple = translate(arg);
+
+		if (isVoid && expression.getType().kind() == TypeKind.VOID) {
+			return translate(arg, true);
+		}
+
+		ExprTriple triple = translate(arg, false);
 		ExpressionNode newArg = triple.getNode();
 
 		// if arg started off as a function call, will newArg
 		// still be a function call? Yes! See translateFunctionCall.
+
+		// mallocs need to keep their casts, i.e., no
+		// tmp=malloc | (int*)tmp | ...
+
 		if (isMallocCall(newArg)) {
 			expression.setArgument(newArg);
 		} else {
@@ -1260,70 +1448,135 @@ public class SideEffectRemover extends BaseTransformer {
 			expression.setArgument(triple.getNode());
 		}
 		triple.setNode(expression);
+		if (isVoid) {
+			shift(triple, true);
+		}
 		return triple;
 	}
 
-	private ExprTriple translateArrow(ArrowNode expression) {
-		ExprTriple result = translate(expression.getStructurePointer());
+	private ExprTriple translateArrow(ArrowNode expression, boolean isVoid) {
+		ExprTriple result = translate(expression.getStructurePointer(), false);
 
 		makesef(result);
 		expression.setStructurePointer(result.getNode());
 		result.setNode(expression);
+		if (isVoid) {
+			shift(result, true);
+		}
 		return result;
 	}
 
 	/**
-	 * Remove side effects from an expression, and do store the resulting value
-	 * in a temporary variable for assignments, functions calls, or spawns.
+	 * Determines if a value is a legal value of its type in any implementation.
+	 * If such a value is used as a void expression, it can be ignored.
+	 * 
+	 * @param value
+	 *            a value
+	 * @return best estimate as to whether this value is strictly conforming; if
+	 *         this method returns true, the value is strictly conforming for
+	 *         its type; otherwise nothing is guaranteed (value may or may not
+	 *         be strictly conforming)
+	 */
+	private boolean isStrictlyConformingValue(Value value) {
+		// TODO: make more precise
+		Configuration config = this.getConfiguration();
+
+		if (value instanceof IntegerValue) {
+			IntegerType type = ((IntegerValue) value).getType();
+			BigInteger val = ((IntegerValue) value).getIntegerValue();
+
+			// eventually, do this right...based on type. use case stmt.
+			if (config.inRangeSignedInt(val))
+				return true;
+			return false;
+		}
+		if (value instanceof StringValue) {
+			return true;
+		}
+		if (value instanceof CharacterValue) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Translates an expression into an equivalent triple in normal form. The
+	 * resulting triple will have the same side-effects and
+	 * exception-side-effects as the original expression.
 	 * 
 	 * @param expression
 	 *            an expression node
+	 * @param isVoid
+	 *            is the result of evaluating the expression not needed (only
+	 *            its side-effects)? If true, the expression node in the
+	 *            resulting triple will be <code>null</code>, but the
+	 *            begin/after clauses may contain expression statements
+	 *            corresponding to exception side-effects in the expression.
 	 * @return a side-effect-free triple equivalent to the original expression
+	 * 
 	 * @throws SyntaxException
 	 *             if a syntax error is discovered in the process
 	 */
-	private ExprTriple translate(ExpressionNode expression) {
+	private ExprTriple translate(ExpressionNode expression, boolean isVoid) {
 		ExpressionKind kind = expression.expressionKind();
 
 		switch (kind) {
+		case CONSTANT: {
+			if (isVoid) {
+				Value value = ((ConstantNode) expression).getConstantValue();
+
+				if (this.isStrictlyConformingValue(value))
+					return new ExprTriple(null);
+
+				ExprTriple result = new ExprTriple(expression);
+
+				shift(result, true);
+				return result;
+			} else {
+				return new ExprTriple(expression);
+			}
+		}
 		case ALIGNOF:
-			return new ExprTriple(expression);
+		case DERIVATIVE_EXPRESSION:
+		case IDENTIFIER_EXPRESSION:
+		case RESULT: {
+			ExprTriple result = new ExprTriple(expression);
+
+			if (isVoid)
+				shift(result, true);
+			return result;
+		}
 		case ARROW:
-			return translateArrow((ArrowNode) expression);
+			return translateArrow((ArrowNode) expression, isVoid);
 		case CAST:
-			return translateCast((CastNode) expression);
+			return translateCast((CastNode) expression, isVoid);
 		case COLLECTIVE:
 			return translateCollective((CollectiveExpressionNode) expression);
 		case COMPOUND_LITERAL:
-			return translateCompoundLiteral((CompoundLiteralNode) expression);
-		case CONSTANT:
-			return new ExprTriple(expression);
-		case DERIVATIVE_EXPRESSION:
-			return new ExprTriple(expression);
+			return translateCompoundLiteral((CompoundLiteralNode) expression,
+					isVoid);
 		case DOT:
-			return translateDot((DotNode) expression);
+			return translateDot((DotNode) expression, isVoid);
 		case FUNCTION_CALL:
-			return translateFunctionCall((FunctionCallNode) expression);
+			return translateFunctionCall((FunctionCallNode) expression, isVoid);
 		case GENERIC_SELECTION:
 			return translateGenericSelection((GenericSelectionNode) expression);
-		case IDENTIFIER_EXPRESSION:
-			return new ExprTriple(expression);
 		case OPERATOR:
-			return translateOperatorExpression((OperatorNode) expression);
+			return translateOperatorExpression((OperatorNode) expression,
+					isVoid);
 		case QUANTIFIED_EXPRESSION:
-			return translateQuantifiedExpression((QuantifiedExpressionNode) expression);
+			return translateQuantifiedExpression(
+					(QuantifiedExpressionNode) expression, isVoid);
 		case REGULAR_RANGE:
-			return translateRegularRange((RegularRangeNode) expression);
+			return translateRegularRange((RegularRangeNode) expression, isVoid);
 		case REMOTE_REFERENCE:
 			return translateRemoteReference((RemoteExpressionNode) expression);
-		case RESULT:
-			return new ExprTriple(expression);
 		case SCOPEOF:
-			return translateScopeOf((ScopeOfNode) expression);
+			return translateScopeOf((ScopeOfNode) expression, isVoid);
 		case SIZEOF:
-			return translateSizeof((SizeofNode) expression);
+			return translateSizeof((SizeofNode) expression, isVoid);
 		case SPAWN:
-			return translateSpawn((SpawnNode) expression);
+			return translateSpawn((SpawnNode) expression, isVoid);
 		default:
 			throw new ABCUnsupportedException("removing side-effects for "
 					+ kind + " expression");
@@ -1358,7 +1611,7 @@ public class SideEffectRemover extends BaseTransformer {
 	 */
 	private SETriple translateGenericNode(ASTNode node) {
 		if (node instanceof ExpressionNode) {
-			ExprTriple result = translate((ExpressionNode) node);
+			ExprTriple result = translate((ExpressionNode) node, false);
 
 			purify(result);
 			return result;
@@ -1404,7 +1657,7 @@ public class SideEffectRemover extends BaseTransformer {
 			SETriple initTriple;
 
 			if (initNode instanceof ExpressionNode) {
-				initTriple = translate((ExpressionNode) initNode);
+				initTriple = translate((ExpressionNode) initNode, false);
 				emptyAfter((ExprTriple) initTriple);
 			} else {
 				initTriple = translateCompoundInitializer(
@@ -1437,42 +1690,35 @@ public class SideEffectRemover extends BaseTransformer {
 		if (expr == null)
 			return new LinkedList<BlockItemNode>();
 
-		ExprTriple triple = translate(expr);
-		List<BlockItemNode> result;
-		ExpressionNode newExpr = triple.getNode();
+		ExprTriple triple = translate(expr, true);
+		List<BlockItemNode> result = triple.getBefore();
 
-		// expr part of triple may contain function call/spawn
-		// makesef(triple);
-		result = triple.getBefore();
-		if (!newExpr.isSideEffectFree(true)
-				&& !containsEquiv(triple.getBefore(), newExpr)
-				&& !containsEquiv(triple.getAfter(), newExpr))
-			result.add(nodeFactory.newExpressionStatementNode(newExpr));
 		result.addAll(triple.getAfter());
 		return result;
 	}
 
-	private boolean containsEquiv(List<? extends ASTNode> nodes, ASTNode child) {
-		for (ASTNode node : nodes) {
-			if (containsEquiv(node, child))
-				return true;
-		}
-		return false;
-	}
+	// private boolean containsEquiv(List<? extends ASTNode> nodes, ASTNode
+	// child) {
+	// for (ASTNode node : nodes) {
+	// if (containsEquiv(node, child))
+	// return true;
+	// }
+	// return false;
+	// }
 
-	private boolean containsEquiv(ASTNode node, ASTNode child) {
-		if (child == null)
-			return false;
-		for (ASTNode subNode : node.children()) {
-			if (subNode == null)
-				continue;
-			if (subNode.equiv(child))
-				return true;
-			if (containsEquiv(subNode, child))
-				return true;
-		}
-		return false;
-	}
+	// private boolean containsEquiv(ASTNode node, ASTNode child) {
+	// if (child == null)
+	// return false;
+	// for (ASTNode subNode : node.children()) {
+	// if (subNode == null)
+	// continue;
+	// if (subNode.equiv(child))
+	// return true;
+	// if (containsEquiv(subNode, child))
+	// return true;
+	// }
+	// return false;
+	// }
 
 	/**
 	 * Transforms an expression statement into a sequence of block items
@@ -1626,7 +1872,7 @@ public class SideEffectRemover extends BaseTransformer {
 		if (cond == null)
 			return;
 
-		ExprTriple condTriple = translate(cond);
+		ExprTriple condTriple = translate(cond, false);
 
 		purify(condTriple);
 
@@ -1705,7 +1951,7 @@ public class SideEffectRemover extends BaseTransformer {
 		normalizeLoopBody(doLoop);
 
 		// do {... befores} while (e);
-		ExprTriple condTriple = translate(doLoop.getCondition());
+		ExprTriple condTriple = translate(doLoop.getCondition(), false);
 
 		purify(condTriple);
 		doLoop.setCondition(condTriple.getNode());
@@ -1958,7 +2204,7 @@ public class SideEffectRemover extends BaseTransformer {
 
 			if (expression != null) {
 				int exprIndex = expression.childIndex();
-				ExprTriple exprTriple = translate(expression);
+				ExprTriple exprTriple = translate(expression, false);
 
 				purify(exprTriple);
 				result.addAll(exprTriple.getBefore());
@@ -1988,7 +2234,7 @@ public class SideEffectRemover extends BaseTransformer {
 		List<BlockItemNode> result = new LinkedList<>();
 		ExpressionNode condition = switchNode.getCondition();
 		int condIndex = condition.childIndex();
-		ExprTriple condTriple = this.translate(condition);
+		ExprTriple condTriple = this.translate(condition, false);
 		StatementNode body = switchNode.getBody();
 		int bodyIndex = body.childIndex();
 		List<BlockItemNode> bodyItems = this.translateStatement(body);
@@ -2038,7 +2284,7 @@ public class SideEffectRemover extends BaseTransformer {
 		StatementNode falseBranch = ifNode.getFalseBranch();
 		int condIndex = condition.childIndex(), trueIndex = trueBranch
 				.childIndex();
-		ExprTriple condTriple = translate(condition);
+		ExprTriple condTriple = translate(condition, false);
 		List<BlockItemNode> trueNormalItems = translateStatement(trueBranch);
 		List<BlockItemNode> result = new LinkedList<>();
 
@@ -2073,7 +2319,7 @@ public class SideEffectRemover extends BaseTransformer {
 		ExpressionNode invariant = civlFor.getInvariant();
 		StatementNode body = civlFor.getBody();
 		int domIndex = domain.childIndex(), bodyIndex = body.childIndex();
-		ExprTriple domTriple = translate(domain);
+		ExprTriple domTriple = translate(domain, false);
 		List<BlockItemNode> normalBodyItems = translateStatement(body);
 
 		purify(domTriple);
@@ -2081,7 +2327,7 @@ public class SideEffectRemover extends BaseTransformer {
 		civlFor.setChild(domIndex, domTriple.getNode());
 		if (invariant != null) {
 			int invIndex = invariant.childIndex();
-			ExprTriple invTriple = translate(invariant);
+			ExprTriple invTriple = translate(invariant, false);
 
 			purify(invTriple);
 			result.addAll(invTriple.getBefore());
@@ -2148,7 +2394,7 @@ public class SideEffectRemover extends BaseTransformer {
 			ExpressionNode value = enumerator.getValue();
 
 			if (value != null) {
-				ExprTriple expr = this.translate(value);
+				ExprTriple expr = this.translate(value, false);
 
 				result.addAll(expr.getBefore());
 				enumerator.setValue(expr.getNode());
