@@ -163,7 +163,7 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 	 * IllegalArgumentException will be thrown: (1) if this is the first
 	 * conversion (index 0) to be added, the old type of the conversion must
 	 * equal the initial type; (2) if this is not the first conversion (index >
-	 * 0) to be added, the old type of the converesion must equals the newType
+	 * 0) to be added, the old type of the conversion must equal the newType
 	 * of the previous conversion.
 	 * 
 	 * @param conversion
@@ -199,7 +199,7 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 	 * sequence (if any). If there are no conversions, it is the same as the
 	 * initial type. Otherwise, it is the newType of the last conversion.
 	 * 
-	 * @return the final coverted type of the expression
+	 * @return the final converted type of the expression
 	 */
 	Type getConvertedType();
 

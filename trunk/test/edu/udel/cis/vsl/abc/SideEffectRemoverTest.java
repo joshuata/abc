@@ -91,4 +91,9 @@ public class SideEffectRemoverTest {
 	public void doWhile() throws ABCException, IOException {
 		check("doWhile.c");
 	}
+
+	@Test
+	public void cond() throws ABCException, IOException {
+		check("cond.c");
+	}
 }
