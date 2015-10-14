@@ -1,7 +1,5 @@
-#include <stdio.h>
-
 int * f() {
-        return NULL;
+  return (void*)0;
 }
 
 int main() {
@@ -10,5 +8,5 @@ int main() {
 
   *(&p) = f(), &a[11];
   *p = *(f()), 5/0;
-  *p=1, a[1]=1, a[2]=2;
+  *p=1, a[1]=1, a[2]=2, a[3]=3, a[4]=4;
 }
