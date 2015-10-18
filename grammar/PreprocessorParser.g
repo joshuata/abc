@@ -187,7 +187,7 @@ nonPoundPpToken	:	HEADER_NAME
 /* An "identifier" for the preprocessor is any C IDENTIFIER or C keyword: */
 /* Added for CIVL-C: any CIVL-C keyword */
 
-identifier	:	IDENTIFIER | c_keyword ;
+identifier	:	IDENTIFIER | c_keyword | gnuc_keyword;
 
 c_keyword	:	AUTO | ASSIGNS | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
         |   DEPENDS | DO | DOUBLE | ELSE | ENUM | EXTERN | FLOAT | FOR | GOTO
@@ -205,6 +205,8 @@ c_keyword	:	AUTO | ASSIGNS | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
 		| 	GLOBAL | SHARED
         |   FATOMIC | CALLS
 		;
+
+gnuc_keyword : TYPEOF;
 
 punctuator	:	nonPoundPunctuator | HASH ;
 

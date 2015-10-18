@@ -77,6 +77,7 @@ tokens
 	SCALAR_INITIALIZER;       // initializer for scalar variable
 	SPECIFIER_QUALIFIER_LIST; // list of type specifiers and qualifiers
     STATEMENT;                // a statement
+    STATEMENT_EXPRESSION;     // a statement expression (GNU C extension)
 	STRUCT_DECLARATION;       // a field declaration
 	STRUCT_DECLARATION_LIST;  // list of field declarations
 	STRUCT_DECLARATOR;        // a struct/union declarator
@@ -85,6 +86,8 @@ tokens
 	TRANSLATION_UNIT;         // final result of translation
 	TYPE;                     // symbol indicating "type"
 	TYPEDEF_NAME;             // use of typedef name
+    TYPEOF_EXPRESSION;
+    TYPEOF_TYPE;
 	TYPE_NAME;                // type specification without identifier
 	TYPE_QUALIFIER_LIST;      // list of type qualifiers
 }
@@ -179,6 +182,8 @@ primaryExpression
 	: constant
 	| IDENTIFIER
 	| STRING_LITERAL
+    | LPAREN compoundStatement RPAREN
+      -> ^(STATEMENT_EXPRESSION LPAREN compoundStatement RPAREN)
 	| LPAREN expression RPAREN 
 	  -> ^(PARENTHESIZED_EXPRESSION LPAREN expression RPAREN)
 	| genericSelection
@@ -676,7 +681,30 @@ typeSpecifier
 	| enumSpecifier
 	| typedefName
 	| domainSpecifier
+    | typeofSpecifier
 	;
+
+/* GNU C extension: 
+ * 6.6 Referring to a Type with typeof
+ * Another way to refer to the type of an expression is with typeof. 
+ * The syntax of using of this keyword looks like sizeof, but the construct acts 
+ * semantically like a type name defined with typedef.
+ * There are two ways of writing the argument to typeof: with an expression or with a type. 
+ * Here is an example with an expression:
+ *   typeof (x[0](1))
+ * This assumes that x is an array of pointers to functions; the type described is that of 
+ * the values of the functions.
+ * Here is an example with a typename as the argument:
+ *   typeof (int *)
+ * */
+typeofSpecifier
+    : TYPEOF LPAREN
+        ( commaExpression RPAREN
+          -> ^(TYPEOF_EXPRESSION LPAREN commaExpression RPAREN)
+        | typeName RPAREN
+          -> ^(TYPEOF_TYPE LPAREN typeName RPAREN)
+        )
+    ;
 
 /* 6.7.2.1
  * Root: STRUCT or UNION

@@ -33,6 +33,8 @@ import static edu.udel.cis.vsl.abc.parse.IF.CParser.STRUCT;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.THREADLOCAL;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPEDEF;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPEDEF_NAME;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPEOF_EXPRESSION;
+import static edu.udel.cis.vsl.abc.parse.IF.CParser.TYPEOF_TYPE;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.UNION;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.UNSIGNED;
 import static edu.udel.cis.vsl.abc.parse.IF.CParser.VOID;
@@ -249,6 +251,11 @@ public class SpecifierAnalysis {
 				case TYPEDEF_NAME:
 					typedefNameCount++;
 					setTypeNameKind(TypeNodeKind.TYPEDEF_NAME);
+					setTypeSpecifierNode(node);
+					break;
+				case TYPEOF_EXPRESSION:
+				case TYPEOF_TYPE:
+					setTypeNameKind(TypeNodeKind.TYPEOF);
 					setTypeSpecifierNode(node);
 					break;
 				case DOMAIN:

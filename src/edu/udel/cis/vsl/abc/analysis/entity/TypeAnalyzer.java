@@ -29,6 +29,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeofNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ArrayType;
 import edu.udel.cis.vsl.abc.ast.type.IF.DomainType;
 import edu.udel.cis.vsl.abc.ast.type.IF.EnumerationType;
@@ -711,6 +712,13 @@ public class TypeAnalyzer {
 		case RANGE:
 			type = typeFactory.rangeType();
 			break;
+		case TYPEOF: {
+			ExpressionNode expression = ((TypeofNode) typeNode)
+					.getExpressionOperand();
+			entityAnalyzer.expressionAnalyzer.processExpression(expression);
+			type = expression.getType();
+			break;
+		}
 		default:
 			throw new RuntimeException("Unreachable");
 		}

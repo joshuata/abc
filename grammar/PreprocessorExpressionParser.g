@@ -137,7 +137,7 @@ white		:	WS | NEWLINE
 
 /* An "identifier" for the preprocessor is any C IDENTIFIER or C keyword: */
 
-identifier	:	IDENTIFIER | c_keyword | civl_keyword | cuda_keyword ;
+identifier	:	IDENTIFIER | c_keyword | civl_keyword | cuda_keyword | gnuc_keyword;
 
 c_keyword	:	AUTO | BREAK | CASE | CHAR | CONST | CONTINUE | DEFAULT
 		| 	DO | DOUBLE | ELSE | ENUM | EXTERN | FLOAT | FOR | GOTO
@@ -154,6 +154,8 @@ civl_keyword	:	ASSIGNS | CHOOSE | COLLECTIVE
 		|	REQUIRES | RESULT | SELF | PROCNULL | SPAWN | TRUE | HERE | ROOT 
 		| 	WAIT | WHEN | FATOMIC | CALLS
 		;
+
+gnuc_keyword  :  TYPEOF;
 		
 cuda_keyword	:	GLOBAL | SHARED
 		;

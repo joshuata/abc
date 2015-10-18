@@ -50,6 +50,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
@@ -91,6 +92,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeofNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
@@ -2219,5 +2221,20 @@ public interface NodeFactory {
 	Configuration configuration();
 
 	WildcardNode newWildcardNode(Source source);
+
+	/**
+	 * creates a new statement expression node (GNU C extension).
+	 * 
+	 * @param source
+	 *            the source of the node
+	 * @param statement
+	 *            the statement enclosed by the expression excluding the
+	 *            expression at end
+	 * @return the new statement expression node (GNU C extension)
+	 */
+	StatementExpressionNode newStatementExpressionNode(Source source,
+			CompoundStatementNode statement);
+
+	TypeofNode newTypeofNode(Source source, ExpressionNode expression);
 
 }

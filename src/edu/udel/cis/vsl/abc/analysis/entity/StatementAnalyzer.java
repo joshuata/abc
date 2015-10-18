@@ -56,6 +56,7 @@ import edu.udel.cis.vsl.abc.ast.type.IF.Type;
 import edu.udel.cis.vsl.abc.ast.type.IF.Type.TypeKind;
 import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
+import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 import edu.udel.cis.vsl.abc.token.IF.UnsourcedException;
 
@@ -75,16 +76,20 @@ public class StatementAnalyzer {
 
 	private ConversionFactory conversionFactory;
 
+	private Configuration configuration;
+
 	// ************************** Constructors ****************************
 
 	StatementAnalyzer(EntityAnalyzer entityAnalyzer,
 			ExpressionAnalyzer expressionAnalyzer,
-			ConversionFactory conversionFactory, TypeFactory typeFactory) {
+			ConversionFactory conversionFactory, TypeFactory typeFactory,
+			Configuration config) {
 		this.entityAnalyzer = entityAnalyzer;
 		this.nodeFactory = entityAnalyzer.nodeFactory;
 		this.expressionAnalyzer = expressionAnalyzer;
 		this.conversionFactory = conversionFactory;
 		this.typeFactory = typeFactory;
+		this.configuration = config;
 	}
 
 	// ************************* Private Methods **************************
@@ -229,7 +234,7 @@ public class StatementAnalyzer {
 			boolean returnTypeIsVoid = returnType.kind() == TypeKind.VOID;
 
 			if (expression == null) {
-				if (!returnTypeIsVoid)
+				if (!this.configuration.svcomp() && !returnTypeIsVoid)
 					throw error("Missing expression in return statement",
 							statement);
 			} else {

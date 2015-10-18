@@ -48,6 +48,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.omp.OmpExecutableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.AtomicNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.BlockItemNode;
@@ -1500,6 +1501,80 @@ public class SideEffectRemover extends BaseTransformer {
 	}
 
 	/**
+	 * For a compound statement expression:
+	 * 
+	 * <pre>
+	 * ({s1; s2; ... sn; expr;})
+	 * </pre>
+	 * 
+	 * translates it into:
+	 * <ul>
+	 * <li>if <code>isVoid</code>
+	 * 
+	 * <pre>
+	 * before({s1; s2; ... sn; expr;})
+	 * NULL
+	 * after({s1; s2; ... sn; expr;})
+	 * </pre>
+	 * 
+	 * </li>
+	 * <li>else
+	 * 
+	 * <pre>
+	 * before({s1; s2; ... sn; expr;})
+	 * side-effect-free(expr)
+	 * after({s1; s2; ... sn; expr;})
+	 * </pre>
+	 * 
+	 * </li>
+	 * </ul>
+	 * 
+	 * @param expression
+	 * @param isVoid
+	 * @return
+	 */
+	private ExprTriple translateStatementExpression(
+			StatementExpressionNode expression, boolean isVoid) {
+		CompoundStatementNode statement = expression.getCompoundStatement(), newCompound = (CompoundStatementNode) this
+				.translateCompound(statement).get(0);
+		List<BlockItemNode> newBlockItems = new LinkedList<>();
+		ExpressionNode lastExpression = expression.getExpression();
+		ExprTriple exprTriple = this.translate(lastExpression, isVoid);
+		VariableDeclarationNode decl = null;
+		ExpressionNode newExpression = null;
+
+		purify(exprTriple);
+		if (!isVoid) {
+			makesef(exprTriple);
+		}
+		newBlockItems.addAll(exprTriple.getBefore());
+		if (!isVoid) {
+			Source source = lastExpression.getSource();
+			String tmpId = tempVariablePrefix + (tempVariableCounter++);
+			ExpressionNode tmpNode = nodeFactory.newIdentifierExpressionNode(
+					source, nodeFactory.newIdentifierNode(source, tmpId));
+
+			decl = nodeFactory.newVariableDeclarationNode(source,
+					nodeFactory.newIdentifierNode(source, tmpId),
+					typeNode(source, lastExpression.getType()));
+			newCompound.addSequenceChild(nodeFactory
+					.newExpressionStatementNode(nodeFactory.newOperatorNode(
+							source, Operator.ASSIGN, tmpNode,
+							exprTriple.getNode())));
+			newExpression = tmpNode.copy();
+		}
+		newBlockItems.add(newCompound);
+		newCompound = nodeFactory.newCompoundStatementNode(
+				statement.getSource(), newBlockItems);
+		newBlockItems = new LinkedList<>();
+		if (!isVoid)
+			newBlockItems.add(decl);
+		newBlockItems.add(newCompound);
+		return new ExprTriple(newBlockItems, newExpression,
+				new LinkedList<BlockItemNode>());
+	}
+
+	/**
 	 * Translates an expression into an equivalent triple in normal form. The
 	 * resulting triple will have the same side-effects and
 	 * exception-side-effects as the original expression.
@@ -1577,6 +1652,9 @@ public class SideEffectRemover extends BaseTransformer {
 			return translateSizeof((SizeofNode) expression, isVoid);
 		case SPAWN:
 			return translateSpawn((SpawnNode) expression, isVoid);
+		case STATEMENT_EXPRESSION:
+			return translateStatementExpression(
+					(StatementExpressionNode) expression, isVoid);
 		default:
 			throw new ABCUnsupportedException("removing side-effects for "
 					+ kind + " expression");
