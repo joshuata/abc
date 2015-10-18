@@ -54,6 +54,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
@@ -105,6 +106,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode.TypeNodeKind;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeofNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
 import edu.udel.cis.vsl.abc.err.IF.ABCRuntimeException;
 import edu.udel.cis.vsl.abc.err.IF.ABCUnsupportedException;
@@ -1617,10 +1619,24 @@ public class ASTPrettyPrinter {
 		case RESULT:
 			result.append("$result");
 			break;
+		case STATEMENT_EXPRESSION:
+			return statementExpression2Pretty((StatementExpressionNode) expression);
 		default:
 			throw new ABCUnsupportedException(
 					"pretty print of expression node of " + kind + " kind");
 		}
+		return result;
+	}
+
+	private static StringBuffer statementExpression2Pretty(
+			StatementExpressionNode statementExpression) {
+		StringBuffer result = new StringBuffer();
+		CompoundStatementNode compound = statementExpression
+				.getCompoundStatement();
+
+		result.append("(");
+		result.append(compound.prettyRepresentation());
+		result.append(")");
 		return result;
 	}
 
@@ -2088,6 +2104,12 @@ public class ASTPrettyPrinter {
 		}
 		case RANGE:
 			result.append("$range");
+			break;
+		case TYPEOF:
+			result.append("typeof(");
+			result.append(expression2Pretty(((TypeofNode) type)
+					.getExpressionOperand()));
+			result.append(")");
 			break;
 		default:
 			throw new ABCUnsupportedException("pretty print of type node of "

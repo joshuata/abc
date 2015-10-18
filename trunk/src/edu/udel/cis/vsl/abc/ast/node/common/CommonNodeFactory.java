@@ -56,6 +56,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.ScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.LabelNode;
@@ -100,6 +101,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.type.PointerTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.StructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.TypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.type.TypeofNode;
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonArrayDesignatorNode;
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonCompoundInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.common.compound.CommonDesignationNode;
@@ -141,6 +143,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonScopeOfNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSelfNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonSpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonStatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonStringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.common.expression.CommonWildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.common.label.CommonOrdinaryLabelNode;
@@ -179,6 +182,7 @@ import edu.udel.cis.vsl.abc.ast.node.common.type.CommonRangeTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonScopeTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonStructureOrUnionTypeNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonTypedefNameNode;
+import edu.udel.cis.vsl.abc.ast.node.common.type.CommonTypeofNode;
 import edu.udel.cis.vsl.abc.ast.node.common.type.CommonVoidTypeNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.ObjectType;
 import edu.udel.cis.vsl.abc.ast.type.IF.StandardBasicType.BasicTypeKind;
@@ -1024,6 +1028,17 @@ public class CommonNodeFactory implements NodeFactory {
 	@Override
 	public Configuration configuration() {
 		return this.configuration;
+	}
+
+	@Override
+	public StatementExpressionNode newStatementExpressionNode(Source source,
+			CompoundStatementNode statement) {
+		return new CommonStatementExpressionNode(source, statement);
+	}
+
+	@Override
+	public TypeofNode newTypeofNode(Source source, ExpressionNode expression) {
+		return new CommonTypeofNode(source, expression);
 	}
 
 }

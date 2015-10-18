@@ -214,6 +214,7 @@ public interface CParser {
 	public static final int STAR = CivlCParser.STAR;
 	public static final int STAREQ = CivlCParser.STAREQ;
 	public static final int STATEMENT = CivlCParser.STATEMENT;
+	public static final int STATEMENT_EXPRESSION = CivlCParser.STATEMENT_EXPRESSION;
 	public static final int STATIC = CivlCParser.STATIC;
 	public static final int STATICASSERT = CivlCParser.STATICASSERT;
 	public static final int STRING_LITERAL = CivlCParser.STRING_LITERAL;
@@ -225,6 +226,8 @@ public interface CParser {
 	public static final int TILDE = CivlCParser.TILDE;
 	public static final int TRUE = CivlCParser.TRUE;
 	public static final int TYPEDEF = CivlCParser.TYPEDEF;
+	public static final int TYPEOF_EXPRESSION = CivlCParser.TYPEOF_EXPRESSION;
+	public static final int TYPEOF_TYPE = CivlCParser.TYPEOF_TYPE;
 	public static final int UNIFORM = CivlCParser.UNIFORM;
 	public static final int UNION = CivlCParser.UNION;
 	public static final int UNSIGNED = CivlCParser.UNSIGNED;
@@ -303,6 +306,7 @@ public interface CParser {
 	public static final int TRANSLATION_UNIT = CivlCParser.TRANSLATION_UNIT;
 	public static final int TYPE = CivlCParser.TYPE;
 	public static final int TYPEDEF_NAME = CivlCParser.TYPEDEF_NAME;
+	public static final int TYPEDOF = CivlCParser.TYPEOF;
 	public static final int TYPE_NAME = CivlCParser.TYPE_NAME;
 	public static final int TYPE_QUALIFIER_LIST = CivlCParser.TYPE_QUALIFIER_LIST;
 

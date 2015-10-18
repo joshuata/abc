@@ -9,18 +9,11 @@ public interface TypeNode extends SizeableNode {
 	 * The different kinds of type names.
 	 */
 	public static enum TypeNodeKind {
-		ARRAY,
-		ATOMIC,
-		BASIC,
-		DOMAIN,
-		ENUMERATION,
-		FUNCTION,
-		POINTER,
-		RANGE,
-		SCOPE,
-		STRUCTURE_OR_UNION,
-		TYPEDEF_NAME,
-		VOID
+		ARRAY, ATOMIC, BASIC, DOMAIN, ENUMERATION, FUNCTION, POINTER, RANGE, SCOPE, STRUCTURE_OR_UNION, TYPEDEF_NAME, VOID,
+		/**
+		 * typeof() of GNU C extension
+		 */
+		TYPEOF
 	};
 
 	@Override

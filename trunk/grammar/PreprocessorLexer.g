@@ -176,6 +176,8 @@ WHEN		:	'$when';
 GLOBAL	:	'__global__';
 SHARED	:	'__shared__';
 
+/* GNU C keywords */
+TYPEOF  :   'typeof';
 
 /****** Identifiers: C11 Sec. 6.4.2 ******/
 

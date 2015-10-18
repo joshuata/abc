@@ -49,6 +49,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.SelfNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SpawnNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.WildcardNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.type.FunctionTypeNode;
@@ -125,6 +126,12 @@ public class ExpressionAnalyzer {
 
 	private NodeFactory nodeFactory;
 
+	/**
+	 * needs the statement analyzer for analyzing statement expression (GNU C
+	 * extension)
+	 */
+	private StatementAnalyzer statementAnalyzer;
+
 	private IntegerType intType;
 
 	private SpecialFunctionCallAnalyzer specialCallAnalyzer;
@@ -147,6 +154,10 @@ public class ExpressionAnalyzer {
 		this.specialCallAnalyzer = new SpecialFunctionCallAnalyzer(
 				this.entityAnalyzer, typeFactory, this.conversionFactory);
 		this.config = entityAnalyzer.configuration;
+	}
+
+	void setStatementAnalyzer(StatementAnalyzer statementAnalyzer) {
+		this.statementAnalyzer = statementAnalyzer;
 	}
 
 	// ************************* Exported Methods **************************
@@ -228,6 +239,9 @@ public class ExpressionAnalyzer {
 			case CALLS:
 				processCalls((CallsNode) node);
 				break;
+			case STATEMENT_EXPRESSION:
+				processStatementExpression((StatementExpressionNode) node);
+				break;
 			default:
 				throw new ABCRuntimeException("Unreachable");
 
@@ -235,6 +249,20 @@ public class ExpressionAnalyzer {
 		} catch (ASTException e) {
 			throw new SyntaxException(e.getMessage(), node.getSource());
 		}
+	}
+
+	/**
+	 * processes a statement expression
+	 * 
+	 * @param statementExpression
+	 * @throws SyntaxException
+	 */
+	private void processStatementExpression(
+			StatementExpressionNode statementExpression) throws SyntaxException {
+		this.statementAnalyzer.processCompoundStatement(statementExpression
+				.getCompoundStatement());
+		statementExpression.setInitialType(statementExpression.getExpression()
+				.getType());
 	}
 
 	/**

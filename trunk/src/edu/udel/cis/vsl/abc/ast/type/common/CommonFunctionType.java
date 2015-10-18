@@ -337,13 +337,14 @@ public class CommonFunctionType extends CommonType implements FunctionType {
 
 		result += returnType.toString();
 		result += " (";
-		for (ObjectType parameterType : parameterTypes) {
-			if (isFirst)
-				isFirst = false;
-			else
-				result += ", ";
-			result += parameterType.toString();
-		}
+		if (parameterTypes != null)
+			for (ObjectType parameterType : parameterTypes) {
+				if (isFirst)
+					isFirst = false;
+				else
+					result += ", ";
+				result += parameterType.toString();
+			}
 		result += ")";
 		return result;
 	}

@@ -154,7 +154,12 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 		 * A CIVL-C <code>$spawn</code> expression; can be cast to
 		 * {@link SpawnNode}.
 		 */
-		SPAWN
+		SPAWN,
+		/**
+		 * A GNU C statement expression; can be cast to
+		 * {@link StatementExpressionNode}
+		 */
+		STATEMENT_EXPRESSION
 	}
 
 	/**
@@ -163,8 +168,8 @@ public interface ExpressionNode extends InitializerNode, SizeableNode,
 	 * IllegalArgumentException will be thrown: (1) if this is the first
 	 * conversion (index 0) to be added, the old type of the conversion must
 	 * equal the initial type; (2) if this is not the first conversion (index >
-	 * 0) to be added, the old type of the conversion must equal the newType
-	 * of the previous conversion.
+	 * 0) to be added, the old type of the conversion must equal the newType of
+	 * the previous conversion.
 	 * 
 	 * @param conversion
 	 *            the conversion to add to the conversion chain for this

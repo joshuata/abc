@@ -49,6 +49,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.expression.OperatorNode.Operator;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.QuantifiedExpressionNode.Quantifier;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeableNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.SizeofNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.expression.StatementExpressionNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.expression.StringLiteralNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.OrdinaryLabelNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.label.SwitchLabelNode;
@@ -60,6 +61,7 @@ import edu.udel.cis.vsl.abc.ast.node.IF.statement.ChooseStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CivlForNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.CompoundStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.DeclarationListNode;
+import edu.udel.cis.vsl.abc.ast.node.IF.statement.ExpressionStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.ForLoopInitializerNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.LabeledStatementNode;
 import edu.udel.cis.vsl.abc.ast.node.IF.statement.StatementNode;
@@ -814,6 +816,31 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 	}
 
 	/**
+	 * 
+	 * @param source
+	 * @param expressionTree
+	 *            has the format: (, COMPOUND_STATEMENT, )
+	 * @param scope
+	 * @return
+	 * @throws SyntaxException
+	 */
+	private StatementExpressionNode translateStatementExpression(Source source,
+			CommonTree expressionTree, SimpleScope scope)
+			throws SyntaxException {
+		CompoundStatementNode statement = this.translateCompoundStatement(
+				(CommonTree) expressionTree.getChild(1), scope);
+		BlockItemNode last = statement
+				.getSequenceChild(statement.numChildren() - 1);
+
+		if (!(last instanceof ExpressionStatementNode)) {
+			this.error("the last element of the compound statement for a "
+					+ "statement expression should only be an expression",
+					expressionTree);
+		}
+		return this.nodeFactory.newStatementExpressionNode(source, statement);
+	}
+
+	/**
 	 * Translates an expression.
 	 * 
 	 * @param expressionTree
@@ -914,6 +941,8 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 		case CALLS:
 			return nodeFactory.newCallsNode(source,
 					translateCall(source, expressionTree, scope));
+		case STATEMENT_EXPRESSION:
+			return translateStatementExpression(source, expressionTree, scope);
 		default:
 			throw error("Unknown expression kind", expressionTree);
 		} // end switch
@@ -1140,6 +1169,27 @@ public class CommonASTBuilderWorker implements ASTBuilderWorker {
 			// translateScopeListUse(scopeListTree);
 
 			result = nodeFactory.newTypedefNameNode(identifierNode, null);
+			break;
+		}
+		case TYPEOF: {
+			CommonTree typeofTree = (CommonTree) analysis.typeSpecifierNode;
+			CommonTree operandTree = (CommonTree) typeofTree.getChild(1);
+
+			if (typeofTree.getType() == TYPEOF_TYPE) {
+				result = this.translateTypeName(operandTree, scope);
+			} else {
+				Source source;
+				ExpressionNode expression = this.translateExpression(
+						operandTree, scope);
+				
+				if (analysis.specifierListNode.getChildCount() == 0)
+					source = this.tokenFactory.newSource(tokenFactory.newCToken(
+							CParser.IDENTIFIER, analysis.basicTypeKind.toString(),
+							tokenFactory.newSystemFormation("system")));
+				else
+					source = newSource(analysis.specifierListNode);
+				result = this.nodeFactory.newTypeofNode(source, expression);
+			}
 			break;
 		}
 		case STRUCTURE_OR_UNION:
