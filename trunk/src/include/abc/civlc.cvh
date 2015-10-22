@@ -18,6 +18,10 @@
 #define NULL ((void*)0)
 #endif
 
+#ifndef __UNSIGNED_BOUND
+#define __UNSIGNED_BOUND 32
+#endif
+
 typedef unsigned long int size_t;
 
 typedef enum Operation $operation;
@@ -111,5 +115,7 @@ $int_iter $int_iter_create($scope scope, int *array, int size);
 
 /* Deletes an $int_iter object from the heap. */
 void $int_iter_destroy($int_iter iter);
+
+int $pow(int, int);
 
 #endif
