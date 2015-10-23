@@ -1511,7 +1511,9 @@ public class ASTPrettyPrinter {
 		case ARROW: {
 			ArrowNode arrow = (ArrowNode) expression;
 
+			result.append("(");
 			result.append(expression2Pretty(arrow.getStructurePointer()));
+			result.append(")");
 			result.append("->");
 			result.append(arrow.getFieldName().name());
 			break;
@@ -1781,8 +1783,9 @@ public class ASTPrettyPrinter {
 			argWtP1 = "(" + arg1 + ")";
 		switch (op) {
 		case ADDRESSOF:
-			result.append("&");
+			result.append("&(");
 			result.append(arg0);
+			result.append(")");
 			break;
 		case ASSIGN:
 			result.append(arg0);
