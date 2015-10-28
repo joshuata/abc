@@ -34,6 +34,9 @@ int $pthread_gpool_size($pthread_gpool_t gpool);
 /* Gets the PID of the index'th thread in the pool */
 $proc $pthread_gpool_thread($pthread_gpool_t gpool, int index);
 
+/* Waits for all threads in the pool to terminate */
+void $pthread_gpool_join($pthread_gpool_t gpool);
+
 /* *************************** Functions of $pthread_pool ************************** */
 
 /* Creates a new local pthread pool object and returns a handle to it. */
