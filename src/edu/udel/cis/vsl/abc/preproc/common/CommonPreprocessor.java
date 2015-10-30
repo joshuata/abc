@@ -57,8 +57,19 @@ public class CommonPreprocessor implements Preprocessor {
 		// if (macroDefs != null && macroDefs.size() > 0) {
 		try {
 			// use temporary file to store the macro definitions
-			File temp = File.createTempFile("tmp" + System.currentTimeMillis(),
-					".h");
+
+			String tmpDirBase = System.getProperty("java.io.tmpdir");
+			// when -Duser.home=$HOME is used, this returns $HOME
+			if (tmpDirBase.startsWith("$")) {
+				tmpDirBase = System.getenv(tmpDirBase.substring(1));
+			}
+
+			File temp = new File(tmpDirBase, "tmp" + System.currentTimeMillis()
+					+ ".h");
+
+			// File temp = File.createTempFile("tmp" +
+			// System.currentTimeMillis(),
+			// ".h");
 			// Write to temp file
 			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
 			PreprocessorWorker worker;
