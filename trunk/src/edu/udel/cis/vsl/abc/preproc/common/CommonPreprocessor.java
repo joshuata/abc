@@ -54,61 +54,54 @@ public class CommonPreprocessor implements Preprocessor {
 	@Override
 	public Map<String, Macro> getMacros(Map<String, String> macroDefs)
 			throws PreprocessorException {
-		// if (macroDefs != null && macroDefs.size() > 0) {
-		try {
-			// use temporary file to store the macro definitions
+		if ((this.config != null && this.config.svcomp())
+				|| (macroDefs != null && macroDefs.size() > 0)) {
+			try {
+				// use temporary file to store the macro definitions
+				String tmpDirBase = System.getProperty("java.io.tmpdir");
+				// when -Duser.home=$HOME is used, this returns $HOME
+				if (tmpDirBase.startsWith("$")) {
+					tmpDirBase = System.getenv(tmpDirBase.substring(1));
+				}
 
-			String tmpDirBase = System.getProperty("java.io.tmpdir");
-			// when -Duser.home=$HOME is used, this returns $HOME
-			if (tmpDirBase.startsWith("$")) {
-				tmpDirBase = System.getenv(tmpDirBase.substring(1));
+				File temp = new File(tmpDirBase, "tmp"
+						+ System.currentTimeMillis() + ".h");
+				// Write to temp file
+				FileWriter tmpWriter = new FileWriter(temp);
+				BufferedWriter tmpOut = new BufferedWriter(tmpWriter);
+				PreprocessorWorker worker;
+				PreprocessorTokenSource tokenSource;
+				Token token;
+
+				// macros for GNU C features
+				// for now, put this here. Find a better place:
+				if (this.config != null && this.config.svcomp())
+					tmpOut.write("#define __attribute__(X)\r\n");
+				for (String macro : macroDefs.keySet())
+					tmpOut.write("#define " + macro + " "
+							+ macroDefs.get(macro) + "\r\n");
+				tmpOut.write("\r\n");
+				tmpOut.flush();
+				tmpOut.close();
+				tmpWriter.close();
+				worker = new PreprocessorWorker(config, this,
+						PreprocessorWorker.defaultSystemIncludes,
+						PreprocessorWorker.defaultSystemIncludes,
+						new HashMap<String, Macro>());
+				tokenSource = worker.outputTokenSource(temp, true);
+				do {
+					token = tokenSource.nextToken();
+				} while (token.getType() != PreprocessorLexer.EOF);
+				// delete the temporary file
+				temp.delete();
+				return tokenSource.macroMap;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				// why doesn't this throw an exception????????
+				return new HashMap<String, Macro>();
 			}
-
-			File temp = new File(tmpDirBase, "tmp" + System.currentTimeMillis()
-					+ ".h");
-
-			// File temp = File.createTempFile("tmp" +
-			// System.currentTimeMillis(),
-			// ".h");
-			// Write to temp file
-			BufferedWriter tmpOut = new BufferedWriter(new FileWriter(temp));
-			PreprocessorWorker worker;
-			PreprocessorTokenSource tokenSource;
-			Token token;
-
-			// macros for GNU C features
-			// for now, put this here. Find a better place:
-			if (this.config != null && this.config.svcomp())
-				tmpOut.write("#define __attribute__(X)\r\n");
-			// tmpOut.write("#define __asm__(X)\r\n");
-			// tmpOut.write("#define __const const\r\n");
-			// tmpOut.write("#define __extension__\r\n");
-			// tmpOut.write("#define __inline inline\r\n");
-			// tmpOut.write("#define __restrict restrict\r\n");
-			// tmpOut.write("#define __thread _Thread_local\r\n");
-			for (String macro : macroDefs.keySet())
-				tmpOut.write("#define " + macro + " " + macroDefs.get(macro)
-						+ "\r\n");
-			tmpOut.write("\r\n");
-			tmpOut.close();
-			worker = new PreprocessorWorker(config, this,
-					PreprocessorWorker.defaultSystemIncludes,
-					PreprocessorWorker.defaultSystemIncludes,
-					new HashMap<String, Macro>());
-			tokenSource = worker.outputTokenSource(temp, true);
-			do {
-				token = tokenSource.nextToken();
-			} while (token.getType() != PreprocessorLexer.EOF);
-			// delete the temporary file
-			temp.delete();
-			return tokenSource.macroMap;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			// why doesn't this throw an exception????????
+		} else
 			return new HashMap<String, Macro>();
-		}
-		// } else
-		// return new HashMap<String, Macro>();
 	}
 
 	/**
