@@ -502,11 +502,13 @@ public abstract class CommonASTNode implements ASTNode {
 			File temp = File.createTempFile("tmp" + System.currentTimeMillis(),
 					".data");
 			PrintStream tmpOut = new PrintStream(temp);
+			FileReader fileReader;
 			BufferedReader bufferReader;
 			String line;
 
 			ASTs.prettyPrint(this, tmpOut);
-			bufferReader = new BufferedReader(new FileReader(temp));
+			fileReader = new FileReader(temp);
+			bufferReader = new BufferedReader(fileReader);
 			line = bufferReader.readLine();
 			while (line != null) {
 				result.append(line);
@@ -514,6 +516,8 @@ public abstract class CommonASTNode implements ASTNode {
 				line = bufferReader.readLine();
 			}
 			bufferReader.close();
+			fileReader.close();
+			tmpOut.close();
 			temp.delete();
 		} catch (IOException e) {
 			result.append(this.toString());
