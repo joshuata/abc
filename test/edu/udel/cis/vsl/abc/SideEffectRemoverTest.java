@@ -96,4 +96,9 @@ public class SideEffectRemoverTest {
 	public void cond() throws ABCException, IOException {
 		check("cond.c");
 	}
+
+	@Test
+	public void dereference() throws ABCException, IOException {
+		check("dereference.c");
+	}
 }

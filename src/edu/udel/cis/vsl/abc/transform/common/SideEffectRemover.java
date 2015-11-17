@@ -685,6 +685,7 @@ public class SideEffectRemover extends BaseTransformer {
 			// in this case we need to keep the dereference
 			// because it might have an exception side-effect (illegal
 			// dereference)
+			dereference.remove();
 			result.addBefore(nodeFactory
 					.newExpressionStatementNode(dereference));
 			result.setNode(null);
