@@ -12,7 +12,7 @@ typedef double clock_t;
 struct tm;
 
 #ifndef NULL
-#define NULL (void*)0
+#define NULL ((void*)0)
 #endif 
 
 #define CLOCKS_PER_SEC 100
