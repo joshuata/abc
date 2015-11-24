@@ -102,6 +102,8 @@ public class CompareCombiner implements Combiner {
 		impl.release();
 		specFileTypeDef = this.getAndRemoveFileTypeNode(specRoot);
 		implFileTypeDef = this.getAndRemoveFileTypeNode(implRoot);
+		processExternVariables(specRoot);
+		processExternVariables(implRoot);
 		if (specFileTypeDef != null)
 			nodes.add(specFileTypeDef);
 		else if (implFileTypeDef != null)
@@ -179,7 +181,7 @@ public class CompareCombiner implements Combiner {
 
 		AST result = astFactory.newAST(newRoot, allSourceFiles);
 
-		// result.prettyPrint(System.out, false);
+		result.prettyPrint(System.out, false);
 		return result;
 	}
 
@@ -648,5 +650,27 @@ public class CompareCombiner implements Combiner {
 
 		return factory.newStringLiteralNode(tokenFactory.newSource(ctoke),
 				text, stringToken.getStringLiteral());
+	}
+
+	/**
+	 * removed extra declaration nodes for extern variables; also make remove
+	 * the extern qualifier for the definition node
+	 * 
+	 * @param root
+	 */
+	private void processExternVariables(SequenceNode<BlockItemNode> root) {
+		for (BlockItemNode item : root) {
+			if (item == null)
+				continue;
+			if (item instanceof VariableDeclarationNode) {
+				VariableDeclarationNode variable = (VariableDeclarationNode) item;
+
+				if (variable.hasExternStorage())
+					if (!variable.getEntity().getDefinition().equals(variable))
+						variable.remove();
+					else
+						variable.setExternStorage(false);
+			}
+		}
 	}
 }
