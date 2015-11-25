@@ -26,8 +26,9 @@ typedef struct _lldiv_t {
 
 
 /* Constants defined */
-
+#ifndef NULL
 #define NULL ((void*)0)
+#endif
 
 #define EXIT_FAILURE 1
 

@@ -18,7 +18,9 @@ typedef int fpos_t;
 
 /* Macros */
 
+#ifndef NULL
 #define NULL ((void*)0)
+#endif
 #define _IOFBF 1
 #define _IOLBF 2
 #define _IONBF 3

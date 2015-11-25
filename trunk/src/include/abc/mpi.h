@@ -1,8 +1,7 @@
 #ifndef __MPI__
 #define __MPI__
 #include <op.h>
-#ifdef NULL
-#else
+#ifndef NULL
 #define NULL ((void*)0)
 #endif
 #define  MPIX_NO_OP  _NO_OP
