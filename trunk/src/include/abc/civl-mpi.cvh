@@ -130,40 +130,42 @@ int $mpi_init(void);
 
 int $mpi_finalize(void);
 
-int $mpi_send(const void *, int, MPI_Datatype, int, int, $comm, int);
+int $mpi_send(const void *, int, MPI_Datatype, int, int, MPI_Comm);
 
-int $mpi_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *, int);
+int $mpi_recv(void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *);
 
 int $mpi_sendrecv(const void *sendbuf, int sendcount, MPI_Datatype sendtype,
 		  int dest, int sendtag, void *recvbuf, int recvcount, 
 		  MPI_Datatype recvtype, int source, int recvtag,
-		  $comm comm, MPI_Status *status, int MPICommId);
+		  MPI_Comm comm, MPI_Status *status);
 
-int $mpi_collective_recv(void *, int, MPI_Datatype, int, int, $comm, MPI_Status *, 
-			 char *, int);
+int $mpi_collective_send(const void *, int, MPI_Datatype, int, int, MPI_Comm);
 
-int $mpi_bcast(void *, int, MPI_Datatype, int, int, MPI_Comm, char *, int);
+int $mpi_collective_recv(void *, int, MPI_Datatype, int, int, MPI_Comm, MPI_Status *, 
+			 char *);
+
+int $mpi_bcast(void *, int, MPI_Datatype, int, int, MPI_Comm, char *);
 
 int $mpi_reduce(const void*, void*, int,
 		MPI_Datatype, MPI_Op, int, int,
-		MPI_Comm, char *, int);
+		MPI_Comm, char *);
 
 int $mpi_gather(const void*, int, MPI_Datatype, 
-	       void*, int, MPI_Datatype, int, int, MPI_Comm, char *, int);
+	       void*, int, MPI_Datatype, int, int, MPI_Comm, char *);
 
 int $mpi_gatherv(const void*, int, MPI_Datatype,
 		void*, const int[], const int[],
 		 MPI_Datatype, int, int, 
-		 MPI_Comm, char *, int);
+		 MPI_Comm, char *);
 
 int $mpi_scatter(const void*, int, MPI_Datatype, 
 		 void*, int, MPI_Datatype, int,
-		 int, MPI_Comm, char *, int);
+		 int, MPI_Comm, char *);
 
 int $mpi_scatterv(const void*, const int[], const
 		 int[], MPI_Datatype, void* ,
 		 int, MPI_Datatype, int, int,
-		  MPI_Comm, char *, int);
+		  MPI_Comm, char *);
 
 void* $mpi_pointerAdd(void*, int, MPI_Datatype);
 
