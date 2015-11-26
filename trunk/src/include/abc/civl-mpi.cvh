@@ -209,25 +209,34 @@ $bundle $mpi_createCoroutineEntries(int routineTag, int root,
    processes are defined by the first argument. */
 void $mpi_coassert(MPI_Comm, _Bool);
 
-/*********** Section: contract system functions ***********/
-/* Contract system functions are functions that calls to them will be
-   treated as expressions in CIVL model. CIVL model may add more
-   arguments on those functions thus the declarations here allows
-   uncertaion number of arguments. However, only arguments explicitly
-   defined and required and ones added by CIVL model are
-   significant. Other arguments will be ignored and removed */
+/*********** Section: contract helper functions ***********/
+      /*********** Side-effect free functions *************/
+      _Bool $mpi_isRecvBufEmpty(int x);
 
-_Bool $mpi_isRecvBufEmpty(int x);
+      /*********** Helper functions *************/
+      /* Enqueue and Dequeue functions extended from "comm" library:
+       * These MPI enqueue and dequeue functions will take a snaphot
+       * while they delivery the messages */
 
-/* snapshots imaging function, i.e. modifying corresponding message
-   buffers simultaneously with MPI communication operations. */
-void $mpi_imageP2pSend(int commID, $message msg, int place);
+      /* MPI Point-to-point enqueue function: It is equivalent to
+       * first call $comm_enqueue on an MPI p2p communicator then
+       * atomically take a snapshot on the specific message buffer */
+       void $mpi_p2pSEnq(int commID, $message msg, int place);
 
-void $mpi_imageColSend(int commID, $message msg, int place);
+      /* MPI collective enqueue function: It is equivalent to first
+       * call $comm_enqueue on an MPI collective communicator then
+       * atomically take a snapshot on the specific message buffer */
+       void $mpi_colSEnq(int commID, $message msg, int place);
 
-void $mpi_imageP2pRecv(int commID, int source, int dest, int tag);
+      /* MPI Point-to-point dequeue function: It is equivalent to
+       * first call $comm_dequeue on an MPI p2p communicator then
+       * atomically take a snapshot on the specific message buffer */
+       void $mpi_p2pSDeq(int commID, int source, int dest, int tag);
 
-void $mpi_imageColRecv(int commID, int source, int dest, int tag);
+      /* MPI collective dequeue function: It is equivalent to first
+       * call $comm_dequeue on an MPI collective communicator then
+       * atomically take a snapshot on the specific message buffer */
+       void $mpi_colSDeq(int commID, int source, int dest, int tag);
 
 #endif
 
