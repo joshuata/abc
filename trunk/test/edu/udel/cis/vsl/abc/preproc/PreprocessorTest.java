@@ -11,11 +11,11 @@ import org.antlr.runtime.TokenSource;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorRuntimeException;
-import edu.udel.cis.vsl.abc.preproc.common.CommonPreprocessor;
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorParser;
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorUtils;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.PreprocessorRuntimeException;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.CommonPreprocessor;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorParser;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorUtils;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 
 public class PreprocessorTest {

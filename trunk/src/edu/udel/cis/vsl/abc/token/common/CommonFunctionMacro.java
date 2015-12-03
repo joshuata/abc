@@ -7,7 +7,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorLexer;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorLexer;
 import edu.udel.cis.vsl.abc.token.IF.FunctionMacro;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 

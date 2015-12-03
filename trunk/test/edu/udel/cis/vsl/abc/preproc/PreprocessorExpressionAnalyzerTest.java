@@ -11,10 +11,10 @@ import org.antlr.runtime.TokenSource;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorExpressionException;
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorExpressionAnalyzer;
-import edu.udel.cis.vsl.abc.preproc.common.PreprocessorExpressionParser;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.PreprocessorExpressionException;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorExpressionAnalyzer;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorExpressionParser;
 import edu.udel.cis.vsl.abc.util.IF.StringPredicate;
 
 /**

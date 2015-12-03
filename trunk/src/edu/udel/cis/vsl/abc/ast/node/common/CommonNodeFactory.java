@@ -195,7 +195,7 @@ import edu.udel.cis.vsl.abc.ast.value.IF.StringValue;
 import edu.udel.cis.vsl.abc.ast.value.IF.Value;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
-import edu.udel.cis.vsl.abc.parse.common.CivlCParser;
+import edu.udel.cis.vsl.abc.front.c.parse.common.CivlCParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
 import edu.udel.cis.vsl.abc.token.IF.ExecutionCharacter;
