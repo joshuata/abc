@@ -8,13 +8,13 @@ import java.util.Map;
 import org.antlr.runtime.tree.CommonTree;
 import org.junit.Test;
 
-import edu.udel.cis.vsl.abc.parse.IF.CParser;
-import edu.udel.cis.vsl.abc.parse.IF.Parse;
-import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.parse.IF.ParseTree;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocess;
-import edu.udel.cis.vsl.abc.preproc.IF.Preprocessor;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.Parse;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.ParseTree;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.Preprocess;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.Preprocessor;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
 

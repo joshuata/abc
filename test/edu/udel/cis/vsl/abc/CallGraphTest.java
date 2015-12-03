@@ -11,8 +11,8 @@ import org.junit.Test;
 import edu.udel.cis.vsl.abc.ast.IF.AST;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
-import edu.udel.cis.vsl.abc.parse.IF.ParseException;
-import edu.udel.cis.vsl.abc.preproc.IF.PreprocessorException;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.ParseException;
+import edu.udel.cis.vsl.abc.front.c.preproc.IF.PreprocessorException;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SyntaxException;
 

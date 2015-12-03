@@ -10,8 +10,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.udel.cis.vsl.abc.preproc.common.FilteredANTLRFileStream;
-import edu.udel.cis.vsl.abc.preproc.common.FilteredANTLRInputStream;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.FilteredANTLRFileStream;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.FilteredANTLRInputStream;
 
 /**
  * Tests the removal of backslash-newline sequences from character streams in

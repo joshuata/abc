@@ -2,10 +2,10 @@ package edu.udel.cis.vsl.abc.ast.entity.IF;
 
 import java.util.Enumeration;
 
-import edu.udel.cis.vsl.abc.antlr2ast.IF.PragmaHandler;
 import edu.udel.cis.vsl.abc.ast.node.IF.declaration.DeclarationNode;
 import edu.udel.cis.vsl.abc.ast.type.IF.Enumerator;
 import edu.udel.cis.vsl.abc.ast.type.IF.Field;
+import edu.udel.cis.vsl.abc.astgen.c.IF.PragmaHandler;
 
 /**
  * <p>

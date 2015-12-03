@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.antlr.runtime.Token;
 
-import edu.udel.cis.vsl.abc.parse.IF.CParser;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.CParser;
 import edu.udel.cis.vsl.abc.token.IF.CToken;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.CTokenSequence;
