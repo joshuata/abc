@@ -32,8 +32,8 @@ import edu.udel.cis.vsl.abc.ast.type.IF.TypeFactory;
 import edu.udel.cis.vsl.abc.ast.type.IF.Types;
 import edu.udel.cis.vsl.abc.ast.value.IF.ValueFactory;
 import edu.udel.cis.vsl.abc.ast.value.IF.Values;
+import edu.udel.cis.vsl.abc.astgen.IF.ASTGenerator;
 import edu.udel.cis.vsl.abc.astgen.c.IF.ASTBuilder;
-import edu.udel.cis.vsl.abc.astgen.c.IF.Antlr2AST;
 import edu.udel.cis.vsl.abc.config.IF.Configuration;
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Language;
 import edu.udel.cis.vsl.abc.config.IF.Configurations;
@@ -104,7 +104,7 @@ public class FrontEnd {
 	private ConversionFactory conversionFactory = Conversions
 			.newConversionFactory(typeFactory);
 
-	private ASTBuilder builder = Antlr2AST.newASTBuilder(astFactory, parser);
+	private ASTBuilder builder = ASTGenerator.newASTBuilder(astFactory, parser);
 
 	private Analyzer analyzer = Analysis.newStandardAnalyzer(configuration,
 			astFactory, entityFactory, conversionFactory);

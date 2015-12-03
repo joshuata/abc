@@ -60,25 +60,47 @@
 					Tokens}</li>
 			</ol></li>
 
-		<li><strong>preproc</strong>
-			<ol>
-				<li>responsibilities: preprocessing a file to generate a
-					post-preprocessor token stream</li>
-				<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
-				<li>interface: {@link edu.udel.cis.vsl.abc.preproc.IF}</li>
-				<li>entry point: {@link
-					edu.udel.cis.vsl.abc.preproc.IF.Preprocess Preprocess}</li>
-			</ol></li>
+		<li><strong>front</strong></li>
+		<ol>
+			<li>responsibilities: preprocessing and parsing a file to
+				produce an ANTLR tree representation of a translation unit</li>
+			<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
+			<li>interface: {@link edu.udel.cis.vsl.abc.front.IF}, {@link
+				edu.udel.cis.vsl.abc.front.c.IF}, {@link
+				edu.udel.cis.vsl.abc.front.fortran.IF}</li>
+			<li>entry point:</li>
+			<li>submodules
+				<ol>
+					<li><strong>preproc</strong>
+						<ol>
+							<li>responsibilities: preprocessing a file to generate a
+								post-preprocessor token stream</li>
+							<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
+							<li>interface: {@link
+								edu.udel.cis.vsl.abc.front.c.preproc.IF}, {@link
+								edu.udel.cis.vsl.abc.front.fortran.preproc.IF}</li>
+							<li>entry point: {@link
+								edu.udel.cis.vsl.abc.front.c.preproc.IF.Preprocess Preprocess},
+								{@link edu.udel.cis.vsl.abc.front.fortran.preproc.IF.Preprocess
+								Preprocess}</li>
+						</ol></li>
 
-		<li><strong>parse</strong>
-			<ol>
-				<li>responsibilities: parsing a token stream to produce an
-					ANTLR tree representation of a translation unit</li>
-				<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
-				<li>interface: {@link edu.udel.cis.vsl.abc.parse.IF}</li>
-				<li>entry point: {@link edu.udel.cis.vsl.abc.parse.IF.Parse
-					Parse}</li>
-			</ol></li>
+					<li><strong>parse</strong>
+						<ol>
+							<li>responsibilities: parsing a token stream to produce an
+								ANTLR tree representation of a translation unit</li>
+							<li>uses: <strong>util</strong>, <strong>config</strong>, <strong>token</strong></li>
+							<li>interface: {@link
+								edu.udel.cis.vsl.abc.front.c.parse.IF}, {@link
+								edu.udel.cis.vsl.abc.front.fortran.parse.IF}</li>
+							<li>entry point: {@link
+								edu.udel.cis.vsl.abc.front.c.parse.IF.Parse Parse}, {@link
+								edu.udel.cis.vsl.abc.front.fortran.parse.IF.Parse Parse}</li>
+						</ol></li>
+				</ol>
+			</li>
+		</ol>
+
 
 		<li><strong>ast</strong>
 			<ol>
@@ -127,6 +149,14 @@
 
 
 
+
+
+
+
+
+
+
+
 								
 							</ol></li>
 						<li><strong>node</strong>
@@ -140,14 +170,16 @@
 				</li>
 			</ol></li>
 
-		<li><strong>antlr2ast</strong>
+		<li><strong>astgen</strong>
 			<ol>
 				<li>responsibilities: translation of ANTLR tree to AST</li>
-				<li>uses: <strong>util</strong>, <strong>token</strong>, </strong><strong>parse</strong>,
+				<li>uses: <strong>util</strong>, <strong>token</strong>, </strong><strong>front</strong>,
 					<strong>ast</strong></li>
-				<li>interface: {@link edu.udel.cis.vsl.abc.antlr2ast.IF}</li>
+				<li>interface: {@link edu.udel.cis.vsl.abc.astgen.IF}, {@link
+					edu.udel.cis.vsl.abc.astgen.c.IF}, {@link
+					edu.udel.cis.vsl.abc.astgen.fortran.IF}</li>
 				<li>entry point: {@link
-					edu.udel.cis.vsl.abc.antlr2ast.IF.Antlr2AST}</li>
+					edu.udel.cis.vsl.abc.astgen.IF.ASTGenerator}</li>
 			</ol></li>
 
 		<li><strong>analysis</strong>
@@ -184,9 +216,9 @@
 			<ol>
 				<li>responsibilities: command line interface, Activator class
 					for marshaling of tools in tool chain</li>
-				<li>uses: <strong>util</strong>, <strong>token</strong>, <strong>preproc</strong>,
-					<strong>parse</strong>, <strong>ast</strong>, <strong>antlr2ast</strong>,
-					<strong>analysis</strong>, <strong>transform</strong>, <strong>program</strong>
+				<li>uses: <strong>util</strong>, <strong>token</strong>, <strong>front</strong>,
+					<strong>ast</strong>, <strong>astgen</strong>, <strong>analysis</strong>,
+					<strong>transform</strong>, <strong>program</strong>
 				</li>
 				<li>interface: {@link edu.udel.cis.vsl.abc}</li>
 				<li>entry point: {@link edu.udel.cis.vsl.abc.ABC ABC}</li>
