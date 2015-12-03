@@ -1549,6 +1549,10 @@ public class SideEffectRemover extends BaseTransformer {
 			makesef(exprTriple);
 		}
 		newBlockItems.addAll(exprTriple.getBefore());
+		// removed the last item of the compound statement, which is handled
+		// separately by lastExpression
+		newCompound.removeChild(newCompound.numChildren() - 1);
+		newCompound = this.normalizeCompoundStatement(newCompound);
 		if (!isVoid) {
 			Source source = lastExpression.getSource();
 			String tmpId = tempVariablePrefix + (tempVariableCounter++);
@@ -1933,6 +1937,26 @@ public class SideEffectRemover extends BaseTransformer {
 			body.insertChildren(body.numChildren(), incItems);
 			forLoop.setIncrementer(null);
 		}
+	}
+
+	private CompoundStatementNode normalizeCompoundStatement(
+			CompoundStatementNode compound) {
+		LinkedList<BlockItemNode> items = new LinkedList<>();
+		boolean hasNull = false;
+
+		for (BlockItemNode child : compound) {
+			if (child == null)
+				hasNull = true;
+			else
+				items.add(child);
+		}
+		if (hasNull) {
+			for (BlockItemNode child : items)
+				child.remove();
+			return this.nodeFactory.newCompoundStatementNode(
+					compound.getSource(), items);
+		} else
+			return compound;
 	}
 
 	/**

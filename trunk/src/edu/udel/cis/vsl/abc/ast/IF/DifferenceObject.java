@@ -197,4 +197,9 @@ public class DifferenceObject {
 	public void print(PrintStream out) {
 		out.println(this.getMessage());
 	}
+
+	@Override
+	public String toString() {
+		return this.message;
+	}
 }
