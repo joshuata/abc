@@ -3,21 +3,21 @@
 int g();
 void h(int k);
 */
-void fi(int x);
+//void fi(int x);
 
 /*
 fnoreturn(int a){
   return a*a;
 }*/
 
-int add(int, int);
+//int add(int, int);
 
 int main() {
   //volatile int t;
   int x;
 
-  fi(x);
-  //x=add(1,2);
+  (x);
+  x=add(1,2);
   //fnoreturn(10);
   /* f();
   g();
@@ -25,8 +25,7 @@ int main() {
   h(t);*/
 }
 
-
-inline int add(int x, int y){
+int add(int x, int y){
   return x+y;
 }
 
@@ -34,8 +33,7 @@ inline int add(int x, int y){
 void h(int x){
   x++;
 }
-*/
 inline void fi(int x){
   x++;
   return;
-  }
+  }*/

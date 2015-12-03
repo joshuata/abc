@@ -15,7 +15,7 @@ import edu.udel.cis.vsl.abc.program.IF.Program;
 
 public class SideEffectRemoverTest {
 
-	// private static boolean debug = false;
+	private static boolean debug = false;
 
 	private static List<String> codes = Arrays.asList("prune", "sef");
 
@@ -29,12 +29,21 @@ public class SideEffectRemoverTest {
 				.compileAndLink(new File[] { file }, Language.CIVL_C);
 
 		program.applyTransformers(codes);
-		program.prettyPrint(System.out);
+		if (debug)
+			program.prettyPrint(System.out);
 
 		Program outputProgram = f.compileAndLink(new File[] { outputFile },
 				Language.CIVL_C);
+		boolean equiv = program.getAST().equiv(outputProgram.getAST());
 
-		assertTrue(program.getAST().equiv(outputProgram.getAST()));
+		if (debug) {
+			if (!equiv) {
+				System.out.println(program.getAST()
+						.diff(outputProgram.getAST()));
+				outputProgram.prettyPrint(System.out);
+			}
+		}
+		assertTrue(equiv);
 	}
 
 	@Test
@@ -100,5 +109,10 @@ public class SideEffectRemoverTest {
 	@Test
 	public void dereference() throws ABCException, IOException {
 		check("dereference.c");
+	}
+
+	@Test
+	public void stmtExpr() throws ABCException, IOException {
+		check("stmtExpression.c");
 	}
 }

@@ -10,13 +10,14 @@ import org.junit.Test;
 
 import edu.udel.cis.vsl.abc.config.IF.Configuration.Architecture;
 import edu.udel.cis.vsl.abc.err.IF.ABCException;
+import edu.udel.cis.vsl.abc.transform.common.Pruner;
+import edu.udel.cis.vsl.abc.transform.common.SideEffectRemover;
 
 public class SvcompTest {
 	/**
 	 * Turn on a lot of output for debugging? Set this to true only in your
 	 * local copy. Be sure to set it back to false before committing!
 	 */
-	// @SuppressWarnings("unused")
 	private static boolean debug = false;
 
 	private static File root = new File(new File("examples"), "svcomp");
@@ -41,8 +42,8 @@ public class SvcompTest {
 		task.setSilent(true);
 		task.setUnkownFunc(true);
 		task.setSvcomp(true);
-		task.addTransformCode("sef");
-		task.addTransformCode("prune");
+		task.addTransformCode(SideEffectRemover.CODE);
+		task.addTransformCode(Pruner.CODE);
 		task.setArchitecture(Architecture._32_BIT);
 		task.setFiles(new File[] { file });
 		frontEnd.showTranslation(task);
@@ -139,4 +140,29 @@ public class SvcompTest {
 		check(this.file("cond.c"));
 	}
 
+	// lazy01_false-unreach-call.i
+	@Test
+	public void lazy01_false() throws ABCException, IOException {
+		check(this.file("lazy01_false-unreach-call.i"));
+	}
+
+	@Test
+	public void implicitFunction() throws ABCException, IOException {
+		check(this.file("implicitFunction.c"));
+	}
+
+	@Test
+	public void emptyReturn() throws ABCException, IOException {
+		check(this.file("emptyReturn.c"));
+	}
+
+	@Test
+	public void statementExpression() throws ABCException, IOException {
+		check(this.file("statementExpression.c"));
+	}
+
+	@Test
+	public void typeof() throws ABCException, IOException {
+		check(this.file("typeof.c"));
+	}
 }
