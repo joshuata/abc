@@ -5,8 +5,6 @@
  *	ISO C99: 7.18 Integer types <stdint.h>
  */
 
-#ifndef __int8_t_defined
-#define __int8_t_defined
 typedef signed char                             int8_t;
 typedef int                                     int16_t;
 typedef long int                                int32_t;
