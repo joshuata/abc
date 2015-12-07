@@ -123,6 +123,14 @@ public class ExpressionEvaluator {
 				return op1;
 			} else if (oper == OperatorNode.Operator.UNARYMINUS) {
 				return universe.minus(op1);
+			} else if (oper == OperatorNode.Operator.SUBSCRIPT) {
+				/* 
+				 * Handle the case where this expression is an array reference expression.
+				 * We use uninterpreted functions for this where the name of the function
+				 * is "subscript" and we have parameters for both the base array and index
+				 * expressions.   This should work for multi-dimensional arrays.
+				 */
+				return universe.divide(op1,op1); // TBD change second operand and replace this with subscript
 			} else {
 				NumericExpression op2 = (NumericExpression) toSarlNumeric(op.getArgument(1));
 				switch (oper) {
@@ -153,8 +161,7 @@ public class ExpressionEvaluator {
 						.symbolicConstant(universe.stringObject(idName), universe.integerType());
 				translateID.put(idName, idSarl);
 				return idSarl;
-			}
-			
+			}	
 		} else {
 			assert false : "ExpressionEvaluator : cannot translate "+o+" to SARL";
 		}
