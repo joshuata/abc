@@ -135,7 +135,8 @@ public class CommonCParser implements CParser {
 	public ParseTree parse(RuleKind rule, CTokenSource tokenSource,
 			Stack<ScopeSymbols> symbols) throws ParseException {
 		TokenStream stream = new CommonTokenStream(tokenSource);
-		CivlCParser parser = new CivlCParser(stream);
+		CivlCParser init_parser = new CivlCParser(stream);
+		CivlCParser_BaseCParser parser = new CivlCParser_BaseCParser(stream, init_parser);
 		CommonTree root;
 
 		parser.setSymbols_stack(symbols);

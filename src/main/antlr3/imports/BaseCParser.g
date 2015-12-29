@@ -1,94 +1,94 @@
 /* Grammar for programming CIVL-C.
  * Based on C11 grammar.
  *
- * Author: Stephen F. Siegel
- * Last modified:
+ * Author: Stephen F. Siegel, University of Delaware
  *
  * This grammar assumes the input token stream is the result of
- * translation phase 7, as specified in the Standard.
+ * translation phase 7, as specified in the C11 Standard.
  * In particular, all the preprocessing has already been
- * done.  
+ * done.
  *
  * In addition to the Standard, I borrowed from the older
  * C grammar included with the ANTLR distribution.
  *
  */
-parser grammar CivlCParser;
+parser grammar BaseCParser;
 
-options
-{
+options {
 	language=Java;
-	tokenVocab=PreprocessorParser;
 	output=AST;
 }
 
 tokens
 {
-	ABSENT;               // represents missing syntactic element
-	GENERIC_ASSOC_LIST;   // generic association list
-	GENERIC_ASSOCIATION;  // a generic association
-	ENUMERATION_CONSTANT; // use of enumeration constant
-	COMPOUND_LITERAL;     // literal for structs, etc.
-	CONTRACT;             // procedure contracts
-	CALL;                 // function call
-	INDEX;                // array subscript operator
-	ARGUMENT_LIST;        // list of arguments to an operator
-	POST_INCREMENT;
-	POST_DECREMENT;
-	PRE_INCREMENT;
-	PRE_DECREMENT;
-	OPERATOR;             // symbol indicating an operator
-	TYPE;                 // symbol indicating "type"
-	EXPR;                 // symbol indicating "expression"
-	PARENTHESIZED_EXPRESSION;
-	CAST;                 // type cast operator
-	DECLARATION;          // a declaration
+	ABSENT;                   // represents missing syntactic element
+	ABSTRACT_DECLARATOR;      // declarator without identifier
+	ARGUMENT_LIST;            // list of arguments to an operator
+	ARRAY_ELEMENT_DESIGNATOR; // [idx]=expr
+	ARRAY_SUFFIX;             // [..] used in declarator
+	BLOCK_ITEM_LIST;          // list of block items
+	CALL;                     // function call
+	CASE_LABELED_STATEMENT;   // case CONST: stmt
+	CAST;                     // type cast operator
+	COMPOUND_LITERAL;         // literal for structs, etc.
+	COMPOUND_STATEMENT;       // { ... }
+	CONTRACT;                 // procedure contracts
+	DECLARATION;              // a declaration
+	DECLARATION_LIST;         // list of declarations
 	DECLARATION_SPECIFIERS;   // list of declaration specifiers
-	INIT_DECLARATOR_LIST;     // list of initializer-declarator pairs
+	DECLARATOR;               // a declarator
+	DEFAULT_LABELED_STATEMENT;// default: stmt
+	DERIVATIVE_EXPRESSION;    // complete derivative expression
+	DESIGNATED_INITIALIZER;   // used in compound initializer
+	DESIGNATION;              // designation, used in compound initializer
+	DIRECT_ABSTRACT_DECLARATOR;   // direct declarator sans identifier
+	DIRECT_DECLARATOR;        // declarator after removing leading *s
+	ENUMERATION_CONSTANT;     // use of enumeration constant
+	ENUMERATOR;               // identifier and optional int constant
+	ENUMERATOR_LIST;          // list of enumerators in enum type definition
+	EXPR;                     // symbol indicating "expression"
+	EXPRESSION_STATEMENT;     // expr; (expression used as stmt)
+	FIELD_DESIGNATOR;         // .id=expr
+	FUNCTION_DEFINITION;      // function definition (contains body)
+	FUNCTION_SUFFIX;          // (..) used in declarator
+	GENERIC_ASSOCIATION;      // a generic association
+	GENERIC_ASSOC_LIST;       // generic association list
+	IDENTIFIER_LABELED_STATEMENT; // label: stmt
+	IDENTIFIER_LIST;          // list of parameter names only in function decl
+	INDEX;                    // array subscript operator
+	INITIALIZER_LIST;         // initializer list in compound initializer
 	INIT_DECLARATOR;          // initializer-declaration pair
- 	STRUCT_DECLARATION_LIST;  // list of field declarations
-	STRUCT_DECLARATION;       // a field declaration
+	INIT_DECLARATOR_LIST;     // list of initializer-declarator pairs
+	OPERATOR;                 // symbol indicating an operator
+	PARAMETER_DECLARATION;    // parameter declaration in function decl
+	PARAMETER_LIST;           // list of parameter decls in function decl
+	PARAMETER_TYPE_LIST;      // parameter list and optional "..."
+	PARENTHESIZED_EXPRESSION; // ( expr )
+	PARTIAL;                  // CIVL-C partial derivative operator
+	PARTIAL_LIST;             // list of partial operators
+	POINTER;                  // * used in declarator
+	POST_DECREMENT;           // expr--
+	POST_INCREMENT;           // expr++
+	PRE_DECREMENT;            // --expr
+	PRE_INCREMENT;            // ++expr
+	PROGRAM;                  // whole program (linking translation units)
+	SCALAR_INITIALIZER;       // initializer for scalar variable
 	SPECIFIER_QUALIFIER_LIST; // list of type specifiers and qualifiers
-	STRUCT_DECLARATOR_LIST;   // list of struct/union declarators
+    STATEMENT;                // a statement
+    STATEMENT_EXPRESSION;     // a statement expression (GNU C extension)
+	STRUCT_DECLARATION;       // a field declaration
+	STRUCT_DECLARATION_LIST;  // list of field declarations
 	STRUCT_DECLARATOR;        // a struct/union declarator
-	ENUMERATOR_LIST;      // list of enumerators in enum type definition
-	ENUMERATOR;           // identifier and optional int constant
-	DECLARATOR;           // a declarator
-	DIRECT_DECLARATOR;    // declarator after removing leading *s
-	TYPE_QUALIFIER_LIST;  // list of type qualifiers
-	ARRAY_SUFFIX;         // [..] used in declarator
-	FUNCTION_SUFFIX;      // (..) used in declarator
-	POINTER;              // * used in declarator
-	PARAMETER_TYPE_LIST;  // parameter list and optional "..."
-	PARAMETER_LIST;       // list of parameter decls in function decl
-	PARAMETER_DECLARATION;// parameter declaration in function decl
-	IDENTIFIER_LIST;      // list of parameter names only in function decl
-	TYPE_NAME;            // type specification without identifier
-	ABSTRACT_DECLARATOR;  // declarator without identifier
-	DIRECT_ABSTRACT_DECLARATOR; // direct declarator sans identifier
-	SCALAR_INITIALIZER;   // 
-	INITIALIZER_LIST;
-	DESIGNATED_INITIALIZER;
-	DESIGNATION;
-	ARRAY_ELEMENT_DESIGNATOR;
-	FIELD_DESIGNATOR;
-	IDENTIFIER_LABELED_STATEMENT;
-	CASE_LABELED_STATEMENT;
-	DEFAULT_LABELED_STATEMENT;
-	COMPOUND_STATEMENT;
-	BLOCK_ITEM_LIST;
-	EXPRESSION_STATEMENT;
-	TRANSLATION_UNIT;
-	DECLARATION_LIST;
-	FUNCTION_DEFINITION;
-	TYPEDEF_NAME;
-	TOKEN_LIST;
-	PARTIAL;
-	PARTIAL_LIST;
-	DERIVATIVE_EXPRESSION;
-	PROGRAM;        // represents whole program (linking translation units)
+	STRUCT_DECLARATOR_LIST;   // list of struct/union declarators
+	TOKEN_LIST;               // list of tokens, e.g., in pragma
+	TRANSLATION_UNIT;         // final result of translation
+	TYPE;                     // symbol indicating "type"
+	TYPEDEF_NAME;             // use of typedef name
+    TYPEOF_EXPRESSION;
+    TYPEOF_TYPE;
+	TYPE_NAME;                // type specification without identifier
+	TYPE_QUALIFIER_LIST;      // list of type qualifiers
 }
-
 scope Symbols {
     Set<String> types; // to keep track of typedefs
     Set<String> enumerationConstants; // to keep track of enum constants
@@ -99,34 +99,24 @@ scope DeclarationScope {
     boolean isTypedef; // is the current declaration a typedef
 }
 
-@header
-{
-package edu.udel.cis.vsl.abc.parse.common;
-
-import java.util.Set;
-import java.util.HashSet;
-import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
-}
-
 @members {
-    public void setSymbols_stack(Stack<ScopeSymbols> symbols){
-        this.Symbols_stack = new Stack();
-        while(!symbols.isEmpty()){
-            ScopeSymbols current = symbols.pop();
-            Symbols_scope mySymbols = new Symbols_scope();
+	public void setSymbols_stack(Stack<ScopeSymbols> symbols){
+		this.Symbols_stack = new Stack();
+		while(!symbols.isEmpty()){
+			ScopeSymbols current = symbols.pop();
+			Symbols_scope mySymbols = new Symbols_scope();
 
-            mySymbols.types = current.types;
-            mySymbols.enumerationConstants = current.enumerationConstants;
-            Symbols_stack.add(mySymbols);
-        }
-    }
-
+			mySymbols.types = current.types;
+			mySymbols.enumerationConstants = current.enumerationConstants;
+			Symbols_stack.add(mySymbols);
+		}
+	}
 
 	@Override
 	public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
 		String hdr = getErrorHeader(e);
 		String msg = getErrorMessage(e, tokenNames);
-		
+
 		throw new RuntimeParseException(hdr+" "+msg, e.token);
 	}
 
@@ -134,7 +124,6 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 	public void emitErrorMessage(String msg) { // don't try to recover!
 	    throw new RuntimeParseException(msg);
 	}
-
 
 	boolean isTypeName(String name) {
 		for (Object scope : Symbols_stack)
@@ -144,7 +133,7 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 
 	boolean isEnumerationConstant(String name) {
 		boolean answer = false;
-		
+
 		// System.err.print("Is "+name+" an enumeration constant: ");
 		for (Object scope : Symbols_stack) {
 			if (((Symbols_scope)scope).enumerationConstants.contains(name)) {
@@ -155,7 +144,7 @@ import edu.udel.cis.vsl.abc.parse.IF.RuntimeParseException;
 		// System.err.println(answer);
 		// System.err.flush();
 		return answer;
-	}	
+	}
 }
 
 /* ***** A.2.1: Expressions ***** */
@@ -168,7 +157,7 @@ constant
 	| FLOATING_CONSTANT
 	| CHARACTER_CONSTANT
 	| SELF | PROCNULL | TRUE | FALSE | RESULT
-	| HERE | ROOT
+	| HERE | ROOT | ELLIPSIS
 	;
 
 enumerationConstant
@@ -181,18 +170,41 @@ primaryExpression
 	: constant
 	| IDENTIFIER
 	| STRING_LITERAL
-	| LPAREN expression RPAREN 
+    | LPAREN compoundStatement RPAREN
+      -> ^(STATEMENT_EXPRESSION LPAREN compoundStatement RPAREN)
+	| LPAREN expression RPAREN
 	  -> ^(PARENTHESIZED_EXPRESSION LPAREN expression RPAREN)
 	| genericSelection
 	| derivativeExpression
 	;
 
 /* 6.5.1.1 */
-
 genericSelection
 	: GENERIC LPAREN assignmentExpression COMMA genericAssocList
 	  RPAREN
 	  -> ^(GENERIC assignmentExpression genericAssocList)
+	;
+
+/* A CIVL-C derivative expression.  Some sequence
+ * of partial-differentiation operators applied to a function.
+ */
+derivativeExpression
+	: DERIV LSQUARE IDENTIFIER COMMA partialList RSQUARE
+	  LPAREN argumentExpressionList RPAREN
+	  -> ^(DERIVATIVE_EXPRESSION IDENTIFIER partialList
+	       argumentExpressionList RPAREN)
+	;
+
+/* A list of partial derivative operators.
+ */
+partialList
+	: partial (COMMA partial)* -> ^(PARTIAL_LIST partial+)
+	;
+
+/* A partial-derivative operator */
+partial
+	: LCURLY IDENTIFIER COMMA INTEGER_CONSTANT RCURLY
+	  -> ^(PARTIAL IDENTIFIER INTEGER_CONSTANT)
 	;
 
 /* 6.5.1.1 */
@@ -222,8 +234,8 @@ postfixExpression
 	    LPAREN argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression ABSENT argumentExpressionList
 	    	 RPAREN ABSENT)
-	  |	// kernel function call:
-	    LEXCON args1=argumentExpressionList REXCON 
+	  |	// CUDA kernel function call:
+	    LEXCON args1=argumentExpressionList REXCON
 	    LPAREN args2=argumentExpressionList RPAREN
 	    -> ^(CALL LPAREN $postfixExpression $args1 $args2 RPAREN ABSENT)
 	  | DOT IDENTIFIER
@@ -233,9 +245,9 @@ postfixExpression
 	  | p=PLUSPLUS
 	    -> ^(OPERATOR POST_INCREMENT[$p]
 	         ^(ARGUMENT_LIST $postfixExpression))
-	  | // CIVL-C @ operator: remote reference like x@f
-	    AT IDENTIFIER
-	    -> ^(AT $postfixExpression IDENTIFIER)
+	  //| // CIVL-C @ operator: remote reference like x@f
+	    //AT IDENTIFIER
+	    //-> ^(AT $postfixExpression IDENTIFIER)
 	  | m=MINUSMINUS
 	    -> ^(OPERATOR POST_DECREMENT[$m]
 	         ^(ARGUMENT_LIST $postfixExpression))
@@ -257,7 +269,7 @@ postfixExpression
  */
 postfixExpressionRoot
 	: (LPAREN typeName RPAREN LCURLY)=>
-	  LPAREN typeName RPAREN LCURLY initializerList 
+	  LPAREN typeName RPAREN LCURLY initializerList
 		( RCURLY
 		| COMMA RCURLY
 		)
@@ -270,7 +282,7 @@ argumentExpressionList
 	: -> ^(ARGUMENT_LIST)
 	| assignmentExpression (COMMA assignmentExpression)*
 	  -> ^(ARGUMENT_LIST assignmentExpression+)
-	;
+	 ;
 
 /* 6.5.3 */
 unaryExpression
@@ -292,13 +304,23 @@ unaryExpression
 	| ALIGNOF LPAREN typeName RPAREN
 	  -> ^(ALIGNOF typeName)
 	| spawnExpression
+    | callsExpression
 	;
 
 
+/* CIVL $spawn expression */
 spawnExpression
-	: SPAWN postfixExpressionRoot LPAREN 
-	  argumentExpressionList RPAREN 
+	: SPAWN postfixExpressionRoot LPAREN
+	  argumentExpressionList RPAREN
 	  -> ^(SPAWN LPAREN postfixExpressionRoot ABSENT
+	       argumentExpressionList RPAREN)
+	;
+
+/* CIVL $calls expression */
+callsExpression
+	: CALLS LPAREN postfixExpressionRoot LPAREN
+	  argumentExpressionList RPAREN RPAREN
+	  -> ^(CALLS LPAREN postfixExpressionRoot ABSENT
 	       argumentExpressionList RPAREN)
 	;
 
@@ -317,19 +339,25 @@ castExpression
 	| unaryExpression
 	;
 
-/* 6.5.5 */
-multiplicativeExpression
-	: (castExpression -> castExpression)
-	( STAR y=castExpression
-	  -> ^(OPERATOR STAR ^(ARGUMENT_LIST $multiplicativeExpression $y))
-	| DIV y=castExpression
-	  -> ^(OPERATOR DIV ^(ARGUMENT_LIST $multiplicativeExpression $y))
-    | MOD y=castExpression
-	  -> ^(OPERATOR MOD ^(ARGUMENT_LIST $multiplicativeExpression $y))
+// TODO
+remoteExpression
+	:(castExpression -> castExpression)
+	( AT y=castExpression
+	  -> ^(OPERATOR AT ^(ARGUMENT_LIST $remoteExpression $y))
     )*
 	;
 
-
+/* 6.5.5 */
+multiplicativeExpression
+	: (remoteExpression -> remoteExpression)
+	( STAR y=remoteExpression
+	  -> ^(OPERATOR STAR ^(ARGUMENT_LIST $multiplicativeExpression $y))
+	| DIV y=remoteExpression
+	  -> ^(OPERATOR DIV ^(ARGUMENT_LIST $multiplicativeExpression $y))
+    | MOD y=remoteExpression
+	  -> ^(OPERATOR MOD ^(ARGUMENT_LIST $multiplicativeExpression $y))
+    )*
+	;
 
 /* 6.5.6 */
 additiveExpression
@@ -352,7 +380,6 @@ rangeExpression
         )
       )?
     ;
-
 
 /* 6.5.7 */
 shiftExpression
@@ -427,7 +454,7 @@ logicalOrExpression
 	    -> ^(OPERATOR OR ^(ARGUMENT_LIST $logicalOrExpression $y))
 	  )*
 	;
-	
+
 /* Added for CIVL-C.  Usually 6.5.15 would use logicalOrExpression. */
 logicalImpliesExpression
 	: ( logicalOrExpression -> logicalOrExpression )
@@ -447,6 +474,30 @@ conditionalExpression
     	         expression
     	         conditionalExpression))
     	)
+	;
+
+/* A CIVL-C quantified expression using $exists or $forall.
+ */
+quantifierExpression
+	: quantifier LCURLY type=typeName id=IDENTIFIER
+	  BITOR restrict=conditionalExpression RCURLY
+	  cond=assignmentExpression
+	  -> ^(quantifier $type $id $restrict $cond)
+	| quantifier LCURLY id=IDENTIFIER ASSIGN
+	  lower=additiveExpression DOTDOT upper=additiveExpression
+	  RCURLY cond=assignmentExpression
+	  -> ^(quantifier $id $lower $upper $cond)
+// eventually change to the following:
+//	| quantifier LCURLY id=IDENTIFIER ASSIGN rangeExpression
+//	  RCURLY cond=assignmentExpression
+//	  -> ^(quantifier $id rangeExpression $cond)
+	;
+
+/* One of the CIVL-C first-order quantifiers.
+ * UNIFORM represents uniform continuity.
+ */
+quantifier
+	: FORALL | EXISTS | UNIFORM
 	;
 
 /* 6.5.16
@@ -481,58 +532,29 @@ assignmentOperator
  * Child 1.1: arg1
  */
 commaExpression
-	: ( x=assignmentExpression -> assignmentExpression)
+	: ( assignmentExpression -> assignmentExpression )
 	  ( COMMA y=assignmentExpression
-	    -> ^(OPERATOR COMMA ^(ARGUMENT_LIST $x $y))
+	    -> ^(OPERATOR COMMA ^(ARGUMENT_LIST $commaExpression $y))
 	  )*
 	;
 
+/* The most general class of expressions.
+ * Includes a CIVL-C "collective" expression,
+ * and all expressions defined previously.
+ */
 expression
 	: COLLECTIVE LPAREN proc=conditionalExpression
-	  COMMA intExpr=conditionalExpression RPAREN
-	  body=conditionalExpression
-	  -> ^(COLLECTIVE $proc $intExpr $body)
+	   RPAREN body=conditionalExpression
+	  -> ^(COLLECTIVE $proc $body)
 	| commaExpression
 	;
-			
-derivativeExpression
-	: DERIV LSQUARE IDENTIFIER COMMA partialList RSQUARE 
-	  LPAREN argumentExpressionList RPAREN
-	  -> ^(DERIVATIVE_EXPRESSION IDENTIFIER partialList argumentExpressionList RPAREN)
-	;
 
-partialList
-	: partial (COMMA partial)* -> ^(PARTIAL_LIST partial+)
-	;
-
-partial
-	: LCURLY IDENTIFIER COMMA INTEGER_CONSTANT RCURLY 
-	  -> ^(PARTIAL IDENTIFIER INTEGER_CONSTANT)
-    ;
 
 /* 6.6 */
 constantExpression
 	: conditionalExpression
 	;
-	
-quantifierExpression
-	: quantifier LCURLY type=typeName id=IDENTIFIER
-	  BITOR restrict=conditionalExpression RCURLY 
-	  cond=assignmentExpression
-	  -> ^(quantifier $type $id $restrict $cond)
-	| quantifier LCURLY id=IDENTIFIER ASSIGN
-      lower=additiveExpression DOTDOT upper=additiveExpression
-      RCURLY cond=assignmentExpression
-	  -> ^(quantifier $id $lower $upper $cond)
-// eventually change to the following:
-//	| quantifier LCURLY id=IDENTIFIER ASSIGN rangeExpression
-//	  RCURLY cond=assignmentExpression
-//	  -> ^(quantifier $id rangeExpression $cond)
-	;
-	
-quantifier
-	: FORALL | EXISTS | UNIFORM
-	;
+
 
 /* ***** A.2.2: Declarations ***** */
 
@@ -551,12 +573,11 @@ quantifier
  * Child 1: stringLiteral
  *
  * The declarationSpecifiers rule returns a bit telling whether
- * "typedef" occurred among the specifiers.  This bit is passed 
+ * "typedef" occurred among the specifiers.  This bit is passed
  * to the initDeclaratorList rule, and down the call chain,
  * where eventually an IDENTIFIER should be reached.  At that point,
  * if the bit is true, the IDENTIFIER is added to the set of typedef
  * names.
- *
  */
 declaration
 scope DeclarationScope;
@@ -564,9 +585,9 @@ scope DeclarationScope;
   $DeclarationScope::isTypedef = false;
 }
 	: d=declarationSpecifiers
-	  ( 
-	    i=initDeclaratorList contract_opt SEMI
-	    -> ^(DECLARATION $d $i contract_opt)
+	  (
+	    i=initDeclaratorList contract SEMI
+	    -> ^(DECLARATION $d $i contract)
 	  | SEMI
 	    -> ^(DECLARATION $d ABSENT ABSENT)
 	  )
@@ -599,7 +620,7 @@ declarationSpecifier
 	| alignmentSpecifier
 	;
 
-/* 
+/*
  * I factored this out of the declarationSpecifiers rule
  * to deal with the ambiguity of "ATOMIC" in one place.
  * "ATOMIC ( typeName )" matches atomicTypeSpecifier, which
@@ -648,7 +669,30 @@ typeSpecifier
 	| enumSpecifier
 	| typedefName
 	| domainSpecifier
+    | typeofSpecifier
 	;
+
+/* GNU C extension:
+ * 6.6 Referring to a Type with typeof
+ * Another way to refer to the type of an expression is with typeof.
+ * The syntax of using of this keyword looks like sizeof, but the construct acts
+ * semantically like a type name defined with typedef.
+ * There are two ways of writing the argument to typeof: with an expression or with a type.
+ * Here is an example with an expression:
+ *   typeof (x[0](1))
+ * This assumes that x is an array of pointers to functions; the type described is that of
+ * the values of the functions.
+ * Here is an example with a typename as the argument:
+ *   typeof (int *)
+ * */
+typeofSpecifier
+    : TYPEOF LPAREN
+        ( commaExpression RPAREN
+          -> ^(TYPEOF_EXPRESSION LPAREN commaExpression RPAREN)
+        | typeName RPAREN
+          -> ^(TYPEOF_TYPE LPAREN typeName RPAREN)
+        )
+    ;
 
 /* 6.7.2.1
  * Root: STRUCT or UNION
@@ -676,8 +720,8 @@ structOrUnion
  * Children: structDeclaration
  */
 structDeclarationList
-	: structDeclaration+
-	  -> ^(STRUCT_DECLARATION_LIST structDeclaration+)
+	: structDeclaration*
+	  -> ^(STRUCT_DECLARATION_LIST structDeclaration*)
 	;
 
 /* 6.7.2.1
@@ -744,8 +788,8 @@ structDeclarator
  * Child 1: enumeratorList
  */
 enumSpecifier
-    : ENUM 
-        ( IDENTIFIER 
+    : ENUM
+        ( IDENTIFIER
           -> ^(ENUM IDENTIFIER ABSENT)
         | IDENTIFIER LCURLY enumeratorList COMMA? RCURLY
           -> ^(ENUM IDENTIFIER enumeratorList)
@@ -772,7 +816,7 @@ enumerator
 	: IDENTIFIER
     	  {
     		$Symbols::enumerationConstants.add($IDENTIFIER.text);
-		// System.err.println("define enum constant "+$IDENTIFIER.text);	
+		// System.err.println("define enum constant "+$IDENTIFIER.text);
     	  }
     	  (  -> ^(ENUMERATOR IDENTIFIER ABSENT)
     	  | (ASSIGN constantExpression)
@@ -797,27 +841,28 @@ typeQualifier
  */
 functionSpecifier
     : INLINE | NORETURN
-    | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN 
+    | ABSTRACT CONTIN LPAREN INTEGER_CONSTANT RPAREN
       -> ^(ABSTRACT INTEGER_CONSTANT)
     | ABSTRACT -> ^(ABSTRACT)
+    | FATOMIC -> ^(FATOMIC)
     | GLOBAL
     ;
 
 /* 6.7.5
  * Root: ALIGNAS
- * Child 0: TYPE or EXPR 
+ * Child 0: TYPE or EXPR
  * Child 1: typeName (if Child 0 is TYPE) or constantExpression
  *          (if Child 0 is EXPR)
  */
 alignmentSpecifier
-    : ALIGNAS LPAREN 
+    : ALIGNAS LPAREN
         ( typeName RPAREN
           -> ^(ALIGNAS TYPE typeName)
         | constantExpression RPAREN
           -> ^(ALIGNAS EXPR constantExpression)
         )
     ;
-	
+
 /* 6.7.6
  * Root: DECLARATOR
  * Child 0: pointer or ABSENT
@@ -832,7 +877,7 @@ declarator
 
 /* 6.7.6
  * Root: DIRECT_DECLARATOR
- * Child 0: directDeclaratorPrefix 
+ * Child 0: directDeclaratorPrefix
  * Children 1..: list of directDeclaratorSuffix (may be empty)
  */
 directDeclarator
@@ -846,7 +891,7 @@ directDeclarator
  * Tree: either an IDENTIFIER or a declarator.
  */
 directDeclaratorPrefix
-	: IDENTIFIER 
+	: IDENTIFIER
 		{
 			if ($DeclarationScope::isTypedef) {
 				$Symbols::types.add($IDENTIFIER.text);
@@ -860,7 +905,6 @@ directDeclaratorPrefix
 directDeclaratorSuffix
 	: directDeclaratorArraySuffix
 	| directDeclaratorFunctionSuffix
-
 	;
 
 /*
@@ -868,7 +912,7 @@ directDeclaratorSuffix
  * child 0: LSQUARE (for source information)
  * child 1: STATIC or ABSENT
  * child 2: TYPE_QUALIFIER_LIST
- * child 3: expression (array extent), 
+ * child 3: expression (array extent),
  *          "*" (unspecified variable length), or ABSENT
  * child 4: RSQUARE (for source information)
  */
@@ -897,7 +941,7 @@ directDeclaratorArraySuffix
  */
 directDeclaratorFunctionSuffix
 	: LPAREN
-	  ( parameterTypeList RPAREN 
+	  ( parameterTypeList RPAREN
 	    -> ^(FUNCTION_SUFFIX LPAREN parameterTypeList  RPAREN)
 	  | identifierList RPAREN
 	    -> ^(FUNCTION_SUFFIX LPAREN identifierList RPAREN)
@@ -921,9 +965,9 @@ assignmentExpression_opt
 	| assignmentExpression
 	;
 
-/* 6.7.6 
+/* 6.7.6
  * Root: POINTER
- * chilren: STAR
+ * children: STAR
  */
 pointer
     : pointer_part+ -> ^(POINTER pointer_part+)
@@ -946,17 +990,17 @@ typeQualifierList
     : typeQualifier+ -> ^(TYPE_QUALIFIER_LIST typeQualifier+)
     ;
 
-/* 6.7.6 
+/* 6.7.6
  * Root: PARAMETER_TYPE_LIST
  * child 0: parameterList (at least 1 parameter declaration)
  * child 1: ELLIPSIS or ABSENT
- * 
+ *
  * If the parameterTypeList occurs in a function prototype
  * (that is not part of a function definition), it defines
  * a new scope (a "function prototype scope").  If it occurs
- * in a function definition, it does not define a new scope. 
+ * in a function definition, it does not define a new scope.
  */
- 
+
 parameterTypeList
 	: {$Symbols::isFunctionDefinition}? parameterTypeListWithoutScope
 	| parameterTypeListWithScope
@@ -989,7 +1033,7 @@ parameterList
       -> ^(PARAMETER_LIST parameterDeclaration+)
     ;
 
-/* 6.7.6 
+/* 6.7.6
  * Root: PARAMETER_DECLARATION
  * Child 0: declarationSpecifiers
  * Child 1: declarator, or abstractDeclarator, or ABSENT
@@ -1010,12 +1054,11 @@ scope DeclarationScope;
 
 // this has non-LL* decision due to recursive rule invocations
 // reachable from alts 1,2...  E.g., both can start with pointer.
-
 declaratorOrAbstractDeclarator
 	:	(declarator)=> declarator
 	|	abstractDeclarator
 	;
-	
+
 
 /* 6.7.6
  * Root: IDENTIFIER_LIST
@@ -1046,7 +1089,7 @@ typeName
  * Root: ABSTRACT_DECLARATOR
  * Child 0. pointer (may be ABSENT).  Some number of *s with possible
  *   type qualifiers.
- * Child 1. directAbstractDeclarator (may be ABSENT). 
+ * Child 1. directAbstractDeclarator (may be ABSENT).
  */
 abstractDeclarator
     : pointer
@@ -1060,7 +1103,7 @@ abstractDeclarator
 /* 6.7.7
  *
  * Root: DIRECT_ABSTRACT_DECLARATOR
- * Child 0. abstract declarator or ABSENT.  
+ * Child 0. abstract declarator or ABSENT.
  * Children 1..: any number of direct abstract declarator suffixes
  *
  * Note that the difference between this and a directDeclarator
@@ -1076,7 +1119,7 @@ directAbstractDeclarator
     ;
 
 
-/* 6.7.8 
+/* 6.7.8
  * Root: TYPEDEF_NAME
  * Child 0: IDENTIFIER
  *
@@ -1087,14 +1130,14 @@ directAbstractDeclarator
  * This is perfectly legal: you can define a typedef twice
  * as long as both definitions are equivalent.  However,
  * the first definition causes foo to be entered into the type name
- * table, so when parsing the second definition, foo is 
+ * table, so when parsing the second definition, foo is
  * interpreted as a typedefName (a type specifier), and the
  * declaration would have empty declarator.   This is not
  * what you want, so you have to forbid it somehow.  I do this
  * by requiring that if you are "in" a typedef, a typedef name
  * cannot be immediately followed by a semicolon.  This is sound
  * because the C11 Standard requires at least one declarator
- * to be present in a typedef.
+ * to be present in a typedef.  See declarationSpecifierList.
  */
 typedefName
     : {isTypeName(input.LT(1).getText())}?
@@ -1191,286 +1234,21 @@ domainSpecifier
 	;
 
 
-
-/* A rule which returns either a declaration (including
- * a possible static assert declaration) or function
- * definition.
- *
- * The fundamental problem is that it is hard to tell
- * whether you are parsing a function definition until
- * you get to the left curly brace which begins the
- * function body.
- *
- * It is possible to do this in a simpler way using syntactic
- * predicates, but the performance penalty for doing so is
- * high.  This rule solves the problem with no syntactic
- * predicates or special look-ahead techniques.
- *
- * A rule with name that ends in "tail" consumes
- * some suffix of a declaration/definition and returns
- * the final result, i.e., either a declaration or
- * function definition tree.  These rules take
- * as input trees for the preceding components of 
- * the declaration.
- */
-declarationOrFunctionDef
-scope DeclarationScope;
-@init {
-  $DeclarationScope::isTypedef = false;
-}
-  :	s=declarationSpecifiers
-	( SEMI -> ^(DECLARATION $s ABSENT ABSENT)
-	| p=pointer_opt
-	  d=directDeclaratorTail[$s.tree, $p.tree]
-	  -> $d
-	)
-  |	staticAssertDeclaration
-  ;
-
-/* Matches a possible pointer portion of the declaration.
- * This is sequence of pointer_part.  Returns
- * either ABSENT or a tree of the form
- * ^(POINTER pointer_part+).
- */
-pointer_opt
-  :	-> ABSENT
-  |	pointer_part+ ->^(POINTER pointer_part+)
-  ;
-
-/* Mathes a possible initializer portion of a declaration.
- * That is an ASSIGN followed by an initializer.
- * Returns either ABSENT or the an initializer tree.
- */
-initializer_opt
-  :	-> ABSENT
-  |	ASSIGN i=initializer -> $i
-  ;
-
-
-identifierInDecl:
-	IDENTIFIER 
-	{ 
-			if ($DeclarationScope::isTypedef) {
-				$Symbols::types.add($IDENTIFIER.text);
-				//System.err.println("define type "+$IDENTIFIER.text);
-			}
-	}
-	-> ^(IDENTIFIER)
-  ;
-
-
-/* Consume the suffix of the declaration that begins
- * with the direct declarator.  Takes as input
- * the declaration specifier tree and the pointer
- * portion tree.  Returns the final result: a DECLARATION
- * or a FUNCTION_DEFINITION tree.
- */
-directDeclaratorTail[
-	Object declarationSpecifiers,
-	Object pointer]
-  :
-	i=identifierInDecl
-	( SEMI -> 
-	  ^(DECLARATION
-	    {$declarationSpecifiers} 
-	    ^(INIT_DECLARATOR_LIST 
-	      ^(INIT_DECLARATOR 
-	        ^(DECLARATOR {$pointer} ^(DIRECT_DECLARATOR $i))
-	        ABSENT)) // no initializer
-	    ABSENT) // no contract
-	| c=commaTail[declarationSpecifiers, pointer, $i.tree] -> $c
-	| e=equalsTail[declarationSpecifiers, pointer, $i.tree] -> $e
-	| a=arraySuffixTail[declarationSpecifiers, pointer, $i.tree] -> $a
-	| f=functionSuffixTail[declarationSpecifiers, pointer, $i.tree] -> $f
-	)
-  |	LPAREN d=declarator RPAREN
-	dd=suffixes_to_directDeclarator[$d.tree]
-	init=initializer_opt
-	( SEMI
-	  ->
-	  ^(DECLARATION
-	   {$declarationSpecifiers} 
-	   ^(INIT_DECLARATOR_LIST 
-	     ^(INIT_DECLARATOR 
-	       ^(DECLARATOR {$pointer} $dd)
-	       $init))
-	   ABSENT) // no contract
-	| (COMMA id+=initDeclarator)+ SEMI
-	  -> 
-	  ^(DECLARATION
-	   {$declarationSpecifiers} 
-	   ^(INIT_DECLARATOR_LIST 
-	     ^(INIT_DECLARATOR 
-	       ^(DECLARATOR {$pointer} $dd)
-	       $init)
-	     $id+)
-	   ABSENT) // no contract
-	)
-  ;
-
-/* Matches a possibly empty sequence of direct
- * declarator suffixes.  Takes as argument tree
- * for a directo declarator prefix.  Returns
- * a direct declarator tree formed from the
- * prefix and the suffixes. */
-suffixes_to_directDeclarator[Object prefix]
-  : 	s+=directDeclaratorSuffix+
-	-> ^(DIRECT_DECLARATOR {$prefix} $s+)
-  |	-> ^(DIRECT_DECLARATOR {$prefix})
-  ;
-
-arraySuffixTail[
-	Object declarationSpecifiers,
-	Object pointer,
-	Object identifier] :
-  a=directDeclaratorArraySuffix
-  d=directDeclaratorSuffixTail[declarationSpecifiers, pointer,
-    identifier, $a.tree, adaptor.create(ABSENT, "ABSENT")]
-  -> $d
-  ;
-
-
-functionSuffixTail[
-	Object declarationSpecifiers,
-	Object pointer,
-	Object identifier] :
-  f=directDeclaratorFunctionSuffix
-  c=contract_opt
-  ( dd=directDeclaratorSuffixTail[declarationSpecifiers, pointer,
-      identifier, $f.tree, $c.tree]
-    -> $dd
-  | d=declarationList_opt
-    body=compoundStatement
-    -> 
-    ^(FUNCTION_DEFINITION
-      {$declarationSpecifiers}
-      ^(DECLARATOR
-        {$pointer}
-        ^(DIRECT_DECLARATOR {$identifier} $f))
-      $d
-      $body
-      $c)
-  )
-  ;
-
-/* Takes trees for the declarationSpecifiers, pointer portion
- * of the declaration, and the declaration prefix.  Matches an
- * initialization: ASSIGN followd by initializer expression.
- * Returns the INIT_DECLARATOR tree formed by the given trees
- * and the new elements. */
-initializer_to_initDeclarator[
-	Object declarationSpecifiers,
-	Object pointer,
-	Object prefix]
-  :	ASSIGN init=initializer
-	->
-	  ^(INIT_DECLARATOR
-	    ^(DECLARATOR
-	      {$pointer}
-	      ^(DIRECT_DECLARATOR {$prefix}))
-	    $init)
-  ;
-
-/* Consumes the suffix of a declaration that begins
- * with the first '=' symbol.  Such a declaration
- * must be an ordinary declaration, not a function
- * definition.   Takes as input trees for the
- * declaration specifiers, pointer portion, and the
- * declaration prefix.  Returns the DECLARATION tree.
- */	
-equalsTail[
-	Object declarationSpecifiers,
-	Object pointer,
-	Object prefix]
-  :
-	i=initializer_to_initDeclarator[
-	  declarationSpecifiers, pointer, prefix]
-	idl=initDeclaratorList_extend[$i.tree]
-	SEMI
-	-> ^(DECLARATION {$declarationSpecifiers} $idl ABSENT)
-  ;
-
-
-comma_to_initDeclarator[Object pointer, Object prefix]
-  :	COMMA ->
-	^(INIT_DECLARATOR
-	  ^(DECLARATOR
-	    {$pointer}
-	    ^(DIRECT_DECLARATOR {$prefix}))
-	  ABSENT)
-  ;
-
-commaTail[
-	Object declarationSpecifiers,
-	Object pointer,
-	Object prefix]
-  :
-	id+=comma_to_initDeclarator[pointer, prefix]
-	id+=initDeclarator
-	(COMMA id+=initDeclarator)*
-	SEMI
-	->
-	^(DECLARATION
-	   {$declarationSpecifiers}
-	   ^(INIT_DECLARATOR_LIST $id+)
-	   ABSENT) // no contract
-  ;
-
-directDeclaratorSuffixTail[
-	Object declarationSpecifiers,
-	Object pointer,
-	Object identifier,
-	Object suffix,
-	Object contract]
-  :
-	dd=directDeclarator_extend[identifier, suffix]
-	id=initDeclarator_extend[pointer, $dd.tree]
-	idl=initDeclaratorList_extend[$id.tree]
-	SEMI 
-	-> ^(DECLARATION {$declarationSpecifiers} $idl {$contract})
-  ;
-
-directDeclarator_extend[
-	Object identifier,
-	Object suffix]
-  :
-	dds+=directDeclaratorSuffix+
-	-> ^(DIRECT_DECLARATOR {$identifier} {$suffix} $dds+)
-  |	-> ^(DIRECT_DECLARATOR {$identifier} {$suffix})
-  ;
-
-initDeclarator_extend[
-	Object pointer,
-	Object directDeclarator]
-  :
-	i=initializer_opt
-	-> ^(INIT_DECLARATOR
-	     ^(DECLARATOR {$pointer} {$directDeclarator}) $i)
-  ;
-	
-initDeclaratorList_extend[Object initDeclarator]
-  :	(COMMA d+=initDeclarator)+
-	-> ^(INIT_DECLARATOR_LIST {$initDeclarator} $d+)
-  |	-> ^(INIT_DECLARATOR_LIST {$initDeclarator})
-  ;
-
 /* ***** A.2.3: Statements ***** */
 
 /* 6.8 */
 statement
-    : labeledStatement
-    | compoundStatement
-    | expressionStatement
-    | selectionStatement
-    | iterationStatement
-    | jumpStatement
-    | pragma
-    | assumeStatement
-    | assertStatement
-    | whenStatement
-    | chooseStatement
-    | atomicStatement
-    | datomicStatement
+    : labeledStatement -> ^(STATEMENT labeledStatement)
+    | compoundStatement -> ^(STATEMENT compoundStatement)
+    | expressionStatement -> ^(STATEMENT expressionStatement)
+    | selectionStatement -> ^(STATEMENT selectionStatement)
+    | iterationStatement -> ^(STATEMENT iterationStatement)
+    | jumpStatement -> ^(STATEMENT jumpStatement)
+//    | pragma -> ^(STATEMENT pragma)
+    | whenStatement -> ^(STATEMENT whenStatement)
+    | chooseStatement -> ^(STATEMENT chooseStatement)
+    | atomicStatement -> ^(STATEMENT atomicStatement)
+    | datomicStatement -> ^(STATEMENT datomicStatement)
     ;
 
 statementWithScope
@@ -1534,26 +1312,6 @@ blockItemList
     : blockItem+ -> ^(BLOCK_ITEM_LIST blockItem+)
     ;
 
-/* 6.8.2 */
-
-
-/* A block item which can be called from the external world.
- * This requires a scope.
- */
-blockItemWithScope
-scope DeclarationScope;
-@init {
-  $DeclarationScope::isTypedef = false;
-}
-	: blockItem;
-
-/* A block item: declaration list, function definition,
- * or statement.
- */
-blockItem
-	: declarationOrFunctionDef
-	| statement
-	;
 
 
 /* 6.8.3
@@ -1620,14 +1378,14 @@ scope Symbols;
 	$Symbols::enumerationConstants = new HashSet<String>();
         $Symbols::isFunctionDefinition = false;
 }
-	: WHILE LPAREN expression RPAREN invariant_opt 
+	: WHILE LPAREN expression RPAREN invariant_opt
 	  s=statementWithScope
 	  -> ^(WHILE expression $s invariant_opt)
-	| DO s=statementWithScope WHILE LPAREN expression RPAREN 
+	| DO s=statementWithScope WHILE LPAREN expression RPAREN
 	  invariant_opt SEMI
 	  -> ^(DO $s expression invariant_opt)
-	| FOR LPAREN 
-	  ( 
+	| FOR LPAREN
+	  (
 	    d=declaration e1=expression_opt SEMI e2=expression_opt
 	    RPAREN i=invariant_opt s=statementWithScope
 	    -> ^(FOR $d $e1 $e2 $s $i)
@@ -1667,12 +1425,12 @@ typeName_opt
  *
  * Root: CONTINUE
  * Child 0: SEMI (for source information)
- * 
+ *
  * Root: BREAK
  * Child 0: SEMI (for source information)
  *
  * Root: RETURN
- * Child 0: expression or ABSENT 
+ * Child 0: expression or ABSENT
  * Child 1: SEMI (for source information)
  */
 jumpStatement
@@ -1683,54 +1441,190 @@ jumpStatement
     ;
 
 /*
+ * A pragma, which is represented as an identifier
+ * (the first token following # pragma), followed
+ * by a sequence of tokens.
+ *
  * Root: PRAGMA
  * child 0: IDENTIFIER (first token following # pragma)
  * child 1: TOKEN_LIST (chilren are list of tokens following identifier)
  * child 2: NEWLINE (character which ends the pragma)
  */
-pragma	:	PRAGMA IDENTIFIER pragmaBody NEWLINE
-		-> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST pragmaBody) NEWLINE)
+pragma
+    : PRAGMA IDENTIFIER NEWLINE
+        -> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST) NEWLINE)
+    | PRAGMA IDENTIFIER pragmaBody NEWLINE
+        -> ^(PRAGMA IDENTIFIER ^(TOKEN_LIST pragmaBody) NEWLINE)
 	;
 
+/* A pragma body, which is any sequence of tokens not
+ * containing NEWLINE, used in pragma rule.
+ */
 pragmaBody
-	:	(~ NEWLINE)*
+	:	(~ NEWLINE)+
 	;
 
-assumeStatement
-	:	ASSUME expression SEMI -> ^(ASSUME expression)
-	;
-	
-assertStatement
-	:	ASSERT conditionalExpression (COLON conditionalExpression (COMMA conditionalExpression)*)? SEMI -> ^(ASSERT conditionalExpression conditionalExpression*)
-	;
-
+/* CIVL-C $when statement.  This is a guarded command.
+ * Syntax: $when (expr) stmt, where expr is a boolean
+ * expression (guard).
+ *
+ * Root: WHEN
+ * Child 0: expression
+ * Child 1: statement
+ */
 whenStatement
 	:	WHEN LPAREN expression RPAREN statement
 		-> ^(WHEN expression statement)
 	;
 
+/* CIVL-C $choose statement.  This is a non-deterministic
+ * selection statement.  Syntax: $choose { stmt stmt ... }.
+ *
+ * Root: CHOOSE
+ * Children: 1 or more statement
+ */
 chooseStatement
-	:	CHOOSE LCURLY statement+ RCURLY 
+	:	CHOOSE LCURLY statement+ RCURLY
 		-> ^(CHOOSE statement+)
 	;
 
-// general atomic block $atomic{...}
+/* CIVL-C $atomic statement.  Syntax:
+ * $atomic stmt.
+ *
+ * Root: CIVLATOMIC
+ * Child 0: statement
+ */
 atomicStatement
 	:	CIVLATOMIC s=statementWithScope
 		-> ^(CIVLATOMIC $s)
 	;
 
-// deterministic atomic block $atom{...}
+/* CIVL-C $atom statement.  Syntax:
+ * $atom stmt.
+ *
+ * Root: CIVLATOM
+ * Child 0: statement
+ */
 datomicStatement
 	:	CIVLATOM s=statementWithScope
 		-> ^(CIVLATOM $s)
 	;
 
-/* ***** A.2.4: External Definitions ***** */
+/* 6.9.1
+ *
+ * Root: FUNCTION_DEFINITION
+ * Child 0: declarationSpecifiers
+ * Child 1: declarator
+ * Child 2: declarationList or ABSENT (formal parameters)
+ * Child 3: compound statement (body)
+ * Child 4: contract
+ */
+functionDefinition
+scope Symbols; // "function scope"
+@init {
+    $Symbols::types = new HashSet<String>();
+    $Symbols::enumerationConstants = new HashSet<String>();
+    $Symbols::isFunctionDefinition = true;
+}
+	: declarator
+	  contract
+	  declarationList_opt
+	  compoundStatement
+	  -> ^(FUNCTION_DEFINITION ^(DECLARATION_SPECIFIERS) declarator
+	       declarationList_opt compoundStatement contract
+	      )
+    | declarationSpecifiers
+	  declarator
+	  contract
+	  declarationList_opt
+	  compoundStatement
+	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
+	       declarationList_opt compoundStatement contract
+	      )
+	;
+
+
+/* 6.9.1
+ * Root: DECLARATION_LIST
+ * Children: declaration (any number)
+ */
+declarationList_opt
+	: declaration* -> ^(DECLARATION_LIST declaration*)
+	;
+
+/* An item in a CIVL-C contract.
+ *
+ * Root: REQUIRES or ENSURES
+ * Child: expression
+ */
+contractItem
+	: separationLogicItem
+    | porItem
+	;
+
+separationLogicItem
+    :
+      REQUIRES LCURLY expression RCURLY -> ^(REQUIRES expression RCURLY)
+	| ENSURES LCURLY expression RCURLY -> ^(ENSURES expression RCURLY)
+
+    ;
+porItem
+    :
+      DEPENDS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(DEPENDS expression? argumentExpressionList)
+    | GUARD (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(GUARD expression? argumentExpressionList)
+    | ASSIGNS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(ASSIGNS expression? argumentExpressionList)
+    | READS (LSQUARE expression RSQUARE)? LCURLY argumentExpressionList RCURLY -> ^(READS expression? argumentExpressionList )
+    ;
+
+/* A CIVL-C contract: sequence of 0 or more
+ * contract items.
+ *
+ * Root: CONTRACT
+ * Children: 0 or more contractItem
+ */
+contract
+	: contractItem* -> ^(CONTRACT contractItem*)
+	;
+
+
+/* A block item which can be called from the external world.
+ * This requires a scope.
+ */
+blockItemWithScope
+scope DeclarationScope;
+@init {
+  $DeclarationScope::isTypedef = false;
+}
+	: blockItem;
+
+/* A block item: a declaration, function definition,
+ * or statement.  Note that in C, a function definition
+ * is not a block item, but in CIVL-C it is.
+ */
+blockItem
+	:
+	  (declarator contract
+	   	  declarationList_opt LCURLY)=>
+	  functionDefinition
+    | (declarationSpecifiers declarator contract
+	   	  declarationList_opt LCURLY)=>
+	  functionDefinition
+	| declaration
+	| pragma
+    | statement
+	;
 
 /* 6.9
  * Root: TRANSLATION_UNIT
- * Children: externalDeclaration
+ * Children: blockItem
+ *
+ * Note that this accepts more than what C allows.
+ * C only allows "external declarations".  This rule
+ * allows any block item, and block items include
+ * function definitions as well as statements,
+ * declarations, etc.  These are permissible in the
+ * CIVL-C language.  To enforce C's stricter restrictions,
+ * do some checks on the tree after parsing completes.
  */
 translationUnit
 scope Symbols; // the global scope
@@ -1741,71 +1635,6 @@ scope DeclarationScope; // just to have an outermost one with isTypedef false
     $Symbols::isFunctionDefinition = false;
     $DeclarationScope::isTypedef = false;
 }
-	:	externalDeclaration* EOF
-		-> ^(TRANSLATION_UNIT externalDeclaration*)
-	;
-
-/* 6.9
- * Need to look ahead to distinguish function definition from
- * a declaration.  As soon as you see the "{", you know you 
- * are in a function definition.
- */
-externalDeclaration
-scope DeclarationScope;
-@init {
-  $DeclarationScope::isTypedef = false;
-}
-	: declarationOrFunctionDef
-	| pragma
-	| assumeStatement
-	| assertStatement
-	;
-
-
-/* 6.9.1
- *
- *
- * Root: FUNCTION_DEFINITION
- * Child 0: declarationSpecifiers
- * Child 1: declarator
- * Child 2: declarationList or ABSENT (formal parameters)
- * Child 3: compound statement (body)
- * Child 4: contract or ABSENT (code contract)
- */
- 
- /*
-functionDefinition
-scope Symbols; // "function scope"
-@init {
-    $Symbols::types = new HashSet<String>();
-    $Symbols::enumerationConstants = new HashSet<String>();
-    $Symbols::isFunctionDefinition = true;
-}
-	: declarationSpecifiers
-	  declarator
-	  contract_opt
-	  declarationList_opt
-	  compoundStatement
-	  -> ^(FUNCTION_DEFINITION declarationSpecifiers declarator
-	       declarationList_opt compoundStatement contract_opt
-	      )
-	;
-
-*/
-
-/* 6.9.1
- * Root: DECLARATION_LIST
- * Children: declaration (any number)
- */
-declarationList_opt
-	: declaration* -> ^(DECLARATION_LIST declaration*)
-	;
-
-contractItem
-	: REQUIRES expression SEMI -> ^(REQUIRES expression)
-	| ENSURES expression SEMI -> ^(ENSURES expression)
-	;
-
-contract_opt
-	: contractItem* -> ^(CONTRACT contractItem*)
+	:	blockItem* EOF
+		-> ^(TRANSLATION_UNIT blockItem*)
 	;

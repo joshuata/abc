@@ -7,11 +7,11 @@ options
 	output=AST;
 }
 
-import CivlCParser;
+import BaseCParser;
 
 tokens
 {
-	IDENTIFIER_LIST;	
+	IDENTIFIER_LIST;
 	PARALLEL_FOR;
 	PARALLEL_SECTIONS;
 	UNIQUE_FOR;
@@ -22,11 +22,15 @@ tokens
 
 /* ANTLR 3.5 doesn't allow redefinition of headers in composite grammars.
 Our solution for this is: add the header (package, imported package)
-to the generated java file in ant.
+to the generated java file in ant. */
 @header
 {
-package edu.udel.cis.vsl.abc.parse.common;
-}*/
+package edu.udel.cis.vsl.abc.front.c.parse.common;
+
+import java.util.Set;
+import java.util.HashSet;
+import edu.udel.cis.vsl.abc.front.c.parse.IF.RuntimeParseException;
+}
 
 @members {
 	@Override
