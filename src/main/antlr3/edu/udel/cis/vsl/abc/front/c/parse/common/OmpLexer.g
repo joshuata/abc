@@ -2,7 +2,7 @@ lexer grammar OmpLexer;
 
 options 
 {
-     tokenVocab=BaseCParser;
+     tokenVocab=PreprocessorParser;
 }
 
 //import PreprocessorLexer;
