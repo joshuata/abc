@@ -72,7 +72,11 @@ public class CommonSource implements Source {
 
 	@Override
 	public String getContent(boolean abbreviated) {
-		return TokenUtils.contentOfRange(firstToken, lastToken, abbreviated);
+		return getLocation(abbreviated) + "\"" + getSource() + "\"";
+	}
+
+	public String getSource() {
+		return TokenUtils.contentOfRange(firstToken, lastToken);
 	}
 }
 

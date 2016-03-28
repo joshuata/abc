@@ -76,4 +76,5 @@ public interface Source {
 
 	String getContent(boolean abbreviated);
 
+	String getSource();
 }

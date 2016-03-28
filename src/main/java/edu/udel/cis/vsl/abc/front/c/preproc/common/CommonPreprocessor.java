@@ -27,6 +27,9 @@ import edu.udel.cis.vsl.abc.token.IF.CTokenSource;
 import edu.udel.cis.vsl.abc.token.IF.Macro;
 import edu.udel.cis.vsl.abc.token.IF.SourceFile;
 import edu.udel.cis.vsl.abc.util.IF.ANTLRUtils;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorLexer;
+import edu.udel.cis.vsl.abc.front.c.preproc.common.PreprocessorParser;
+
 
 /**
  * The class provides easy access to all services exported by the preproc module

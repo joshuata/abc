@@ -125,9 +125,8 @@ public class FrontEnd {
 	/**
 	 * Creates a {@link Preprocessor} based on the specified system and include
 	 * path lists. The new {@link Preprocessor} can be used to preprocess source
-	 * files repeatedly. The method {@link Preprocessor#outputTokenSource(File)}
-	 * is used to obtain the stream of tokens emanating from the preprocessor.
-	 * 
+	 * files repeatedly.
+	 *
 	 * @return the new Preprocessor
 	 */
 	public Preprocessor getPreprocessor() {
@@ -614,7 +613,7 @@ public class FrontEnd {
 	 * prints file scope functions that are used but no definitions are ever
 	 * provided
 	 * 
-	 * @param program
+	 * @param program The program
 	 */
 	private void printUnknownFunctions(PrintStream out, Program program) {
 		SequenceNode<BlockItemNode> root = program.getAST().getRootNode();
@@ -630,11 +629,10 @@ public class FrontEnd {
 
 					if (!functionNames.contains(functionName)) {
 						if (i == 0)
-							System.out
-									.println("==== functions without definition ====");
+							out.println("==== functions without definition ====");
 						else
-							System.out.print(",");
-						System.out.print(functionName);
+							out.print(",");
+						out.print(functionName);
 						functionNames.add(functionName);
 						i++;
 					}

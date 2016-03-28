@@ -162,9 +162,7 @@ public class TokenUtils {
 		return result;
 	}
 	
-	public static String contentOfRange(CToken first, CToken last,
-			boolean abbreviated) {
-		String result = summarizeRangeLocation(first, last, abbreviated);
+	public static String contentOfRange(CToken first, CToken last) {
 		String excerpt = "";
 //		int tokenCount = 0;
 		CToken token = first;
@@ -179,15 +177,14 @@ public class TokenUtils {
 				excerpt += " ... ";
 			excerpt += last.getText();
 		}
-		excerpt = quoteText(excerpt);
-		result = result + " " + excerpt;
+		excerpt = escapeText(excerpt);
 		{ // experimental
 			Formation formation = first.getFormation();
 
 			if (formation != null)
-				result += formation.suffix();
+				excerpt += formation.suffix();
 		}
-		return result;
+		return excerpt;
 	}
 
 	/**
@@ -200,18 +197,28 @@ public class TokenUtils {
 	 */
 	public static String quotedText(Token token) {
 		String txt = token.getText();
-
 		if (txt != null)
 			return quoteText(txt);
 		return "<no text>";
 	}
 
+	public static String escapedText(Token token) {
+		String txt = token.getText();
+		if (txt != null)
+			return escapeText(txt);
+		return "<no text>";
+	}
+
 	private static String quoteText(String text) {
+		return "\"" + escapeText(text) + "\"";
+	}
+
+	private static String escapeText(String text) {
 		String txt = text.replaceAll("\n", "\\\\n");
 
 		txt = txt.replaceAll("\r", "\\\\r");
 		txt = txt.replaceAll("\t", "\\\\t");
-		return "\"" + txt + "\"";
+		return txt;
 	}
 
 	public static TokenSource makeTokenSourceFromList(CToken first) {
